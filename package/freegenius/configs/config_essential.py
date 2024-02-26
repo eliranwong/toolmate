@@ -47,7 +47,7 @@ defaultSettings = (
     ('autoUpgrade', True),
     ('chatbot', 'chatgpt'),
     ('ollamaDefaultModel', 'starling-lm'),
-    ('customTrayCommands', ['mistral', 'llama2', 'gemma7b', 'llava']),
+    ('customTrayCommands', ['starling-lm', 'mistral', 'llama2', 'codellama', 'llava']),
     ('chatGPTApiModel', 'gpt-3.5-turbo'),
     ('chatGPTApiMaxTokens', 4000),
     ('chatGPTApiMinTokens', 256),

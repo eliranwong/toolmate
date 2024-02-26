@@ -280,26 +280,54 @@ class FreeGenius:
                 callEntry = f"[CALL_{i}]"
                 if not callEntry in config.inputSuggestions:
                     config.inputSuggestions.append(callEntry)
+        # update freeGeniusActionPrompt
+        self.freeGeniusActionPrompt = self.formulateFreeGeniusActionPrompt()
+        if config.developer:
+            import pprint
+            pprint.pprint(self.freeGeniusActionPrompt)
 
     def formulateFreeGeniusActionPrompt(self):
+        # actions
         actions = ""
         for key, value in config.freeGeniusActions.items():
-            action = """  - "{0}": {1}
-    - To choose the "{0}" action, Assistant should respond like so:
-{2}"action": "{0}"{3}
+            actions += f"""\n  * action: '{key}'\n    - use case: {value}\n"""
+            # tested & workable alternative:
+#            actions += """  - "{0}": {1}
+#    - To choose the "{0}" action, Assistant should respond like so:
+#{2}"action": "{0}"{3}
+#
+#""".format(key, value, "{", "}")
+        actions += f"""\n  * action: 'other_request'\n    - use case: all the actions listed above are not relevant to the original request\n"""
+#        actions += """  - "other_request": Useful for when all the actions listed above are not relevant to the original request.
+#    - To choose the "other_request" action, Assistant should respond like so:
+#{"action": "other_request"}"""
+        
+        # examples
+        examples = """Here are some past examples of Assistant responding to the User:
 
-""".format(key, value, "{", "}")
-            actions += f"""\n  * action: '{key}'\n    - description: {value}\n"""
-        actions += """  - "other_request": Useful for when all the actions listed above are not relevant to the original request.
-    - To choose the "other_request" action, Assistant should respond like so:
-{"action": "other_request"}
+User: Hello! How are you today?
+Assistant: {"action": "other_request"}
+""" if config.freeGeniusActionExamples else ""
 
-"""
+        for key, value in config.freeGeniusActionExamples.items():
+            examples += "\n"
+            for i in value:
+                examples += """User: {0}
+Assistant: {1}"action": "{2}"{3}
+""".format(i, "{", key, "}")
+            examples += "\n"
+
+        if examples:
+            examples += """
+User: Thanks, Bye!
+Assistant: {"action": "other_request"}"""
+
         return f"""Assistant, an expert JSON builder, is able choose an action to resolve User's request by responding with a JSON string that contains one parameter "action".
 
 Actions available to Assistant are:
-
 {actions}
+
+{examples}
 
 Choose an action and respond with JSON string that contains one single parameter "action".
 """
@@ -760,7 +788,8 @@ Choose an action and respond with JSON string that contains one single parameter
         config.chatGPTApiAvailableFunctions[name] = method
         config.freeGeniusActions[name] = signature["description"]
         config.freeGeniusActionParameters[name] = signature["parameters"]["properties"]
-        config.freeGeniusActionExamples[name] = examples
+        if examples: # optional
+            config.freeGeniusActionExamples[name] = examples
 
     # call a specific function and return messages
     def runFunction(self, messages, functionSignatures, function_name):
@@ -872,9 +901,6 @@ Choose an action and respond with JSON string that contains one single parameter
             function_args = json.loads(func_arguments)
             function_response = fuction_to_call(function_args)
         return function_response
-
-    def runFreeCompletion(self):
-        ...
 
     def runCompletion(self, thisMessage, noFunctionCall=False):
         self.functionJustCalled = False
@@ -2063,7 +2089,6 @@ My writing:
                         #self.print(f"calling function '{config.runSpecificFuntion}' ...")
                         print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Calling function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{config.runSpecificFuntion}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
                     fineTunedUserInput = re.sub(specialEntryPattern, "", fineTunedUserInput)
-                    #config.currentMessages.append({"role": "user", "content": self.formulateFreeGeniusActionPrompt(fineTunedUserInput)})
 
                     # force loading internet searches
                     if config.loadingInternetSearches == "always":
@@ -2078,11 +2103,9 @@ My writing:
                     # ollama
                     # check for intended actions
                     completion = ollama.generate(
-                        #model=config.ollamaDefaultModel,
-                        model="starling-lm",
-                        #messages=config.currentMessages,
+                        model=config.ollamaDefaultModel,
                         prompt=fineTunedUserInput,
-                        system=self.formulateFreeGeniusActionPrompt(),
+                        system=self.freeGeniusActionPrompt,
                         stream=False,
                         options=Options(
                             temperature=config.llmTemperature,
@@ -2090,17 +2113,24 @@ My writing:
                         format="json",
                     )
                     action = json.loads(completion["response"])["action"]
-                    print(action)
                     
                     # take action
-                    #if action == "other_request":
-                    if True == False:
+                    if action in ("python_qa", "other_request"):
+                        # update message chain
+                        config.currentMessages.append({"role": "user", "content": fineTunedUserInput})
                         # start spinning
                         config.stop_event = threading.Event()
                         config.spinner_thread = threading.Thread(target=self.spinning_animation, args=(config.stop_event,))
                         config.spinner_thread.start()
 
-                        completion = self.runFreeCompletion(config.currentMessages)
+                        completion = ollama.chat(
+                            model=config.ollamaDefaultModel,
+                            messages=config.currentMessages,
+                            stream=True,
+                            options=Options(
+                                temperature=config.llmTemperature,
+                            ),
+                        )
                         # stop spinning
                         self.runPython = True
                         self.stopSpinning()
@@ -2108,7 +2138,7 @@ My writing:
                         # Create a new thread for the streaming task
                         streamingWordWrapper = StreamingWordWrapper()
                         streaming_event = threading.Event()
-                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True))
+                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion))
                         # Start the streaming thread
                         self.streaming_thread.start()
 

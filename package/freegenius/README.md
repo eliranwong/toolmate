@@ -8,3 +8,7 @@ a wide range of tasks. It's designed to learn, adapt, and grow with the user, of
 # Progress
 
 ... in progress ...
+
+* preparing core features: action screening & calling
+
+not in production yet

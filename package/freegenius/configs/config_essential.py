@@ -150,6 +150,10 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "freeGeniusActions",
+    "freeGeniusActionExamples",
+    "freeGeniusActionParameters",
+    "freeGeniusActionMethods",
     "setBasicConfigDone",
     "google_cloud_credentials_file",
     "actionHelp",

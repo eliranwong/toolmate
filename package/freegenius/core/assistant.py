@@ -243,8 +243,9 @@ class FreeGenius:
         config.chatGPTApiFunctionSignatures = {}
         config.chatGPTApiAvailableFunctions = {}
         config.freeGeniusActions = {}
-        config.freeGeniusActionParameters = {}
         config.freeGeniusActionExamples = {}
+        config.freeGeniusActionParameters = {}
+        config.freeGeniusActionMethods = {}
 
         pluginFolder = os.path.join(config.letMeDoItAIFolder, "plugins")
         if self.storageDir:
@@ -280,57 +281,10 @@ class FreeGenius:
                 callEntry = f"[CALL_{i}]"
                 if not callEntry in config.inputSuggestions:
                     config.inputSuggestions.append(callEntry)
-        # update freeGeniusActionPrompt
-        self.freeGeniusActionPrompt = self.formulateFreeGeniusActionPrompt()
+        # update actionScreeningPrompt
+        self.actionScreeningPrompt = self.getActionScreeningPrompt()
         if config.developer:
-            import pprint
-            pprint.pprint(self.freeGeniusActionPrompt)
-
-    def formulateFreeGeniusActionPrompt(self):
-        # actions
-        actions = ""
-        for key, value in config.freeGeniusActions.items():
-            actions += f"""\n  * action: '{key}'\n    - use case: {value}\n"""
-            # tested & workable alternative:
-#            actions += """  - "{0}": {1}
-#    - To choose the "{0}" action, Assistant should respond like so:
-#{2}"action": "{0}"{3}
-#
-#""".format(key, value, "{", "}")
-        actions += f"""\n  * action: 'other_request'\n    - use case: all the actions listed above are not relevant to the original request\n"""
-#        actions += """  - "other_request": Useful for when all the actions listed above are not relevant to the original request.
-#    - To choose the "other_request" action, Assistant should respond like so:
-#{"action": "other_request"}"""
-        
-        # examples
-        examples = """Here are some past examples of Assistant responding to the User:
-
-User: Hello! How are you today?
-Assistant: {"action": "other_request"}
-""" if config.freeGeniusActionExamples else ""
-
-        for key, value in config.freeGeniusActionExamples.items():
-            examples += "\n"
-            for i in value:
-                examples += """User: {0}
-Assistant: {1}"action": "{2}"{3}
-""".format(i, "{", key, "}")
-            examples += "\n"
-
-        if examples:
-            examples += """
-User: Thanks, Bye!
-Assistant: {"action": "other_request"}"""
-
-        return f"""Assistant, an expert JSON builder, is able choose an action to resolve User's request by responding with a JSON string that contains one parameter "action".
-
-Actions available to Assistant are:
-{actions}
-
-{examples}
-
-Choose an action and respond with JSON string that contains one single parameter "action".
-"""
+            pprint.pprint(self.actionScreeningPrompt)
 
     # Voice Typing Language
     def setSpeechToTextLanguage(self):
@@ -783,13 +737,14 @@ Choose an action and respond with JSON string that contains one single parameter
         self.addFunctionCall(name="python_qa", signature=functionSignature, method=python_qa)
 
     # integrate function call plugin
-    def addFunctionCall(self, name: str, signature: dict, method: Callable[[dict], str], examples=[]):
-        config.chatGPTApiFunctionSignatures[name] = signature
-        config.chatGPTApiAvailableFunctions[name] = method
+    def addFunctionCall(self, name: str, signature: dict, method: Callable[[dict], str], examples: list[str]=[]):
+        #config.chatGPTApiFunctionSignatures[name] = signature
+        #config.chatGPTApiAvailableFunctions[name] = method
         config.freeGeniusActions[name] = signature["description"]
-        config.freeGeniusActionParameters[name] = signature["parameters"]["properties"]
         if examples: # optional
             config.freeGeniusActionExamples[name] = examples
+        config.freeGeniusActionParameters[name] = signature["parameters"]["properties"]
+        config.freeGeniusActionMethods[name] = method
 
     # call a specific function and return messages
     def runFunction(self, messages, functionSignatures, function_name):
@@ -2102,20 +2057,12 @@ My writing:
                     #completion = self.runCompletion(config.currentMessages, noFunctionCall)
                     # ollama
                     # check for intended actions
-                    completion = ollama.generate(
-                        model=config.ollamaDefaultModel,
-                        prompt=fineTunedUserInput,
-                        system=self.freeGeniusActionPrompt,
-                        stream=False,
-                        options=Options(
-                            temperature=config.llmTemperature,
-                        ),
-                        format="json",
-                    )
-                    action = json.loads(completion["response"])["action"]
+                    action = self.screenActions(fineTunedUserInput)
+                    if not action:
+                        continue
                     
                     # take action
-                    if action in ("python_qa", "other_request"):
+                    if action in ("python_qa", "other_request") and not action in config.freeGeniusActionMethods:
                         # update message chain
                         config.currentMessages.append({"role": "user", "content": fineTunedUserInput})
                         # start spinning
@@ -2148,8 +2095,30 @@ My writing:
                         # when streaming is done or when user press "ctrl+q"
                         self.streaming_thread.join()
                     else:
+                        # action in config.freeGeniusActionMethods
                         if config.developer:
                             self.print3(f"calling action: {action}")
+                        parameters = self.extractActionParameters(config.currentMessages, fineTunedUserInput, action)
+                        if config.developer:
+                            self.print2("Action Parameters:")
+                            pprint.pprint(parameters)
+                        if parameters:
+                            #response = config.freeGeniusActionMethods[action](parameters)
+                            response = ""
+                            if response:
+                                if response == "[INVALID]":
+                                    # generate chat content
+                                    ...
+                                else:
+                                    # update message chain
+                                    # further conversation
+                                    ...
+                            elif config.developer:
+                                # a simple notification without further chat generation
+                                self.print2("Action completed!")
+                        else:
+                            # generate chat content
+                            ...
 
                 # error codes: https://platform.openai.com/docs/guides/error-codes/python-library-error-types
                 except openai.APIError as e:
@@ -2181,14 +2150,106 @@ My writing:
                     self.saveChat(config.currentMessages)
                     storagedirectory, config.currentMessages = startChat()
 
-    def launchChatbot(self, chatbot, fineTunedUserInput):
+    def getActionScreeningPrompt(self):
+        # actions
+        actions = ""
+        for key, value in config.freeGeniusActions.items():
+            actions += f"""\n  * action: '{key}'\n    - use case: {value}\n"""
+        # use case: chat instead or function
+        actions += f"""\n  * action: 'other_request'\n    - use case: all the actions listed above are not relevant to User's request\n"""
+        
+        # examples
+        examples = """Here are some past examples of Assistant responding to the User:
+
+User: Hello! How are you today?
+Assistant: {"action": "other_request"}
+"""
+
+        for key, value in config.freeGeniusActionExamples.items():
+            examples += "\n"
+            for i in value:
+                examples += """User: {0}
+Assistant: {1}"action": "{2}"{3}
+""".format(i, "{", key, "}")
+            examples += "\n"
+
+        examples += """
+User: Tell me more about it.
+Assistant: {"action": "other_request"}
+User: Thanks, Bye!
+Assistant: {"action": "other_request"}"""
+
+        return f"""Assistant, an expert JSON builder, is able choose an action to resolve User's request by responding with a JSON string that contains one key "action".
+
+Actions available to Assistant are:
+{actions}
+
+{examples}
+
+Choose an action and respond with JSON string that contains one single key, "action".
+"""
+
+    def screenActions(self, userInput) -> str:
+        completion = ollama.generate(
+            model=config.ollamaDefaultModel,
+            prompt=userInput,
+            system=self.actionScreeningPrompt,
+            format="json",
+            stream=False,
+            options=Options(
+                temperature=config.llmTemperature,
+            ),
+        )
+        # action
+        return json.loads(completion["response"])["action"]
+
+    def extractActionParameters(self, ongoingMessages, userInput, action) -> dict:
+        def getKeyDescriptions(parameters) -> str:
+            descriptions = [f"""* "{parameter}" - {parameters[parameter]["description"]}""" for parameter in parameters]
+            return "\n".join(descriptions)
+
+        parameters = config.freeGeniusActionParameters[action]
+        # create a template
+        template = {parameter: "" if parameters[parameter]["type"] == "string" else [] for parameter in parameters} # support string and list/array first, more later
+        # prompt
+        prompt = f"""Use this template:
+
+{template}
+
+Based on my request, generate a JSON string that contains {len(parameters)} keys: "{'", "'.join(parameters.keys())}"
+Key descriptions:
+{getKeyDescriptions(parameters)}
+
+Here is my request:
+
+{userInput}"""
+
+        completion = ollama.chat(
+            model=config.ollamaDefaultModel,
+            messages=[
+                *ongoingMessages,
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+            format="json",
+            stream=False,
+            options=Options(
+                temperature=config.llmTemperature,
+            ),
+        )
+        # parameters
+        return json.loads(completion["message"]["content"])
+
+    def launchChatbot(self, chatbot, userInput):
         if config.isTermux:
             chatbot = "chatgpt"
         chatbots = {
-            "chatgpt": lambda: ChatGPT().run(fineTunedUserInput),
-            "geminipro": lambda: GeminiPro(temperature=config.llmTemperature).run(fineTunedUserInput),
-            "palm2": lambda: Palm2().run(fineTunedUserInput, temperature=config.llmTemperature),
-            "codey": lambda: Codey().run(fineTunedUserInput, temperature=config.llmTemperature),
+            "chatgpt": lambda: ChatGPT().run(userInput),
+            "geminipro": lambda: GeminiPro(temperature=config.llmTemperature).run(userInput),
+            "palm2": lambda: Palm2().run(userInput, temperature=config.llmTemperature),
+            "codey": lambda: Codey().run(userInput, temperature=config.llmTemperature),
         }
         if chatbot in chatbots:
             chatbots[chatbot]()

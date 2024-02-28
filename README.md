@@ -11,4 +11,6 @@ a wide range of tasks. It's designed to learn, adapt, and grow with the user, of
 
 * preparing core features: action screening & calling
 
+* testing multi-step actions
+
 not in production yet

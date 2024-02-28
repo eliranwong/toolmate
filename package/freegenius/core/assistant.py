@@ -2057,7 +2057,7 @@ My writing:
                     #completion = self.runCompletion(config.currentMessages, noFunctionCall)
                     # ollama
                     # check for intended actions
-                    action = self.screenActions(fineTunedUserInput)
+                    action = self.getResponseDict(prompt=fineTunedUserInput, system=self.actionScreeningPrompt)["action"]
                     if not action:
                         continue
                     
@@ -2097,14 +2097,16 @@ My writing:
                     else:
                         # action in config.freeGeniusActionMethods
                         if config.developer:
-                            self.print3(f"calling action: {action}")
+                            self.print3(f"Calling action: {action}")
                         parameters = self.extractActionParameters(config.currentMessages, fineTunedUserInput, action)
                         if config.developer:
                             self.print2("Action Parameters:")
                             pprint.pprint(parameters)
                         if parameters:
-                            #response = config.freeGeniusActionMethods[action](parameters)
+                            self.print3(f"Running action: {action}")
+                            # block response for now for testing
                             response = ""
+                            # response = config.freeGeniusActionMethods[action](parameters)
                             if response:
                                 if response == "[INVALID]":
                                     # generate chat content
@@ -2115,7 +2117,7 @@ My writing:
                                     ...
                             elif config.developer:
                                 # a simple notification without further chat generation
-                                self.print2("Action completed!")
+                                self.print3("Action completed!")
                         else:
                             # generate chat content
                             ...
@@ -2189,21 +2191,26 @@ Actions available to Assistant are:
 Choose an action and respond with JSON string that contains one single key, "action".
 """
 
-    def screenActions(self, userInput) -> str:
+    def getResponseDict(self, *args, **kwargs) -> dict:
+        """
+        Get structured response in a dictionary
+        """
         completion = ollama.generate(
             model=config.ollamaDefaultModel,
-            prompt=userInput,
-            system=self.actionScreeningPrompt,
             format="json",
             stream=False,
             options=Options(
                 temperature=config.llmTemperature,
             ),
+            *args,
+            **kwargs,
         )
-        # action
-        return json.loads(completion["response"])["action"]
+        return json.loads(completion["response"])
 
     def extractActionParameters(self, ongoingMessages, userInput, action) -> dict:
+        """
+        Extract action parameters
+        """
         def getKeyDescriptions(parameters) -> str:
             descriptions = [f"""* "{parameter}" - {parameters[parameter]["description"]}""" for parameter in parameters]
             return "\n".join(descriptions)
@@ -2216,11 +2223,11 @@ Choose an action and respond with JSON string that contains one single key, "act
 
 {template}
 
-Based on my request, generate a JSON string that contains {len(parameters)} keys: "{'", "'.join(parameters.keys())}"
+Based on my request / query, generate a JSON string that contains {len(parameters)} keys: "{'", "'.join(parameters.keys())}"
 Key descriptions:
 {getKeyDescriptions(parameters)}
 
-Here is my request:
+Here is my request / query:
 
 {userInput}"""
 
@@ -2240,7 +2247,26 @@ Here is my request:
             ),
         )
         # parameters
-        return json.loads(completion["message"]["content"])
+        output = json.loads(completion["message"]["content"])
+        # final check below
+        if "code" in output and not output["code"]:
+            codeDescription = parameters["code"]["description"]
+            template = {
+                "code": ""
+            }
+            system = f"""Use this template:
+
+{template}
+
+To generate a JSON that contains {len(template)} key, "code", based on my request.
+"code" is the requested python code.
+
+Remember, give me the code only in your response, without extra comment or information."""
+            if config.developer:
+                self.print3(f"""Code generation: {codeDescription}""")
+            codeOutput = self.getResponseDict(prompt=f"""{codeDescription}\n\nHere is my request / query:\n\n{userInput}""", system=system).get("code", "")
+            output["code"] = codeOutput
+        return output
 
     def launchChatbot(self, chatbot, userInput):
         if config.isTermux:

@@ -6,7 +6,7 @@ As with [LetMeDoIt AI](https://github.com/eliranwong/letmedoit), FreeGenius AI i
 
 # Beyond LetMeDoIt AI
 
-The genesis of this project stems from our aspiration to augment the capabilities of LetMeDoIt AI significantly.
+The genesis of this project stems from our aspiration to augment the capabilities of [LetMeDoIt AI](https://github.com/eliranwong/letmedoit) significantly.
 
 [LetMeDoIt AI](https://github.com/eliranwong/letmedoit) boasts advanced functionalities in both conversational interaction and task execution. However, its fundamental operations rely extensively on OpenAI's function calling capabilities. This reliance has led to a variety of user requests, including:
 
@@ -43,7 +43,7 @@ Challenges in Using Function Calling Features Without an OpenAI API Key:
 
 In essence, no existing solution matches the capabilities of OpenAI's function calling feature. There is a clear need for an innovative and efficient method to implement function calling features on standard hardware. After extensive experimentation and overcoming numerous challenges, the author has developed a new approach:
 
-This novel strategy involves breaking down the function calling process into several distinct steps:
+This novel strategy involves breaking down the function calling process into several distinct steps for multiple generations:
 
 1. Intent Screening
 2. Action Selection
@@ -55,7 +55,7 @@ This methodology has been found to work effectively with freely available open-s
 
 [Code examples will be shared by the author when possible]
 
-We invite further discussion and contributions to refine and enhance this strategy.
+We invite [further discussion and contributions](https://github.com/eliranwong/freegenius/issues) to refine and enhance this strategy.
 
 # Welcome Contributions
 

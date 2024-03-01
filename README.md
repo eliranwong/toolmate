@@ -18,7 +18,7 @@ The genesis of this project stems from our aspiration to augment the capabilitie
 
 The development of this project aims to fulfill these user requests, thereby significantly enhancing the LetMeDoIt AI suite by incorporating these features and innovations.
 
-Beyond responding to user requests, the creator of LetMeDoIt AI harbors a vision that, in the near future, everyone will have access to a customisable, tailor-made and personal AI assistant, reminiscent of Iron Man's Jarvis. It is crucial that these personal AI assistants are compatible with standard computer hardware, removing the barrier of requiring expensive technological investments from users. This initiative is geared towards constructing FreeGenius AI that champions compatibility with readily available and affordable computing hardware.
+Beyond responding to user requests, the creator of LetMeDoIt AI harbors a vision that, in the near future, everyone will have access to a customizable, tailor-made and personal AI assistant, reminiscent of Iron Man's Jarvis. It is crucial that these personal AI assistants are compatible with standard computer hardware, removing the barrier of requiring expensive technological investments from users. This initiative is geared towards constructing FreeGenius AI that champions compatibility with readily available and affordable computing hardware.
 
 # Goals
 

@@ -34,6 +34,12 @@ The author aims to equip FreeGenius AI, as an AI suite that is able to:
 
 # Approach to Run Function Calling Equivalent Features Offline with Common Hardwares
 
+Currently, LetMeDoIt AI core features heavily reply on the strength of OpenAI function calling features, which offer abilities:
+
+- to organize structured data from unstructured query
+- to accept multiple functions in a single guery
+- to automatically choose an appropriate functions from numerouse available functions specified, by using the "auto" option.
+
 Challenges in Using Function Calling Features Without an OpenAI API Key:
 
 - Many popular open-source AI models lack support for function calling capabilities.

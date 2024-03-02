@@ -79,6 +79,6 @@ Support link: https://www.paypal.me/letmedoitai
 
 * preparing core features: action screening & calling
 
-* testing multi-step actions
+* testing action selection among 35 available functions in one go
 
 not in production yet

@@ -22,7 +22,7 @@ with open(os.path.join(package, "requirements.txt"), "r") as fileObj:
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name=package,
-    version="0.0.08",
+    version="0.0.10",
     python_requires=">=3.8",
     description="FreeGenius AI, a FREE, LOCAL, OFFLINE & HIGHLY CUSTOMIZABLE AI suite that supports numerous open-source LLMs, with optional integration with AutoGen agents, OpenAI API, Google Gemini Pro and unlimited plugins.",
     long_description=long_description,

@@ -1,6 +1,7 @@
 from letmedoit import config
 import letmedoit.config
 import openai, threading, os, time, traceback, re, subprocess, json, pydoc, textwrap, shutil, datetime, pprint
+from openai import OpenAI
 from pathlib import Path
 import pygments, ollama
 from ollama import Options
@@ -48,6 +49,10 @@ class FreeGenius:
         self.runPlugins()
 
     def setup(self):
+        self.oLllamaClient = OpenAI( 
+            base_url = 'http://localhost:11434/v1', 
+            api_key='ollama', # required, but unused 
+        )
         self.models = list(SharedUtil.tokenLimits.keys())
         config.divider = self.divider = "--------------------"
         self.runPython = True
@@ -243,7 +248,6 @@ class FreeGenius:
         config.chatGPTApiFunctionSignatures = {}
         config.chatGPTApiAvailableFunctions = {}
         config.freeGeniusActions = {}
-        config.freeGeniusActionExamples = {}
         config.freeGeniusActionParameters = {}
         config.freeGeniusActionMethods = {}
 
@@ -272,7 +276,8 @@ class FreeGenius:
                     if not run:
                         config.pluginExcludeList.append(plugin)
         if internetSeraches in config.pluginExcludeList:
-            del config.chatGPTApiFunctionSignatures["integrate google searches"]
+            #del config.chatGPTApiFunctionSignatures["integrate_google_searches"]
+            ...
         self.setupPythonExecution()
         if config.terminalEnableTermuxAPI:
             self.setupTermuxExecution()
@@ -281,10 +286,8 @@ class FreeGenius:
                 callEntry = f"[CALL_{i}]"
                 if not callEntry in config.inputSuggestions:
                     config.inputSuggestions.append(callEntry)
-        # update actionScreeningPrompt
-        self.actionScreeningPrompt = self.getActionScreeningPrompt()
-        if config.developer:
-            pprint.pprint(self.actionScreeningPrompt)
+        # set up action calling
+        self.setupActionCalling()
 
     # Voice Typing Language
     def setSpeechToTextLanguage(self):
@@ -635,6 +638,14 @@ class FreeGenius:
             return json.dumps(info)
 
         functionSignature = {
+            "intent": [
+                "access to device information",
+                "execute a computing task or run a command",
+                "generate code",
+            ],
+            "examples": [
+                "Run Termux command",
+            ],
             "name": "execute_termux_command",
             "description": "Execute Termux command on Android",
             "parameters": {
@@ -658,7 +669,7 @@ class FreeGenius:
             },
         }
 
-        self.addFunctionCall(name="execute_termux_command", signature=functionSignature, method=execute_termux_command)
+        self.addFunctionCall(signature=functionSignature, method=execute_termux_command)
 
     def setupPythonExecution(self):
         def execute_python_code(function_args):
@@ -693,6 +704,17 @@ class FreeGenius:
             return SharedUtil.executePythonCode(refinedCode)
 
         functionSignature = {
+            "intent": [
+                "access to device information",
+                "execute a computing task or run a command",
+                "generate code",
+            ],
+            "examples": [
+                "What is my operating system",
+                "Open media player",
+                "Run python code",
+                "Run system command",
+            ],
             "name": "execute_python_code",
             "description": "Execute python code to resolve a computing task",
             "parameters": {
@@ -716,12 +738,18 @@ class FreeGenius:
             },
         }
 
-        self.addFunctionCall(name="execute_python_code", signature=functionSignature, method=execute_python_code)
+        self.addFunctionCall(signature=functionSignature, method=execute_python_code)
 
         ### A dummy function to redirect q&a task about python, otherwise, it may be mistaken by execute_python_code
         def python_qa(_):
             return "[INVALID]"
         functionSignature = {
+            "intent": [
+                "answer a question that you have sufficient knowledge",
+            ],
+            "examples": [
+                "How to use decorators in python",
+            ],
             "name": "python_qa",
             "description": f'''Answer questions or provide information about python''',
             "parameters": {
@@ -734,15 +762,53 @@ class FreeGenius:
                 },
             },
         }
-        self.addFunctionCall(name="python_qa", signature=functionSignature, method=python_qa)
+        self.addFunctionCall(signature=functionSignature, method=python_qa)
 
     # integrate function call plugin
-    def addFunctionCall(self, name: str, signature: dict, method: Callable[[dict], str], examples: list[str]=[]):
+    def addFunctionCall(self, signature: dict, method: Callable[[dict], str]):
         #config.chatGPTApiFunctionSignatures[name] = signature
         #config.chatGPTApiAvailableFunctions[name] = method
-        config.freeGeniusActions[name] = signature["description"]
-        if examples: # optional
-            config.freeGeniusActionExamples[name] = examples
+        description = signature.get("description", [])
+        examples = signature.get("examples", [])
+        
+        # calibration
+        # ask current model to estimate action intent and assign name, as different models understand differently
+        template = {"intent": "", "name": ""}
+        messages = [
+            {"role": "user", "content": f"""Use this template to respond in JSON format:
+
+{template}
+
+YOU MUST FOLLOW THESE INSTRUCTIONS CAREFULLY.                                        
+<instructions>
+1. Reponse based on the following action:
+  - use case: {description}
+  - examples: {examples}
+2. Describe the intent of the action and fill in the value of the key 'intent' in the template
+3. Assign a name to identify the action and fill in the value of the key 'name' in the template
+  - this name must NOT duplicate any of the existing action names: {list(config.freeGeniusActionMethods.keys())}
+4. Response with the JSON string that contains keys 'intent' and 'name' and their values
+</instructions>       
+"""},
+        ]
+        calibration = self.getResponseDict(messages=messages)
+        name = calibration.get("name", signature.get("name"))
+        intent = [calibration.get("intent")] if "intent" in calibration else signature.get("intent")
+
+        action = {
+            "action": name,
+            "use case": description,
+            "examples": examples,
+        } if examples else {
+            "action": name,
+            "use case": description,
+        }
+
+        for i in intent:
+            if i in config.freeGeniusActions:
+                config.freeGeniusActions[i].append(action)
+            else:
+                config.freeGeniusActions[i] = [action]
         config.freeGeniusActionParameters[name] = signature["parameters"]["properties"]
         config.freeGeniusActionMethods[name] = method
 
@@ -2056,13 +2122,25 @@ My writing:
                     # openai
                     #completion = self.runCompletion(config.currentMessages, noFunctionCall)
                     # ollama
-                    # check for intended actions
-                    action = self.getResponseDict(prompt=fineTunedUserInput, system=self.actionScreeningPrompt)["action"]
+                    # 1. intent screening
+                    messages = [
+                        #{"role": "system", "content": self.intentScreeningPrompt},
+                        {"role": "user", "content": f"""{self.intentScreeningPrompt}\nHere is my input:\n{fineTunedUserInput}"""},
+                    ]
+                    intent = self.getResponseDict(messages)["intent"]
+                    # 2. action selection
+                    messages = [
+                        #{"role": "system", "content": self.getActionSelectionPrompt(intent)},
+                        {"role": "user", "content": f"{self.getActionSelectionPrompt(intent)}\nHere is my input:\n{fineTunedUserInput}"},
+                    ]
+                    action = self.getResponseDict(messages)["name"]
                     if not action:
                         continue
                     
-                    # take action
-                    if action in ("python_qa", "other_request") and not action in config.freeGeniusActionMethods:
+                    # check action
+                    if action in self.intents[-3:] and not action in config.freeGeniusActionMethods:
+                        # chat feature only; no function method is called in this case
+
                         # update message chain
                         config.currentMessages.append({"role": "user", "content": fineTunedUserInput})
                         # start spinning
@@ -2098,10 +2176,14 @@ My writing:
                         # action in config.freeGeniusActionMethods
                         if config.developer:
                             self.print3(f"Calling action: {action}")
+                        # 3. parameter extraction
                         parameters = self.extractActionParameters(config.currentMessages, fineTunedUserInput, action)
                         if config.developer:
                             self.print2("Action Parameters:")
                             pprint.pprint(parameters)
+                        # 4. function execution
+                        # block for now for testing
+                        parameters = {}
                         if parameters:
                             self.print3(f"Running action: {action}")
                             # block response for now for testing
@@ -2152,121 +2234,111 @@ My writing:
                     self.saveChat(config.currentMessages)
                     storagedirectory, config.currentMessages = startChat()
 
-    def getActionScreeningPrompt(self):
-        # actions
-        actions = ""
-        for key, value in config.freeGeniusActions.items():
-            actions += f"""\n  * action: '{key}'\n    - use case: {value}\n"""
-        # use case: chat instead or function
-        actions += f"""\n  * action: 'other_request'\n    - use case: all the actions listed above are not relevant to User's request\n"""
-        
-        # examples
-        examples = """Here are some past examples of Assistant responding to the User:
+    def getResponseDict(self, messages, **kwargs):
+        config.ollamaDefaultModel = "orca2"
+        print(config.ollamaDefaultModel)
+        try:
+            response = self.oLllamaClient.chat.completions.create(
+                temperature=0.0,
+                max_tokens=-1,
+                model=config.ollamaDefaultModel,
+                response_format={"type": "json_object"},
+                messages=messages,
+                stream=True,
+                **kwargs,
+            )
+            jsonOutput = ""
+            for event in response:
+                jsonOutput += event.choices[0].delta.content
+            print(jsonOutput)
+            return json.loads(jsonOutput)
+        except:
+            SharedUtil.showErrors()
+            return {}
 
-User: Hello! How are you today?
-Assistant: {"action": "other_request"}
+    def setupActionCalling(self):
+        self.intents = list(config.freeGeniusActions.keys()) + [
+            # the following actions use chat feature
+            "translate or improve content",
+            "answer a question that you have sufficient knowledge",
+            "other requests",
+        ]
+        # print(self.intents)
+        template = {"intent": ""}
+        intentJsons = "\n".join([str({"intent": intent}) for intent in self.intents])
+        self.intentScreeningPrompt = f"""Select only one JSON string from the following options to answer me in JSON format:
+
+{intentJsons}
+
+To response with a JSON string, selected from the intents provided above only, without additional notes or explanations
+YOU MUST FOLLOW THESE INSTRUCTIONS CAREFULLY.                                        
+<instructions>
+1. Use this template in your response: {template}
+  - fill up the value of key 'intent'
+  - the value of the key 'intent' must be the exact value in one of the JSON strings options that you are provided with above.
+  - choose only form the given options, do not use other values for the intent
+2. Respond with a JSON string that contains the selected intent.
+</instructions>"""
+        if config.developer:
+            print(self.intentScreeningPrompt)
+
+    def getActionSelectionPrompt(self, intent):
+        #actionJsons = "\n".join([str(i) for i in config.freeGeniusActions[intent]])
+        actionJsons = ""
+        template = {"name": ""}
+        for i in config.freeGeniusActions[intent]:
+            action = {"name": i["action"]}
+            actionJsons += f"""# Action
+name: {action}
+use case: {i["use case"]}
+examples: {i["examples"]}
+
 """
+        return f"""You have access of available actions provided below in JSON format.  You are able to choose an action that resolve my input in the best way:
 
-        for key, value in config.freeGeniusActionExamples.items():
-            examples += "\n"
-            for i in value:
-                examples += """User: {0}
-Assistant: {1}"action": "{2}"{3}
-""".format(i, "{", key, "}")
-            examples += "\n"
+{actionJsons}
 
-        examples += """
-User: Tell me more about it.
-Assistant: {"action": "other_request"}
-User: Thanks, Bye!
-Assistant: {"action": "other_request"}"""
+YOU MUST FOLLOW THESE INSTRUCTIONS CAREFULLY.                                        
+<instructions>
+1. Consider each "action" with regards to its "use case" and "examples"
+2. Select an action that can resolve my input in the best way.
+3. Use template:
 
-        return f"""Assistant, an expert JSON builder, is able choose an action to resolve User's request by responding with a JSON string that contains one key "action".
+{template}
 
-Actions available to Assistant are:
-{actions}
-
-{examples}
-
-Choose an action and respond with JSON string that contains one single key, "action".
-"""
-
-    def getResponseDict(self, *args, **kwargs) -> dict:
-        """
-        Get structured response in a dictionary
-        """
-        completion = ollama.generate(
-            model=config.ollamaDefaultModel,
-            format="json",
-            stream=False,
-            options=Options(
-                temperature=config.llmTemperature,
-            ),
-            *args,
-            **kwargs,
-        )
-        return json.loads(completion["response"])
+To answer me the name of the action in a JSON string the contains one key "name", without additional notes or explanations.
+  - the value of the key 'name' must match one of the action names listed available options above.
+  - do not use other names.
+</instructions>"""
 
     def extractActionParameters(self, ongoingMessages, userInput, action) -> dict:
         """
         Extract action parameters
         """
-        def getKeyDescriptions(parameters) -> str:
-            descriptions = [f"""* "{parameter}" - {parameters[parameter]["description"]}""" for parameter in parameters]
-            return "\n".join(descriptions)
+        def getPrompt(template, parameter, parameterDetails):
+            return f"""Use the following template to response in JSON format:
 
+{template}
+
+YOU MUST FOLLOW THESE INSTRUCTIONS CAREFULLY.                                        
+<instructions>        
+1. Based on my input and our ongoing conversation, fill in the value of the key '{parameter}' in the JSON string.
+  - description: {parameterDetails['description']}
+  - type: {parameterDetails['type']}
+2. Return the JSON string to me, without additional notes or explanation
+</instructions>
+"""
         parameters = config.freeGeniusActionParameters[action]
-        # create a template
-        template = {parameter: "" if parameters[parameter]["type"] == "string" else [] for parameter in parameters} # support string and list/array first, more later
-        # prompt
-        prompt = f"""Use this template:
-
-{template}
-
-Based on my request / query, generate a JSON string that contains {len(parameters)} keys: "{'", "'.join(parameters.keys())}"
-Key descriptions:
-{getKeyDescriptions(parameters)}
-
-Here is my request / query:
-
-{userInput}"""
-
-        completion = ollama.chat(
-            model=config.ollamaDefaultModel,
-            messages=[
+        template = {}
+        for parameter in parameters:
+            parameterDetails = parameters[parameter]
+            template[parameter] = "" if parameterDetails['type'] == "string" else []
+            messages = [
                 *ongoingMessages,
-                {
-                    "role": "user",
-                    "content": prompt,
-                },
-            ],
-            format="json",
-            stream=False,
-            options=Options(
-                temperature=config.llmTemperature,
-            ),
-        )
-        # parameters
-        output = json.loads(completion["message"]["content"])
-        # final check below
-        if "code" in output and not output["code"]:
-            codeDescription = parameters["code"]["description"]
-            template = {
-                "code": ""
-            }
-            system = f"""Use this template:
-
-{template}
-
-To generate a JSON that contains {len(template)} key, "code", based on my request.
-"code" is the requested python code.
-
-Remember, give me the code only in your response, without extra comment or information."""
-            if config.developer:
-                self.print3(f"""Code generation: {codeDescription}""")
-            codeOutput = self.getResponseDict(prompt=f"""{codeDescription}\n\nHere is my request / query:\n\n{userInput}""", system=system).get("code", "")
-            output["code"] = codeOutput
-        return output
+                {"role": "user", "content": f"""{getPrompt(template, parameter, parameterDetails)}\nHere is my input:\n{userInput}"""},
+            ]
+            template = self.getResponseDict(messages)
+        return template
 
     def launchChatbot(self, chatbot, userInput):
         if config.isTermux:

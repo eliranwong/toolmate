@@ -1,3 +1,4 @@
+from typing import Any, Optional
 from letmedoit import config
 import letmedoit.config
 import openai, threading, os, time, traceback, re, subprocess, json, pydoc, textwrap, shutil, datetime, pprint
@@ -49,7 +50,7 @@ class FreeGenius:
         self.runPlugins()
 
     def setup(self):
-        self.oLllamaClient = OpenAI( 
+        self.oLllamaClient = OpenAI(
             base_url = 'http://localhost:11434/v1', 
             api_key='ollama', # required, but unused 
         )
@@ -2233,6 +2234,52 @@ My writing:
                     self.print("starting a new chat!")
                     self.saveChat(config.currentMessages)
                     storagedirectory, config.currentMessages = startChat()
+
+    def stringToDict(
+            self,
+            oaiclient: Any,
+            input: str,
+            schema: dict,
+            model: str = "neural-chat",
+            temperature: float = 0.0,
+            max_tokens: int = -1
+            messages: Optional[list[dict]] = [],
+            **kwargs,
+        ):
+        # format a JSON schema
+        template = {}
+        for parameter, details in schema["parameters"]["properties"].items():
+            template[parameter] = f"""<{details["description"]}>""" if details["type"] == "string" else [f"""<{details["description"]}>"""]
+        # craft a prompt
+        prompt = f"""Follow the following schema to response in JSON format, based on my input{" and our conversation" if messages else ""}:
+
+{template}
+
+Here is my input:
+
+{input}
+
+Response in JSON format without additional notes or explanations"""
+        # update messages
+        messages += [{"role": "user", "content": prompt}]
+
+        try:
+            response = oaiclient.chat.completions.create(
+                model=model,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                response_format={"type": "json_object"},
+                messages=messages,
+                stream=True,
+                **kwargs,
+            )
+            jsonOutput = ""
+            for event in response:
+                jsonOutput += event.choices[0].delta.content
+            return json.loads(jsonOutput)
+        except:
+            print(traceback.format_exc())
+            return {}
 
     def getResponseDict(self, messages, **kwargs):
         config.ollamaDefaultModel = "orca2"

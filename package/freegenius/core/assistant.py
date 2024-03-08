@@ -2240,9 +2240,9 @@ My writing:
             oaiclient: Any,
             input: str,
             schema: dict,
-            model: str = "neural-chat",
+            model: str = "mistral",
             temperature: float = 0.0,
-            max_tokens: int = -1
+            max_tokens: int = -1,
             messages: Optional[list[dict]] = [],
             **kwargs,
         ):

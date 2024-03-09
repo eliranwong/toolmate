@@ -9,9 +9,9 @@ from typing import Callable
 
 dev_dir = os.path.expanduser("~/dev/freegenius/package/freegenius")
 
-chat_store = os.path.join(dev_dir, "action_store")
-Path(chat_store).mkdir(parents=True, exist_ok=True)
-chroma_client = chromadb.PersistentClient(chat_store, Settings(anonymized_telemetry=False))
+action_store = os.path.join(dev_dir, "action_store")
+Path(action_store).mkdir(parents=True, exist_ok=True)
+chroma_client = chromadb.PersistentClient(action_store, Settings(anonymized_telemetry=False))
 
 def getEmbeddingFunction(embeddingModel="", openaiApiKey=""):
     # import statement is placed here to make this file compatible on Android
@@ -44,6 +44,7 @@ def query_vectors(collection, query, n=1):
 
 def add_action(signature):
     name, description, parameters = signature["name"], signature["description"], signature["parameters"]["properties"]
+    print(f"Registering action: {name}")
     if "examples" in signature:
         description = description + "\n" + "\n".join(signature["examples"])
     collection = get_or_create_collection("actions")
@@ -60,6 +61,13 @@ def addFunctionCall(signature: str, method: Callable[[dict], str]):
     add_action(signature)
 
 def runPlugins():
+    # remove old action store, allowing changes in plugins
+    try:
+        chroma_client.delete_collection("actions")
+        print("Old action store removed!")
+    except:
+        print(traceback.format_exc())
+
     # The following config values can be modified with plugins, to extend functionalities
     config.addFunctionCall = addFunctionCall
     config.aliases = {}
@@ -96,8 +104,9 @@ def execPythonFile(script="", content=""):
     return False
 
 if __name__ == "__main__":
-    #runPlugins()
-    query = "What time is it now?"
+    runPlugins()
+    # query = "What time is it now?"
+    query = "Email an appreciation message to Eliran Wong, whose email is support@letmedoit.ai"
     collection = get_or_create_collection("actions")
     result = query_vectors(collection, query)
     metadatas = result["metadatas"][0][0]

@@ -1,5 +1,7 @@
 import ollama
 from ollama import Options
+from freegenius import config
+
 
 def screen_user_request(user_request: str, model="mistral") -> None:
     """
@@ -45,11 +47,10 @@ HERE IS MY REQUEST:
         )
         print(completion["message"]["content"])
 
-user_request = """
-What time is it now?
-"""
-
-screen_user_request(user_request)
+if __name__ == "__main__":
+    config.ollamaDefaultModel = "mistral"
+    user_request = """What time is it now?"""
+    screen_user_request(user_request)
 
 # Notes:
 # Tested model: llama2

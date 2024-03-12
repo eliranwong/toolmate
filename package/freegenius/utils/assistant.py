@@ -45,6 +45,9 @@ class LetMeDoItAI:
         SharedUtil.runPlugins()
 
     def setup(self):
+        # set up tool store client
+        SharedUtil.setupToolStoreClient()
+
         self.models = list(SharedUtil.tokenLimits.keys())
         config.divider = self.divider = "--------------------"
         config.runPython = True
@@ -111,10 +114,11 @@ class LetMeDoItAI:
             exit(0)
 
         # initial completion check at startup
-        if config.initialCompletionCheck:
-            SharedUtil.checkCompletion()
-        else:
-            SharedUtil.setAPIkey()
+        if config.llmServer == "cahtgpt":
+            if config.initialCompletionCheck:
+                SharedUtil.checkCompletion()
+            else:
+                SharedUtil.setAPIkey()
 
         chat_history = os.path.join(config.historyParentFolder if config.historyParentFolder else config.letMeDoItAIFolder, "history", "chats")
         self.terminal_chat_session = PromptSession(history=FileHistory(chat_history))
@@ -1546,18 +1550,19 @@ My writing:
                     config.runPython = True
                     self.stopSpinning()
 
-                    # Create a new thread for the streaming task
-                    streamingWordWrapper = StreamingWordWrapper()
-                    streaming_event = threading.Event()
-                    self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True))
-                    # Start the streaming thread
-                    self.streaming_thread.start()
+                    if completion is not None:
+                        # Create a new thread for the streaming task
+                        streamingWordWrapper = StreamingWordWrapper()
+                        streaming_event = threading.Event()
+                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmServer == "chatgpt" else False))
+                        # Start the streaming thread
+                        self.streaming_thread.start()
 
-                    # wait while text output is steaming; capture key combo 'ctrl+q' or 'ctrl+z' to stop the streaming
-                    streamingWordWrapper.keyToStopStreaming(streaming_event)
+                        # wait while text output is steaming; capture key combo 'ctrl+q' or 'ctrl+z' to stop the streaming
+                        streamingWordWrapper.keyToStopStreaming(streaming_event)
 
-                    # when streaming is done or when user press "ctrl+q"
-                    self.streaming_thread.join()
+                        # when streaming is done or when user press "ctrl+q"
+                        self.streaming_thread.join()
 
                 # error codes: https://platform.openai.com/docs/guides/error-codes/python-library-error-types
                 except openai.APIError as e:

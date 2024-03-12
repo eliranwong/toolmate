@@ -9,9 +9,9 @@ from typing import Callable
 
 dev_dir = os.path.expanduser("~/dev/freegenius/package/freegenius")
 
-action_store = os.path.join(dev_dir, "action_store")
-Path(action_store).mkdir(parents=True, exist_ok=True)
-chroma_client = chromadb.PersistentClient(action_store, Settings(anonymized_telemetry=False))
+tool_store = os.path.join(dev_dir, "tool_store")
+Path(tool_store).mkdir(parents=True, exist_ok=True)
+tool_store_client = chromadb.PersistentClient(tool_store, Settings(anonymized_telemetry=False))
 
 def getEmbeddingFunction(embeddingModel="", openaiApiKey=""):
     # import statement is placed here to make this file compatible on Android
@@ -21,7 +21,7 @@ def getEmbeddingFunction(embeddingModel="", openaiApiKey=""):
     return embedding_functions.SentenceTransformerEmbeddingFunction(model_name=embeddingModel) # support custom Sentence Transformer Embedding models by modifying config.embeddingModel
 
 def get_or_create_collection(collection_name):
-    collection = chroma_client.get_or_create_collection(
+    collection = tool_store_client.get_or_create_collection(
         name=collection_name,
         metadata={"hnsw:space": "cosine"},
         embedding_function=getEmbeddingFunction(),
@@ -42,12 +42,12 @@ def query_vectors(collection, query, n=1):
         n_results = n,
     )
 
-def add_action(signature):
+def add_tool(signature):
     name, description, parameters = signature["name"], signature["description"], signature["parameters"]["properties"]
-    print(f"Registering action: {name}")
+    print(f"Adding tool: {name}")
     if "examples" in signature:
         description = description + "\n" + "\n".join(signature["examples"])
-    collection = get_or_create_collection("actions")
+    collection = get_or_create_collection("tools")
     metadata = {
         "name": name,
         "parameters": json.dumps(parameters),
@@ -58,13 +58,13 @@ def addFunctionCall(signature: str, method: Callable[[dict], str]):
     name = signature["name"]
     config.chatGPTApiFunctionSignatures[name] = {key: value for key, value in signature.items() if not key in ("intent", "examples")}
     config.chatGPTApiAvailableFunctions[name] = method
-    add_action(signature)
+    add_tool(signature)
 
 def runPlugins():
-    # remove old action store, allowing changes in plugins
+    # remove old tool store, allowing changes in plugins
     try:
-        chroma_client.delete_collection("actions")
-        print("Old action store removed!")
+        tool_store_client.delete_collection("tools")
+        print("Old tool store removed!")
     except:
         print(traceback.format_exc())
 
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     runPlugins()
     # query = "What time is it now?"
     query = "Email an appreciation message to Eliran Wong, whose email is support@letmedoit.ai"
-    collection = get_or_create_collection("actions")
+    collection = get_or_create_collection("tools")
     result = query_vectors(collection, query)
     metadatas = result["metadatas"][0][0]
     print(metadatas["name"], json.loads(metadatas["parameters"]))

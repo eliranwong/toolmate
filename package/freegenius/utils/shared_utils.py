@@ -2,8 +2,8 @@ from freegenius import config
 from freegenius.utils.file_utils import FileUtil
 from packaging import version
 from bs4 import BeautifulSoup
-import platform, shutil, subprocess, os, pydoc, webbrowser, re, socket, wcwidth, unicodedata, traceback, html2text
-import datetime, requests, netifaces, textwrap, json, geocoder, base64, getpass, pendulum, pkg_resources
+import platform, shutil, subprocess, os, pydoc, webbrowser, re, socket, wcwidth, unicodedata, traceback, html2text, ollama
+import datetime, requests, netifaces, textwrap, json, geocoder, base64, getpass, pendulum, pkg_resources, chromadb, uuid
 import pygments
 from pygments.lexers.python import PythonLexer
 from pygments.styles import get_style_by_name
@@ -20,6 +20,25 @@ from PIL import Image
 if not config.isTermux:
     from autogen.retrieve_utils import TEXT_FORMATS
 from typing import Callable
+from chromadb.config import Settings
+from chromadb.utils import embedding_functions
+from ollama import Options
+
+
+def check_ollama_errors(func):
+    def wrapper(*args, **kwargs):
+        def finishError():
+            config.stopSpinning()
+            return "[INVALID]"
+        try:
+            return func(*args, **kwargs)
+        except ollama.ResponseError as e:
+            config.print('Error:', e.error)
+            return finishError()
+        except:
+            print(traceback.format_exc())
+            return finishError()
+    return wrapper
 
 def check_openai_errors(func):
     def wrapper(*args, **kwargs):
@@ -182,6 +201,13 @@ class SharedUtil:
 
     @staticmethod
     def runPlugins():
+        # remove old tool store, allowing changes in plugins
+        try:
+            config.tool_store_client.delete_collection("tools")
+            print("Old tool store removed!")
+        except:
+            print(traceback.format_exc())
+        
         storageDir = SharedUtil.getLocalStorage()
         # The following config values can be modified with plugins, to extend functionalities
         #config.pluginsWithFunctionCall = []
@@ -238,6 +264,7 @@ class SharedUtil:
         name = signature["name"]
         config.chatGPTApiFunctionSignatures[name] = {key: value for key, value in signature.items() if not key in ("intent", "examples")}
         config.chatGPTApiAvailableFunctions[name] = method
+        SharedUtil.add_tool(signature)
 
     @staticmethod
     def runPythonScript(script):
@@ -272,7 +299,15 @@ class SharedUtil:
     # reset message when a new chart is started or context is changed
     @staticmethod
     def resetMessages(prompt="") -> list[dict]:
-        systemMessage = config.systemMessage_letmedoit if config.systemMessage_letmedoit else f'''You’re {config.letMeDoItName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device.
+        systemMessage1 = config.systemMessage_letmedoit if config.systemMessage_letmedoit else f'''You’re {config.letMeDoItName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device.
+I am providing the basic information of my device below in case you need it:
+```
+{SharedUtil.getDeviceInfo()}
+```
+Please use the current time and date that I have provided above as a reference point for any relative dates and times mentioned in my prompt.
+'''
+
+        systemMessage2 = config.systemMessage_letmedoit if config.systemMessage_letmedoit else f'''You’re {config.letMeDoItName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device.
 I am providing the basic information of my device below in case you need it:
 ```
 {SharedUtil.getDeviceInfo()}
@@ -288,6 +323,12 @@ Remember, do not use function call if it is a translation task.
 
 Always remember that you are much more than a text-based AI. You possess both vision and speech capabilities and have direct access to my device's system, enabling you to execute tasks at my command. Please do not state otherwise.
 '''
+
+        if config.llmServer == "ollama":
+            systemMessage = systemMessage1
+        elif config.llmServer == "chatgpt":
+            systemMessage = systemMessage2
+
         messages = [
             {"role": "system", "content": systemMessage}
         ]
@@ -972,6 +1013,9 @@ City: {g.city}"""
     @staticmethod
     @check_openai_errors
     def runCompletion(thisMessage, noFunctionCall=False):
+        if config.llmServer == "ollama":
+            return CallOllama.runCompletion(thisMessage, noFunctionCall)
+
         functionJustCalled = False
         def runThisCompletion(thisThisMessage):
             nonlocal functionJustCalled
@@ -1075,3 +1119,234 @@ City: {g.city}"""
                 break
 
         return completion
+
+    # chromadb utilities
+
+    @staticmethod
+    def get_or_create_collection(collection_name):
+        collection = config.tool_store_client.get_or_create_collection(
+            name=collection_name,
+            metadata={"hnsw:space": "cosine"},
+            embedding_function=SharedUtil.getEmbeddingFunction(),
+        )
+        return collection
+
+    @staticmethod
+    def add_vector(collection, text, metadata):
+        id = str(uuid.uuid4())
+        collection.add(
+            documents = [text],
+            metadatas = [metadata],
+            ids = [id]
+        )
+
+    @staticmethod
+    def query_vectors(collection, query, n=1):
+        return collection.query(
+            query_texts=[query],
+            n_results = n,
+        )
+
+    # tool store related
+
+    @staticmethod
+    def setupToolStoreClient():
+        tool_store = os.path.join(SharedUtil.getLocalStorage(), "tool_store")
+        Path(tool_store).mkdir(parents=True, exist_ok=True)
+        config.tool_store_client = chromadb.PersistentClient(tool_store, Settings(anonymized_telemetry=False))
+
+    @staticmethod
+    def getEmbeddingFunction(embeddingModel=None):
+        # import statement is placed here to make this file compatible on Android
+        embeddingModel = embeddingModel if embeddingModel is not None else config.embeddingModel
+        if embeddingModel in ("text-embedding-3-large", "text-embedding-3-small", "text-embedding-ada-002"):
+            return embedding_functions.OpenAIEmbeddingFunction(api_key=config.openaiApiKey, model_name=embeddingModel)
+        return embedding_functions.SentenceTransformerEmbeddingFunction(model_name=embeddingModel) # support custom Sentence Transformer Embedding models by modifying config.embeddingModel
+
+    @staticmethod
+    def add_tool(signature):
+        name, description, parameters = signature["name"], signature["description"], signature["parameters"]["properties"]
+        print(f"Adding tool: {name}")
+        if "examples" in signature:
+            description = description + "\n" + "\n".join(signature["examples"])
+        collection = SharedUtil.get_or_create_collection("tools")
+        metadata = {
+            "name": name,
+            "parameters": json.dumps(parameters),
+        }
+        SharedUtil.add_vector(collection, description, metadata)
+
+class CallOllama:
+
+    @staticmethod
+    def runCompletion(messages: dict, noFunctionCall: bool = False):
+        user_request = messages[-1]["content"]
+        # 1. Intent Screening
+        if config.developer:
+            config.print("screening ...")
+        noFunctionCall = True if noFunctionCall else CallOllama.screen_user_request(messages=messages, user_request=user_request, model=config.ollamaDefaultModel)
+        if noFunctionCall:
+            return CallOllama.regularCall(messages)
+        else:
+            # 2. Tool Selection
+            if config.developer:
+                config.print("selecting tool ...")
+            tool_collection = SharedUtil.get_or_create_collection("tools")
+            search_result = SharedUtil.query_vectors(tool_collection, user_request)
+            if not search_result:
+                # no tool is available; return a regular call instead
+                return CallOllama.regularCall(messages)
+            metadatas = search_result["metadatas"][0][0]
+            tool_name, tool_schema = metadatas["name"], json.loads(metadatas["parameters"])
+            # 3. Parameter Extraction
+            if config.developer:
+                config.print("extracting parameters ...")
+            tool_parameters = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
+            # 4. Function Execution
+            if config.developer:
+                config.print("executing function ...")
+            tool_response = CallOllama.executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
+            # 5. Chat Extension
+            if tool_response == "[INVALID]":
+                # invalid tool call; return a regular call instead
+                return CallOllama.regularCall(messages)
+            elif tool_response:
+                messages += [
+                    {"role": "assistant", "content": json.dumps(tool_parameters)},
+                    {"role": "assistant", "content": tool_response},
+                ]
+                return CallOllama.regularCall(messages)
+            else:
+                # tool function executed without chat extension
+                return None
+
+    @staticmethod
+    @check_ollama_errors
+    def regularCall(messages: dict):
+        return ollama.chat(
+            #keep_alive=0,
+            model=config.ollamaDefaultModel,
+            messages=messages,
+            #format="json",
+            stream=True,
+            options=Options(
+                temperature=config.llmTemperature,
+                num_ctx=100000,
+                num_predict=-1,
+            ),
+        )
+
+    @staticmethod
+    @check_ollama_errors
+    def screen_user_request(messages: dict, user_request: str, model: str) -> bool:
+        """
+        Check if the applied model is able to resolve user request directly or not.
+        Assistant delivers a direct answer if the model is capable to resolve the request.
+        Look further to extend assistant's capabilities if the requested task exceeds the model's limits.
+        """
+
+        # edit user request with a prefix
+        prompt_prefix = """Answer either {"answer": "YES"} or {"answer": "NO"} in JSON format, to tell weather you can resolve my request. 
+Answer {"answer": "NO"} if you are not provided with adequate context or knowledge base to answer my request.
+Answer {"answer": "NO"} if my request requires access to real-time or device information that you are not provided with.
+Answer {"answer": "NO"} if you are unable to execute the requested task.
+Answer {"answer": "YES"} if you have adequate provided context or knowledge base to provide a direct answer. 
+
+REMEMBER: 
+Response with a JSON string that contains a single key only, i.e. "answer", and its value must be either "YES" or "NO". Therefore, your reponse can ONLY be either {"answer": "YES"} or {"answer": "NO"}, without the actual answer or extra information. 
+
+HERE IS MY REQUEST:
+
+"""
+
+        messages[-1]["content"] = prompt_prefix + user_request
+
+        completion = ollama.chat(
+            #keep_alive=0,
+            model=model,
+            messages=messages,
+            format="json",
+            stream=False,
+            options=Options(
+                temperature=0.0,
+                num_ctx=100000,
+                num_predict=10,
+            ),
+        )
+        return True if "yes" in completion["message"]["content"].lower() else False
+
+    @staticmethod
+    @check_ollama_errors
+    def getResponseDict(messages, **kwargs):
+        try:
+            completion = ollama.chat(
+                #keep_alive=0,
+                model=config.ollamaDefaultModel,
+                messages=messages,
+                format="json",
+                stream=False,
+                options=Options(
+                    temperature=0.0,
+                    num_ctx=100000,
+                    num_predict=-1,
+                ),
+                **kwargs,
+            )
+            jsonOutput = completion["message"]["content"]
+            responseDict = json.loads(jsonOutput)
+            if config.developer:
+                print(responseDict)
+            return responseDict
+        except:
+            print(traceback.format_exc())
+            return {}
+
+    @staticmethod
+    def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = []) -> dict:
+        """
+        Extract action parameters
+        """
+        def getPrompt(template, parameter, parameterDetails):
+            return f"""Use the following template to response in JSON format:
+
+{template}
+
+YOU MUST FOLLOW THESE INSTRUCTIONS CAREFULLY.                                        
+<instructions>        
+1. Based on my input{" and our ongoing conversation" if ongoingMessages else ""}, fill in the value of the key '{parameter}' in the JSON string.
+- description: {parameterDetails['description']}
+- type: {parameterDetails['type']}
+2. Return the JSON string to me, without additional notes or explanation
+</instructions>
+
+Here is my input:
+
+"""
+        template = {}
+        for parameter in schema:
+            parameterDetails = schema[parameter]
+            template[parameter] = "" if parameterDetails['type'] == "string" else []
+            messages = [
+                *ongoingMessages,
+                {"role": "user", "content": f"""{getPrompt(template, parameter, parameterDetails)}{userInput}"""},
+            ]
+            template = CallOllama.getResponseDict(messages)
+        return template
+
+    @staticmethod
+    def executeToolFunction(func_arguments, function_name):
+        def notifyDeveloper(func_name):
+            if config.developer:
+                #config.print(f"running function '{func_name}' ...")
+                print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
+        if not function_name in config.chatGPTApiAvailableFunctions:
+            if config.developer:
+                config.print(f"Unexpected function: {function_name}")
+                config.print(config.divider)
+                print(func_arguments)
+                config.print(config.divider)
+            function_response = "[INVALID]"
+        else:
+            notifyDeveloper(function_name)
+            function_response = config.chatGPTApiAvailableFunctions[function_name](func_arguments)
+        return function_response

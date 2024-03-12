@@ -25,6 +25,7 @@ if config.isTermux:
     ]
 
 defaultSettings = (
+    ('llmServer', "ollama"),
     ('includeIpInSystemMessage', False),
     ('translateToLanguage', ''),
     ('dynamicTokenCount', False),
@@ -46,7 +47,7 @@ defaultSettings = (
     ('mouseSupport', False),
     ('autoUpgrade', True),
     ('chatbot', 'chatgpt'),
-    ('ollamaDefaultModel', 'starling-lm'),
+    ('ollamaDefaultModel', 'phi'),
     ('customTrayCommands', ['starling-lm', 'orca2', 'mistral', 'llama2', 'codellama', 'llava']),
     ('chatGPTApiModel', 'gpt-3.5-turbo'),
     ('chatGPTApiMaxTokens', 4000),

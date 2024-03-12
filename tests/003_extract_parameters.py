@@ -27,7 +27,7 @@ def getResponseDict(messages, **kwargs):
         print(traceback.format_exc())
         return {}
 
-def extractActionParameters(schema: dict, userInput: str, ongoingMessages: list = []) -> dict:
+def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = []) -> dict:
     """
     Extract action parameters
     """
@@ -61,9 +61,9 @@ Here is my input:
 if __name__ == "__main__":
     config.ollamaDefaultModel = "mistral"
     #parameters = {'code': {'type': 'string', 'description': 'Python code that integrates package pendulum to resolve my query'}}
-    #print(extractActionParameters(parameters, "What time is it now?"))
+    #print(extractToolParameters(parameters, "What time is it now?"))
     schema = {'email': {'type': 'string', 'description': "The email application. Return 'gmail' if not given.", 'enum': ['gmail', 'outlook']}, 'recipient': {'type': 'string', 'description': 'The recipient of the email.'}, 'subject': {'type': 'string', 'description': 'Give a title to the email.'}, 'body': {'type': 'string', 'description': 'The body or content of the email.'}}
-    parameters = extractActionParameters(schema, "Email an appreciation message to Eliran Wong, whose email is support@letmedoit.ai")
+    parameters = extractToolParameters(schema, "Email an appreciation message to Eliran Wong, whose email is support@letmedoit.ai")
 
 # result
 #{'email': 'support@letmedoit.ai'}

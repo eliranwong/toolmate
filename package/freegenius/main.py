@@ -46,8 +46,9 @@ config.letMeDoItAIFolder = letMeDoItAIFolder
 config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
 
 # package name
-with open(os.path.join(config.letMeDoItAIFolder, "package_name.txt"), "r", encoding="utf-8") as fileObj:
-    package = fileObj.read()
+#with open(os.path.join(config.letMeDoItAIFolder, "package_name.txt"), "r", encoding="utf-8") as fileObj:
+#    package = fileObj.read()
+package = "freegenius"
 
 def restartApp():
     print(f"Restarting {config.letMeDoItName} ...")

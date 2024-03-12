@@ -9,7 +9,7 @@ This plugin is created to avoid conflicts with plugin "analyze files"
 """
 
 from freegenius import config
-from letmedoit.utils.shared_utils import SharedUtil
+from freegenius.utils.shared_utils import SharedUtil
 import re, os
 
 def manipulate_files(function_args):

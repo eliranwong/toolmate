@@ -7,7 +7,7 @@ Ask SQLite file. To retrieve information from or make changes in a sqlite file, 
 """
 
 from freegenius import config
-from letmedoit.utils.shared_utils import SharedUtil
+from freegenius.utils.shared_utils import SharedUtil
 import os, sqlite3, json, pprint
 
 def search_sqlite(function_args):

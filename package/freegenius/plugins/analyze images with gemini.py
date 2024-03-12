@@ -9,7 +9,7 @@ reference: https://platform.openai.com/docs/guides/vision
 """
 
 from freegenius import config
-from letmedoit.geminiprovision import GeminiProVision
+from freegenius.geminiprovision import GeminiProVision
 
 def analyze_images_with_gemini(function_args):
     answer = GeminiProVision(temperature=config.llmTemperature).analyze_images(function_args)

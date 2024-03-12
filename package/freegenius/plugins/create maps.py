@@ -7,7 +7,7 @@ Create maps
 """
 
 from freegenius import config
-from letmedoit.utils.shared_utils import SharedUtil
+from freegenius.utils.shared_utils import SharedUtil
 import re, os
 
 def create_map(function_args):

@@ -7,7 +7,7 @@ Retrieve information about dates and times
 """
 
 from freegenius import config
-from letmedoit.utils.shared_utils import SharedUtil
+from freegenius.utils.shared_utils import SharedUtil
 
 def datetimes(function_args):
     code = function_args.get("code") # required

@@ -8,8 +8,8 @@ execute termux command
 """
 
 from freegenius import config
-from letmedoit.utils.shared_utils import SharedUtil
-from letmedoit.health_check import HealthCheck
+from freegenius.utils.shared_utils import SharedUtil
+from freegenius.health_check import HealthCheck
 import textwrap, re, pygments, json, pydoc
 from pygments.lexers.shell import BashLexer
 from prompt_toolkit.formatted_text import PygmentsTokens

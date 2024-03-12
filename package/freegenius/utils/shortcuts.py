@@ -1,9 +1,11 @@
-from letmedoit import config
+from freegenius import config
 from pathlib import Path
 import platform, os, sys, ctypes, subprocess, re
 import shutil
 
 def createShortcuts():
+    systemtrayFile = os.path.join(config.letMeDoItAIFolder, "systemtray.py")
+
     thisOS = platform.system()
     appName = config.letMeDoItName.split()[0]
     # Windows icon
@@ -33,6 +35,21 @@ def createShortcuts():
                     print(f"Created: {shortcutBat1}")
                 except:
                     pass
+        # system tray shortcut
+        shortcutBat1 = os.path.join(config.letMeDoItAIFolder, f"{appName}Tray.bat")
+        desktopShortcut1a = os.path.join(os.path.expanduser('~'), 'Desktop', f"{appName}Tray.bat")
+        desktopShortcut1b = os.path.join(os.path.expanduser('~'), 'OneDrive', 'Desktop', f"{appName}Tray.bat")
+        shortcutCommand1 = f'''powershell.exe -NoExit -Command "{sys.executable} '{systemtrayFile}'"'''
+        # Create .bat for application shortcuts
+        if not os.path.exists(shortcutBat1):
+            for i in (shortcutBat1, desktopShortcut1a, desktopShortcut1b):
+                try:
+                    print("creating system tray shortcuts ...")
+                    with open(i, "w") as fileObj:
+                        fileObj.write(shortcutCommand1)
+                    print(f"Created: {shortcutBat1}")
+                except:
+                    pass
 
     # on macOS
     # on iOS a-Shell app, ~/Desktop/ is invalid
@@ -46,6 +63,18 @@ def createShortcuts():
                     f.write("#!/bin/bash\n")
                     f.write(f"cd {config.letMeDoItAIFolder}\n")
                     f.write(f"{sys.executable} {config.letMeDoItFile}\n")
+                os.chmod(shortcut_file, 0o755)
+                print(f"Created: {shortcut_file}")
+                shutil.copy(shortcut_file, desktopPath) # overwrites older version
+                print("Copied to Desktop!")
+            # system tray shortcut
+            shortcut_file = os.path.join(config.letMeDoItAIFolder, f"{appName}Tray.command")
+            if not os.path.isfile(shortcut_file):
+                print("creating system tray shortcut ...")
+                with open(shortcut_file, "w") as f:
+                    f.write("#!/bin/bash\n")
+                    f.write(f"cd {config.letMeDoItAIFolder}\n")
+                    f.write(f"{sys.executable} {systemtrayFile}\n")
                 os.chmod(shortcut_file, 0o755)
                 print(f"Created: {shortcut_file}")
                 shutil.copy(shortcut_file, desktopPath) # overwrites older version
@@ -90,9 +119,46 @@ Name={config.letMeDoItName}
                     print("Copied to Desktop!")
             except:
                 pass
+        # system tray shortcut
+        def desktopSystemTrayFileContent():
+            iconPath = os.path.join(config.letMeDoItAIFolder, "icons", f"systemtray.png")
+            if not os.path.isfile(iconPath):
+                iconPath = os.path.join(config.letMeDoItAIFolder, "icons", "LetMeDoIt.png")
+            return f"""#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Version=1.0
+Type=Application
+Path={config.letMeDoItAIFolder}
+Exec={sys.executable} {systemtrayFile}
+Icon={iconPath}
+Name={config.letMeDoItName} Tray
+"""
+        linuxDesktopFile = os.path.join(config.letMeDoItAIFolder, f"{appName}Tray.desktop")
+        if not os.path.exists(linuxDesktopFile):
+            print("creating system tray shortcut ...")
+            # Create .desktop shortcut
+            with open(linuxDesktopFile, "w") as fileObj:
+                fileObj.write(desktopSystemTrayFileContent())
+            print(f"Created: {linuxDesktopFile}")
+            try:
+                # Try to copy the newly created .desktop file to:
+                from pathlib import Path
+                # ~/.local/share/applications
+                userAppDir = os.path.join(str(Path.home()), ".local", "share", "applications")
+                Path(userAppDir).mkdir(parents=True, exist_ok=True)
+                shutil.copy(linuxDesktopFile, userAppDir) # overwrites older version
+                print(f"Copied to '{userAppDir}'!")
+                # ~/Desktop
+                desktopPath = os.path.expanduser("~/Desktop")
+                if os.path.isdir(desktopPath):
+                    shutil.copy(linuxDesktopFile, desktopPath) # overwrites older version
+                    print("Copied to Desktop!")
+            except:
+                pass
 
     # create utilities
-    #createUtilities()
+    createUtilities()
     #createAppAlias()
 
 def createUtilities():

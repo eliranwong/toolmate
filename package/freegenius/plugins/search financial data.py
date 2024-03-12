@@ -7,7 +7,7 @@ search financial data with yfinance
 """
 
 from freegenius import config
-from letmedoit.utils.shared_utils import SharedUtil
+from freegenius.utils.shared_utils import SharedUtil
 import json
 
 def search_finance(function_args):

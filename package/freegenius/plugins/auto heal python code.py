@@ -1,7 +1,7 @@
 from freegenius import config
 import traceback
-from letmedoit.utils.install import installmodule
-from letmedoit.utils.shared_utils import SharedUtil
+from freegenius.utils.install import installmodule
+from freegenius.utils.shared_utils import SharedUtil
 
 """
 LetMeDoIt AI Plugin - auto heal python code

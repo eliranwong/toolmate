@@ -7,7 +7,7 @@ open a url with default web browser
 """
 
 from freegenius import config
-from letmedoit.utils.shared_utils import SharedUtil
+from freegenius.utils.shared_utils import SharedUtil
 
 # Function method
 def open_browser(function_args):

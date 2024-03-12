@@ -12,7 +12,7 @@ LetMeDoIt AI Plugin - download youtube or web content
 
 from freegenius import config
 import re, subprocess, os
-from letmedoit.utils.shared_utils import SharedUtil
+from freegenius.utils.shared_utils import SharedUtil
 from pathlib import Path
 
 

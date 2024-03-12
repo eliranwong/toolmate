@@ -8,7 +8,7 @@ Ask Google Gemini Pro for information
 
 
 from freegenius import config
-from letmedoit.geminipro import GeminiPro
+from freegenius.geminipro import GeminiPro
 
 def ask_gemini_pro(function_args):
     config.stopSpinning()

@@ -8,7 +8,7 @@ Ask Llama2 for information
 
 
 from freegenius import config
-from letmedoit.ollamachat import OllamaChat
+from freegenius.ollamachat import OllamaChat
 
 def ask_llama2(function_args):
     query = function_args.get("query") # required

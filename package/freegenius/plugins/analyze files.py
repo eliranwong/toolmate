@@ -9,7 +9,7 @@ analyze files with integrated "AutoGen Retriever"
 
 from freegenius import config
 import os
-from letmedoit.autoretriever import AutoGenRetriever
+from freegenius.autoretriever import AutoGenRetriever
 from PIL import Image
 
 

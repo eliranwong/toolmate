@@ -9,11 +9,11 @@ pronunce words
 try:
     from gtts import gTTS
 except:
-    from letmedoit.utils.install import installmodule
+    from freegenius.utils.install import installmodule
     installmodule(f"--upgrade gTTS")
 
 from freegenius import config
-from letmedoit.utils.tts_utils import TTSUtil
+from freegenius.utils.tts_utils import TTSUtil
 
 
 from gtts import gTTS

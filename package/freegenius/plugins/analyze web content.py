@@ -8,8 +8,8 @@ analyze web content with "AutoGen Retriever"
 
 
 from freegenius import config
-from letmedoit.utils.shared_utils import SharedUtil
-from letmedoit.autoretriever import AutoGenRetriever
+from freegenius.utils.shared_utils import SharedUtil
+from freegenius.autoretriever import AutoGenRetriever
 
 def analyze_web_content(function_args):
     query = function_args.get("query") # required

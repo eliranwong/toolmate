@@ -8,7 +8,7 @@ Ask ChatGPT for conversation only; no function calling
 
 
 from freegenius import config
-from letmedoit.chatgpt import ChatGPT
+from freegenius.chatgpt import ChatGPT
 
 def ask_chatgpt(function_args):
     config.stopSpinning()

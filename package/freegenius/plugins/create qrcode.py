@@ -7,7 +7,7 @@ Create qr code image
 """
 
 from freegenius import config
-from letmedoit.utils.shared_utils import SharedUtil
+from freegenius.utils.shared_utils import SharedUtil
 import os, json
 
 def create_qrcode(function_args):

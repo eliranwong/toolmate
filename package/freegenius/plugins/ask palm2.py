@@ -8,7 +8,7 @@ Ask Google PaLM 2 for information
 
 
 from freegenius import config
-from letmedoit.palm2 import Palm2
+from freegenius.palm2 import Palm2
 
 def ask_palm2(function_args):
     query = function_args.get("query") # required

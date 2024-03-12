@@ -8,7 +8,7 @@ build a group of agents to execute a task with integrated "AutoGen Agent Builder
 
 
 from freegenius import config
-from letmedoit.autobuilder import AutoGenBuilder
+from freegenius.autobuilder import AutoGenBuilder
 
 def build_agents(function_args):
     task = function_args.get("task") # required

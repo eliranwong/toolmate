@@ -8,7 +8,7 @@ Ask Google Codey for information about coding
 
 
 from freegenius import config
-from letmedoit.codey import Codey
+from freegenius.codey import Codey
 
 def ask_codey(function_args):
     query = function_args.get("query") # required

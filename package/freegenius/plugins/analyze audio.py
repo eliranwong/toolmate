@@ -7,7 +7,7 @@ analyze audio file
 """
 
 from freegenius import config
-from letmedoit.utils.shared_utils import SharedUtil
+from freegenius.utils.shared_utils import SharedUtil
 import os
 
 # Function method

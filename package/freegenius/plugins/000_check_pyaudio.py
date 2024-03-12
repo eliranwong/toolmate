@@ -1,6 +1,6 @@
 from freegenius import config
-from letmedoit.utils.install import installmodule
-from letmedoit.utils.shared_utils import SharedUtil
+from freegenius.utils.install import installmodule
+from freegenius.utils.shared_utils import SharedUtil
 import os
 
 # For more information, read https://github.com/Uberi/speech_recognition#pyaudio-for-microphone-users

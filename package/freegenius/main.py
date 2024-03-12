@@ -32,45 +32,22 @@ except:
     # write off problematic configFile
     open(configFile, "w", encoding="utf-8").close()
     from freegenius import config
-import letmedoit.config
 from pathlib import Path
 
-config.letMeDoItName = "FreeGenius AI"
-letmedoit.config.letMeDoItFile = config.letMeDoItFile = letMeDoItFile
-letmedoit.config.letMeDoItAIFolder = config.letMeDoItAIFolder = letMeDoItAIFolder
-letmedoit.config.isTermux = config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
-
-letmedoit.config.terminalColors = config.terminalColors = {
-    "ansidefault": "ansidefault",
-    "ansiblack": "ansiwhite",
-    "ansired": "ansibrightred",
-    "ansigreen": "ansibrightgreen",
-    "ansiyellow": "ansibrightyellow",
-    "ansiblue": "ansibrightblue",
-    "ansimagenta": "ansibrightmagenta",
-    "ansicyan": "ansibrightcyan",
-    "ansigray": "ansibrightblack",
-    "ansiwhite": "ansiblack",
-    "ansibrightred": "ansired",
-    "ansibrightgreen": "ansigreen",
-    "ansibrightyellow": "ansiyellow",
-    "ansibrightblue": "ansiblue",
-    "ansibrightmagenta": "ansimagenta",
-    "ansibrightcyan": "ansicyan",
-    "ansibrightblack": "ansigray",
+apps = {
+    "freegenius": ("FreeGenius", "FreeGenius AI"),
 }
 
-# package name
-package = "freegenius"
+basename = os.path.basename(letMeDoItAIFolder)
+if not hasattr(config, "letMeDoItName") or not config.letMeDoItName:
+    config.letMeDoItName = "FreeGenius AI"
+config.letMeDoItFile = letMeDoItFile
+config.letMeDoItAIFolder = letMeDoItAIFolder
+config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
 
-def getStorageDir():
-    storageDir = os.path.join(os.path.expanduser('~'), package)
-    try:
-        Path(storageDir).mkdir(parents=True, exist_ok=True)
-    except:
-        pass
-    return storageDir if os.path.isdir(storageDir) else ""
-letmedoit.config.getStorageDir = config.getStorageDir = getStorageDir
+# package name
+with open(os.path.join(config.letMeDoItAIFolder, "package_name.txt"), "r", encoding="utf-8") as fileObj:
+    package = fileObj.read()
 
 def restartApp():
     print(f"Restarting {config.letMeDoItName} ...")
@@ -78,14 +55,14 @@ def restartApp():
     exit(0)
 config.restartApp = restartApp
 
-from freegenius.configs.config_tools import *
-from freegenius.configs.config_essential import temporaryConfigs
-from letmedoit.utils.install import installmodule
-from letmedoit.utils.shared_utils import SharedUtil
+from freegenius.utils.config_tools import *
+from freegenius.utils.install import installmodule
+from freegenius.utils.shared_utils import SharedUtil
 
 # automatic update
 config.pipIsUpdated = False
-def updateApp(thisPackage):
+def updateApp():
+    thisPackage = f"{package}_android" if config.isTermux else package
     print(f"Checking '{thisPackage}' version ...")
     installed_version = SharedUtil.getPackageInstalledVersion(thisPackage)
     if installed_version is None:
@@ -111,9 +88,9 @@ def updateApp(thisPackage):
 
 # import other libraries
 import pprint
-from letmedoit.utils.shortcuts import createShortcuts
-from freegenius.core.assistant import FreeGenius
-from letmedoit.utils.vlc_utils import VlcUtil
+from freegenius.utils.shortcuts import *
+from freegenius.utils.assistant import LetMeDoItAI
+from freegenius.utils.vlc_utils import VlcUtil
 from prompt_toolkit.shortcuts import set_title, clear_title
 try:
     # hide pygame welcome message
@@ -123,33 +100,6 @@ try:
     config.isPygameInstalled = True
 except:
     config.isPygameInstalled = False
-
-def setOsOpenCmd():
-    config.thisPlatform = thisPlatform
-    if config.terminalEnableTermuxAPI:
-        config.open = "termux-share"
-    elif thisPlatform == "Linux":
-        config.open = "xdg-open"
-    elif thisPlatform == "Darwin":
-        config.open = "open"
-    elif thisPlatform == "Windows":
-        config.open = "start"
-    # name macOS
-    if config.thisPlatform == "Darwin":
-        config.thisPlatform = "macOS"
-
-def saveConfig():
-    with open(configFile, "w", encoding="utf-8") as fileObj:
-        for name in dir(config):
-            excludeConfigList = temporaryConfigs + config.excludeConfigList
-            if not name.startswith("__") and not name in excludeConfigList:
-                try:
-                    value = eval(f"config.{name}")
-                    if not callable(value) and not str(value).startswith("<"):
-                        fileObj.write("{0} = {1}\n".format(name, pprint.pformat(value)))
-                except:
-                    pass
-config.saveConfig = saveConfig
 
 def set_log_file_max_lines(log_file, max_lines):
     if os.path.isfile(log_file):
@@ -173,7 +123,7 @@ def main():
     print(f"launching {config.letMeDoItName} ...")
 
     # Create the parser
-    parser = argparse.ArgumentParser(description="FreeGenius AI cli options")
+    parser = argparse.ArgumentParser(description="LetMeDoIt AI cli options")
     # Add arguments
     parser.add_argument("default", nargs="?", default=None, help="default entry; accepts a string; ignored when -l/rf/f/r flag is used")
     parser.add_argument('-c', '--context', action='store', dest='context', help="specify pre-defined context with -r flag; accepts a string")
@@ -191,16 +141,16 @@ def main():
     # update to the latest version
     if args.update:
         if args.update.lower() == "true":
-            updateApp(package)
+            updateApp()
     # determined by config.autoUpgrade if -u flag is not used
     elif config.autoUpgrade:
-        updateApp(package)
+        updateApp()
 
     # initial completion check at startup
     config.initialCompletionCheck = False if args.nocheck and args.nocheck.lower() == "true" else True
 
     # include ip in system message
-    letmedoit.config.includeIpInSystemMessageTemp = config.includeIpInSystemMessageTemp = True if args.ip and args.ip.lower() == "true" else False
+    config.includeIpInSystemMessageTemp = True if args.ip and args.ip.lower() == "true" else False
 
     # specify pre-defined context
     if args.context:
@@ -253,21 +203,21 @@ def main():
         config.accept_default = False
 
     set_title(config.letMeDoItName)
-    setOsOpenCmd()
+    SharedUtil.setOsOpenCmd(thisPlatform)
     createShortcuts()
     config.excludeConfigList = []
     config.isVlcPlayerInstalled = VlcUtil.isVlcPlayerInstalled()
     # save loaded configs
-    saveConfig()
+    config.saveConfig()
     # check log files; remove old lines if more than 3000 lines is found in a log file
     for i in ("chats", "paths", "commands"):
         filepath = os.path.join(config.historyParentFolder if config.historyParentFolder else config.letMeDoItAIFolder, "history", i)
         set_log_file_max_lines(filepath, 3000)
-    FreeGenius().startChats()
+    LetMeDoItAI().startChats()
     # Do the following tasks before exit
     # backup configurations
-    saveConfig()
-    storageDir = getStorageDir()
+    config.saveConfig()
+    storageDir = SharedUtil.getLocalStorage()
     if os.path.isdir(storageDir):
         shutil.copy(configFile, os.path.join(storageDir, "config_backup.py"))
     # delete temporary content

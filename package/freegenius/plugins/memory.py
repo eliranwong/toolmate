@@ -9,7 +9,7 @@ modified from source: https://medium.com/@simon_attard/building-a-memory-layer-f
 """
 
 from freegenius import config
-from letmedoit.health_check import HealthCheck
+from freegenius.health_check import HealthCheck
 from pathlib import Path
 from chromadb.config import Settings
 import uuid, os, chromadb, getpass, geocoder, datetime, json

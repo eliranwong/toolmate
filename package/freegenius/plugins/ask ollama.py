@@ -7,13 +7,13 @@ Ask Ollama Chat for information
 """
 
 from freegenius import config
-from letmedoit.ollamachat import OllamaChat
-from letmedoit.utils.ollama_models import ollama_models
+from freegenius.ollamachat import OllamaChat
+from freegenius.utils.ollama_models import ollama_models
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.completion import WordCompleter, FuzzyCompleter
 from prompt_toolkit.styles import Style
-from letmedoit.health_check import HealthCheck
+from freegenius.health_check import HealthCheck
 from pathlib import Path
 import os
 

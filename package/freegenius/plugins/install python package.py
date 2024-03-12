@@ -7,7 +7,7 @@ install python package into the environment that runs LetMeDoIt AI
 """
 
 from freegenius import config
-from letmedoit.utils.install import installmodule
+from freegenius.utils.install import installmodule
 
 # Function method
 def install_package(function_args):

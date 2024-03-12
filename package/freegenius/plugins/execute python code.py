@@ -7,8 +7,8 @@ execute python code
 """
 
 from freegenius import config
-from letmedoit.utils.shared_utils import SharedUtil
-from letmedoit.health_check import HealthCheck
+from freegenius.utils.shared_utils import SharedUtil
+from freegenius.health_check import HealthCheck
 import pygments
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit.formatted_text import PygmentsTokens

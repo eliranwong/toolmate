@@ -7,11 +7,11 @@ search and open old chat records
 """
 
 from freegenius import config
-from letmedoit.health_check import HealthCheck
+from freegenius.health_check import HealthCheck
 from pathlib import Path
 from chromadb.config import Settings
 import uuid, os, chromadb, re
-from letmedoit.utils.shared_utils import SharedUtil
+from freegenius.utils.shared_utils import SharedUtil
 from prompt_toolkit import print_formatted_text, HTML
 
 chat_store = os.path.join(config.getLocalStorage(), "chats")

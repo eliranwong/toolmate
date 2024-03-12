@@ -8,7 +8,7 @@ solve math problems with integrated "AutoGen Math Solver"
 
 
 from freegenius import config
-from letmedoit.automath import AutoGenMath
+from freegenius.automath import AutoGenMath
 
 def solve_math(function_args):
     query = function_args.get("query") # required

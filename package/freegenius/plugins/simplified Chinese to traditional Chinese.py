@@ -7,7 +7,7 @@ Convert simplified Chinese into traditional Chinese in text output
 try:
     from opencc import OpenCC
 except:
-    from letmedoit.utils.install import installmodule
+    from freegenius.utils.install import installmodule
     installmodule(f"--upgrade opencc")
 
 from freegenius import config

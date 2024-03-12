@@ -8,7 +8,7 @@ edit text files
 
 from freegenius import config
 import os, re, sys
-from letmedoit.utils.shared_utils import SharedUtil
+from freegenius.utils.shared_utils import SharedUtil
 
 # persistent
 # users can customise 'textEditor' and 'textFileExtensions' in config.py

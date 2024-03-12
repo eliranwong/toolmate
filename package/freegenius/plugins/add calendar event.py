@@ -1,6 +1,6 @@
 from freegenius import config
 import datetime
-from letmedoit.utils.shared_utils import SharedUtil
+from freegenius.utils.shared_utils import SharedUtil
 import urllib.parse
 
 """

@@ -21,6 +21,7 @@ config.print = config.print2 = config.print3 = print
 config.addFunctionCall = SharedUtil.addFunctionCall
 config.divider = "--------------------"
 SharedUtil.setOsOpenCmd()
+SharedUtil.setupToolStoreClient()
 
 import sys, platform, shutil, webbrowser
 from freegenius.gui.chatgui import ChatGui
@@ -34,14 +35,7 @@ letMeDoItFile = os.path.realpath(__file__)
 letMeDoItAIFolder = os.path.dirname(letMeDoItFile)
 with open(os.path.join(letMeDoItAIFolder, "package_name.txt"), "r", encoding="utf-8") as fileObj:
     package = fileObj.read()
-apps = {
-    "myhand": "MyHand",
-    #"letmedoit": "LetMeDoIt",
-    "letmedoit": "systemtray",
-    "taskwiz": "TaskWiz",
-    "cybertask": "CyberTask",
-}
-iconFile = os.path.join(letMeDoItAIFolder, "icons", f"{apps[package]}.png")
+iconFile = os.path.join(letMeDoItAIFolder, "icons", "systemtray.png")
 thisOS = platform.system()
 
 

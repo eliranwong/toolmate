@@ -30,7 +30,9 @@ functionSignature = {
         "interact with user",
     ],
     "examples": [
-        "Pronunce",
+        "pronounce words",
+        "speak in",
+        "read",
     ],
     "name": "pronunce_words",
     "description": "pronounce words or sentences",

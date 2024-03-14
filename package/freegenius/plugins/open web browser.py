@@ -27,7 +27,7 @@ functionSignature = {
         "Open https://letmedoit.ai",
     ],
     "name": "open_browser",
-    "description": f'''Open an url with default web browser''',
+    "description": f'''Open https:// url with web browser''',
     "parameters": {
         "type": "object",
         "properties": {

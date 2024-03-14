@@ -19,7 +19,6 @@ if not hasattr(config, "currentMessages"):
 HealthCheck.checkCompletion()
 
 import autogen, os, json, traceback
-from pathlib import Path
 from freegenius.utils.prompts import Prompts
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.styles import Style
@@ -51,7 +50,7 @@ class AutoGenMath:
         os.environ["AUTOGEN_USE_DOCKER"] = "False"
 
     def getResponse(self, math_problem):
-        config_list = autogen.config_list_from_json(
+        oai_config_list = autogen.config_list_from_json(
             env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
             filter_dict={
                 "model": {
@@ -60,6 +59,14 @@ class AutoGenMath:
             }
         )
 
+        ollama_config_list = [
+            {
+                "model": config.ollamaDefaultModel,
+                "base_url": "http://localhost:11434/v1",
+                "api_key": "ollama",
+            }
+        ]
+
         # reference https://microsoft.github.io/autogen/docs/reference/agentchat/contrib/math_user_proxy_agent
         # 1. create an AssistantAgent instance named "assistant"
         assistant = autogen.AssistantAgent(
@@ -67,7 +74,7 @@ class AutoGenMath:
             system_message="You are a helpful assistant.",
             llm_config={
                 #"cache_seed": 42,  # seed for caching and reproducibility
-                "config_list": config_list,  # a list of OpenAI API configurations
+                "config_list": oai_config_list if config.llmServer == "chatgpt" else ollama_config_list,
                 "temperature": config.llmTemperature,  # temperature for sampling
                 "timeout": 600,
             },  # configuration for autogen's enhanced inference API which is compatible with OpenAI API

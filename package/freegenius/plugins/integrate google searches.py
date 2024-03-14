@@ -36,10 +36,11 @@ functionSignature = {
         "access to internet real-time information",
     ],
     "examples": [
-        "Search internet",
+        "Search online",
+        "Google search",
     ],
     "name": "integrate_google_searches",
-    "description": "Search internet for keywords when ChatGPT lacks information or when user ask about latest updates",
+    "description": "Search internet for real-time information or latest updates",
     "parameters": {
         "type": "object",
         "properties": {

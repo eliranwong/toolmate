@@ -60,7 +60,7 @@ class AutoGenAssistant:
 Below is my message:
 {message}"""
 
-        config_list = autogen.config_list_from_json(
+        oai_config_list = autogen.config_list_from_json(
             env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
             filter_dict={
                 "model": {
@@ -69,11 +69,19 @@ Below is my message:
             }
         )
 
+        ollama_config_list = [
+            {
+                "model": config.ollamaDefaultModel,
+                "base_url": "http://localhost:11434/v1",
+                "api_key": "ollama",
+            }
+        ]
+
         assistant = autogen.AssistantAgent(
             name="assistant",
             llm_config={
                 #"cache_seed": 42,  # seed for caching and reproducibility
-                "config_list": config_list,  # a list of OpenAI API configurations
+                "config_list": oai_config_list if config.llmServer == "chatgpt" else ollama_config_list,
                 "temperature": config.llmTemperature,  # temperature for sampling
                 "timeout": 300,
             },  # configuration for autogen's enhanced inference API which is compatible with OpenAI API

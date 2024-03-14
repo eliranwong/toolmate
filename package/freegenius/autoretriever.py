@@ -87,7 +87,7 @@ class AutoGenRetriever:
                 config.print2("File format not supported!")
                 return None
 
-        config_list = autogen.config_list_from_json(
+        oai_config_list = autogen.config_list_from_json(
             env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
             filter_dict={
                 "model": {
@@ -96,13 +96,21 @@ class AutoGenRetriever:
             }
         )
 
+        ollama_config_list = [
+            {
+                "model": config.ollamaDefaultModel,
+                "base_url": "http://localhost:11434/v1",
+                "api_key": "ollama",
+            }
+        ]
+
         # https://microsoft.github.io/autogen/docs/reference/agentchat/contrib/retrieve_assistant_agent
         assistant = RetrieveAssistantAgent(
             name="assistant", 
             system_message="You are a helpful assistant.",
             llm_config={
                 #"cache_seed": 42,  # seed for caching and reproducibility
-                "config_list": config_list,  # a list of OpenAI API configurations
+                "config_list": oai_config_list if config.llmServer == "chatgpt" else ollama_config_list,
                 "temperature": config.llmTemperature,  # temperature for sampling
                 "timeout": 600,
             },  # configuration for autogen's enhanced inference API which is compatible with OpenAI API
@@ -123,7 +131,7 @@ class AutoGenRetriever:
                     #"task": "qa", # the task of the retrieve chat. Possible values are "code", "qa" and "default". System prompt will be different for different tasks. The default value is default, which supports both code and qa.
                     "docs_path": docs_path,
                     "chunk_token_size": 2000, # the chunk token size for the retrieve chat. If key not provided, a default size max_tokens * 0.4 will be used.
-                    "model": config_list[0]["model"],
+                    "model": oai_config_list[0]["model"] if config.llmServer == "chatgpt" else config.ollamaDefaultModel,
                     "client": client,
                     "embedding_function": HealthCheck.getEmbeddingFunction(),
                     #"embedding_model": "all-mpnet-base-v2", # the embedding model to use for the retrieve chat. If key not provided, a default model all-MiniLM-L6-v2 will be used. All available models can be found at https://www.sbert.net/docs/pretrained_models.html. The default model is a fast model. If you want to use a high performance model, all-mpnet-base-v2 is recommended.

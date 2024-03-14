@@ -49,7 +49,7 @@ In essence, no existing solution matches the capabilities of OpenAI's function c
 
 This novel strategy involves breaking down the function calling process into several distinct steps for multiple generations:
 
-1. Intent Screening
+1. Intent Screening (optional)
 2. Tool Selection
 3. Parameter Extraction
 4. Function Execution
@@ -57,7 +57,7 @@ This novel strategy involves breaking down the function calling process into sev
 
 This methodology has been found to work effectively with freely available open-source models, even on devices lacking a GPU.
 
-[Code examples will be shared by the author when possible]
+[In case you are interested, you may check the class "CallOllama" [in this file](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/utils/shared_utils.py)]
 
 We invite [further discussion and contributions](https://github.com/eliranwong/freegenius/issues) to refine and enhance this strategy.
 
@@ -77,12 +77,60 @@ Support link: https://www.paypal.me/letmedoitai
 
 * function calling equivalent in place
 
-* testing llm "phi" with local llm server "Ollama"
+* testing llm Microsoft "[phi](https://ollama.com/library/phi)" with local llm server "[Ollama](https://ollama.com/)"; good speed with average hardware
+
+# Tested Function Call Plugins:
+
+So far, we tested the following function call plugins:
+
+* pronunce words
+* open web browser
+* add calender event
+* integrate google searches
+* dates and times
+* search weather info
+* create qr code
+* analyze files
+* solve math problems
+* ask chatgpt
+* ask codey
+* ask gemini pro
+* ask gemma
+* ask ollama
+* ask palm2
+* ask llama2
+* ask mistral
+* ask ollama
+* analyze web content
+* auto heal python code
+* create ai assistants
+* create maps
+* execute python code
+* download youtube or web content
+* install python package
+* memory
+* modify images
+* search financial data
+* search latest news
+* send tweet
+* send emails
+* remove image background
+
+pending:
+
+* create images
+* ask llava
+* ask sqlite
+* create statistical graphics
 
 # Not for Production Yet
 
 The project still needs lots of cleanup; not for production yet
 
 # For Testing
+
+Installation of Ollama required. Read https://ollama.com/
+
+To install FreeGenius AI
 
 > pip install freegenius

@@ -200,7 +200,14 @@ class SharedUtil:
             return False
 
     @staticmethod
-    def runPlugins():        
+    def runPlugins():
+        # remove old tool store, allowing changes in plugins
+        try:
+            config.tool_store_client.delete_collection("tools")
+            print("Old tool store removed!")
+        except:
+            print(traceback.format_exc())
+        
         storageDir = SharedUtil.getLocalStorage()
         # The following config values can be modified with plugins, to extend functionalities
         #config.pluginsWithFunctionCall = []
@@ -1006,6 +1013,9 @@ City: {g.city}"""
     @staticmethod
     @check_openai_errors
     def runCompletion(thisMessage, noFunctionCall=False):
+        if config.llmServer == "ollama":
+            return CallOllama.runCompletion(thisMessage, noFunctionCall)
+
         functionJustCalled = False
         def runThisCompletion(thisThisMessage):
             nonlocal functionJustCalled
@@ -1142,11 +1152,6 @@ City: {g.city}"""
     @staticmethod
     def setupToolStoreClient():
         tool_store = os.path.join(SharedUtil.getLocalStorage(), "tool_store")
-        try:
-            shutil.rmtree(tool_store, ignore_errors=True)
-            config.print2("Old tool store removed!")
-        except:
-            config.print2("Failed to remove old tool store!")
         Path(tool_store).mkdir(parents=True, exist_ok=True)
         config.tool_store_client = chromadb.PersistentClient(tool_store, Settings(anonymized_telemetry=False))
 
@@ -1176,11 +1181,10 @@ class CallOllama:
     @staticmethod
     def runCompletion(messages: dict, noFunctionCall: bool = False):
         user_request = messages[-1]["content"]
-        if config.intent_screening:
-            # 1. Intent Screening
-            if config.developer:
-                config.print("screening ...")
-            noFunctionCall = True if noFunctionCall else CallOllama.screen_user_request(messages=messages, user_request=user_request, model=config.ollamaDefaultModel)
+        # 1. Intent Screening
+        if config.developer:
+            config.print("screening ...")
+        noFunctionCall = True if noFunctionCall else CallOllama.screen_user_request(messages=messages, user_request=user_request, model=config.ollamaDefaultModel)
         if noFunctionCall:
             return CallOllama.regularCall(messages)
         else:
@@ -1192,35 +1196,25 @@ class CallOllama:
             if not search_result:
                 # no tool is available; return a regular call instead
                 return CallOllama.regularCall(messages)
-            semantic_distance = search_result["distances"][0][0]
-            if semantic_distance > config.tool_dependence:
-                return CallOllama.regularCall(messages)
             metadatas = search_result["metadatas"][0][0]
             tool_name, tool_schema = metadatas["name"], json.loads(metadatas["parameters"])
-            if config.developer:
-                config.print3(f"Selected: {tool_name} ({semantic_distance})")
             # 3. Parameter Extraction
             if config.developer:
                 config.print("extracting parameters ...")
             tool_parameters = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
             # 4. Function Execution
+            if config.developer:
+                config.print("executing function ...")
             tool_response = CallOllama.executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
             # 5. Chat Extension
             if tool_response == "[INVALID]":
                 # invalid tool call; return a regular call instead
                 return CallOllama.regularCall(messages)
             elif tool_response:
-                #messages += [
-                #    {"role": "assistant", "content": json.dumps(tool_parameters)},
-                #    {"role": "assistant", "content": tool_response},
-                #]
-                messages[-1]["content"] = f"""Use the following information:
-
-{tool_response}
-
-in response to my query:
-
-{user_request}"""
+                messages += [
+                    {"role": "assistant", "content": json.dumps(tool_parameters)},
+                    {"role": "assistant", "content": tool_response},
+                ]
                 return CallOllama.regularCall(messages)
             else:
                 # tool function executed without chat extension
@@ -1313,8 +1307,6 @@ HERE IS MY REQUEST:
         Extract action parameters
         """
         def getPrompt(template, parameter, parameterDetails):
-            acceptedValues = f'''either "{'" or "'.join(parameterDetails["enum"])}"''' if "enum" in parameterDetails else ""
-            description = f"{parameterDetails['description']}\nRemember, you should format the requested information into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."
             return f"""Use the following template to response in JSON format:
 
 {template}
@@ -1322,7 +1314,7 @@ HERE IS MY REQUEST:
 YOU MUST FOLLOW THESE INSTRUCTIONS CAREFULLY.                                        
 <instructions>        
 1. Based on my input{" and our ongoing conversation" if ongoingMessages else ""}, fill in the value of the key '{parameter}' in the JSON string.
-- description: {acceptedValues if acceptedValues else description}
+- description: {parameterDetails['description']}
 - type: {parameterDetails['type']}
 2. Return the JSON string to me, without additional notes or explanation
 </instructions>
@@ -1338,13 +1330,7 @@ Here is my input:
                 *ongoingMessages,
                 {"role": "user", "content": f"""{getPrompt(template, parameter, parameterDetails)}{userInput}"""},
             ]
-            if parameter == "code":
-                ollamaDefaultModel = config.ollamaDefaultModel
-                config.ollamaDefaultModel = config.ollamaCodeModel # tested: codellama, wizardcoder:python
-                config.print2(f"generating code with '{config.ollamaDefaultModel}' ...")
             template = CallOllama.getResponseDict(messages)
-            if parameter == "code":
-                config.ollamaDefaultModel = ollamaDefaultModel
         return template
 
     @staticmethod

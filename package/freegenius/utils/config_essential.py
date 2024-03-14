@@ -25,6 +25,8 @@ if config.isTermux:
     ]
 
 defaultSettings = (
+    ('intent_screening', False), # set True to increase both reliability and waiting time
+    ('tool_dependence', 0.8),
     ('llmServer', "ollama"),
     ('includeIpInSystemMessage', False),
     ('translateToLanguage', ''),
@@ -48,6 +50,7 @@ defaultSettings = (
     ('autoUpgrade', True),
     ('chatbot', 'chatgpt'),
     ('ollamaDefaultModel', 'phi'),
+    ('ollamaCodeModel', 'phi'),
     ('customTrayCommands', ['starling-lm', 'orca2', 'mistral', 'llama2', 'codellama', 'llava']),
     ('chatGPTApiModel', 'gpt-3.5-turbo'),
     ('chatGPTApiMaxTokens', 4000),

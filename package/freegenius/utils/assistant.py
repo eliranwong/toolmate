@@ -1,11 +1,10 @@
 from freegenius import config
-import openai, threading, os, time, traceback, re, subprocess, json, pydoc, textwrap, shutil, datetime, pprint, sys
+import openai, threading, os, time, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys
 from pathlib import Path
-import pygments
-from pygments.lexers.python import PythonLexer
+#from pygments.lexers.python import PythonLexer
 #from pygments.lexers.shell import BashLexer
 #from pygments.lexers.markup import MarkdownLexer
-from prompt_toolkit.formatted_text import PygmentsTokens
+#from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.completion import WordCompleter, FuzzyCompleter
@@ -19,7 +18,7 @@ from freegenius.utils.get_path_prompt import GetPath
 from freegenius.utils.prompt_shared_key_bindings import swapTerminalColors
 from freegenius.utils.file_utils import FileUtil
 from freegenius.utils.terminal_system_command_prompt import SystemCommandPrompt
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius.utils.shared_utils import SharedUtil, CallOllama
 from freegenius.utils.tts_utils import TTSUtil
 from freegenius.utils.ttsLanguages import TtsLanguages
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
@@ -1545,7 +1544,7 @@ My writing:
                             self.print("Unable to load internet resources.")
                             SharedUtil.showErrors()
 
-                    completion = SharedUtil.runCompletion(config.currentMessages, noFunctionCall)
+                    completion = SharedUtil.runCompletion(config.currentMessages, noFunctionCall) if config.llmServer == "chatgpt" else CallOllama.runCompletion(config.currentMessages, noFunctionCall)
                     # stop spinning
                     config.runPython = True
                     self.stopSpinning()

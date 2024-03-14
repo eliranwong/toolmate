@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - send a tweet to twitter
+LetMeDoIt AI Plugin - send tweet
 
 send a tweet to twitter
 
@@ -24,6 +24,7 @@ functionSignature = {
     ],
     "examples": [
         "Send a tweet",
+        "write twitter",
     ],
     "name": "send_tweet",
     "description": f'''Send a tweet to twitter''',

@@ -8,19 +8,24 @@ Create qr code image
 
 from freegenius import config
 from freegenius.utils.shared_utils import SharedUtil
-import os, json
+import os, qrcode
 
 def create_qrcode(function_args):
-    code = function_args.get("code") # required
-    information = SharedUtil.showAndExecutePythonCode(code)
-    if information:
-        filepath = json.loads(information)["information"]
-        if os.path.isfile(filepath):
-            config.print3(f"File saved at: {filepath}")
-            try:
-                os.system(f'''{config.open} "{filepath}"''')
-            except:
-                pass
+    url = function_args.get("content") # required
+    qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=4)
+    qr.add_data(url)
+    qr.make(fit=True)
+
+    filepath = os.path.join(SharedUtil.getLocalStorage(), "qrcode.png")
+    img = qr.make_image(fill='black', back_color='white')
+    img.save(filepath)
+    
+    if os.path.isfile(filepath):
+        config.print3(f"File saved at: {filepath}")
+        try:
+            os.system(f'''{config.open} "{filepath}"''')
+        except:
+            pass
     return ""
 
 functionSignature = {
@@ -35,12 +40,12 @@ functionSignature = {
     "parameters": {
         "type": "object",
         "properties": {
-            "code": {
+            "content": {
                 "type": "string",
-                "description": "Python code that integrates package qrcode to resolve my request. Always save the qr code image in png format and use 'print' function to print its full path only, without additional description or comment, in the last line of your code.",
+                "description": "The url or text content that is to be converted into qr code.",
             },
         },
-        "required": ["code"],
+        "required": ["content"],
     },
 }
 

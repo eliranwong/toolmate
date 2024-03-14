@@ -11,6 +11,8 @@ from freegenius import config
 from freegenius.autobuilder import AutoGenBuilder
 
 def build_agents(function_args):
+    if not config.openaiApiKey:
+        return "OpenAI API key not found! This feature works with ChatGPT models only!"
     task = function_args.get("task") # required
     title = function_args.get("title") # required
     config.print2("AutoGen Agent Builder launched!")

@@ -7,11 +7,11 @@ search latest news
 """
 
 from freegenius import config
-import feedparser
+import feedparser, re
 
 # Function method to get the latest news from a specific RSS feed
 def search_latest_news(function_args: dict) -> str:
-    keywords = function_args.get("keywords")
+    keywords = function_args.get("keywords").replace(" ", "+")
     feed_url = f"https://news.google.com/rss/search?q={keywords}&hl=en-US&gl=US&ceid=US:en"
     feed = feedparser.parse(feed_url)
 
@@ -37,7 +37,8 @@ functionSignature = {
         "access to internet real-time information",
     ],
     "examples": [
-        "Tell me latest news about",
+        "latest news about",
+        "what happened today",
     ],
     "name": "search_latest_news",
     "description": "Search the latest news with given keywords",

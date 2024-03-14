@@ -29,15 +29,13 @@ if config.openweathermapApi:
             "What's the current weather",
         ],
         "name": "search_weather_info",
-        "description": f'''Answer query about weather''',
+        "description": f'''Answer about weather''',
         "parameters": {
             "type": "object",
             "properties": {
                 "code": {
                     "type": "string",
-                    "description": f"""Python code that use my OpenWeatherMap API key '{config.openweathermapApi}' to resolve my request.
-To work with OpenWeatherMap API key, you may integrWhat is the current weather in New York?ate python package geocoder in the code to find the required Latitude and Longitude.
-In the last line of your code, use 'print' function to print the requested information, without additional description or comment.""",
+                    "description": f"""Generate python code that use my OpenWeatherMap API key '{config.openweathermapApi}' to resolve my request. Use Celsius as the unit for temperature.""",
                 },
             },
             "required": ["code"],

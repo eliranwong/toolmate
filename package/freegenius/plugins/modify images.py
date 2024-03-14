@@ -7,7 +7,7 @@ modify the given images according to changes specified by users
 """
 
 from freegenius import config
-import openai, os
+import os
 from openai import OpenAI
 from freegenius.utils.shared_utils import SharedUtil
 from freegenius.utils.shared_utils import check_openai_errors
@@ -17,6 +17,8 @@ from base64 import b64decode
 from urllib.parse import quote
 
 def modify_images(function_args):
+    if not config.openaiApiKey:
+        return "OpenAI API key not found! This feature works with ChatGPT models only!"
     changes = function_args.get("changes") # required
     files = function_args.get("files") # required
     #print(files)

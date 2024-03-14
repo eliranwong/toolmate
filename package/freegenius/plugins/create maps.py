@@ -37,7 +37,7 @@ functionSignature = {
         "properties": {
             "code": {
                 "type": "string",
-                "description": "Python code that integrates package folium to resolve my request. Created maps are saved in html format",
+                "description": "Generate python code that integrates package folium to resolve my request. Created maps are saved in *.html file. Tell me the file path at the end.",
             },
         },
         "required": ["code"],

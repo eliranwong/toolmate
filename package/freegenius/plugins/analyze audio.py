@@ -12,6 +12,8 @@ import os
 
 # Function method
 def analyze_audio(function_args):
+    if not config.openaiApiKey:
+        return "OpenAI API key not found! This feature works with ChatGPT models only!"
     def check_file_format(file_path):
         # List of allowed file extensions
         allowed_extensions = ('.mp3', '.mp4', '.mpeg', '.mpga', '.m4a', '.wav', '.webm')

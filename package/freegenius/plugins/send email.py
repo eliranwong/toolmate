@@ -105,12 +105,12 @@ functionSignature = {
     "parameters": {
         "type": "object",
         "properties": {
-            "email": {
+            "server": {
                 "type": "string",
-                "description": "The email application. Return 'gmail' if not given.",
+                "description": "The email server. Return 'gmail' if not given.",
                 "enum": ['gmail', 'outlook'],
             },
-            "recipient": {
+            "email": {
                 "type": "string",
                 "description": "The recipient of the email.",
             },

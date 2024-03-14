@@ -98,7 +98,9 @@ functionSignature1 = {
         "arrange activities",
     ],
     "examples": [
-        "Remember that",
+        "Remember,",
+        "Save in your memory",
+        "Keep in mind",
     ],
     "name": "save_memory",
     "description": """Use this function if I mention something which you think would be useful in the future and should be saved as a memory. Saved memories will allow you to retrieve snippets of past conversations when needed.""",
@@ -107,18 +109,19 @@ functionSignature1 = {
         "properties": {
             "memory": {
                 "type": "string",
-                "description": "Full description of the memory to be saved. I would like you to help me with converting relative dates and times, if any, into exact dates and times based on the given current date and time."
+                "description": "Full description of the memory to be saved. I would like you to help me with converting relative dates and times, if any, into exact dates and times based on the given current date and time.",
             },
             "title": {
                 "type": "string",
-                "description": "Title of the memory"
+                "description": "Title of the memory",
             },
             "type": {
                 "type": "string",
-                "description": "Type of the memory, return either 'general', 'instruction', 'fact', 'event', or 'concept'"
+                "description": "Type of the memory, return either 'general', 'instruction', 'fact', 'event', or 'concept'",
+                "enum": ["general", "instruction", "fact", "event", "concept"],
             },
             "tags": {
-                "type": "string",
+                "type": "array",
                 "description": """Return a list of tags about the memory, e.g. '["work", "to_do", "follow_up"]'"""
             },
         },
@@ -131,10 +134,12 @@ functionSignature2 = {
         "arrange activities",
     ],
     "examples": [
-        "Do you remember that",
+        "Search your memory",
+        "Recall from your memory",
+        "Retrieve from your memory",
     ],
     "name": "retrieve_memory",
-    "description": """Use this function to query and retrieve memories of important conversation snippets that we had in the past. Use this function if the information you require is not in the current prompt or you need additional information to refresh your memory.""",
+    "description": """Recall memories of important conversation snippets that we had in the past.""",
     "parameters": {
         "type": "object",
         "properties": {

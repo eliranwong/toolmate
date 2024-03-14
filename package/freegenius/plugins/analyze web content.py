@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - analyze webpage
+LetMeDoIt AI Plugin - analyze web content
 
 analyze web content with "AutoGen Retriever"
 
@@ -32,7 +32,7 @@ def analyze_web_content(function_args):
 
     # process with AutoGen Retriever
     config.print2("AutoGen Retriever launched!")
-    last_message = AutoGenRetriever().getResponse(filename, query)
+    last_message = AutoGenRetriever().getResponse(filename, query, True)
     config.currentMessages += last_message
     config.print2("AutoGen Retriever closed!")
 
@@ -44,20 +44,21 @@ functionSignature = {
         "access to internet real-time information",
     ],
     "examples": [
-        "summarize this webpage",
+        "analyze this url",
+        "summarize this website",
     ],
     "name": "analyze_web_content",
     "description": "retrieve information from a webpage if an url is provided",
     "parameters": {
         "type": "object",
         "properties": {
-            "query": {
-                "type": "string",
-                "description": "Questions that users ask about the given url",
-            },
             "url": {
                 "type": "string",
                 "description": """Return the given url. Return an empty string '' if it is not given.""",
+            },
+            "query": {
+                "type": "string",
+                "description": "Question that I ask about the given url",
             },
         },
         "required": ["query", "url"],

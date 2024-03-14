@@ -128,7 +128,8 @@ functionSignature = {
         "access to internet real-time information",
     ],
     "examples": [
-        "Add a calender event",
+        "google calendar",
+        "outlook calendar",
     ],
     "name": "add_calendar_event",
     "description": "add calendar event",

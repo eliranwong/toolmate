@@ -1,7 +1,7 @@
 """
-LetMeDoIt AI Plugin - dates and times
+LetMeDoIt AI Plugin - create statistical graphics
 
-Retrieve information about dates and times
+create statistical graphics to visulize data
 
 [FUNCTION_CALL]
 """
@@ -31,7 +31,7 @@ functionSignature = {
         "create content",
     ],
     "examples": [
-        "Create a plot / graph / chart",
+        "Create a plot / graph / bar chart / par chart",
         "Visualize data",
     ],
     "name": "create_statistical_graphics",
@@ -41,7 +41,7 @@ functionSignature = {
         "properties": {
             "code": {
                 "type": "string",
-                "description": "Python code that integrates package seaborn to resolve my request. Use TkAgg as backend. Created plots are saved in png format",
+                "description": "Generate python code that integrates package matplotlib to resolve my input. Save the result in png format. Tell me the image path at the end.",
             },
         },
         "required": ["code"],

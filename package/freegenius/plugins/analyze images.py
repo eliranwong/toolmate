@@ -10,11 +10,13 @@ reference: https://platform.openai.com/docs/guides/vision
 
 from freegenius import config
 from freegenius.utils.shared_utils import SharedUtil, check_openai_errors
-import openai, os
+import os
 from openai import OpenAI
 
 @check_openai_errors
 def analyze_images(function_args):
+    if not config.openaiApiKey:
+        return "OpenAI API key not found! This feature works with ChatGPT models only!"
     query = function_args.get("query") # required
     files = function_args.get("files") # required
     #print(files)

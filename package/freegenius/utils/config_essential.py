@@ -25,9 +25,13 @@ if config.isTermux:
     ]
 
 defaultSettings = (
+    # unique configs in FreeGenius AI
+    ('llmServer', "ollama"), # "chatgpt", "ollama", "llamafile"
     ('intent_screening', False), # set True to increase both reliability and waiting time
-    ('tool_dependence', 0.8),
-    ('llmServer', "ollama"),
+    ('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools
+    ('ollamaDefaultModel', 'phi'), # ollama model used for general purposes
+    ('ollamaCodeModel', 'phi'), # ollama model used for code generation
+    # common configs as in LetMeDoIt AI
     ('includeIpInSystemMessage', False),
     ('translateToLanguage', ''),
     ('dynamicTokenCount', False),
@@ -49,8 +53,6 @@ defaultSettings = (
     ('mouseSupport', False),
     ('autoUpgrade', True),
     ('chatbot', 'chatgpt'),
-    ('ollamaDefaultModel', 'phi'),
-    ('ollamaCodeModel', 'phi'),
     ('customTrayCommands', ['starling-lm', 'orca2', 'mistral', 'llama2', 'codellama', 'llava']),
     ('chatGPTApiModel', 'gpt-3.5-turbo'),
     ('chatGPTApiMaxTokens', 4000),

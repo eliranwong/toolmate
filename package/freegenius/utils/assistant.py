@@ -398,6 +398,8 @@ class LetMeDoItAI:
             apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.openaiApiKey, is_password=True)
             if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
                 config.openaiApiKey = apikey
+            else:
+                config.openaiApiKey = "freegenius"
             #self.print("Enter your Organization ID [optional]:")
             #oid = self.prompts.simplePrompt(default=config.openaiApiOrganization, is_password=True)
             #if oid and not oid.strip().lower() in (config.cancel_entry, config.exit_entry):

@@ -10,7 +10,7 @@ if not os.path.isfile(configFile):
 from freegenius import config
 config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
 
-import traceback, json, pprint, wcwidth, textwrap, threading, time
+import traceback, json, pprint, wcwidth, textwrap, threading, time, shutil
 import openai, tiktoken
 from openai import OpenAI
 from pygments.styles import get_style_by_name
@@ -24,6 +24,7 @@ from prompt_toolkit.application import run_in_terminal
 from freegenius.utils.vlc_utils import VlcUtil
 from freegenius.utils.tts_utils import TTSUtil
 from freegenius.utils.config_essential import defaultSettings
+from freegenius.utils.download import Downloader
 from pathlib import Path
 from PIL import Image
 import speech_recognition as sr
@@ -377,20 +378,31 @@ class HealthCheck:
         apikey = prompt(default=config.openaiApiKey, is_password=True)
         if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
             config.openaiApiKey = apikey
+        else:
+            config.openaiApiKey = "freegenius"
         #HealthCheck.checkCompletion()
 
     @staticmethod
     @check_openai_errors
     def checkCompletion():
-        # instantiate a client that can shared with plugins
         os.environ["OPENAI_API_KEY"] = config.openaiApiKey
-        client = OpenAI()
-        client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content" : "hello"}],
-            n=1,
-            max_tokens=10,
-        )
+
+        if config.llmServer == "ollama":
+            if shutil.which("ollama"):
+                for i in (config.ollamaDefaultModel, config.ollamaCodeModel):
+                    Downloader.downloadOllamaModel(i)
+            else:
+                print("Ollama not found! Install it first!")
+                print("Check https://ollama.com")
+                exit(0)
+        elif config.llmServer == "chatgpt":
+            client = OpenAI()
+            client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content" : "hello"}],
+                n=1,
+                max_tokens=10,
+            )
         # set variable 'OAI_CONFIG_LIST' to work with pyautogen
         oai_config_list = []
         for model in HealthCheck.models:

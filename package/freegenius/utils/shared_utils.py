@@ -1,5 +1,6 @@
 from freegenius import config
 from freegenius.utils.file_utils import FileUtil
+from freegenius.utils.download import Downloader
 from packaging import version
 from bs4 import BeautifulSoup
 import platform, shutil, subprocess, os, pydoc, webbrowser, re, socket, wcwidth, unicodedata, traceback, html2text, ollama
@@ -114,13 +115,22 @@ class SharedUtil:
     @staticmethod
     @check_openai_errors
     def checkCompletion():
-        SharedUtil.setAPIkey()
-        config.oai_client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content" : "hello"}],
-            n=1,
-            max_tokens=10,
-        )
+        if config.llmServer == "ollama":
+            if shutil.which("ollama"):
+                for i in (config.ollamaDefaultModel, config.ollamaCodeModel):
+                    Downloader.downloadOllamaModel(i)
+            else:
+                print("Ollama not found! Install it first!")
+                print("Check https://ollama.com")
+                exit(0)
+        elif config.llmServer == "chatgpt":
+            SharedUtil.setAPIkey()
+            config.oai_client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content" : "hello"}],
+                n=1,
+                max_tokens=10,
+            )
 
     @staticmethod
     def setAPIkey():

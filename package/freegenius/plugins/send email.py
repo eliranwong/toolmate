@@ -60,10 +60,10 @@ When you click on this URL, it will open a new window in Outlook web app and fil
 """
 
 def send_email(function_args):
-    email = function_args.get("email") # required
-    recipient = function_args.get("recipient", "") # optional
-    subject = function_args.get("subject") # required
-    body = function_args.get("body", "") # optional
+    email = function_args.get("server", "gmail") # optional
+    recipient = function_args.get("email", "") # required
+    subject = function_args.get("subject", "") # required
+    body = function_args.get("body", "") # required
 
     subject = urllib.parse.quote(subject)
     body = urllib.parse.quote(body)
@@ -98,6 +98,8 @@ functionSignature = {
         "access to internet real-time information",
     ],
     "examples": [
+        "Draft email",
+        "Write email",
         "Send email",
     ],
     "name": "send_email",
@@ -123,7 +125,7 @@ functionSignature = {
                 "description": "The body or content of the email.",
             },
         },
-        "required": ["email", "subject"],
+        "required": ["email", "subject", "body"],
     },
 }
 

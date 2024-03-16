@@ -121,8 +121,12 @@ class StreamingWordWrapper:
                     # openai
                     answer = event.choices[0].delta.content
                 elif isinstance(event, dict):
-                    # ollama chat
-                    answer = event['message']['content']
+                    if "message" in event:
+                        # ollama chat
+                        answer = event["message"].get("content", "")
+                    else:
+                        # llama.cpp chat
+                        answer = event["choices"][0]["delta"].get("content", "")
                 else:
                     # vertex ai
                     answer = event.text

@@ -18,7 +18,7 @@ from freegenius.utils.get_path_prompt import GetPath
 from freegenius.utils.prompt_shared_key_bindings import swapTerminalColors
 from freegenius.utils.file_utils import FileUtil
 from freegenius.utils.terminal_system_command_prompt import SystemCommandPrompt
-from freegenius.utils.shared_utils import SharedUtil, CallOllama, CallLlamaFile
+from freegenius.utils.shared_utils import SharedUtil, CallOllama, CallLlamaCpp
 from freegenius.utils.tts_utils import TTSUtil
 from freegenius.utils.ttsLanguages import TtsLanguages
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
@@ -1548,10 +1548,10 @@ My writing:
 
                     if config.llmServer == "chatgpt":
                         completion = SharedUtil.runCompletion(config.currentMessages, noFunctionCall)
-                    elif config.llmServer == "llamafile":
-                        completion = CallLlamaFile.runCompletion(config.currentMessages, noFunctionCall)
-                    else:
+                    elif config.llmServer == "ollama":
                         completion = CallOllama.runCompletion(config.currentMessages, noFunctionCall)
+                    elif config.llmServer == "llamacpp":
+                        completion = CallLlamaCpp.runCompletion(config.currentMessages, noFunctionCall)
                     # stop spinning
                     config.runPython = True
                     self.stopSpinning()
@@ -1560,7 +1560,7 @@ My writing:
                         # Create a new thread for the streaming task
                         streamingWordWrapper = StreamingWordWrapper()
                         streaming_event = threading.Event()
-                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmServer in ("chatgpt", "llamafile") else False))
+                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmServer == "chatgpt" else False))
                         # Start the streaming thread
                         self.streaming_thread.start()
 

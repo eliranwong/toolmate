@@ -25,6 +25,7 @@ from freegenius.utils.vlc_utils import VlcUtil
 from freegenius.utils.tts_utils import TTSUtil
 from freegenius.utils.config_essential import defaultSettings
 from freegenius.utils.download import Downloader
+from llama_cpp import Llama
 from pathlib import Path
 from PIL import Image
 import speech_recognition as sr
@@ -387,7 +388,22 @@ class HealthCheck:
     def checkCompletion():
         os.environ["OPENAI_API_KEY"] = config.openaiApiKey
 
-        if config.llmServer == "ollama":
+        if config.llmServer == "llamacpp":
+            config.llamacppDefaultModel = Llama.from_pretrained(
+                repo_id=config.llamacppDefaultModel_repo_id,
+                filename=config.llamacppDefaultModel_filename,
+                chat_format="chatml",
+                n_ctx=config.llamacppDefaultModel_n_ctx,
+                verbose=False,
+            )
+            config.llamacppCodeModel = Llama.from_pretrained(
+                repo_id=config.llamacppCodeModel_repo_id,
+                filename=config.llamacppCodeModel_filename,
+                chat_format="chatml",
+                n_ctx=config.llamacppCodeModel_n_ctx,
+                verbose=False,
+            )
+        elif config.llmServer == "ollama":
             if shutil.which("ollama"):
                 for i in (config.ollamaDefaultModel, config.ollamaCodeModel):
                     Downloader.downloadOllamaModel(i)

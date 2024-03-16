@@ -26,14 +26,20 @@ if config.isTermux:
 
 defaultSettings = (
     # unique configs in FreeGenius AI
-    ('llmServer', "ollama"), # "chatgpt", "ollama", "llamafile"
+    ('llmServer', "ollama" if shutil.which("ollama") else "llamacpp"), # "chatgpt", "ollama", "llamacpp", "gemini"
     ('intent_screening', False), # set True to increase both reliability and waiting time
     ('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools
-    ('ollamaDefaultModel', 'phi'), # ollama model used for general purposes
-    ('ollamaCodeModel', 'phi'), # ollama model used for code generation
     ('tokenizers_parallelism', 'true'), # 'true' / 'false'
     ('includeDeviceInfoInContext', False),
     ('includeIpInDeviceInfo', False),
+    ('ollamaDefaultModel', 'phi'), # ollama model used for general purposes
+    ('ollamaCodeModel', 'phi'), # ollama model used for code generation
+    ('llamacppDefaultModel_repo_id', 'TheBloke/phi-2-GGUF'), # llama.cpp model used for general purposes
+    ('llamacppDefaultModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for general purposes
+    ('llamacppDefaultModel_n_ctx', 4096), # llama.cpp default model context window
+    ('llamacppCodeModel_repo_id', 'TheBloke/phi-2-GGUF'), # llama.cpp model used for code generation
+    ('llamacppCodeModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for code generation
+    ('llamacppCodeModel_n_ctx', 4096), # llama.cpp code model context window
     # common configs as in LetMeDoIt AI
     ('translateToLanguage', ''),
     ('dynamicTokenCount', False),
@@ -158,6 +164,8 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "llamacppDefaultModel",
+    "llamacppCodeModel",
     "new_chat_response",
     "runPython",
     "freeGeniusActions",

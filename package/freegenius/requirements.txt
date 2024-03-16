@@ -49,3 +49,4 @@ soundfile==0.12.1
 sounddevice==0.4.6
 elevenlabs==0.3.0b0
 ollama
+llama-cpp-python

@@ -15,7 +15,7 @@ config.setConfig = setConfig
 ## alternative to include config restoration method
 #from freegenius.utils.config_tools import *
 from freegenius.utils.shared_utils import SharedUtil
-config.includeIpInSystemMessageTemp = True
+config.includeIpInDeviceInfoTemp = True
 config.getLocalStorage = SharedUtil.getLocalStorage
 config.print = config.print2 = config.print3 = print
 config.addFunctionCall = SharedUtil.addFunctionCall

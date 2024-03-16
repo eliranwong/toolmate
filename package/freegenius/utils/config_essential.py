@@ -32,8 +32,9 @@ defaultSettings = (
     ('ollamaDefaultModel', 'phi'), # ollama model used for general purposes
     ('ollamaCodeModel', 'phi'), # ollama model used for code generation
     ('tokenizers_parallelism', 'true'), # 'true' / 'false'
+    ('includeDeviceInfoInContext', False),
+    ('includeIpInDeviceInfo', False),
     # common configs as in LetMeDoIt AI
-    ('includeIpInSystemMessage', False),
     ('translateToLanguage', ''),
     ('dynamicTokenCount', False),
     ('use_oai_assistant', False), # support OpenAI Assistants API in AutoGen Agent Builder
@@ -168,7 +169,7 @@ temporaryConfigs = [
     "actionHelp",
     "isTermux",
     "oai_client",
-    "includeIpInSystemMessageTemp",
+    "includeIpInDeviceInfoTemp",
     "initialCompletionCheck",
     "promptStyle1",
     "promptStyle2",

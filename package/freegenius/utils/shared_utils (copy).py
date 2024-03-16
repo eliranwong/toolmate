@@ -732,7 +732,7 @@ Acess the risk level of this Python code:
             thisPlatform = platform.system()
             if thisPlatform == "Darwin":
                 thisPlatform = "macOS"
-        if config.includeIpInSystemMessageTemp or includeIp or (config.includeIpInSystemMessage and config.includeIpInSystemMessageTemp):
+        if config.includeIpInDeviceInfoTemp or includeIp or (config.includeIpInDeviceInfo and config.includeIpInDeviceInfoTemp):
             wan_ip = SharedUtil.get_wan_ip()
             local_ip = SharedUtil.get_local_ip()
             ipInfo = f'''Wan ip: {wan_ip}
@@ -1308,7 +1308,7 @@ HERE IS MY REQUEST:
         """
         def getPrompt(template, parameter, parameterDetails):
             acceptedValues = f'''either "{'" or "'.join(parameterDetails["enum"])}"''' if "enum" in parameterDetails else ""
-            description = f"{parameterDetails['description']}\nRemember, you should format the requested information into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."
+            description = f"{parameterDetails['description']}\nRemember, you should format the requested information, if any, into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."
             return f"""Use the following template to response in JSON format:
 
 {template}

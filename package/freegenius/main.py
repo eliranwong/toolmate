@@ -151,7 +151,7 @@ def main():
     config.initialCompletionCheck = False if args.nocheck and args.nocheck.lower() == "true" else True
 
     # include ip in system message
-    config.includeIpInSystemMessageTemp = True if args.ip and args.ip.lower() == "true" else False
+    config.includeIpInDeviceInfoTemp = True if args.ip and args.ip.lower() == "true" else False
 
     # specify pre-defined context
     if args.context:

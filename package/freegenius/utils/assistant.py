@@ -600,11 +600,11 @@ class LetMeDoItAI:
         option = self.dialogs.getValidOptions(
             options=options,
             title="Include IP information",
-            default="enable" if config.includeIpInSystemMessage else "disable",
+            default="enable" if config.includeIpInDeviceInfo else "disable",
             text="Include IP information in system message\ncan enhance response about locations.\nSelect an option below:"
         )
         if option:
-            config.includeIpInSystemMessage = (option == "enable")
+            config.includeIpInDeviceInfo = (option == "enable")
             config.saveConfig()
             self.print3(f"Include IP information: {option}d!")
 

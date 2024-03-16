@@ -60,10 +60,10 @@ functionSignature = {
         "generate code",
     ],
     "examples": [
-        "What is my operating system",
-        "Open media player",
         "Run python code",
         "Run system command",
+        "Execute python code",
+        "Execute system command",
     ],
     "name": "execute_python_code",
     "description": "Execute python code to resolve a computing task",

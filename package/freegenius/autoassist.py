@@ -142,7 +142,7 @@ Below is my message:
         self.print(f"<{config.terminalCommandEntryColor1}>\n\nAutoGen Assistant closed!</{config.terminalCommandEntryColor1}>")
 
 def main():
-    config.includeIpInSystemMessageTemp = config.includeIpInSystemMessage
+    config.includeIpInDeviceInfoTemp = config.includeIpInDeviceInfo
     AutoGenAssistant().run()
 
 if __name__ == '__main__':

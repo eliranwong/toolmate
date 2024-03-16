@@ -292,13 +292,7 @@ class SharedUtil:
     # reset message when a new chart is started or context is changed
     @staticmethod
     def resetMessages(prompt="") -> list[dict]:
-        systemMessage1 = config.systemMessage_letmedoit if config.systemMessage_letmedoit else f'''You’re {config.letMeDoItName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device.
-I am providing the basic information of my device below in case you need it:
-```
-{SharedUtil.getDeviceInfo()}
-```
-Please use the current time and date that I have provided above as a reference point for any relative dates and times mentioned in my prompt.
-'''
+        systemMessage1 = config.systemMessage_letmedoit if config.systemMessage_letmedoit else f'''You’re {config.letMeDoItName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device.'''
 
         systemMessage2 = config.systemMessage_letmedoit if config.systemMessage_letmedoit else f'''You’re {config.letMeDoItName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device.
 I am providing the basic information of my device below in case you need it:
@@ -317,7 +311,7 @@ Remember, do not use function call if it is a translation task.
 Always remember that you are much more than a text-based AI. You possess both vision and speech capabilities and have direct access to my device's system, enabling you to execute tasks at my command. Please do not state otherwise.
 '''
 
-        if config.llmServer == "ollama":
+        if config.llmServer in ("ollama", "llamafile"):
             systemMessage = systemMessage1
         elif config.llmServer == "chatgpt":
             systemMessage = systemMessage2
@@ -732,7 +726,7 @@ Acess the risk level of this Python code:
             thisPlatform = platform.system()
             if thisPlatform == "Darwin":
                 thisPlatform = "macOS"
-        if config.includeIpInSystemMessageTemp or includeIp or (config.includeIpInSystemMessage and config.includeIpInSystemMessageTemp):
+        if config.includeIpInDeviceInfoTemp or includeIp or (config.includeIpInDeviceInfo and config.includeIpInDeviceInfoTemp):
             wan_ip = SharedUtil.get_wan_ip()
             local_ip = SharedUtil.get_local_ip()
             ipInfo = f'''Wan ip: {wan_ip}
@@ -1160,7 +1154,7 @@ City: {g.city}"""
 
     @staticmethod
     def add_tool(signature):
-        name, description, parameters = signature["name"], signature["description"], signature["parameters"]["properties"]
+        name, description, parameters = signature["name"], signature["description"], signature["parameters"]
         print(f"Adding tool: {name}")
         if "examples" in signature:
             description = description + "\n" + "\n".join(signature["examples"])
@@ -1214,19 +1208,28 @@ class CallOllama:
                 # invalid tool call; return a regular call instead
                 return CallOllama.regularCall(messages)
             elif tool_response:
-                messages[-1]["content"] = f"""{user_request}
+                if config.developer:
+                    config.print2(config.divider)
+                    config.print2("Tool output:")
+                    print(tool_response)
+                    config.print2(config.divider)
+                messages[-1]["content"] = f"""Describe the query and response below in your own words.
 
-Remember, respond according to your knowledge base, along with the following additional information:
+Query:
+{user_request}
 
+Response:
 {tool_response}"""
                 return CallOllama.regularCall(messages)
             else:
                 # tool function executed without chat extension
+                config.currentMessages.append({"role": "assistant", "content": "Done!"})
                 return None
 
     @staticmethod
     @check_ollama_errors
     def regularCall(messages: dict):
+        # Note: config.currentMessages is updated, in this case, in method streamOutputs
         return ollama.chat(
             #keep_alive=0,
             model=config.ollamaDefaultModel,
@@ -1312,7 +1315,14 @@ HERE IS MY REQUEST:
         """
         Extract action parameters
         """
-        template = {parameter: "" if schema[parameter]['type'] == "string" else [] for parameter in schema}
+        
+        deviceInfo = f"""\n\nMy device information:\n{SharedUtil.getDeviceInfo()}""" if config.includeDeviceInfoInContext else ""
+        if "code" in schema["properties"]:
+            enforceCodeOutput = """ Remember, you should format the requested information, if any, into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."""
+            schema["properties"]["code"]["description"] += enforceCodeOutput
+
+        properties = schema["properties"]
+        template = {property: "" if properties[property]['type'] == "string" else [] for property in properties}
         
         messages = ongoingMessages[:-2] + [
             {
@@ -1330,7 +1340,7 @@ HERE IS MY REQUEST:
 Base the value of each key, in the template, on the following content and your generation:
 
 <content>
-{userInput}
+{userInput}{deviceInfo}
 </content>
 
 Remember, generate values when required and answer in JSON with the filled template ONLY.""",
@@ -1338,14 +1348,16 @@ Remember, generate values when required and answer in JSON with the filled templ
         ]
 
         parameters = CallOllama.getResponseDict(messages)
-        if "code" in parameters and not parameters.get("code").strip():
+
+        # enforce code generation
+        if "code" in schema["required"] and "code" in parameters and not parameters.get("code").strip():
             template = {"code": ""}
             messages = ongoingMessages[:-2] + [
                 {
                     "role": "system",
                     "content": f"""You are a JSON builder expert. You response to my input according to the following schema:
 
-{schema["code"]}""",
+{properties["code"]}""",
                 },
                 {
                     "role": "user",
@@ -1355,16 +1367,19 @@ Remember, generate values when required and answer in JSON with the filled templ
 
 Fill in the value of key "code", in the template, by code generation:
 
-{schema["code"]["description"]}
+{properties["code"]["description"]}
 
 Here is my request:
 
+<request>
 {userInput}
+</request>{deviceInfo}
 
 Remember, answer in JSON with the filled template ONLY.""",
                 },
             ]
 
+            # switch to a dedicated model for code generation
             ollamaDefaultModel = config.ollamaDefaultModel
             config.ollamaDefaultModel = config.ollamaCodeModel
             code = CallOllama.getResponseDict(messages)

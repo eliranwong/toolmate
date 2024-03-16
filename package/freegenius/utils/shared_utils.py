@@ -1493,13 +1493,17 @@ class CallLlamaCpp:
                     config.print2("Tool output:")
                     print(tool_response)
                     config.print2(config.divider)
-                messages[-1]["content"] = f"""Describe the query and response below in your own words in detail, without comment about your ability.
+                messages[-1]["content"] = f"""Response to the following query according to given supplementary information.
 
 Query:
+<query>
 {user_request}
+</query>
 
-Response:
-{tool_response}"""
+Supplementary information:
+<supplementary_information>
+{tool_response}
+</supplementary_information>"""
                 return CallLlamaCpp.regularCall(messages)
             else:
                 # tool function executed without chat extension
@@ -1512,6 +1516,7 @@ Response:
             messages=messages,
             temperature=config.llmTemperature,
             stream=True,
+            max_tokens=10000,
             **kwargs,
         )
 
@@ -1529,6 +1534,7 @@ Response:
                 response_format={"type": "json_object", "schema": schema} if schema else {"type": "json_object"},
                 temperature=config.llmTemperature,
                 stream=False,
+                max_tokens=10000,
                 **kwargs,
             )
             jsonOutput = completion["choices"][0]["message"].get("content", "{}")
@@ -1550,6 +1556,9 @@ Response:
         if "code" in schema["properties"]:
             enforceCodeOutput = """ Remember, you should format the requested information, if any, into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."""
             schema["properties"]["code"]["description"] += enforceCodeOutput
+            code_instruction = f"""\n\nParticularly, generate python code as the value of the JSON key "code" based on the following instruction:\n{schema["properties"]["code"]["description"]}"""
+        else:
+            code_instruction = ""
 
         properties = schema["properties"]
         messages = ongoingMessages[:-2] + [
@@ -1565,13 +1574,13 @@ Response:
 {userInput}{deviceInfo}
 </content>
 
-Generate content to fill up the value of each required key in the JSON, if information is not provided.
+Generate content to fill up the value of each required key in the JSON, if information is not provided.{code_instruction}
 
 Remember, output in JSON.""",
             },
         ]
 
-        parameters = CallLlamaCpp.getResponseDict(messages, schema)
+        parameters = CallLlamaCpp.getResponseDict(messages, properties if len(properties) == 1 else schema)
 
         # enforce code generation
         if "code" in schema["required"] and "code" in parameters and (not isinstance(parameters.get("code"), str) or not parameters.get("code").strip() or not SharedUtil.isValidPythodCode(parameters.get("code").strip())):
@@ -1599,7 +1608,7 @@ Remember, output in JSON.""",
             # switch to a dedicated model for code generation
             ollamaDefaultModel = config.ollamaDefaultModel
             config.ollamaDefaultModel = config.ollamaCodeModel
-            code = CallLlamaCpp.getResponseDict(messages, {properties["code"]})
+            code = CallLlamaCpp.getResponseDict(messages, properties["code"])
             parameters["code"] = code["code"]
             config.ollamaDefaultModel = ollamaDefaultModel
         return parameters

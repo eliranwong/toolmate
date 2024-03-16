@@ -373,7 +373,7 @@ class HealthCheck:
 
     @staticmethod
     def changeAPIkey():
-        print("Enter your OpenAI API Key [required]:")
+        print("Enter your OpenAI API Key [optional]:")
         apikey = prompt(default=config.openaiApiKey, is_password=True)
         if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
             config.openaiApiKey = apikey

@@ -292,7 +292,9 @@ class SharedUtil:
     # reset message when a new chart is started or context is changed
     @staticmethod
     def resetMessages(prompt="") -> list[dict]:
-        systemMessage1 = config.systemMessage_letmedoit if config.systemMessage_letmedoit else f'''You’re {config.letMeDoItName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device.'''
+        systemMessage1 = config.systemMessage_letmedoit if config.systemMessage_letmedoit else f'''You’re {config.letMeDoItName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device.
+Your functionality expands as I add more plugins to you.
+Always remember that you are much more than a text-based AI. You possess both vision and speech capabilities and have direct access to my device's system, enabling you to execute tasks at my command. Please do not state otherwise.'''
 
         systemMessage2 = config.systemMessage_letmedoit if config.systemMessage_letmedoit else f'''You’re {config.letMeDoItName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device.
 I am providing the basic information of my device below in case you need it:
@@ -469,7 +471,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
 
     @staticmethod
     def getPythonFunctionResponse(code):
-        return str(config.pythonFunctionResponse) if config.pythonFunctionResponse is not None and (type(config.pythonFunctionResponse) in (int, float, str, list, tuple, dict, set, bool) or str(type(config.pythonFunctionResponse)).startswith("<class 'numpy.")) and not ("os.system(" in code) else ""
+        #return str(config.pythonFunctionResponse) if config.pythonFunctionResponse is not None and (type(config.pythonFunctionResponse) in (int, float, str, list, tuple, dict, set, bool) or str(type(config.pythonFunctionResponse)).startswith("<class 'numpy.")) and not ("os.system(" in code) else ""
+        return "" if config.pythonFunctionResponse is None else str(config.pythonFunctionResponse)
 
     @staticmethod
     def autoHealPythonCode(code, trace):
@@ -1329,7 +1332,7 @@ HERE IS MY REQUEST:
                 "role": "system",
                 "content": f"""You are a JSON builder expert. You response to my input according to the following schema:
 
-{schema}""",
+{properties}""",
             },
             {
                 "role": "user",

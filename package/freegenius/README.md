@@ -49,8 +49,8 @@ In essence, no existing solution matches the capabilities of OpenAI's function c
 
 This novel strategy involves breaking down the function calling process into several distinct steps for multiple generations:
 
-1. Intent Screening (optional)
-2. Tool Selection
+1. Intent Screening (optional; config.intent_screening is set to False by default)
+2. Tool Selection (config.tool_dependence is introduced from version 0.0.13; read next section)
 3. Parameter Extraction
 4. Function Execution
 5. Chat Extension
@@ -60,6 +60,18 @@ This methodology has been found to work effectively with freely available open-s
 [In case you are interested, you may check the class "CallOllama" [in this file](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/utils/shared_utils.py)]
 
 We invite [further discussion and contributions](https://github.com/eliranwong/freegenius/issues) to refine and enhance this strategy.
+
+# Tool Dependence
+
+A new config item "tool_dependence" is introduced in FreeGenius AI from version 0.0.13.
+
+This value helps the assistance to determine if a function call plugin is needed.
+
+Its value ranges from 0.0 to 1.0:
+
+* 0.0 means totally independent of function call plugins. Responses are totally depends on models' own abilities or knowledge base
+* 1.0 means fually dependent on function call tools that at least a function call plugin, among available tools, is used to extend model's capabilities
+* setting a value between 0.0 and 1.0 allow users to customise how they want to depends on function call plugins.
 
 # Welcome Contributions
 

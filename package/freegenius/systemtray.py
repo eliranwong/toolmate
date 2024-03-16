@@ -22,6 +22,7 @@ config.addFunctionCall = SharedUtil.addFunctionCall
 config.divider = "--------------------"
 SharedUtil.setOsOpenCmd()
 SharedUtil.setupToolStoreClient()
+os.environ["TOKENIZERS_PARALLELISM"] = config.tokenizers_parallelism
 
 import sys, platform, shutil, webbrowser
 from freegenius.gui.chatgui import ChatGui

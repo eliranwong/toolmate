@@ -4,7 +4,7 @@ from packaging import version
 from bs4 import BeautifulSoup
 import platform, shutil, subprocess, os, pydoc, webbrowser, re, socket, wcwidth, unicodedata, traceback, html2text, ollama
 import datetime, requests, netifaces, textwrap, json, geocoder, base64, getpass, pendulum, pkg_resources, chromadb, uuid
-import pygments, pprint
+import pygments
 from pygments.lexers.python import PythonLexer
 from pygments.styles import get_style_by_name
 from prompt_toolkit.styles.pygments import style_from_pygments_cls
@@ -1202,13 +1202,9 @@ class CallOllama:
             # 3. Parameter Extraction
             if config.developer:
                 config.print("extracting parameters ...")
-            try:
-                tool_parameters = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
-                # 4. Function Execution
-                tool_response = CallOllama.executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
-            except:
-                print(traceback.format_exc())
-                tool_response = "[INVALID]"
+            tool_parameters = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
+            # 4. Function Execution
+            tool_response = CallOllama.executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
             # 5. Chat Extension
             if tool_response == "[INVALID]":
                 # invalid tool call; return a regular call instead
@@ -1272,7 +1268,7 @@ HERE IS MY REQUEST:
             format="json",
             stream=False,
             options=Options(
-                temperature=config.llmTemperature,
+                temperature=0.0,
                 num_ctx=100000,
                 num_predict=10,
             ),
@@ -1282,7 +1278,6 @@ HERE IS MY REQUEST:
     @staticmethod
     @check_ollama_errors
     def getResponseDict(messages, **kwargs):
-        #pprint.pprint(messages)
         try:
             completion = ollama.chat(
                 #keep_alive=0,
@@ -1298,10 +1293,9 @@ HERE IS MY REQUEST:
                 **kwargs,
             )
             jsonOutput = completion["message"]["content"]
-            jsonOutput = re.sub("^[^{]*?({.*?})[^}]*?$", r"\1", jsonOutput)
             responseDict = json.loads(jsonOutput)
             if config.developer:
-                pprint.pprint(responseDict)
+                print(responseDict)
             return responseDict
         except:
             print(traceback.format_exc())
@@ -1312,65 +1306,37 @@ HERE IS MY REQUEST:
         """
         Extract action parameters
         """
-        template = {parameter: "" if schema[parameter]['type'] == "string" else [] for parameter in schema}
-        
-        messages = ongoingMessages[:-2] + [
-            {
-                "role": "system",
-                "content": f"""You are a JSON builder expert. You response to my input according to the following schema:
-
-{schema}""",
-            },
-            {
-                "role": "user",
-                "content": f"""Use the following template in your response:
+        def getPrompt(template, parameter, parameterDetails):
+            acceptedValues = f'''either "{'" or "'.join(parameterDetails["enum"])}"''' if "enum" in parameterDetails else ""
+            description = f"{parameterDetails['description']}\nRemember, you should format the requested information into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."
+            return f"""Use the following template to response in JSON format:
 
 {template}
 
-Base the value of each key, in the template, on the following content and your generation:
+YOU MUST FOLLOW THESE INSTRUCTIONS CAREFULLY.                                        
+<instructions>        
+1. Based on my input{" and our ongoing conversation" if ongoingMessages else ""}, fill in the value of the key '{parameter}' in the JSON string.
+- description: {acceptedValues if acceptedValues else description}
+- type: {parameterDetails['type']}
+2. Return the JSON string to me, without additional notes or explanation
+</instructions>
 
-<content>
-{userInput}
-</content>
+Here is my input:
 
-Remember, generate values when required and answer in JSON with the filled template ONLY.""",
-            },
-        ]
-
-        parameters = CallOllama.getResponseDict(messages)
-        if "code" in parameters and not parameters.get("code").strip():
-            template = {"code": ""}
-            messages = ongoingMessages[:-2] + [
-                {
-                    "role": "system",
-                    "content": f"""You are a JSON builder expert. You response to my input according to the following schema:
-
-{schema["code"]}""",
-                },
-                {
-                    "role": "user",
-                    "content": f"""Use the following template in your response:
-
-{template}
-
-Fill in the value of key "code", in the template, by code generation:
-
-{schema["code"]["description"]}
-
-Here is my request:
-
-{userInput}
-
-Remember, answer in JSON with the filled template ONLY.""",
-                },
-            ]
-
-            ollamaDefaultModel = config.ollamaDefaultModel
-            config.ollamaDefaultModel = config.ollamaCodeModel
-            code = CallOllama.getResponseDict(messages)
-            parameters["code"] = code["code"]
-            config.ollamaDefaultModel = ollamaDefaultModel
-        return parameters
+"""
+        template = {}
+        for parameter in schema:
+            parameterDetails = schema[parameter]
+            template[parameter] = "" if parameterDetails['type'] == "string" else []
+            messages = ongoingMessages[:-1] + [{"role": "user", "content": f"""{getPrompt(template, parameter, parameterDetails)}{userInput}"""}]
+            if parameter == "code":
+                ollamaDefaultModel = config.ollamaDefaultModel
+                config.ollamaDefaultModel = config.ollamaCodeModel # tested: codellama, wizardcoder:python
+                config.print2(f"generating code with '{config.ollamaDefaultModel}' ...")
+            template = CallOllama.getResponseDict(messages)
+            if parameter == "code":
+                config.ollamaDefaultModel = ollamaDefaultModel
+        return template
 
     @staticmethod
     def executeToolFunction(func_arguments, function_name):
@@ -1391,4 +1357,191 @@ Remember, answer in JSON with the filled template ONLY.""",
         return function_response
 
 class CallLlamaFile:
-    ...
+
+    @staticmethod
+    def runCompletion(messages: dict, noFunctionCall: bool = False):
+        user_request = messages[-1]["content"]
+        if config.intent_screening:
+            # 1. Intent Screening
+            if config.developer:
+                config.print("screening ...")
+            noFunctionCall = True if noFunctionCall else CallLlamaFile.screen_user_request(messages=messages, user_request=user_request, model=config.ollamaDefaultModel)
+        if noFunctionCall:
+            return CallLlamaFile.regularCall(messages)
+        else:
+            # 2. Tool Selection
+            if config.developer:
+                config.print("selecting tool ...")
+            tool_collection = SharedUtil.get_or_create_collection("tools")
+            search_result = SharedUtil.query_vectors(tool_collection, user_request)
+            if not search_result:
+                # no tool is available; return a regular call instead
+                return CallLlamaFile.regularCall(messages)
+            semantic_distance = search_result["distances"][0][0]
+            if semantic_distance > config.tool_dependence:
+                return CallLlamaFile.regularCall(messages)
+            metadatas = search_result["metadatas"][0][0]
+            tool_name, tool_schema = metadatas["name"], json.loads(metadatas["parameters"])
+            if config.developer:
+                config.print3(f"Selected: {tool_name} ({semantic_distance})")
+            # 3. Parameter Extraction
+            if config.developer:
+                config.print("extracting parameters ...")
+            tool_parameters = CallLlamaFile.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
+            # 4. Function Execution
+            tool_response = CallLlamaFile.executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
+            # 5. Chat Extension
+            if tool_response == "[INVALID]":
+                # invalid tool call; return a regular call instead
+                return CallLlamaFile.regularCall(messages)
+            elif tool_response:
+                messages[-1]["content"] = f"""{user_request}
+
+Remember, respond according to your knowledge base, along with the following additional information:
+
+{tool_response}"""
+                return CallLlamaFile.regularCall(messages)
+            else:
+                # tool function executed without chat extension
+                return None
+
+    @staticmethod
+    def regularCall(messages: dict):
+        llamaFileClient = OpenAI(
+            base_url="http://localhost:8080/v1", #make sure that Llamafile server is running on 8080
+            api_key = "sk-no-key-required"
+        )
+        return llamaFileClient.chat.completions.create(
+            model="LLaMA_CPP",
+            messages=messages,
+            n=1,
+            temperature=config.llmTemperature,
+            #max_tokens=SharedUtil.getDynamicTokens(messages),
+            stream=True,
+        )
+
+    @staticmethod
+    def screen_user_request(messages: dict, user_request: str, model: str) -> bool:
+        """
+        Check if the applied model is able to resolve user request directly or not.
+        Assistant delivers a direct answer if the model is capable to resolve the request.
+        Look further to extend assistant's capabilities if the requested task exceeds the model's limits.
+        """
+
+        # edit user request with a prefix
+        prompt_prefix = """Answer either {"answer": "YES"} or {"answer": "NO"} in JSON format, to tell weather you can resolve my request. 
+Answer {"answer": "NO"} if you are not provided with adequate context or knowledge base to answer my request.
+Answer {"answer": "NO"} if my request requires access to real-time or device information that you are not provided with.
+Answer {"answer": "NO"} if you are unable to execute the requested task.
+Answer {"answer": "YES"} if you have adequate provided context or knowledge base to provide a direct answer. 
+
+REMEMBER: 
+Response with a JSON string that contains a single key only, i.e. "answer", and its value must be either "YES" or "NO". Therefore, your reponse can ONLY be either {"answer": "YES"} or {"answer": "NO"}, without the actual answer or extra information. 
+
+HERE IS MY REQUEST:
+
+"""
+
+        messages[-1]["content"] = prompt_prefix + user_request
+
+        completion = ollama.chat(
+            #keep_alive=0,
+            model=model,
+            messages=messages,
+            format="json",
+            stream=False,
+            options=Options(
+                temperature=0.0,
+                num_ctx=100000,
+                num_predict=10,
+            ),
+        )
+        return True if "yes" in completion["message"]["content"].lower() else False
+
+    @staticmethod
+    def getResponseDict(messages, parameter, parameterDetails, **kwargs):
+        print(messages)
+        try:
+            llamaFileClient = OpenAI(
+                base_url="http://localhost:8080/v1", #make sure that Llamafile server is running on 8080
+                api_key = "sk-no-key-required"
+            )
+            completion = llamaFileClient.chat.completions.create(
+                model="LLaMA_CPP",
+                response_format = {
+                    "type": "json_object",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            parameter: parameterDetails
+                        },
+                        "required": [parameter],
+                    },
+                },
+                messages=messages,
+                n=1,
+                temperature=config.llmTemperature,
+                #max_tokens=SharedUtil.getDynamicTokens(messages),
+                stream=False,
+                **kwargs,
+            )
+            jsonOutput = completion.choices[0].message.content
+            jsonOutput = re.sub("^[^{]*?({.*?})[^}]*?$", r"\1", jsonOutput)
+            jsonOutput = re.sub("^{'(.*?)':", r'{"\1":', jsonOutput)
+            print(jsonOutput)
+            responseDict = json.loads(jsonOutput)
+            if config.developer:
+                print(responseDict)
+            return responseDict
+        except:
+            print(traceback.format_exc())
+            return {}
+
+    @staticmethod
+    def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = []) -> dict:
+        print(12345, userInput)
+        """
+        Extract action parameters
+        """
+        def getPrompt(template, parameter, parameterDetails):
+            acceptedValues = f'''either "{'" or "'.join(parameterDetails["enum"])}"''' if "enum" in parameterDetails else ""
+            description = f"{parameterDetails['description']}\nRemember, you should format the requested information into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."
+            template[parameter] = f"""<{acceptedValues if acceptedValues else description}>"""
+            return f"""Use the following schema to response in JSON:
+
+{template}
+
+To extract information from the following content:
+
+"""
+        template = {}
+        for parameter in schema:
+            parameterDetails = schema[parameter]
+            template[parameter] = "" if parameterDetails['type'] == "string" else []
+            messages = ongoingMessages[:-1] + [{"role": "user", "content": f"""{getPrompt(template, parameter, parameterDetails)}{userInput}"""}]
+            if parameter == "code":
+                ollamaDefaultModel = config.ollamaDefaultModel
+                config.ollamaDefaultModel = config.ollamaCodeModel # tested: codellama, wizardcoder:python
+                config.print2(f"generating code with '{config.ollamaDefaultModel}' ...")
+            template = CallLlamaFile.getResponseDict(messages, parameter, parameterDetails)
+            if parameter == "code":
+                config.ollamaDefaultModel = ollamaDefaultModel
+        return template
+
+    @staticmethod
+    def executeToolFunction(func_arguments, function_name):
+        def notifyDeveloper(func_name):
+            if config.developer:
+                #config.print(f"running function '{func_name}' ...")
+                print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
+        if not function_name in config.chatGPTApiAvailableFunctions:
+            if config.developer:
+                config.print(f"Unexpected function: {function_name}")
+                config.print(config.divider)
+                print(func_arguments)
+                config.print(config.divider)
+            function_response = "[INVALID]"
+        else:
+            notifyDeveloper(function_name)
+            function_response = config.chatGPTApiAvailableFunctions[function_name](func_arguments)
+        return function_response

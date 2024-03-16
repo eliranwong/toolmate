@@ -1,10 +1,14 @@
 from setuptools import setup
+from setuptools.command.install import install
 import os, shutil
 
-# Notes: Steps to change package name
-# 1. change folder name "letmedoit" to <pacakge_name>
-# 2. edit package/package_name.txt and change its content to <pacakge_name>
-# 3. search for "from letmedoit" and replace with "from <package_name>"
+class PreInstallCommand(install):
+    """Pre-installation for installation mode."""
+    # setting 'CMAKE_ARGS' for installation of 'llama-cpp-python'
+    # read https://github.com/abetlen/llama-cpp-python
+    def run(self):
+        os.environ['CMAKE_ARGS'] = "-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS"
+        install.run(self)
 
 # package name
 package_name_0 = os.path.join("package_name.txt")
@@ -51,6 +55,9 @@ setup(
     long_description=long_description,
     author="Eliran Wong",
     author_email="support@letmedoit.ai",
+    cmdclass={
+        'install': PreInstallCommand,
+    },
     packages=[
         package,
         f"{package}.audio",

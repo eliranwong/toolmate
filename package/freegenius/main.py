@@ -88,7 +88,6 @@ def updateApp():
                     print(f"Failed to upgrade '{thisPackage}'!")
 
 # import other libraries
-import pprint
 from freegenius.utils.shortcuts import *
 from freegenius.utils.assistant import LetMeDoItAI
 from freegenius.utils.vlc_utils import VlcUtil
@@ -101,6 +100,7 @@ try:
     config.isPygameInstalled = True
 except:
     config.isPygameInstalled = False
+os.environ["TOKENIZERS_PARALLELISM"] = config.tokenizers_parallelism
 
 def set_log_file_max_lines(log_file, max_lines):
     if os.path.isfile(log_file):

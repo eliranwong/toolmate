@@ -31,6 +31,7 @@ defaultSettings = (
     ('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools
     ('ollamaDefaultModel', 'phi'), # ollama model used for general purposes
     ('ollamaCodeModel', 'phi'), # ollama model used for code generation
+    ('tokenizers_parallelism', 'true'), # 'true' / 'false'
     # common configs as in LetMeDoIt AI
     ('includeIpInSystemMessage', False),
     ('translateToLanguage', ''),
@@ -156,6 +157,7 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "new_chat_response",
     "runPython",
     "freeGeniusActions",
     "freeGeniusActionExamples",

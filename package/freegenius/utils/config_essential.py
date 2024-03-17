@@ -33,13 +33,20 @@ defaultSettings = (
     ('includeDeviceInfoInContext', False),
     ('includeIpInDeviceInfo', False),
     ('ollamaDefaultModel', 'phi'), # ollama model used for general purposes
+    ('ollamaDefaultModel_num_ctx', 100000), # ollama default model context window
+    ('ollamaDefaultModel_num_predict', -1), # ollama default model maximum tokens
+    ('ollamaDefaultModel_keep_alive', "5m"), # ollama default model keep alive time
     ('ollamaCodeModel', 'phi'), # ollama model used for code generation
+    ('ollamaCodeModel_num_ctx', 100000), # ollama code model context window
+    ('ollamaCodeModel_num_predict', -1), # ollama code model maximum tokens
     ('llamacppDefaultModel_repo_id', 'TheBloke/phi-2-GGUF'), # llama.cpp model used for general purposes
     ('llamacppDefaultModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for general purposes
     ('llamacppDefaultModel_n_ctx', 4096), # llama.cpp default model context window
+    ('llamacppDefaultModel_max_tokens', 10000), # llama.cpp default model maximum tokens
     ('llamacppCodeModel_repo_id', 'TheBloke/phi-2-GGUF'), # llama.cpp model used for code generation
     ('llamacppCodeModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for code generation
     ('llamacppCodeModel_n_ctx', 4096), # llama.cpp code model context window
+    ('llamacppCodeModel_max_tokens', 10000), # llama.cpp code model maximum tokens
     # common configs as in LetMeDoIt AI
     ('translateToLanguage', ''),
     ('dynamicTokenCount', False),
@@ -68,7 +75,7 @@ defaultSettings = (
     #('chatGPTApiNoOfChoices', 1),
     ('chatGPTApiFunctionCall', "auto"),
     ('passFunctionCallReturnToChatGPT', True),
-    ('llmTemperature', 0.8),
+    ('llmTemperature', 0.5),
     ('max_consecutive_auto_reply', 10), # work with pyautogen
     ('memoryClosestMatches', 5),
     ('chatRecordClosestMatches', 5),

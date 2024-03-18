@@ -194,7 +194,7 @@ Remember, answer in JSON with the filled template ONLY.""",
             if config.developer:
                 #config.print(f"running function '{func_name}' ...")
                 print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
-        if not function_name in config.chatGPTApiAvailableFunctions:
+        if not function_name in config.llmAvailableFunctions:
             if config.developer:
                 config.print(f"Unexpected function: {function_name}")
                 config.print(config.divider)
@@ -203,5 +203,5 @@ Remember, answer in JSON with the filled template ONLY.""",
             function_response = "[INVALID]"
         else:
             notifyDeveloper(function_name)
-            function_response = config.chatGPTApiAvailableFunctions[function_name](func_arguments)
+            function_response = config.llmAvailableFunctions[function_name](func_arguments)
         return function_response

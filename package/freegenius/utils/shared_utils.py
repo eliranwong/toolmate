@@ -130,8 +130,8 @@ class SharedUtil:
         config.predefinedInstructions = {}
         config.inputSuggestions = []
         config.outputTransformers = []
-        config.chatGPTApiFunctionSignatures = {}
-        config.chatGPTApiAvailableFunctions = {}
+        config.llmFunctionSignatures = {}
+        config.llmAvailableFunctions = {}
 
         pluginFolder = os.path.join(config.letMeDoItAIFolder, "plugins")
         if storageDir:
@@ -162,8 +162,8 @@ class SharedUtil:
                     if not run:
                         config.pluginExcludeList.append(plugin)
         if internetSeraches in config.pluginExcludeList:
-            del config.chatGPTApiFunctionSignatures["integrate_google_searches"]
-        for i in config.chatGPTApiAvailableFunctions:
+            del config.llmFunctionSignatures["integrate_google_searches"]
+        for i in config.llmAvailableFunctions:
             if not i in ("python_qa",):
                 callEntry = f"[CALL_{i}]"
                 if not callEntry in config.inputSuggestions:
@@ -173,8 +173,8 @@ class SharedUtil:
     @staticmethod
     def addFunctionCall(signature: str, method: Callable[[dict], str]):
         name = signature["name"]
-        config.chatGPTApiFunctionSignatures[name] = {key: value for key, value in signature.items() if not key in ("intent", "examples")}
-        config.chatGPTApiAvailableFunctions[name] = method
+        config.llmFunctionSignatures[name] = {key: value for key, value in signature.items() if not key in ("intent", "examples")}
+        config.llmAvailableFunctions[name] = method
         SharedUtil.add_tool(signature)
 
     @staticmethod
@@ -393,7 +393,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
         for i in range(config.max_consecutive_auto_heal):
             userInput = f"Original python code:\n```\n{code}\n```\n\nTraceback:\n```\n{trace}\n```"
             config.print3(f"Auto-correction attempt: {(i + 1)}")
-            function_call_message, function_call_response = CallLLM.getSingleFunctionCallResponse(userInput, [config.chatGPTApiFunctionSignatures["heal_python"]], "heal_python")
+            function_call_message, function_call_response = CallLLM.getSingleFunctionCallResponse(userInput, [config.llmFunctionSignatures["heal_python"]], "heal_python")
             # display response
             config.print(config.divider)
             if config.developer:
@@ -1013,7 +1013,7 @@ class CallOllama:
     @staticmethod
     @check_ollama_errors
     def getSingleFunctionCallResponse(messages: list, function_name: str, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
-        tool_schema = config.chatGPTApiFunctionSignatures[function_name]["parameters"]
+        tool_schema = config.llmFunctionSignatures[function_name]["parameters"]
         user_request = messages[-1]["content"]
         func_arguments = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages, temperature=temperature, num_ctx=num_ctx, num_predict=num_predict, **kwargs)
         function_call_response = CallOllama.executeToolFunction(func_arguments=func_arguments, function_name=function_name)
@@ -1228,7 +1228,7 @@ Remember, answer in JSON with the filled template ONLY.""",
             if config.developer:
                 #config.print(f"running function '{func_name}' ...")
                 print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
-        if not function_name in config.chatGPTApiAvailableFunctions:
+        if not function_name in config.llmAvailableFunctions:
             if config.developer:
                 config.print(f"Unexpected function: {function_name}")
                 config.print(config.divider)
@@ -1237,7 +1237,7 @@ Remember, answer in JSON with the filled template ONLY.""",
             function_response = "[INVALID]"
         else:
             notifyDeveloper(function_name)
-            function_response = config.chatGPTApiAvailableFunctions[function_name](func_arguments)
+            function_response = config.llmAvailableFunctions[function_name](func_arguments)
         return function_response
 
 
@@ -1324,7 +1324,7 @@ class CallLlamaCpp:
 
     @staticmethod
     def getSingleFunctionCallResponse(messages: list, function_name: str, temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs):
-        tool_schema = config.chatGPTApiFunctionSignatures[function_name]["parameters"]
+        tool_schema = config.llmFunctionSignatures[function_name]["parameters"]
         user_request = messages[-1]["content"]
         func_arguments = CallLlamaCpp.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages, temperature=temperature, max_tokens=max_tokens, **kwargs)
         function_call_response = CallLlamaCpp.executeToolFunction(func_arguments=func_arguments, function_name=function_name)
@@ -1559,7 +1559,7 @@ Remember, output in JSON.""",
             if config.developer:
                 #config.print(f"running function '{func_name}' ...")
                 print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
-        if not function_name in config.chatGPTApiAvailableFunctions:
+        if not function_name in config.llmAvailableFunctions:
             if config.developer:
                 config.print(f"Unexpected function: {function_name}")
                 config.print(config.divider)
@@ -1568,7 +1568,7 @@ Remember, output in JSON.""",
             function_response = "[INVALID]"
         else:
             notifyDeveloper(function_name)
-            function_response = config.chatGPTApiAvailableFunctions[function_name](func_arguments)
+            function_response = config.llmAvailableFunctions[function_name](func_arguments)
         return function_response
 
 
@@ -1761,7 +1761,7 @@ class CallChatGPT:
             # handle known and unwanted function
             function_response = "[INVALID]" 
         # handle unexpected function
-        elif not function_name in config.chatGPTApiAvailableFunctions:
+        elif not function_name in config.llmAvailableFunctions:
             if config.developer:
                 config.print(f"Unexpected function: {function_name}")
                 config.print(config.divider)
@@ -1770,7 +1770,7 @@ class CallChatGPT:
             function_response = "[INVALID]"
         else:
             notifyDeveloper(function_name)
-            fuction_to_call = config.chatGPTApiAvailableFunctions[function_name]
+            fuction_to_call = config.llmAvailableFunctions[function_name]
             # convert the arguments from json into a dict
             function_args = json.loads(func_arguments)
             function_response = fuction_to_call(function_args)
@@ -1782,14 +1782,14 @@ class CallChatGPT:
         functionJustCalled = False
         def runThisCompletion(thisThisMessage):
             nonlocal functionJustCalled
-            if config.chatGPTApiFunctionSignatures and not functionJustCalled and not noFunctionCall:
+            if config.llmFunctionSignatures and not functionJustCalled and not noFunctionCall:
                 return config.oai_client.chat.completions.create(
                     model=config.chatGPTApiModel,
                     messages=thisThisMessage,
                     n=1,
                     temperature=config.llmTemperature,
-                    max_tokens=SharedUtil.getDynamicTokens(thisThisMessage, config.chatGPTApiFunctionSignatures.values()),
-                    tools=SharedUtil.convertFunctionSignaturesIntoTools([config.chatGPTApiFunctionSignatures[config.runSpecificFuntion]] if config.runSpecificFuntion and config.runSpecificFuntion in config.chatGPTApiFunctionSignatures else config.chatGPTApiFunctionSignatures.values()),
+                    max_tokens=SharedUtil.getDynamicTokens(thisThisMessage, config.llmFunctionSignatures.values()),
+                    tools=SharedUtil.convertFunctionSignaturesIntoTools([config.llmFunctionSignatures[config.runSpecificFuntion]] if config.runSpecificFuntion and config.runSpecificFuntion in config.llmFunctionSignatures else config.llmFunctionSignatures.values()),
                     tool_choice={"type": "function", "function": {"name": config.runSpecificFuntion}} if config.runSpecificFuntion else config.chatGPTApiFunctionCall,
                     stream=True,
                 )
@@ -1884,12 +1884,13 @@ class CallChatGPT:
         return completion
 
 
-from vertexai.preview.generative_models import GenerativeModel, Content, Part
+from vertexai.preview.generative_models import GenerativeModel, Content, Part, FunctionDeclaration, Tool
 from vertexai.generative_models._generative_models import (
     GenerationConfig,
     HarmCategory,
     HarmBlockThreshold,
 )
+
 
 class CallGemini:
 
@@ -1943,7 +1944,7 @@ class CallGemini:
         }
 
     @staticmethod
-    def regularCall(messages: dict, useSystemMessage: bool=True):
+    def regularCall(messages: dict, useSystemMessage: bool=True, **kwargs):
         history, systemMessage, lastUserMessage = CallGemini.toGeminiMessages(messages=messages)
         userMessage = f"{systemMessage}\n\nHere is my request:\n{lastUserMessage}" if useSystemMessage and systemMessage else lastUserMessage
         chat = config.geminipro_model.start_chat(history=history)
@@ -1952,28 +1953,32 @@ class CallGemini:
             generation_config=config.geminipro_generation_config,
             safety_settings=config.geminipro_safety_settings,
             stream=True,
+            **kwargs,
         )
 
     @staticmethod
-    def getResponseDict(messages: list, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
-        #pprint.pprint(messages)
+    def getResponseDict(history: list, schema: dict, userMessage: str, **kwargs):
+        name, description, parameters = schema["name"], schema["description"], schema["parameters"]
+        chat = config.geminipro_model.start_chat(history=history)
+        # declare a function
+        function_declaration = FunctionDeclaration(
+            name=name,
+            description=description,
+            parameters=parameters,
+        )
+        tool = Tool(
+            function_declarations=[function_declaration],
+        )
         try:
-            completion = ollama.chat(
-                #keep_alive=config.ollamaDefaultModel_keep_alive,
-                model=config.ollamaDefaultModel,
-                messages=messages,
-                format="json",
+            completion = chat.send_message(
+                userMessage,
+                generation_config=config.geminipro_generation_config,
+                safety_settings=config.geminipro_safety_settings,
+                tools=[tool],
                 stream=False,
-                options=Options(
-                    temperature=temperature if temperature is not None else config.llmTemperature,
-                    num_ctx=num_ctx if num_ctx is not None else config.ollamaDefaultModel_num_ctx,
-                    num_predict=num_predict if num_predict is not None else config.ollamaDefaultModel_num_predict,
-                ),
                 **kwargs,
             )
-            jsonOutput = completion["message"]["content"]
-            jsonOutput = re.sub("^[^{]*?({.*?})[^}]*?$", r"\1", jsonOutput)
-            responseDict = json.loads(jsonOutput)
+            responseDict = dict(completion.candidates[0].content.parts[0].function_call.args)
             if config.developer:
                 pprint.pprint(responseDict)
             return responseDict
@@ -2006,7 +2011,7 @@ class CallGemini:
     def runSingleFunctionCall(messages, function_name):
         messagesCopy = messages[:]
         try:
-            _, function_call_response = CallOllama.getSingleFunctionCallResponse(messages, function_name)
+            _, function_call_response = CallGemini.getSingleFunctionCallResponse(messages, function_name)
             function_call_response = function_call_response if function_call_response else config.tempContent
             messages[-1]["content"] += f"""\n\nAvailable information:\n{function_call_response}"""
             config.tempContent = ""
@@ -2017,10 +2022,10 @@ class CallGemini:
 
     @staticmethod
     def getSingleFunctionCallResponse(messages: list, function_name: str, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
-        tool_schema = config.chatGPTApiFunctionSignatures[function_name]["parameters"]
+        tool_schema = config.llmFunctionSignatures[function_name]
         user_request = messages[-1]["content"]
-        func_arguments = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages, temperature=temperature, num_ctx=num_ctx, num_predict=num_predict, **kwargs)
-        function_call_response = CallOllama.executeToolFunction(func_arguments=func_arguments, function_name=function_name)
+        func_arguments = CallGemini.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages, temperature=temperature, num_ctx=num_ctx, num_predict=num_predict, **kwargs)
+        function_call_response = CallGemini.executeToolFunction(func_arguments=func_arguments, function_name=function_name)
         function_call_message_mini = {
             "role": "assistant",
             "content": "",
@@ -2035,18 +2040,14 @@ class CallGemini:
 
     @staticmethod
     def runAutoFunctionCall(messages: dict, noFunctionCall: bool = False):
-        return CallGemini.regularCall(messages=messages)
-
-    @staticmethod
-    def runAutoFunctionCall2(messages: dict, noFunctionCall: bool = False):
         user_request = messages[-1]["content"]
         if config.intent_screening:
             # 1. Intent Screening
             if config.developer:
                 config.print("screening ...")
-            noFunctionCall = True if noFunctionCall else CallOllama.screen_user_request(messages=messages, user_request=user_request)
+            noFunctionCall = True if noFunctionCall else CallGemini.screen_user_request(messages=messages, user_request=user_request)
         if noFunctionCall:
-            return CallOllama.regularCall(messages)
+            return CallGemini.regularCall(messages)
         else:
             # 2. Tool Selection
             if config.developer:
@@ -2055,28 +2056,29 @@ class CallGemini:
             search_result = SharedUtil.query_vectors(tool_collection, user_request)
             if not search_result:
                 # no tool is available; return a regular call instead
-                return CallOllama.regularCall(messages)
+                return CallGemini.regularCall(messages)
             semantic_distance = search_result["distances"][0][0]
             if semantic_distance > config.tool_dependence:
-                return CallOllama.regularCall(messages)
+                return CallGemini.regularCall(messages)
             metadatas = search_result["metadatas"][0][0]
-            tool_name, tool_schema = metadatas["name"], json.loads(metadatas["parameters"])
+            tool_name = metadatas["name"]
+            tool_schema = config.llmFunctionSignatures[tool_name]
             if config.developer:
                 config.print3(f"Selected: {tool_name} ({semantic_distance})")
             # 3. Parameter Extraction
             if config.developer:
                 config.print("extracting parameters ...")
             try:
-                tool_parameters = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
+                tool_parameters = CallGemini.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
                 # 4. Function Execution
-                tool_response = CallOllama.executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
+                tool_response = CallGemini.executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
             except:
                 print(traceback.format_exc())
                 tool_response = "[INVALID]"
             # 5. Chat Extension
             if tool_response == "[INVALID]":
                 # invalid tool call; return a regular call instead
-                return CallOllama.regularCall(messages)
+                return CallGemini.regularCall(messages)
             elif tool_response:
                 if config.developer:
                     config.print2(config.divider)
@@ -2090,7 +2092,7 @@ My query:
 
 Your response:
 {tool_response}"""
-                return CallOllama.regularCall(messages)
+                return CallGemini.regularCall(messages)
             else:
                 # tool function executed without chat extension
                 config.currentMessages.append({"role": "assistant", "content": "Done!"})
@@ -2135,98 +2137,20 @@ Remember, response in JSON with the filled template ONLY.""",
             },
         ]
 
-        output = CallOllama.getResponseDict(messages_for_screening, temperature=0.0, num_predict=20)
+        output = CallGemini.getResponseDict(messages_for_screening, temperature=0.0, num_predict=20)
         return True if "yes" in str(output).lower() else False
 
     @staticmethod
-    def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_predict: Optional[int]=None, **kwargs) -> dict:
+    def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], useSystemMessage: bool=True, **kwargs) -> dict:
         """
         Extract action parameters
         """
-        
-        deviceInfo = f"""\n\nMy device information:\n{SharedUtil.getDeviceInfo()}""" if config.includeDeviceInfoInContext else ""
-        if "code" in schema["properties"]:
-            enforceCodeOutput = """ Remember, you should format the requested information, if any, into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."""
-            schema["properties"]["code"]["description"] += enforceCodeOutput
-            code_instruction = f"""\n\nParticularly, generate python code as the value of the JSON key "code" based on the following instruction:\n{schema["properties"]["code"]["description"]}"""
-        else:
-            code_instruction = ""
 
-        properties = schema["properties"]
-        template = {property: "" if properties[property]['type'] == "string" else [] for property in properties}
-        
-        messages = ongoingMessages[:-2] + [
-            {
-                "role": "system",
-                "content": f"""You are a JSON builder expert. You response to my input according to the following schema:
+        history, systemMessage, lastUserMessage = CallGemini.toGeminiMessages(messages=ongoingMessages)
+        deviceInfo = f"""\n\nI am providing my device information below in case you need it:\n```\n{SharedUtil.getDeviceInfo()}\n```""" if config.includeDeviceInfoInContext else ""
+        userMessage = f"{systemMessage}{deviceInfo}\n\nHere is my request:\n{lastUserMessage}" if useSystemMessage and systemMessage else lastUserMessage
 
-{properties}""",
-            },
-            {
-                "role": "user",
-                "content": f"""Use the following template in your response:
-
-{template}
-
-Base the value of each key, in the template, on the following content and your generation:
-
-<content>
-{userInput}{deviceInfo}
-</content>
-
-Generate content to fill up the value of each required key in the JSON, if information is not provided.{code_instruction}
-
-Remember, response in JSON with the filled template ONLY.""",
-            },
-        ]
-
-        parameters = CallOllama.getResponseDict(messages, temperature=temperature, num_ctx=num_ctx, num_predict=num_predict, **kwargs)
-
-        # enforce code generation
-        if (len(properties) == 1 or "code" in schema["required"]) and "code" in parameters and (not isinstance(parameters.get("code"), str) or not parameters.get("code").strip() or not SharedUtil.isValidPythodCode(parameters.get("code").strip())):
-            template = {"code": ""}
-            messages = ongoingMessages[:-2] + [
-                {
-                    "role": "system",
-                    "content": f"""You are a JSON builder expert. You response to my input according to the following schema:
-
-{properties["code"]}""",
-                },
-                {
-                    "role": "user",
-                    "content": f"""Use the following template in your response:
-
-{template}
-
-Fill in the value of key "code", in the template, by code generation:
-
-{properties["code"]["description"]}
-
-Here is my request:
-
-<request>
-{userInput}
-</request>{deviceInfo}
-
-Remember, answer in JSON with the filled template ONLY.""",
-                },
-            ]
-
-            # switch to a dedicated model for code generation
-            ollamaDefaultModel = config.ollamaDefaultModel
-            ollamaDefaultModel_num_ctx = config.ollamaDefaultModel_num_ctx
-            ollamaDefaultModel_num_predict = config.ollamaDefaultModel_num_predict
-
-            config.ollamaDefaultModel = config.ollamaCodeModel
-            config.ollamaDefaultModel_num_ctx = config.ollamaCodeModel_num_ctx
-            config.ollamaDefaultModel_num_predict = config.ollamaCodeModel_num_predict
-
-            code = CallOllama.getResponseDict(messages, temperature=temperature, num_ctx=num_ctx, num_predict=num_predict, **kwargs)
-            parameters["code"] = code["code"]
-
-            config.ollamaDefaultModel = ollamaDefaultModel
-            config.ollamaDefaultModel_num_ctx = ollamaDefaultModel_num_ctx
-            config.ollamaDefaultModel_num_predict = ollamaDefaultModel_num_predict
+        parameters = CallGemini.getResponseDict(history=history, schema=schema, userMessage=userMessage, **kwargs)
 
         return parameters
 
@@ -2236,7 +2160,7 @@ Remember, answer in JSON with the filled template ONLY.""",
             if config.developer:
                 #config.print(f"running function '{func_name}' ...")
                 print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
-        if not function_name in config.chatGPTApiAvailableFunctions:
+        if not function_name in config.llmAvailableFunctions:
             if config.developer:
                 config.print(f"Unexpected function: {function_name}")
                 config.print(config.divider)
@@ -2245,5 +2169,5 @@ Remember, answer in JSON with the filled template ONLY.""",
             function_response = "[INVALID]"
         else:
             notifyDeveloper(function_name)
-            function_response = config.chatGPTApiAvailableFunctions[function_name](func_arguments)
+            function_response = config.llmAvailableFunctions[function_name](func_arguments)
         return function_response

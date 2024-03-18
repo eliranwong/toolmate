@@ -28,7 +28,7 @@ def analyze_web_content(function_args):
             "files": [filename],
         }
         config.print3("Running function: 'analyze_images'")
-        return config.chatGPTApiAvailableFunctions["analyze_images"](function_args)
+        return config.llmAvailableFunctions["analyze_images"](function_args)
 
     # process with AutoGen Retriever
     config.print2("AutoGen Retriever launched!")

@@ -118,7 +118,7 @@ class CentralWidget(QWidget):
             messages=config.currentMessages,
             n=1,
             temperature=config.llmTemperature,
-            max_tokens=SharedUtil.getDynamicTokens(config.currentMessages, config.chatGPTApiFunctionSignatures.values()),
+            max_tokens=SharedUtil.getDynamicTokens(config.currentMessages, config.llmFunctionSignatures.values()),
             stream=True,
         )
         # display response
@@ -142,8 +142,8 @@ class CentralWidget(QWidget):
             messages=messages,
             n=1,
             temperature=config.llmTemperature,
-            max_tokens=SharedUtil.getDynamicTokens(messages, config.chatGPTApiFunctionSignatures.values()),
-            tools=SharedUtil.convertFunctionSignaturesIntoTools(config.chatGPTApiFunctionSignatures.values()),
+            max_tokens=SharedUtil.getDynamicTokens(messages, config.llmFunctionSignatures.values()),
+            tools=SharedUtil.convertFunctionSignaturesIntoTools(config.llmFunctionSignatures.values()),
             tool_choice="auto",
             stream=True,
         )
@@ -159,7 +159,7 @@ class CentralWidget(QWidget):
                 function_index = function_call.index
                 function_name = function_call.function.name
                 func_argument = function_arguments[function_index]
-                response = config.chatGPTApiAvailableFunctions[function_name](json.loads(func_argument))
+                response = config.llmAvailableFunctions[function_name](json.loads(func_argument))
 
                 function_call_message = {
                     "role": "assistant",

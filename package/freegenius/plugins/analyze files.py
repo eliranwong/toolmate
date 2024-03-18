@@ -35,7 +35,7 @@ def analyze_files(function_args):
                 "files": [files],
             }
             config.print3("Running function: 'analyze_images'")
-            return config.chatGPTApiAvailableFunctions["analyze_images"](function_args)
+            return config.llmAvailableFunctions["analyze_images"](function_args)
         config.stopSpinning()
         config.print2("AutoGen Retriever launched!")
         last_message = AutoGenRetriever().getResponse(files, query, True)

@@ -56,8 +56,8 @@ def add_tool(signature):
 
 def addFunctionCall(signature: str, method: Callable[[dict], str]):
     name = signature["name"]
-    config.chatGPTApiFunctionSignatures[name] = {key: value for key, value in signature.items() if not key in ("intent", "examples")}
-    config.chatGPTApiAvailableFunctions[name] = method
+    config.llmFunctionSignatures[name] = {key: value for key, value in signature.items() if not key in ("intent", "examples")}
+    config.llmAvailableFunctions[name] = method
     add_tool(signature)
 
 def runPlugins():
@@ -78,8 +78,8 @@ def runPlugins():
     config.predefinedInstructions = {}
     config.inputSuggestions = []
     config.outputTransformers = []
-    config.chatGPTApiFunctionSignatures = {}
-    config.chatGPTApiAvailableFunctions = {}
+    config.llmFunctionSignatures = {}
+    config.llmAvailableFunctions = {}
 
     pluginFolder = os.path.join(dev_dir, "plugins")
     py_files = glob.glob(f"{pluginFolder}/*.py")

@@ -197,7 +197,7 @@ class Prompts:
                     #currentInput = currentInput.replace("[NO_FUNCTION_CALL]", "")
                     currentInput = re.sub(no_function_call_pattern, "", currentInput)
                 else:
-                    availableFunctionTokens = SharedUtil.count_tokens_from_functions(config.chatGPTApiFunctionSignatures)
+                    availableFunctionTokens = SharedUtil.count_tokens_from_functions(config.llmFunctionSignatures)
                 currentInputTokens = len(encoding.encode(config.fineTuneUserInput(currentInput)))
                 loadedMessageTokens = SharedUtil.count_tokens_from_messages(config.currentMessages)
                 selectedModelLimit = SharedUtil.tokenLimits[config.chatGPTApiModel]

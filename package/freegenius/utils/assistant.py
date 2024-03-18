@@ -967,7 +967,7 @@ class LetMeDoItAI:
 
     def getMaxTokens(self):
         contextWindowLimit = SharedUtil.tokenLimits[config.chatGPTApiModel]
-        functionTokens = SharedUtil.count_tokens_from_functions(config.chatGPTApiFunctionSignatures.values())
+        functionTokens = SharedUtil.count_tokens_from_functions(config.llmFunctionSignatures.values())
         maxToken = contextWindowLimit - functionTokens - config.chatGPTApiMinTokens
         if maxToken > 4096 and config.chatGPTApiModel in (
             "gpt-4-turbo-preview",
@@ -1526,7 +1526,7 @@ My writing:
                     # if user don't want function call or a particular function call
                     noFunctionCall = ("[NO_FUNCTION_CALL]" in fineTunedUserInput)
                     checkCallSpecificFunction = re.search("\[CALL_([^\[\]]+?)\]", fineTunedUserInput)
-                    config.runSpecificFuntion = checkCallSpecificFunction.group(1) if checkCallSpecificFunction and checkCallSpecificFunction.group(1) in config.chatGPTApiAvailableFunctions else ""
+                    config.runSpecificFuntion = checkCallSpecificFunction.group(1) if checkCallSpecificFunction and checkCallSpecificFunction.group(1) in config.llmAvailableFunctions else ""
                     if config.developer and config.runSpecificFuntion:
                         #self.print(f"calling function '{config.runSpecificFuntion}' ...")
                         print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Calling function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{config.runSpecificFuntion}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
@@ -1541,7 +1541,7 @@ My writing:
                     # force loading internet searches
                     if config.loadingInternetSearches == "always":
                         try:
-                            config.currentMessages = CallLLM.runSingleFunctionCall(config.currentMessages, [config.chatGPTApiFunctionSignatures["integrate_google_searches"]], "integrate_google_searches")
+                            config.currentMessages = CallLLM.runSingleFunctionCall(config.currentMessages, [config.llmFunctionSignatures["integrate_google_searches"]], "integrate_google_searches")
                         except:
                             self.print("Unable to load internet resources.")
                             SharedUtil.showErrors()

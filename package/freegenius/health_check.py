@@ -388,7 +388,7 @@ class HealthCheck:
     def checkCompletion():
         os.environ["OPENAI_API_KEY"] = config.openaiApiKey
 
-        if config.llmPlatform == "llamacpp":
+        if config.llmBackend == "llamacpp":
             config.llamacppDefaultModel = Llama.from_pretrained(
                 repo_id=config.llamacppDefaultModel_repo_id,
                 filename=config.llamacppDefaultModel_filename,
@@ -403,7 +403,7 @@ class HealthCheck:
                 n_ctx=config.llamacppCodeModel_n_ctx,
                 verbose=False,
             )
-        elif config.llmPlatform == "ollama":
+        elif config.llmBackend == "ollama":
             if shutil.which("ollama"):
                 for i in (config.ollamaDefaultModel, config.ollamaCodeModel):
                     Downloader.downloadOllamaModel(i)
@@ -411,7 +411,7 @@ class HealthCheck:
                 print("Ollama not found! Install it first!")
                 print("Check https://ollama.com")
                 exit(0)
-        elif config.llmPlatform == "chatgpt":
+        elif config.llmBackend == "chatgpt":
             client = OpenAI()
             client.chat.completions.create(
                 model="gpt-3.5-turbo",

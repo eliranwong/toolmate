@@ -90,7 +90,7 @@ class CallLlamaCpp:
 
     @staticmethod
     def getSingleFunctionCallResponse(messages: list, function_name: str, temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs):
-        tool_schema = config.chatGPTApiFunctionSignatures[function_name]["parameters"]
+        tool_schema = config.llmFunctionSignatures[function_name]["parameters"]
         user_request = messages[-1]["content"]
         func_arguments = CallLlamaCpp.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages, temperature=temperature, max_tokens=max_tokens, **kwargs)
         function_call_response = CallLlamaCpp.executeToolFunction(func_arguments=func_arguments, function_name=function_name)
@@ -313,7 +313,7 @@ Remember, output in JSON.""",
             if config.developer:
                 #config.print(f"running function '{func_name}' ...")
                 print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
-        if not function_name in config.chatGPTApiAvailableFunctions:
+        if not function_name in config.llmAvailableFunctions:
             if config.developer:
                 config.print(f"Unexpected function: {function_name}")
                 config.print(config.divider)
@@ -322,5 +322,5 @@ Remember, output in JSON.""",
             function_response = "[INVALID]"
         else:
             notifyDeveloper(function_name)
-            function_response = config.chatGPTApiAvailableFunctions[function_name](func_arguments)
+            function_response = config.llmAvailableFunctions[function_name](func_arguments)
         return function_response

@@ -42,11 +42,11 @@ Testing:
 
 * [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/)
 
+* [Google Vertex AI](https://cloud.google.com/vertex-ai) / [Gemini Pro & Gemini Pro Vision](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
+
 Pending:
 
 * [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
-
-* [Google Vertex AI](https://cloud.google.com/vertex-ai) / [Gemini Pro & Gemini Pro Vision](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
 
 ## How to Change LLM Backend?
 

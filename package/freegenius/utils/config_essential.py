@@ -26,7 +26,7 @@ if config.isTermux:
 
 defaultSettings = (
     # unique configs in FreeGenius AI
-    ('llmBackend', "ollama" if shutil.which("ollama") else "llamacpp"), # "chatgpt", "ollama", "llamacpp", "gemini"
+    ('llmBackend', "ollama" if shutil.which("ollama") else "llamacpp"), # "ollama", "llamacpp", "chatgpt", "gemini"
     ('intent_screening', False), # set True to increase both reliability and waiting time
     ('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools
     ('tokenizers_parallelism', 'true'), # 'true' / 'false'
@@ -47,6 +47,7 @@ defaultSettings = (
     ('llamacppCodeModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for code generation
     ('llamacppCodeModel_n_ctx', 4096), # llama.cpp code model context window
     ('llamacppCodeModel_max_tokens', 10000), # llama.cpp code model maximum tokens
+    ('geminipro_max_output_tokens', 8192), # check supported value at https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
     # common configs as in LetMeDoIt AI
     ('translateToLanguage', ''),
     ('dynamicTokenCount', False),
@@ -171,6 +172,9 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "geminipro_model",
+    "geminipro_generation_config",
+    "geminipro_safety_settings",
     "llamacppDefaultModel",
     "llamacppCodeModel",
     "new_chat_response",

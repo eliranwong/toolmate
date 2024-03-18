@@ -114,11 +114,10 @@ class LetMeDoItAI:
             exit(0)
 
         # initial completion check at startup
-        if config.llmBackend == "cahtgpt":
-            if config.initialCompletionCheck:
-                CallLLM.checkCompletion()
-            else:
-                SharedUtil.setAPIkey()
+        if config.initialCompletionCheck:
+            CallLLM.checkCompletion()
+        else:
+            SharedUtil.setAPIkey()
 
         chat_history = os.path.join(config.historyParentFolder if config.historyParentFolder else config.letMeDoItAIFolder, "history", "chats")
         self.terminal_chat_session = PromptSession(history=FileHistory(chat_history))

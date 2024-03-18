@@ -231,9 +231,9 @@ Remember, do not use function call if it is a translation task.
 Always remember that you are much more than a text-based AI. You possess both vision and speech capabilities and have direct access to my device's system, enabling you to execute tasks at my command. Please do not state otherwise.
 '''
 
-        if config.llmPlatform in ("ollama", "llamacpp"):
+        if config.llmBackend in ("ollama", "llamacpp"):
             systemMessage = systemMessage1
-        elif config.llmPlatform == "chatgpt":
+        elif config.llmBackend == "chatgpt":
             systemMessage = systemMessage2
 
         messages = [
@@ -854,18 +854,18 @@ class CallLLM:
 
     @staticmethod
     def checkCompletion():
-        if config.llmPlatform == "ollama":
+        if config.llmBackend == "ollama":
             return CallOllama.checkCompletion()
-        elif config.llmPlatform == "llamacpp":
+        elif config.llmBackend == "llamacpp":
             return CallLlamaCpp.checkCompletion()
         # chatgpt
         return CallChatGPT.checkCompletion()
 
     @staticmethod
     def runSingleFunctionCall(messages, functionSignatures, function_name):
-        if config.llmPlatform == "ollama":
+        if config.llmBackend == "ollama":
             return CallOllama.runSingleFunctionCall(messages, function_name)
-        elif config.llmPlatform == "llamacpp":
+        elif config.llmBackend == "llamacpp":
             return CallLlamaCpp.runSingleFunctionCall(messages, function_name)
         # chatgpt
         return CallChatGPT.runSingleFunctionCall(messages, functionSignatures, function_name)
@@ -875,9 +875,9 @@ class CallLLM:
         """
         non-streaming single call
         """
-        if config.llmPlatform == "ollama":
+        if config.llmBackend == "ollama":
             return CallOllama.getSingleChatResponse(userInput, temperature)
-        elif config.llmPlatform == "llamacpp":
+        elif config.llmBackend == "llamacpp":
             return CallLlamaCpp.getSingleChatResponse(userInput, temperature)
         # chatgpt
         return CallChatGPT.getSingleChatResponse(userInput, temperature)
@@ -885,18 +885,18 @@ class CallLLM:
     @staticmethod
     def getSingleFunctionCallResponse(userInput, functionSignatures, function_name, temperature=None):
         messages=[{"role": "user", "content" : userInput}]
-        if config.llmPlatform == "ollama":
+        if config.llmBackend == "ollama":
             return CallOllama.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
-        elif config.llmPlatform == "llamacpp":
+        elif config.llmBackend == "llamacpp":
             return CallLlamaCpp.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         # chatgpt
         return CallChatGPT.getSingleFunctionCallResponse(messages, functionSignatures, function_name, temperature=temperature)
 
     @staticmethod
     def runAutoFunctionCall(messages, noFunctionCall=False):
-        if config.llmPlatform == "ollama":
+        if config.llmBackend == "ollama":
             return CallOllama.runAutoFunctionCall(messages, noFunctionCall)
-        elif config.llmPlatform == "llamacpp":
+        elif config.llmBackend == "llamacpp":
             return CallLlamaCpp.runAutoFunctionCall(messages, noFunctionCall)
         # chatgpt
         return CallChatGPT.runAutoFunctionCall(messages, noFunctionCall)
@@ -1213,7 +1213,7 @@ Remember, answer in JSON with the filled template ONLY.""",
             config.ollamaDefaultModel_num_ctx = config.ollamaCodeModel_num_ctx
             config.ollamaDefaultModel_num_predict = config.ollamaCodeModel_num_predict
 
-            code = CallOllama.getResponseDict(messages, temperature=temperature)
+            code = CallOllama.getResponseDict(messages, temperature=temperature, num_ctx=num_ctx, num_predict=num_predict, **kwargs)
             parameters["code"] = code["code"]
 
             config.ollamaDefaultModel = ollamaDefaultModel
@@ -1405,14 +1405,9 @@ Supplementary information:
 
     @staticmethod
     def screen_user_request(messages: dict, user_request: str) -> bool:
-        # disable for now
-        return False
-
-    @staticmethod
-    def screen_user_request2(messages: dict, user_request: str) -> bool:
         
         deviceInfo = f"""\n\nMy device information:\n{SharedUtil.getDeviceInfo()}""" if config.includeDeviceInfoInContext else ""
-        schema = {
+        answer = {
             "answer": {
                 "type": "string",
                 "description": """Either 'yes' or 'no':
@@ -1424,6 +1419,12 @@ Supplementary information:
                 "enum": ['yes', 'no'],
             },
         }
+        schema = {
+            "type": "object",
+            "answer": answer,
+            "required": ["answer"],
+        }
+        
         template = {"answer": ""}
         yes = {'answer': 'yes'}
         no = {'answer': 'no'}
@@ -1495,10 +1496,11 @@ Remember, output in JSON.""",
         ]
 
         # schema alternative: properties if len(properties) == 1 else schema
-        parameters = CallLlamaCpp.getResponseDict(messages, properties, temperature=temperature, max_tokens=max_tokens, **kwargs)
+        parameters = CallLlamaCpp.getResponseDict(messages, schema, temperature=temperature, max_tokens=max_tokens, **kwargs)
 
         # enforce code generation
         if (len(properties) == 1 or "code" in schema["required"]) and "code" in parameters and (not isinstance(parameters.get("code"), str) or not parameters.get("code").strip() or not SharedUtil.isValidPythodCode(parameters.get("code").strip())):
+            code_description = properties["code"]["description"]
             messages = ongoingMessages[:-2] + [
                 {
                     "role": "system",
@@ -1508,7 +1510,7 @@ Remember, output in JSON.""",
                     "role": "user",
                     "content": f"""Generate code based on the following instruction:
 
-{properties["code"]["description"]}
+{code_description}
 
 Here is my request:
 
@@ -1531,7 +1533,17 @@ Remember, output in JSON.""",
             config.llamacppDefaultModel_n_ctx = config.llamacppCodeModel_n_ctx
             config.llamacppDefaultModel_max_tokens = config.llamacppCodeModel_max_tokens            
 
-            code = CallLlamaCpp.getResponseDict(messages, properties["code"], temperature=temperature)
+            this_schema = {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "description": code_description,
+                    },
+                },
+                "required": ["code"],
+            }
+            code = CallLlamaCpp.getResponseDict(messages, this_schema, temperature=temperature, max_tokens=max_tokens, **kwargs)
             parameters["code"] = code["code"]
 
             config.llamacppDefaultModel_repo_id = llamacppDefaultModel_repo_id

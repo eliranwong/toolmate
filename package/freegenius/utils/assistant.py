@@ -114,7 +114,7 @@ class LetMeDoItAI:
             exit(0)
 
         # initial completion check at startup
-        if config.llmPlatform == "cahtgpt":
+        if config.llmBackend == "cahtgpt":
             if config.initialCompletionCheck:
                 CallLLM.checkCompletion()
             else:
@@ -1557,7 +1557,7 @@ My writing:
                         # Create a new thread for the streaming task
                         streamingWordWrapper = StreamingWordWrapper()
                         streaming_event = threading.Event()
-                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmPlatform == "chatgpt" else False))
+                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmBackend == "chatgpt" else False))
                         # Start the streaming thread
                         self.streaming_thread.start()
 

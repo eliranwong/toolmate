@@ -30,9 +30,11 @@ The author aims to equip FreeGenius AI, as an AI suite that is able to:
 - devlops strategies plugin framework to execute multi-step generation or task execution
 - run with common computer hardwares with reasonable and affordable cost
 
-# Supported LLM Platform / Models
+# Supported LLM Backend / Models
 
-Determined by config.llmPlatform; accepted values: 'ollama', 'llamacpp', 'chatgpt', 'gemini'; 'ollama' by default
+LLM Backend is determined by the value of config.llmBackend
+
+Default: 'ollama' if Ollama is installed else 'llamacpp'
 
 Testing:
 
@@ -45,6 +47,32 @@ Pending:
 * [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
 
 * [Google Vertex AI](https://cloud.google.com/vertex-ai) / [Gemini Pro & Gemini Pro Vision](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
+
+## How to Change LLM Backend?
+
+For now, you need to manually edit the value of 'llmBackend' in config.py
+
+Accepted values: 'ollama', 'llamacpp'
+
+Pending: 'chatgpt', 'gemini'
+
+## How to Change Models?
+
+While the app is still in testing stage, you need to edit manually the folloinwg values in config.py:
+
+* ollamaDefaultModel
+
+* ollamaCodeModel
+
+* llamacppDefaultModel_repo_id
+
+* llamacppDefaultModel_filename
+
+* llamacppCodeModel_repo_id
+
+* llamacppCodeModel_filename
+
+Remarks: Edit config.py only when the app is closed.
 
 # Approach to Run Function Calling Equivalent Features Offline with Common Hardwares
 

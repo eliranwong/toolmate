@@ -26,8 +26,7 @@ if config.isTermux:
 
 defaultSettings = (
     # unique configs in FreeGenius AI
-    #('llmPlatform', "ollama" if shutil.which("ollama") else "llamacpp"), # "chatgpt", "ollama", "llamacpp", "gemini"
-    ('llmPlatform', "ollama"),
+    ('llmBackend', "ollama" if shutil.which("ollama") else "llamacpp"), # "chatgpt", "ollama", "llamacpp", "gemini"
     ('intent_screening', False), # set True to increase both reliability and waiting time
     ('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools
     ('tokenizers_parallelism', 'true'), # 'true' / 'false'
@@ -76,7 +75,7 @@ defaultSettings = (
     #('chatGPTApiNoOfChoices', 1),
     ('chatGPTApiFunctionCall', "auto"),
     ('passFunctionCallReturnToChatGPT', True),
-    ('llmTemperature', 0.5),
+    ('llmTemperature', 0.3),
     ('max_consecutive_auto_reply', 10), # work with pyautogen
     ('memoryClosestMatches', 5),
     ('chatRecordClosestMatches', 5),

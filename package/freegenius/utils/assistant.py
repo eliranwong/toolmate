@@ -18,7 +18,8 @@ from freegenius.utils.get_path_prompt import GetPath
 from freegenius.utils.prompt_shared_key_bindings import swapTerminalColors
 from freegenius.utils.file_utils import FileUtil
 from freegenius.utils.terminal_system_command_prompt import SystemCommandPrompt
-from freegenius.utils.shared_utils import SharedUtil, CallOllama, CallLlamaCpp
+from freegenius.utils.shared_utils import SharedUtil
+from freegenius.utils.shared_utils import CallLLM
 from freegenius.utils.tts_utils import TTSUtil
 from freegenius.utils.ttsLanguages import TtsLanguages
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
@@ -113,9 +114,9 @@ class LetMeDoItAI:
             exit(0)
 
         # initial completion check at startup
-        if config.llmServer == "cahtgpt":
+        if config.llmPlatform == "cahtgpt":
             if config.initialCompletionCheck:
-                SharedUtil.checkCompletion()
+                CallLLM.checkCompletion()
             else:
                 SharedUtil.setAPIkey()
 
@@ -404,7 +405,7 @@ class LetMeDoItAI:
             #oid = self.prompts.simplePrompt(default=config.openaiApiOrganization, is_password=True)
             #if oid and not oid.strip().lower() in (config.cancel_entry, config.exit_entry):
             #    config.openaiApiOrganization = oid
-            SharedUtil.checkCompletion()
+            CallLLM.checkCompletion()
             config.saveConfig()
             self.print2("Configurations updated!")
 
@@ -1480,7 +1481,7 @@ class LetMeDoItAI:
                             day_of_week = ""
                         else:
                             day_of_week = f"today is {SharedUtil.getDayOfWeek()} and "
-                        improvedVersion = SharedUtil.getSingleChatResponse(f"""Improve the following writing, according to {config.improvedWritingSytle}
+                        improvedVersion = CallLLM.getSingleChatResponse(f"""Improve the following writing, according to {config.improvedWritingSytle}
 In addition, I would like you to help me with converting relative dates and times, if any, into exact dates and times based on the reference that {day_of_week}current datetime is {str(datetime.datetime.now())}.
 Remember, provide me with the improved writing only, enclosed in triple quotes ``` and without any additional information or comments.
 My writing:
@@ -1541,17 +1542,13 @@ My writing:
                     # force loading internet searches
                     if config.loadingInternetSearches == "always":
                         try:
-                            config.currentMessages = SharedUtil.runFunction(config.currentMessages, [config.chatGPTApiFunctionSignatures["integrate_google_searches"]], "integrate_google_searches")
+                            config.currentMessages = CallLLM.runSingleFunctionCall(config.currentMessages, [config.chatGPTApiFunctionSignatures["integrate_google_searches"]], "integrate_google_searches")
                         except:
                             self.print("Unable to load internet resources.")
                             SharedUtil.showErrors()
 
-                    if config.llmServer == "chatgpt":
-                        completion = SharedUtil.runCompletion(config.currentMessages, noFunctionCall)
-                    elif config.llmServer == "ollama":
-                        completion = CallOllama.runCompletion(config.currentMessages, noFunctionCall)
-                    elif config.llmServer == "llamacpp":
-                        completion = CallLlamaCpp.runCompletion(config.currentMessages, noFunctionCall)
+                    completion = CallLLM.runAutoFunctionCall(config.currentMessages, noFunctionCall)
+                    
                     # stop spinning
                     config.runPython = True
                     self.stopSpinning()
@@ -1560,7 +1557,7 @@ My writing:
                         # Create a new thread for the streaming task
                         streamingWordWrapper = StreamingWordWrapper()
                         streaming_event = threading.Event()
-                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmServer == "chatgpt" else False))
+                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmPlatform == "chatgpt" else False))
                         # Start the streaming thread
                         self.streaming_thread.start()
 

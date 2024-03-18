@@ -4,7 +4,7 @@ class CallLlamaFile:
     # not workable yet; may not support it
 
     @staticmethod
-    def runCompletion(messages: dict, noFunctionCall: bool = False):
+    def runAutoFunctionCall(messages: dict, noFunctionCall: bool = False):
         user_request = messages[-1]["content"]
         if config.intent_screening:
             # 1. Intent Screening

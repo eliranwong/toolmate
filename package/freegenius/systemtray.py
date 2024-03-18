@@ -50,10 +50,6 @@ class SystemTrayIcon(QSystemTrayIcon):
 
         self.menu = QMenu(parent)
 
-        #quickTask = QAction("Quick Task", self)
-        #quickTask.triggered.connect(lambda: QuickTask().run(standalone=False))
-        #self.menu.addAction(quickTask)
-
         if config.developer:
             chatgui = QAction("Desktop Assistant [experimental]", self)
             chatgui.triggered.connect(self.showGui)

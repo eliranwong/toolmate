@@ -8,7 +8,8 @@ Ask SQLite file. To retrieve information from or make changes in a sqlite file, 
 
 from freegenius import config
 from freegenius.utils.shared_utils import SharedUtil
-import os, sqlite3, json, pprint
+from freegenius.utils.shared_utils import CallLLM
+import os, sqlite3, json
 
 def search_sqlite(function_args):
     db = function_args.get("path") # required
@@ -59,7 +60,7 @@ And run python code to resolve my request: {request}
 
 Please consider individual table information below for code generation:
 {info}"""
-        _, function_call_response = SharedUtil.getSingleFunctionResponse(userInput, [config.chatGPTApiFunctionSignatures["execute_python_code"]], "execute_python_code")
+        _, function_call_response = CallLLM.getSingleFunctionCallResponse(userInput, [config.chatGPTApiFunctionSignatures["execute_python_code"]], "execute_python_code")
         return function_call_response
     except:
         SharedUtil.showErrors()

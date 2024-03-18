@@ -30,13 +30,9 @@ The author aims to equip FreeGenius AI, as an AI suite that is able to:
 - devlops strategies plugin framework to execute multi-step generation or task execution
 - run with common computer hardwares with reasonable and affordable cost
 
-# Supported LLM Server / Models
+# Supported LLM Platform / Models
 
-Determined by config.llmServer; accepted values: 'ollama', 'llamacpp', 'chatgpt', 'gemini'
-
-'ollama' is set as default if Ollama is installed
-
-'llamacpp' is set as default if Ollama is not installed
+Determined by config.llmPlatform; accepted values: 'ollama', 'llamacpp', 'chatgpt', 'gemini'; 'ollama' by default
 
 Testing:
 
@@ -48,7 +44,7 @@ Pending:
 
 * [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
 
-* [Google Vertex AI](https://cloud.google.com/vertex-ai) / [Gemini Pro & Gemini Pro Vision, PaLM 2, Codey](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
+* [Google Vertex AI](https://cloud.google.com/vertex-ai) / [Gemini Pro & Gemini Pro Vision](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
 
 # Approach to Run Function Calling Equivalent Features Offline with Common Hardwares
 

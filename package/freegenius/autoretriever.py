@@ -110,7 +110,7 @@ class AutoGenRetriever:
             system_message="You are a helpful assistant.",
             llm_config={
                 #"cache_seed": 42,  # seed for caching and reproducibility
-                "config_list": oai_config_list if config.llmServer == "chatgpt" else ollama_config_list,
+                "config_list": oai_config_list if config.llmPlatform == "chatgpt" else ollama_config_list,
                 "temperature": config.llmTemperature,  # temperature for sampling
                 "timeout": 600,
             },  # configuration for autogen's enhanced inference API which is compatible with OpenAI API
@@ -131,7 +131,7 @@ class AutoGenRetriever:
                     #"task": "qa", # the task of the retrieve chat. Possible values are "code", "qa" and "default". System prompt will be different for different tasks. The default value is default, which supports both code and qa.
                     "docs_path": docs_path,
                     "chunk_token_size": 2000, # the chunk token size for the retrieve chat. If key not provided, a default size max_tokens * 0.4 will be used.
-                    "model": oai_config_list[0]["model"] if config.llmServer == "chatgpt" else config.ollamaDefaultModel,
+                    "model": oai_config_list[0]["model"] if config.llmPlatform == "chatgpt" else config.ollamaDefaultModel,
                     "client": client,
                     "embedding_function": HealthCheck.getEmbeddingFunction(),
                     #"embedding_model": "all-mpnet-base-v2", # the embedding model to use for the retrieve chat. If key not provided, a default model all-MiniLM-L6-v2 will be used. All available models can be found at https://www.sbert.net/docs/pretrained_models.html. The default model is a fast model. If you want to use a high performance model, all-mpnet-base-v2 is recommended.

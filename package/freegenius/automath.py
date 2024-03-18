@@ -74,7 +74,7 @@ class AutoGenMath:
             system_message="You are a helpful assistant.",
             llm_config={
                 #"cache_seed": 42,  # seed for caching and reproducibility
-                "config_list": oai_config_list if config.llmServer == "chatgpt" else ollama_config_list,
+                "config_list": oai_config_list if config.llmPlatform == "chatgpt" else ollama_config_list,
                 "temperature": config.llmTemperature,  # temperature for sampling
                 "timeout": 600,
             },  # configuration for autogen's enhanced inference API which is compatible with OpenAI API

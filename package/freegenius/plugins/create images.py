@@ -9,7 +9,8 @@ generate images with model "dall-e-3"
 from freegenius import config
 import os
 from base64 import b64decode
-from freegenius.utils.shared_utils import SharedUtil, check_openai_errors
+from freegenius.utils.shared_utils import SharedUtil
+from freegenius.utils.shared_utils import check_openai_errors
 from freegenius.utils.terminal_mode_dialogs import TerminalModeDialogs
 from openai import OpenAI
 from pathlib import Path

@@ -1987,21 +1987,18 @@ class CallGemini:
             return {}
 
     @staticmethod
-    def getSingleChatResponse(userInput: str, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
+    def getSingleChatResponse(userInput: str, **kwargs):
         # non-streaming single call
         try:
-            completion = ollama.chat(
-                model=config.ollamaDefaultModel,
-                messages=[{"role": "user", "content" : userInput}],
+            chat = config.geminipro_model.start_chat()
+            completion = chat.send_message(
+                userInput,
+                generation_config=config.geminipro_generation_config,
+                safety_settings=config.geminipro_safety_settings,
                 stream=False,
-                options=Options(
-                    temperature=temperature if temperature is not None else config.llmTemperature,
-                    num_ctx=num_ctx if num_ctx is not None else config.ollamaDefaultModel_num_ctx,
-                    num_predict=num_predict if num_predict is not None else config.ollamaDefaultModel_num_predict,
-                ),
                 **kwargs,
             )
-            return completion["message"]["content"]
+            return completion.candidates[0].content.parts[0].text
         except:
             return ""
 
@@ -2146,12 +2143,50 @@ Remember, response in JSON with the filled template ONLY.""",
         Extract action parameters
         """
 
+        deviceInfo = f"""
+
+Here is my device information for additional reference:
+<my_device_information>
+{SharedUtil.getDeviceInfo()}
+</my_device_information>""" if config.includeDeviceInfoInContext else ""
+
+        # Generate Code when required
+        if "code" in schema["parameters"]["required"]:
+            enforceCodeOutput = """ Remember, you should format the requested information, if any, into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."""
+            schema["parameters"]["properties"]["code"]["description"] += enforceCodeOutput
+            code_instruction = f"""Generate python code according to the following instruction:
+</instruction>
+{schema["parameters"]["properties"]["code"]["description"]}
+</instruction>
+
+Here is my request:
+<request>
+{userInput}
+</request>{deviceInfo}
+
+Remember, response with the required python code ONLY, WITHOUT extra notes or explanations."""
+            code = f"""The required code is given below:
+<code>
+{CallGemini.getSingleChatResponse(code_instruction)}
+</code>"""
+            code = code.replace(r"\\n", "\n")
+        else:
+            code = ""
+        print(code)
+
         history, systemMessage, lastUserMessage = CallGemini.toGeminiMessages(messages=ongoingMessages)
-        deviceInfo = f"""\n\nI am providing my device information below in case you need it:\n```\n{SharedUtil.getDeviceInfo()}\n```""" if config.includeDeviceInfoInContext else ""
-        userMessage = f"{systemMessage}{deviceInfo}\n\nHere is my request:\n{lastUserMessage}" if useSystemMessage and systemMessage else lastUserMessage
+        
+        userMessage = f"""<request>
+{lastUserMessage}
+</request>{deviceInfo}{code}
+
+When necessary, generate content based on your knowledge."""
+        #userMessage = f"{systemMessage}{deviceInfo}\n\nUse function call based on my request:\n{lastUserMessage}" if useSystemMessage and systemMessage else lastUserMessage
 
         parameters = CallGemini.getResponseDict(history=history, schema=schema, userMessage=userMessage, **kwargs)
-
+        # fix linebreak
+        if code:
+            parameters["code"] = parameters["code"].replace("\\n", "\n")
         return parameters
 
     @staticmethod

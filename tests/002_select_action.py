@@ -56,8 +56,8 @@ def add_tool(signature):
 
 def addFunctionCall(signature: str, method: Callable[[dict], str]):
     name = signature["name"]
-    config.llmFunctionSignatures[name] = {key: value for key, value in signature.items() if not key in ("intent", "examples")}
-    config.llmAvailableFunctions[name] = method
+    config.toolFunctionSchemas[name] = {key: value for key, value in signature.items() if not key in ("intent", "examples")}
+    config.toolFunctionMethods[name] = method
     add_tool(signature)
 
 def runPlugins():
@@ -78,8 +78,8 @@ def runPlugins():
     config.predefinedInstructions = {}
     config.inputSuggestions = []
     config.outputTransformers = []
-    config.llmFunctionSignatures = {}
-    config.llmAvailableFunctions = {}
+    config.toolFunctionSchemas = {}
+    config.toolFunctionMethods = {}
 
     pluginFolder = os.path.join(dev_dir, "plugins")
     py_files = glob.glob(f"{pluginFolder}/*.py")

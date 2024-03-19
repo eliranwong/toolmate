@@ -28,7 +28,7 @@ def analyze_web_content(function_args):
             "files": [filename],
         }
         config.print3("Running function: 'analyze_images'")
-        return config.llmAvailableFunctions["analyze_images"](function_args)
+        return config.toolFunctionMethods["analyze_images"](function_args)
 
     # process with AutoGen Retriever
     config.print2("AutoGen Retriever launched!")

@@ -118,7 +118,7 @@ class CentralWidget(QWidget):
             messages=config.currentMessages,
             n=1,
             temperature=config.llmTemperature,
-            max_tokens=SharedUtil.getDynamicTokens(config.currentMessages, config.llmFunctionSignatures.values()),
+            max_tokens=SharedUtil.getDynamicTokens(config.currentMessages, config.toolFunctionSchemas.values()),
             stream=True,
         )
         # display response
@@ -142,8 +142,8 @@ class CentralWidget(QWidget):
             messages=messages,
             n=1,
             temperature=config.llmTemperature,
-            max_tokens=SharedUtil.getDynamicTokens(messages, config.llmFunctionSignatures.values()),
-            tools=SharedUtil.convertFunctionSignaturesIntoTools(config.llmFunctionSignatures.values()),
+            max_tokens=SharedUtil.getDynamicTokens(messages, config.toolFunctionSchemas.values()),
+            tools=SharedUtil.convertFunctionSignaturesIntoTools(config.toolFunctionSchemas.values()),
             tool_choice="auto",
             stream=True,
         )
@@ -159,7 +159,7 @@ class CentralWidget(QWidget):
                 function_index = function_call.index
                 function_name = function_call.function.name
                 func_argument = function_arguments[function_index]
-                response = config.llmAvailableFunctions[function_name](json.loads(func_argument))
+                response = config.toolFunctionMethods[function_name](json.loads(func_argument))
 
                 function_call_message = {
                     "role": "assistant",

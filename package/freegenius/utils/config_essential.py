@@ -233,8 +233,8 @@ temporaryConfigs = [
     "predefinedInstructions", # used with plugins; pre-defined instructions
     "predefinedContexts", # used with plugins; pre-defined contexts
     # used with plugins; function call
-    "llmFunctionSignatures",
-    "llmAvailableFunctions",
+    "toolFunctionSchemas",
+    "toolFunctionMethods",
     "pythonFunctionResponse", # used with plugins; function call when function name is 'python'
     # LetMeDoItAI methods shared from Class LetMeDoItAI
     "getLocalStorage",

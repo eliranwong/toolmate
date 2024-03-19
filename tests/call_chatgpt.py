@@ -197,7 +197,7 @@ class CallChatGPT:
             # handle known and unwanted function
             function_response = "[INVALID]" 
         # handle unexpected function
-        elif not function_name in config.llmAvailableFunctions:
+        elif not function_name in config.toolFunctionMethods:
             if config.developer:
                 config.print(f"Unexpected function: {function_name}")
                 config.print(config.divider)
@@ -206,7 +206,7 @@ class CallChatGPT:
             function_response = "[INVALID]"
         else:
             notifyDeveloper(function_name)
-            fuction_to_call = config.llmAvailableFunctions[function_name]
+            fuction_to_call = config.toolFunctionMethods[function_name]
             # convert the arguments from json into a dict
             function_args = json.loads(func_arguments)
             function_response = fuction_to_call(function_args)
@@ -218,14 +218,14 @@ class CallChatGPT:
         functionJustCalled = False
         def runThisCompletion(thisThisMessage):
             nonlocal functionJustCalled
-            if config.llmFunctionSignatures and not functionJustCalled and not noFunctionCall:
+            if config.toolFunctionSchemas and not functionJustCalled and not noFunctionCall:
                 return config.oai_client.chat.completions.create(
                     model=config.chatGPTApiModel,
                     messages=thisThisMessage,
                     n=1,
                     temperature=config.llmTemperature,
-                    max_tokens=SharedUtil.getDynamicTokens(thisThisMessage, config.llmFunctionSignatures.values()),
-                    tools=SharedUtil.convertFunctionSignaturesIntoTools([config.llmFunctionSignatures[config.runSpecificFuntion]] if config.runSpecificFuntion and config.runSpecificFuntion in config.llmFunctionSignatures else config.llmFunctionSignatures.values()),
+                    max_tokens=SharedUtil.getDynamicTokens(thisThisMessage, config.toolFunctionSchemas.values()),
+                    tools=SharedUtil.convertFunctionSignaturesIntoTools([config.toolFunctionSchemas[config.runSpecificFuntion]] if config.runSpecificFuntion and config.runSpecificFuntion in config.toolFunctionSchemas else config.toolFunctionSchemas.values()),
                     tool_choice={"type": "function", "function": {"name": config.runSpecificFuntion}} if config.runSpecificFuntion else config.chatGPTApiFunctionCall,
                     stream=True,
                 )

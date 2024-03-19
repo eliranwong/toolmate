@@ -60,55 +60,7 @@ Testing:
 
 * [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
 
-* LetMeDoIt mode / [ChatGPT models](https://platform.openai.com/docs/models)
-
-# LetMeDoIt Mode
-
-You can use LetMeDoIt mode, by setting "config.llmBackend" to "letmedoit".
-
-In LetMeDoIt mode, the assistant handles all your requests as [LetMeDoIt AI](https://github.com/eliranwong/letmedoit) does
-
-## Differences between LetMeDoIt Mode and ChatGPT Mode
-
-Both LetMeDoIt Mode and ChatGPT Mode are powered by ChatGPT models.
-
-Major differences are listed below:
-
-1. Configurations are different even both are powered 
-
-ChatGPT Mode: "config.llmBackend" set to "chatgpt"
-
-LetMeDoIt Mode: "config.llmBackend" set to "letmedoit"
-
-2. Screening
-
-ChatGPT Mode: Screening of user requests is optional
-
-LetMeDoIt Mode: Screening option is not applicable
-
-3. Tool Selection from Multiple Options
-
-ChatGPT Mode: Determined by the closest similarity search in FreeGenius AI tool store. User selection will be supported by introducing config.auto_tool_selection_threshold and config.maximum_tool_choices 
-
-LetMeDoIt Mode: Totally determined by ChatGPT models
-
-4. Token Costs
-
-ChatGPT Mode: Cheaper, as only one tool, the selected one, is handled in each function call.
-
-LetMeDoIt Mode: More expensive, as all enabled tools are handled together in each function call, which is required for automatic tool selection.
-
-5. Speed
-
-ChatGPT Mode: Slower in case only a few tools are in place. Faster in case there are many tools installed and enabled.
-
-LetMeDoIt Mode: Faster in case only a few tools are in place. Slower in case there are many tools installed and enabled.
-
-6. Testing
-
-ChatGPT Mode: Still in testing stage that some tools may not work.  Please kindly help report of any issues at https://github.com/eliranwong/freegenius/issues 
-
-LetMeDoIt Mode: All tools were originally developed for LetMeDoIt AI. They should work out of the box.
+* [LetMeDoIt mode](https://github.com/eliranwong/freegenius/wiki/LetMeDoIt-Mode) / [ChatGPT models](https://platform.openai.com/docs/models)
 
 ## How to Change LLM Backend?
 
@@ -136,7 +88,7 @@ While the app is still in testing stage, you need to edit manually the folloinwg
 
 Remarks: Edit config.py only when the app is closed.
 
-# Approach to Run Function Calling Equivalent Features Offline with Common Hardwares
+# Approach to Run Function Calling Equivalent Features Offline with Affordable Hardwares
 
 Currently, [LetMeDoIt AI](https://github.com/eliranwong/letmedoit) core features heavily reply on the strengths of OpenAI function calling features, which offer abilities:
 

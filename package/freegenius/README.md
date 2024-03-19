@@ -30,6 +30,20 @@ The author aims to equip FreeGenius AI, as an AI suite that is able to:
 - devlops strategies plugin framework to execute multi-step generation or task execution
 - run with common computer hardwares with reasonable and affordable cost
 
+# In Testing Stage; Not for Production Yet
+
+Please kindly note that the project is still in testing phrase. It is not for production yet.
+
+## For Testing and Contributions
+
+Install FreeGenius AI, by running:
+
+> pip install freegenius
+
+We appreciate anyone who help testing / codeing.
+
+Please kindly report of any issues at https://github.com/eliranwong/freegenius/issues
+
 # Supported LLM Backend / Models
 
 LLM Backend is determined by the value of config.llmBackend
@@ -44,9 +58,57 @@ Testing:
 
 * [Google Vertex AI](https://cloud.google.com/vertex-ai) / [Gemini Pro & Gemini Pro Vision](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
 
-Pending:
-
 * [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
+
+* LetMeDoIt mode / [ChatGPT models](https://platform.openai.com/docs/models)
+
+# LetMeDoIt Mode
+
+You can use LetMeDoIt mode, by setting "config.llmBackend" to "letmedoit".
+
+In LetMeDoIt mode, the assistant handles all your requests as [LetMeDoIt AI](https://github.com/eliranwong/letmedoit) does
+
+## Differences between LetMeDoIt Mode and ChatGPT Mode
+
+Both LetMeDoIt Mode and ChatGPT Mode are powered by ChatGPT models.
+
+Major differences are listed below:
+
+1. Configurations are different even both are powered 
+
+ChatGPT Mode: "config.llmBackend" set to "chatgpt"
+
+LetMeDoIt Mode: "config.llmBackend" set to "letmedoit"
+
+2. Screening
+
+ChatGPT Mode: Screening of user requests is optional
+
+LetMeDoIt Mode: Screening option is not applicable
+
+3. Tool Selection from Multiple Options
+
+ChatGPT Mode: Determined by the closest similarity search in FreeGenius AI tool store. User selection will be supported by introducing config.auto_tool_selection_threshold and config.maximum_tool_choices 
+
+LetMeDoIt Mode: Totally determined by ChatGPT models
+
+4. Token Costs
+
+ChatGPT Mode: Cheaper, as only one tool, the selected one, is handled in each function call.
+
+LetMeDoIt Mode: More expensive, as all enabled tools are handled together in each function call, which is required for automatic tool selection.
+
+5. Speed
+
+ChatGPT Mode: Slower in case only a few tools are in place. Faster in case there are many tools installed and enabled.
+
+LetMeDoIt Mode: Faster in case only a few tools are in place. Slower in case there are many tools installed and enabled.
+
+6. Testing
+
+ChatGPT Mode: Still in testing stage that some tools may not work.  Please kindly help report of any issues at https://github.com/eliranwong/freegenius/issues 
+
+LetMeDoIt Mode: All tools were originally developed for LetMeDoIt AI. They should work out of the box.
 
 ## How to Change LLM Backend?
 
@@ -127,14 +189,6 @@ You are welcome to make contributions to this project by:
 
 Support link: https://www.paypal.me/letmedoitai
 
-# Progress
-
-... in progress ...
-
-* function calling equivalent in place
-
-* testing llm Microsoft "[phi](https://ollama.com/library/phi)" with local llm server "[Ollama](https://ollama.com/)"; good speed with average hardware
-
 # Tested Function Call Plugins:
 
 So far, we tested the following function call plugins:
@@ -179,14 +233,10 @@ pending:
 * ask sqlite
 * create statistical graphics
 
-# Not for Production Yet
+# Documentation
 
-The project still needs lots of cleanup; not for production yet
+Pending ...
 
-# For Testing
+Most current features follow https://github.com/eliranwong/letmedoit/wiki
 
-Installation of Ollama required. Read https://ollama.com/
-
-To install FreeGenius AI
-
-> pip install freegenius
+Particularly, plugin structure follows https://github.com/eliranwong/letmedoit/wiki/Plugins-%E2%80%90-Overview

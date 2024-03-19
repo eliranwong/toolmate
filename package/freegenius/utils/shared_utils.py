@@ -26,6 +26,14 @@ from llama_cpp import Llama
 from freegenius.utils.download import Downloader
 from ollama import Options
 
+from vertexai.preview.generative_models import GenerativeModel, Content, Part, FunctionDeclaration, Tool
+from vertexai.generative_models._generative_models import (
+    GenerationConfig,
+    HarmCategory,
+    HarmBlockThreshold,
+)
+
+
 class SharedUtil:
 
     # token limit
@@ -230,7 +238,7 @@ Remember, do not use function call if it is a translation task.
 Always remember that you are much more than a text-based AI. You possess both vision and speech capabilities and have direct access to my device's system, enabling you to execute tasks at my command. Please do not state otherwise.
 '''
 
-        systemMessage = systemMessage2 if config.llmBackend == "chatgpt" else systemMessage1
+        systemMessage = systemMessage2 if config.llmBackend in ("chatgpt", "letmedoit") else systemMessage1
 
         messages = [
             {"role": "system", "content": systemMessage}
@@ -381,7 +389,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
 
     @staticmethod
     def convertFunctionSignaturesIntoTools(functionSignatures):
-        return [{"type": "function", "function": func} for func in functionSignatures]
+        return [{"type": "function", "function": functionSignature} for functionSignature in functionSignatures]
 
     @staticmethod
     def getPythonFunctionResponse(code):
@@ -848,8 +856,10 @@ class CallLLM:
             return CallLlamaCpp.checkCompletion()
         elif config.llmBackend == "gemini":
             return CallGemini.checkCompletion()
-        # chatgpt
-        return CallChatGPT.checkCompletion()
+        elif config.llmBackend == "chatgpt":
+            return CallChatGPT.checkCompletion()
+        # letmedoit
+        return CallLetMeDoIt.checkCompletion()
 
     @staticmethod
     def runSingleFunctionCall(messages, functionSignatures, function_name):
@@ -859,8 +869,10 @@ class CallLLM:
             return CallLlamaCpp.runSingleFunctionCall(messages, function_name)
         elif config.llmBackend == "gemini":
             return CallGemini.runSingleFunctionCall(messages, function_name)
-        # chatgpt
-        return CallChatGPT.runSingleFunctionCall(messages, functionSignatures, function_name)
+        elif config.llmBackend == "chatgpt":
+            return CallChatGPT.runSingleFunctionCall(messages, functionSignatures, function_name)
+        # letmedoit
+        return CallLetMeDoIt.runSingleFunctionCall(messages, functionSignatures, function_name)
 
     @staticmethod
     def getSingleChatResponse(userInput, messages=[], temperature=None):
@@ -874,8 +886,10 @@ class CallLLM:
         elif config.llmBackend == "gemini":
             history, *_ = CallLLM.toGeminiMessages(messages=messages)
             return CallGemini.getSingleChatResponse(userInput, history=history)
-        # chatgpt
-        return CallChatGPT.getSingleChatResponse(userInput, messages=messages, temperature=temperature)
+        elif config.llmBackend == "chatgpt":
+            return CallChatGPT.getSingleChatResponse(userInput, messages=messages, temperature=temperature)
+        # letmedoit
+        return CallLetMeDoIt.getSingleChatResponse(userInput, messages=messages, temperature=temperature)
 
     @staticmethod
     def getSingleFunctionCallResponse(userInput, functionSignatures, function_name, temperature=None):
@@ -886,8 +900,10 @@ class CallLLM:
             return CallLlamaCpp.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmBackend == "gemini":
             return CallGemini.getSingleFunctionCallResponse(messages, function_name)
-        # chatgpt
-        return CallChatGPT.getSingleFunctionCallResponse(messages, functionSignatures, function_name, temperature=temperature)
+        elif config.llmBackend == "chatgpt":
+            return CallChatGPT.getSingleFunctionCallResponse(messages, functionSignatures, function_name, temperature=temperature)
+        # letmedoit
+        return CallLetMeDoIt.getSingleFunctionCallResponse(messages, functionSignatures, function_name, temperature=temperature)
 
     @staticmethod
     def runAutoFunctionCall(messages, noFunctionCall=False):
@@ -897,8 +913,28 @@ class CallLLM:
             return CallLlamaCpp.runAutoFunctionCall(messages, noFunctionCall)
         elif config.llmBackend == "gemini":
             return CallGemini.runAutoFunctionCall(messages, noFunctionCall)
-        # chatgpt
-        return CallChatGPT.runAutoFunctionCall(messages, noFunctionCall)
+        elif config.llmBackend == "chatgpt":
+            return CallChatGPT.runAutoFunctionCall(messages, noFunctionCall)
+        # letmedoit
+        return CallLetMeDoIt.runAutoFunctionCall(messages, noFunctionCall)
+
+    @staticmethod
+    def executeToolFunction(func_arguments: dict, function_name: str):
+        def notifyDeveloper(func_name):
+            if config.developer:
+                #config.print(f"running function '{func_name}' ...")
+                print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
+        if not function_name in config.toolFunctionMethods:
+            if config.developer:
+                config.print(f"Unexpected function: {function_name}")
+                config.print(config.divider)
+                print(func_arguments)
+                config.print(config.divider)
+            function_response = "[INVALID]"
+        else:
+            notifyDeveloper(function_name)
+            function_response = config.toolFunctionMethods[function_name](func_arguments)
+        return function_response
 
     @staticmethod
     def toParameterSchema(schema) -> dict:
@@ -1064,7 +1100,7 @@ class CallOllama:
         tool_schema = config.toolFunctionSchemas[function_name]["parameters"]
         user_request = messages[-1]["content"]
         func_arguments = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages, temperature=temperature, num_ctx=num_ctx, num_predict=num_predict, **kwargs)
-        function_call_response = CallOllama.executeToolFunction(func_arguments=func_arguments, function_name=function_name)
+        function_call_response = CallLLM.executeToolFunction(func_arguments=func_arguments, function_name=function_name)
         function_call_message_mini = {
             "role": "assistant",
             "content": "",
@@ -1109,7 +1145,7 @@ class CallOllama:
             try:
                 tool_parameters = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
                 # 4. Function Execution
-                tool_response = CallOllama.executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
+                tool_response = CallLLM.executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
             except:
                 print(traceback.format_exc())
                 tool_response = "[INVALID]"
@@ -1271,24 +1307,6 @@ Remember, answer in JSON with the filled template ONLY.""",
 
         return parameters
 
-    @staticmethod
-    def executeToolFunction(func_arguments: dict, function_name: str):
-        def notifyDeveloper(func_name):
-            if config.developer:
-                #config.print(f"running function '{func_name}' ...")
-                print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
-        if not function_name in config.toolFunctionMethods:
-            if config.developer:
-                config.print(f"Unexpected function: {function_name}")
-                config.print(config.divider)
-                print(func_arguments)
-                config.print(config.divider)
-            function_response = "[INVALID]"
-        else:
-            notifyDeveloper(function_name)
-            function_response = config.toolFunctionMethods[function_name](func_arguments)
-        return function_response
-
 
 class CallLlamaCpp:
 
@@ -1377,7 +1395,7 @@ class CallLlamaCpp:
         tool_schema = config.toolFunctionSchemas[function_name]["parameters"]
         user_request = messages[-1]["content"]
         func_arguments = CallLlamaCpp.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages, temperature=temperature, max_tokens=max_tokens, **kwargs)
-        function_call_response = CallLlamaCpp.executeToolFunction(func_arguments=func_arguments, function_name=function_name)
+        function_call_response = CallLLM.executeToolFunction(func_arguments=func_arguments, function_name=function_name)
         function_call_message_mini = {
             "role": "assistant",
             "content": "",
@@ -1422,7 +1440,7 @@ class CallLlamaCpp:
             try:
                 tool_parameters = CallLlamaCpp.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
                 # 4. Function Execution
-                tool_response = CallLlamaCpp.executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
+                tool_response = CallLLM.executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
             except:
                 print(traceback.format_exc())
                 tool_response = "[INVALID]"
@@ -1604,24 +1622,6 @@ Remember, output in JSON.""",
 
         return parameters
 
-    @staticmethod
-    def executeToolFunction(func_arguments: dict, function_name: str):
-        def notifyDeveloper(func_name):
-            if config.developer:
-                #config.print(f"running function '{func_name}' ...")
-                print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
-        if not function_name in config.toolFunctionMethods:
-            if config.developer:
-                config.print(f"Unexpected function: {function_name}")
-                config.print(config.divider)
-                print(func_arguments)
-                config.print(config.divider)
-            function_response = "[INVALID]"
-        else:
-            notifyDeveloper(function_name)
-            function_response = config.toolFunctionMethods[function_name](func_arguments)
-        return function_response
-
 
 def check_openai_errors(func):
     def wrapper(*args, **kwargs):
@@ -1679,269 +1679,6 @@ def check_openai_errors(func):
             print(traceback.format_exc())
             return finishError()
     return wrapper
-
-
-class CallChatGPT:
-
-    @staticmethod
-    @check_openai_errors
-    def checkCompletion():
-        SharedUtil.setAPIkey()
-        config.oai_client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content" : "hello"}],
-            n=1,
-            max_tokens=10,
-        )
-
-    @staticmethod
-    @check_openai_errors
-    def getSingleChatResponse(userInput, messages=[], temperature=None):
-        """
-        non-streaming single call
-        """
-        messages.append({"role": "user", "content" : userInput})
-        try:
-            completion = OpenAI().chat.completions.create(
-                model=config.chatGPTApiModel,
-                messages=messages,
-                n=1,
-                temperature=temperature if temperature is not None else config.llmTemperature,
-                max_tokens=config.chatGPTApiMaxTokens,
-            )
-            return completion.choices[0].message.content
-        except:
-            return ""
-
-    @staticmethod
-    def runSingleFunctionCall(messages, functionSignatures, function_name):
-        messagesCopy = messages[:]
-        try:
-            function_call_message, function_call_response = CallChatGPT.getSingleFunctionCallResponse(messages, functionSignatures, function_name)
-            messages.append(function_call_message)
-            messages.append(
-                {
-                    "role": "function",
-                    "name": function_name,
-                    "content": function_call_response if function_call_response else config.tempContent,
-                }
-            )
-            config.tempContent = ""
-        except:
-            SharedUtil.showErrors()
-            return messagesCopy
-        return messages
-
-    @staticmethod
-    @check_openai_errors
-    def getSingleFunctionCallResponse(messages, functionSignatures, function_name, temperature=None):
-        completion = config.oai_client.chat.completions.create(
-            model=config.chatGPTApiModel,
-            messages=messages,
-            max_tokens=SharedUtil.getDynamicTokens(messages, functionSignatures),
-            temperature=temperature if temperature is not None else config.llmTemperature,
-            n=1,
-            tools=SharedUtil.convertFunctionSignaturesIntoTools(functionSignatures),
-            tool_choice={"type": "function", "function": {"name": function_name}},
-        )
-        function_call_message = completion.choices[0].message
-        tool_call = function_call_message.tool_calls[0]
-        func_arguments = tool_call.function.arguments
-        function_call_message_mini = {
-            "role": "assistant",
-            "content": "",
-            "function_call": {
-                "name": tool_call.function.name,
-                "arguments": func_arguments,
-            }
-        }
-        function_call_response = CallChatGPT.finetuneSingleFunctionCallResponse(func_arguments, function_name)
-        return function_call_message_mini, function_call_response
-
-    @staticmethod
-    def finetuneSingleFunctionCallResponse(func_arguments, function_name):
-        # fine tune function call response; applied to chatgpt only
-        def notifyDeveloper(func_name):
-            if config.developer:
-                #config.print(f"running function '{func_name}' ...")
-                print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
-        # ChatGPT's built-in function named "python"
-        if function_name == "python":
-            notifyDeveloper(function_name)
-            python_code = textwrap.dedent(func_arguments)
-            refinedCode = SharedUtil.fineTunePythonCode(python_code)
-
-            config.print(config.divider)
-            config.print2("running python code ...")
-            risk = SharedUtil.riskAssessment(python_code)
-            SharedUtil.showRisk(risk)
-            if config.developer or config.codeDisplay:
-                print("```")
-                #print(python_code)
-                # pygments python style
-                tokens = list(pygments.lex(python_code, lexer=PythonLexer()))
-                print_formatted_text(PygmentsTokens(tokens), style=SharedUtil.getPygmentsStyle())
-                print("```")
-            config.print(config.divider)
-
-            config.stopSpinning()
-            if not config.runPython:
-                info = {"information": python_code}
-                return json.dumps(info)
-            elif SharedUtil.confirmExecution(risk):
-                config.print("Do you want to continue? [y]es / [N]o")
-                confirmation = prompt(style=config.promptStyle2, default="y")
-                if not confirmation.lower() in ("y", "yes"):
-                    info = {"information": python_code}
-                    return json.dumps(info)
-            try:
-                exec(refinedCode, globals())
-                function_response = SharedUtil.getPythonFunctionResponse(refinedCode)
-            except:
-                trace = SharedUtil.showErrors()
-                config.print(config.divider)
-                if config.max_consecutive_auto_heal > 0:
-                    return SharedUtil.autoHealPythonCode(refinedCode, trace)
-                else:
-                    return "[INVALID]"
-            if function_response:
-                info = {"information": function_response}
-                function_response = json.dumps(info)
-        # known unwanted functions are handled here
-        elif function_name in ("translate_text",):
-            # "translate_text" has two arguments, "text", "target_language"
-            # handle known and unwanted function
-            function_response = "[INVALID]" 
-        # handle unexpected function
-        elif not function_name in config.toolFunctionMethods:
-            if config.developer:
-                config.print(f"Unexpected function: {function_name}")
-                config.print(config.divider)
-                print(func_arguments)
-                config.print(config.divider)
-            function_response = "[INVALID]"
-        else:
-            notifyDeveloper(function_name)
-            fuction_to_call = config.toolFunctionMethods[function_name]
-            # convert the arguments from json into a dict
-            function_args = json.loads(func_arguments)
-            function_response = fuction_to_call(function_args)
-        return function_response
-
-    @staticmethod
-    @check_openai_errors
-    def runAutoFunctionCall(thisMessage, noFunctionCall=False):
-        functionJustCalled = False
-        def runThisCompletion(thisThisMessage):
-            nonlocal functionJustCalled
-            if config.toolFunctionSchemas and not functionJustCalled and not noFunctionCall:
-                return config.oai_client.chat.completions.create(
-                    model=config.chatGPTApiModel,
-                    messages=thisThisMessage,
-                    n=1,
-                    temperature=config.llmTemperature,
-                    max_tokens=SharedUtil.getDynamicTokens(thisThisMessage, config.toolFunctionSchemas.values()),
-                    tools=SharedUtil.convertFunctionSignaturesIntoTools([config.toolFunctionSchemas[config.runSpecificFuntion]] if config.runSpecificFuntion and config.runSpecificFuntion in config.toolFunctionSchemas else config.toolFunctionSchemas.values()),
-                    tool_choice={"type": "function", "function": {"name": config.runSpecificFuntion}} if config.runSpecificFuntion else config.chatGPTApiFunctionCall,
-                    stream=True,
-                )
-            return config.oai_client.chat.completions.create(
-                model=config.chatGPTApiModel,
-                messages=thisThisMessage,
-                n=1,
-                temperature=config.llmTemperature,
-                max_tokens=SharedUtil.getDynamicTokens(thisThisMessage),
-                stream=True,
-            )
-
-        while True:
-            completion = runThisCompletion(thisMessage)
-            config.runSpecificFuntion = ""
-            try:
-                # consume the first delta
-                for event in completion:
-                    first_delta = event.choices[0].delta
-                    # check if a tool is called
-                    if first_delta.tool_calls: # a tool is called
-                        function_calls = [i for i in first_delta.tool_calls if i.type == "function"]
-                        # non_function_calls = [i for i in first_delta.tool_calls if not i.type == "function"]
-                    else: # no tool is called; same handling as tools finished calling; which break the loop later
-                        functionJustCalled = True
-                    # consume the first delta only at this point
-                    break
-                # Continue only when a function is called
-                if functionJustCalled:
-                    break
-
-                # get all tool arguments, both of functions and non-functions
-                toolArguments = SharedUtil.getToolArgumentsFromStreams(completion)
-
-                func_responses = ""
-                bypassFunctionCall = False
-                # handle function calls
-                for func in function_calls:
-                    func_index = func.index
-                    func_id = func.id
-                    func_name = func.function.name
-                    func_arguments = toolArguments[func_index]
-
-                    # get function response
-                    func_response = CallChatGPT.finetuneSingleFunctionCallResponse(func_arguments, func_name)
-
-                    # "[INVALID]" practically mean that it ignores previously called function and continues chat without function calling
-                    if func_response == "[INVALID]":
-                        bypassFunctionCall = True
-                    elif func_response or config.tempContent:
-                        # send the function call info and response to GPT
-                        function_call_message = {
-                            "role": "assistant",
-                            "content": "",
-                            "function_call": {
-                                "name": func_name,
-                                "arguments": func_arguments,
-                            }
-                        }
-                        thisMessage.append(function_call_message) # extend conversation with assistant's reply
-                        thisMessage.append(
-                            {
-                                "tool_call_id": func_id,
-                                "role": "function",
-                                "name": func_name,
-                                "content": func_response if func_response else config.tempContent,
-                            }
-                        )  # extend conversation with function response
-                        config.tempContent = ""
-                        if func_response:
-                            func_responses += f"\n{func_response}\n{config.divider}"
-
-                functionJustCalled = True
-
-                # bypassFunctionCall is set to True, usually when a function is called by mistake
-                if bypassFunctionCall:
-                    pass
-                # two cases that breaks the loop at this point
-                # 1. func_responses == ""
-                # 2. config.passFunctionCallReturnToChatGPT = False
-                elif not config.passFunctionCallReturnToChatGPT or not func_responses:
-                    if func_responses:
-                        config.print(f"{config.divider}\n{func_responses}")
-                    # A break here means that no information from the called function is passed back to ChatGPT
-                    # 1. config.passFunctionCallReturnToChatGPT is set to True
-                    # 2. func_responses = "" or None; can be specified in plugins
-                    break
-            except:
-                SharedUtil.showErrors()
-                break
-
-        return completion
-
-
-from vertexai.preview.generative_models import GenerativeModel, Content, Part, FunctionDeclaration, Tool
-from vertexai.generative_models._generative_models import (
-    GenerationConfig,
-    HarmCategory,
-    HarmBlockThreshold,
-)
 
 
 class CallGemini:
@@ -2049,7 +1786,7 @@ class CallGemini:
         tool_schema = config.toolFunctionSchemas[function_name]
         user_request = messages[-1]["content"]
         func_arguments = CallGemini.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages, **kwargs)
-        function_call_response = CallGemini.executeToolFunction(func_arguments=func_arguments, function_name=function_name)
+        function_call_response = CallLLM.executeToolFunction(func_arguments=func_arguments, function_name=function_name)
         function_call_message_mini = {
             "role": "assistant",
             "content": "",
@@ -2095,7 +1832,7 @@ class CallGemini:
             try:
                 tool_parameters = CallGemini.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
                 # 4. Function Execution
-                tool_response = CallGemini.executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
+                tool_response = CallLLM.executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
             except:
                 print(traceback.format_exc())
                 tool_response = "[INVALID]"
@@ -2211,13 +1948,170 @@ When necessary, generate content based on your knowledge."""
             parameters["code"] = parameters["code"].replace("\\n", "\n")
         return parameters
 
+
+class CallChatGPT:
+
     @staticmethod
-    def executeToolFunction(func_arguments: dict, function_name: str):
+    @check_openai_errors
+    def checkCompletion():
+        SharedUtil.setAPIkey()
+        config.oai_client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content" : "hello"}],
+            n=1,
+            max_tokens=10,
+        )
+
+    @staticmethod
+    @check_openai_errors
+    def regularCall(messages: dict, **kwargs):
+        return config.oai_client.chat.completions.create(
+            model=config.chatGPTApiModel,
+            messages=messages,
+            n=1,
+            temperature=config.llmTemperature,
+            max_tokens=SharedUtil.getDynamicTokens(messages),
+            stream=True,
+        )
+
+    @staticmethod
+    @check_openai_errors
+    def getResponseDict(messages: list, schema: dict, **kwargs) -> dict:
+        completion = config.oai_client.chat.completions.create(
+            model=config.chatGPTApiModel,
+            messages=messages,
+            n=1,
+            temperature=config.llmTemperature,
+            max_tokens=SharedUtil.getDynamicTokens(messages, [schema]),
+            tools=[{"type": "function", "function": schema}],
+            tool_choice={"type": "function", "function": {"name": schema["name"]}},
+            stream=False,
+            **kwargs,
+        )
+        responseDict = json.loads(completion.choices[0].message.tool_calls[0].function.arguments)
+        if config.developer:
+            pprint.pprint(responseDict)
+        return responseDict
+
+    @staticmethod
+    @check_openai_errors
+    def getSingleChatResponse(userInput, messages=[], temperature=None):
+        """
+        non-streaming single call
+        """
+        messages.append({"role": "user", "content" : userInput})
+        completion = OpenAI().chat.completions.create(
+            model=config.chatGPTApiModel,
+            messages=messages,
+            n=1,
+            temperature=temperature if temperature is not None else config.llmTemperature,
+            max_tokens=config.chatGPTApiMaxTokens,
+        )
+        return completion.choices[0].message.content
+
+    @staticmethod
+    def runSingleFunctionCall(messages, functionSignatures, function_name):
+        messagesCopy = messages[:]
+        try:
+            function_call_message, function_call_response = CallChatGPT.getSingleFunctionCallResponse(messages, functionSignatures, function_name)
+            messages.append(function_call_message)
+            messages.append(
+                {
+                    "role": "function",
+                    "name": function_name,
+                    "content": function_call_response if function_call_response else config.tempContent,
+                }
+            )
+            config.tempContent = ""
+        except:
+            SharedUtil.showErrors()
+            return messagesCopy
+        return messages
+
+    @staticmethod
+    @check_openai_errors
+    def getSingleFunctionCallResponse(messages: list[dict], functionSignatures: list[dict], function_name: str, temperature=None, **kwargs):
+        completion = config.oai_client.chat.completions.create(
+            model=config.chatGPTApiModel,
+            messages=messages,
+            n=1,
+            temperature=temperature if temperature is not None else config.llmTemperature,
+            max_tokens=SharedUtil.getDynamicTokens(messages, functionSignatures),
+            tools=SharedUtil.convertFunctionSignaturesIntoTools(functionSignatures),
+            tool_choice={"type": "function", "function": {"name": function_name}},
+            stream=False,
+            **kwargs,
+        )
+        function_call_message = completion.choices[0].message
+        tool_call = function_call_message.tool_calls[0]
+        func_arguments = tool_call.function.arguments
+        function_call_message_mini = {
+            "role": "assistant",
+            "content": "",
+            "function_call": {
+                "name": tool_call.function.name,
+                "arguments": func_arguments,
+            }
+        }
+        function_call_response = CallChatGPT.finetuneSingleFunctionCallResponse(func_arguments, function_name)
+        return function_call_message_mini, function_call_response
+
+    @staticmethod
+    def finetuneSingleFunctionCallResponse(func_arguments, function_name):
+        # fine tune function call response; applied to chatgpt only
         def notifyDeveloper(func_name):
             if config.developer:
                 #config.print(f"running function '{func_name}' ...")
                 print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
-        if not function_name in config.toolFunctionMethods:
+        # ChatGPT's built-in function named "python"
+        if function_name == "python":
+            notifyDeveloper(function_name)
+            python_code = textwrap.dedent(func_arguments)
+            refinedCode = SharedUtil.fineTunePythonCode(python_code)
+
+            config.print(config.divider)
+            config.print2("running python code ...")
+            risk = SharedUtil.riskAssessment(python_code)
+            SharedUtil.showRisk(risk)
+            if config.developer or config.codeDisplay:
+                print("```")
+                #print(python_code)
+                # pygments python style
+                tokens = list(pygments.lex(python_code, lexer=PythonLexer()))
+                print_formatted_text(PygmentsTokens(tokens), style=SharedUtil.getPygmentsStyle())
+                print("```")
+            config.print(config.divider)
+
+            config.stopSpinning()
+            if not config.runPython:
+                info = {"information": python_code}
+                return json.dumps(info)
+            elif SharedUtil.confirmExecution(risk):
+                config.print("Do you want to continue? [y]es / [N]o")
+                confirmation = prompt(style=config.promptStyle2, default="y")
+                if not confirmation.lower() in ("y", "yes"):
+                    info = {"information": python_code}
+                    return json.dumps(info)
+            try:
+                exec(refinedCode, globals())
+                function_response = SharedUtil.getPythonFunctionResponse(refinedCode)
+            except:
+                trace = SharedUtil.showErrors()
+                config.print(config.divider)
+                if config.max_consecutive_auto_heal > 0:
+                    return SharedUtil.autoHealPythonCode(refinedCode, trace)
+                else:
+                    return "[INVALID]"
+            if function_response:
+                info = {"information": function_response}
+                function_response = json.dumps(info)
+        # known unwanted functions are handled here
+        elif function_name in ("translate_text",):
+            # "translate_text" has two arguments, "text", "target_language"
+            # handle known and unwanted function
+            function_response = "[INVALID]" 
+        # handle unexpected function
+        elif not function_name in config.toolFunctionMethods:
             if config.developer:
                 config.print(f"Unexpected function: {function_name}")
                 config.print(config.divider)
@@ -2226,5 +2120,373 @@ When necessary, generate content based on your knowledge."""
             function_response = "[INVALID]"
         else:
             notifyDeveloper(function_name)
-            function_response = config.toolFunctionMethods[function_name](func_arguments)
+            fuction_to_call = config.toolFunctionMethods[function_name]
+            # convert the arguments from json into a dict
+            function_args = json.loads(func_arguments)
+            function_response = fuction_to_call(function_args)
         return function_response
+
+    # Auto Function Call equivalence
+
+    @staticmethod
+    def runAutoFunctionCall(messages: dict, noFunctionCall: bool = False):
+        user_request = messages[-1]["content"]
+        if config.intent_screening:
+            # 1. Intent Screening
+            if config.developer:
+                config.print("screening ...")
+            noFunctionCall = True if noFunctionCall else CallChatGPT.screen_user_request(messages=messages)
+        if noFunctionCall:
+            return CallChatGPT.regularCall(messages)
+        else:
+            # 2. Tool Selection
+            if config.developer:
+                config.print("selecting tool ...")
+            tool_collection = SharedUtil.get_or_create_collection("tools")
+            search_result = SharedUtil.query_vectors(tool_collection, user_request)
+            if not search_result:
+                # no tool is available; return a regular call instead
+                return CallChatGPT.regularCall(messages)
+            semantic_distance = search_result["distances"][0][0]
+            if semantic_distance > config.tool_dependence:
+                return CallChatGPT.regularCall(messages)
+            metadatas = search_result["metadatas"][0][0]
+            tool_name = metadatas["name"]
+            tool_schema = config.toolFunctionSchemas[tool_name]
+            if config.developer:
+                config.print3(f"Selected: {tool_name} ({semantic_distance})")
+            # 3. Parameter Extraction
+            if config.developer:
+                config.print("extracting parameters ...")
+            try:
+                #tool_parameters = CallChatGPT.extractToolParameters(schema=tool_schema, ongoingMessages=messages)
+                tool_parameters = CallChatGPT.getResponseDict(messages=messages, schema=tool_schema)
+                # 4. Function Execution
+                tool_response = CallLLM.executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
+            except:
+                print(traceback.format_exc())
+                tool_response = "[INVALID]"
+            # 5. Chat Extension
+            if tool_response == "[INVALID]":
+                # invalid tool call; return a regular call instead
+                return CallChatGPT.regularCall(messages)
+            elif tool_response:
+                if config.developer:
+                    config.print2(config.divider)
+                    config.print2("Tool output:")
+                    print(tool_response)
+                    config.print2(config.divider)
+                # update message chain
+                messages.append(
+                    {
+                        "role": "assistant",
+                        "content": "",
+                        "function_call": {
+                            "name": tool_name,
+                            "arguments": json.dumps(tool_parameters),
+                        }
+                    }
+                )
+                messages.append(
+                    {
+                        "role": "function",
+                        "name": tool_name,
+                        "content": tool_response if tool_response else config.tempContent,
+                    }
+                )
+                config.tempContent = ""
+
+                return CallChatGPT.regularCall(messages)
+            else:
+                # tool function executed without chat extension
+                config.currentMessages.append({"role": "assistant", "content": "Done!"})
+                return None
+
+    @staticmethod
+    def screen_user_request(messages: dict) -> bool:
+        properties = {
+            "answer": {
+                "type": "string",
+                "description": """Evaluate my request to determine if you are able to resolve my request as a text-based AI:
+- Answer 'no' if you are asked to execute a computing task or an online search.
+- Answer 'no' if you are asked for updates / news / real-time information.
+- Answer 'yes' if the request is a greeting or translation.
+- Answer 'yes' only if you have full information to give a direct response.""",
+                "enum": ['yes', 'no'],
+            },
+        }
+        schema = {
+            "name": "screen_user_request",
+            "description": f'''Estimate user request''',
+            "parameters": {
+                "type": "object",
+                "properties": properties,
+                "required": ["code"],
+            },
+        }
+        output = CallChatGPT.getResponseDict(messages, schema=schema)
+        return True if "yes" in str(output).lower() else False
+
+    @staticmethod
+    def extractToolParameters(schema: dict, ongoingMessages: list = [], **kwargs) -> dict:
+        """
+        Extract action parameters
+        """
+        parameters = CallChatGPT.getResponseDict(messages=ongoingMessages, schema=schema, **kwargs)
+        return parameters
+
+
+class CallLetMeDoIt:
+
+    @staticmethod
+    @check_openai_errors
+    def checkCompletion():
+        SharedUtil.setAPIkey()
+        config.oai_client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content" : "hello"}],
+            n=1,
+            max_tokens=10,
+        )
+
+    @staticmethod
+    @check_openai_errors
+    def getSingleChatResponse(userInput, messages=[], temperature=None):
+        """
+        non-streaming single call
+        """
+        messages.append({"role": "user", "content" : userInput})
+        try:
+            completion = OpenAI().chat.completions.create(
+                model=config.chatGPTApiModel,
+                messages=messages,
+                n=1,
+                temperature=temperature if temperature is not None else config.llmTemperature,
+                max_tokens=config.chatGPTApiMaxTokens,
+            )
+            return completion.choices[0].message.content
+        except:
+            return ""
+
+    @staticmethod
+    def runSingleFunctionCall(messages, functionSignatures, function_name):
+        messagesCopy = messages[:]
+        try:
+            function_call_message, function_call_response = CallLetMeDoIt.getSingleFunctionCallResponse(messages, functionSignatures, function_name)
+            messages.append(function_call_message)
+            messages.append(
+                {
+                    "role": "function",
+                    "name": function_name,
+                    "content": function_call_response if function_call_response else config.tempContent,
+                }
+            )
+            config.tempContent = ""
+        except:
+            SharedUtil.showErrors()
+            return messagesCopy
+        return messages
+
+    @staticmethod
+    @check_openai_errors
+    def getSingleFunctionCallResponse(messages, functionSignatures, function_name, temperature=None):
+        completion = config.oai_client.chat.completions.create(
+            model=config.chatGPTApiModel,
+            messages=messages,
+            max_tokens=SharedUtil.getDynamicTokens(messages, functionSignatures),
+            temperature=temperature if temperature is not None else config.llmTemperature,
+            n=1,
+            tools=SharedUtil.convertFunctionSignaturesIntoTools(functionSignatures),
+            tool_choice={"type": "function", "function": {"name": function_name}},
+        )
+        function_call_message = completion.choices[0].message
+        tool_call = function_call_message.tool_calls[0]
+        func_arguments = tool_call.function.arguments
+        function_call_message_mini = {
+            "role": "assistant",
+            "content": "",
+            "function_call": {
+                "name": tool_call.function.name,
+                "arguments": func_arguments,
+            }
+        }
+        function_call_response = CallLetMeDoIt.finetuneSingleFunctionCallResponse(func_arguments, function_name)
+        return function_call_message_mini, function_call_response
+
+    @staticmethod
+    def finetuneSingleFunctionCallResponse(func_arguments, function_name):
+        # fine tune function call response; applied to chatgpt only
+        def notifyDeveloper(func_name):
+            if config.developer:
+                #config.print(f"running function '{func_name}' ...")
+                print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
+        # ChatGPT's built-in function named "python"
+        if function_name == "python":
+            notifyDeveloper(function_name)
+            python_code = textwrap.dedent(func_arguments)
+            refinedCode = SharedUtil.fineTunePythonCode(python_code)
+
+            config.print(config.divider)
+            config.print2("running python code ...")
+            risk = SharedUtil.riskAssessment(python_code)
+            SharedUtil.showRisk(risk)
+            if config.developer or config.codeDisplay:
+                print("```")
+                #print(python_code)
+                # pygments python style
+                tokens = list(pygments.lex(python_code, lexer=PythonLexer()))
+                print_formatted_text(PygmentsTokens(tokens), style=SharedUtil.getPygmentsStyle())
+                print("```")
+            config.print(config.divider)
+
+            config.stopSpinning()
+            if not config.runPython:
+                info = {"information": python_code}
+                return json.dumps(info)
+            elif SharedUtil.confirmExecution(risk):
+                config.print("Do you want to continue? [y]es / [N]o")
+                confirmation = prompt(style=config.promptStyle2, default="y")
+                if not confirmation.lower() in ("y", "yes"):
+                    info = {"information": python_code}
+                    return json.dumps(info)
+            try:
+                exec(refinedCode, globals())
+                function_response = SharedUtil.getPythonFunctionResponse(refinedCode)
+            except:
+                trace = SharedUtil.showErrors()
+                config.print(config.divider)
+                if config.max_consecutive_auto_heal > 0:
+                    return SharedUtil.autoHealPythonCode(refinedCode, trace)
+                else:
+                    return "[INVALID]"
+            if function_response:
+                info = {"information": function_response}
+                function_response = json.dumps(info)
+        # known unwanted functions are handled here
+        elif function_name in ("translate_text",):
+            # "translate_text" has two arguments, "text", "target_language"
+            # handle known and unwanted function
+            function_response = "[INVALID]" 
+        # handle unexpected function
+        elif not function_name in config.toolFunctionMethods:
+            if config.developer:
+                config.print(f"Unexpected function: {function_name}")
+                config.print(config.divider)
+                print(func_arguments)
+                config.print(config.divider)
+            function_response = "[INVALID]"
+        else:
+            notifyDeveloper(function_name)
+            fuction_to_call = config.toolFunctionMethods[function_name]
+            # convert the arguments from json into a dict
+            function_args = json.loads(func_arguments)
+            function_response = fuction_to_call(function_args)
+        return function_response
+
+    @staticmethod
+    @check_openai_errors
+    def runAutoFunctionCall(thisMessage, noFunctionCall=False):
+        functionJustCalled = False
+        def runThisCompletion(thisThisMessage):
+            nonlocal functionJustCalled
+            if config.toolFunctionSchemas and not functionJustCalled and not noFunctionCall:
+                toolFunctionSchemas = [config.toolFunctionSchemas[config.runSpecificFuntion]] if config.runSpecificFuntion and config.runSpecificFuntion in config.toolFunctionSchemas else config.toolFunctionSchemas.values()
+                return config.oai_client.chat.completions.create(
+                    model=config.chatGPTApiModel,
+                    messages=thisThisMessage,
+                    n=1,
+                    temperature=config.llmTemperature,
+                    max_tokens=SharedUtil.getDynamicTokens(thisThisMessage, toolFunctionSchemas),
+                    tools=SharedUtil.convertFunctionSignaturesIntoTools(toolFunctionSchemas),
+                    tool_choice={"type": "function", "function": {"name": config.runSpecificFuntion}} if config.runSpecificFuntion else config.chatGPTApiFunctionCall,
+                    stream=True,
+                )
+            return config.oai_client.chat.completions.create(
+                model=config.chatGPTApiModel,
+                messages=thisThisMessage,
+                n=1,
+                temperature=config.llmTemperature,
+                max_tokens=SharedUtil.getDynamicTokens(thisThisMessage),
+                stream=True,
+            )
+
+        while True:
+            completion = runThisCompletion(thisMessage)
+            config.runSpecificFuntion = ""
+            try:
+                # consume the first delta
+                for event in completion:
+                    first_delta = event.choices[0].delta
+                    # check if a tool is called
+                    if first_delta.tool_calls: # a tool is called
+                        function_calls = [i for i in first_delta.tool_calls if i.type == "function"]
+                        # non_function_calls = [i for i in first_delta.tool_calls if not i.type == "function"]
+                    else: # no tool is called; same handling as tools finished calling; which break the loop later
+                        functionJustCalled = True
+                    # consume the first delta only at this point
+                    break
+                # Continue only when a function is called
+                if functionJustCalled:
+                    break
+
+                # get all tool arguments, both of functions and non-functions
+                toolArguments = SharedUtil.getToolArgumentsFromStreams(completion)
+
+                func_responses = ""
+                bypassFunctionCall = False
+                # handle function calls
+                for func in function_calls:
+                    func_index = func.index
+                    func_id = func.id
+                    func_name = func.function.name
+                    func_arguments = toolArguments[func_index]
+
+                    # get function response
+                    func_response = CallLetMeDoIt.finetuneSingleFunctionCallResponse(func_arguments, func_name)
+
+                    # "[INVALID]" practically mean that it ignores previously called function and continues chat without function calling
+                    if func_response == "[INVALID]":
+                        bypassFunctionCall = True
+                    elif func_response or config.tempContent:
+                        # send the function call info and response to GPT
+                        function_call_message = {
+                            "role": "assistant",
+                            "content": "",
+                            "function_call": {
+                                "name": func_name,
+                                "arguments": func_arguments,
+                            }
+                        }
+                        thisMessage.append(function_call_message) # extend conversation with assistant's reply
+                        thisMessage.append(
+                            {
+                                "tool_call_id": func_id,
+                                "role": "function",
+                                "name": func_name,
+                                "content": func_response if func_response else config.tempContent,
+                            }
+                        )  # extend conversation with function response
+                        config.tempContent = ""
+                        if func_response:
+                            func_responses += f"\n{func_response}\n{config.divider}"
+
+                functionJustCalled = True
+
+                # bypassFunctionCall is set to True, usually when a function is called by mistake
+                if bypassFunctionCall:
+                    pass
+                # two cases that breaks the loop at this point
+                # 1. func_responses == ""
+                # 2. config.passFunctionCallReturnToChatGPT = False
+                elif not config.passFunctionCallReturnToChatGPT or not func_responses:
+                    if func_responses:
+                        config.print(f"{config.divider}\n{func_responses}")
+                    # A break here means that no information from the called function is passed back to ChatGPT
+                    # 1. config.passFunctionCallReturnToChatGPT is set to True
+                    # 2. func_responses = "" or None; can be specified in plugins
+                    break
+            except:
+                SharedUtil.showErrors()
+                break
+
+        return completion

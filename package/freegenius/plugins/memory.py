@@ -121,7 +121,7 @@ functionSignature1 = {
                 "enum": ["general", "instruction", "fact", "event", "concept"],
             },
             "tags": {
-                "type": "array",
+                "type": "string",
                 "description": """Return a list of tags about the memory, e.g. '["work", "to_do", "follow_up"]'"""
             },
         },

@@ -88,7 +88,7 @@ While the app is still in testing stage, you need to edit manually the folloinwg
 
 Remarks: Edit config.py only when the app is closed.
 
-# Approach to Run Function Calling Equivalent Features Offline with Common Hardwares
+# Approach to Run Function Calling Equivalent Features Offline with Affordable Hardwares
 
 Currently, [LetMeDoIt AI](https://github.com/eliranwong/letmedoit) core features heavily reply on the strengths of OpenAI function calling features, which offer abilities:
 

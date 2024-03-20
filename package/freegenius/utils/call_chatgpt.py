@@ -1,4 +1,4 @@
-from freegenius import showErrors, get_or_create_collection, query_vectors
+from freegenius import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle
 
 from freegenius import config
 from freegenius.utils.file_utils import FileUtil
@@ -34,6 +34,18 @@ from vertexai.generative_models._generative_models import (
     HarmCategory,
     HarmBlockThreshold,
 )
+
+# token limit
+# reference: https://platform.openai.com/docs/models/gpt-4
+tokenLimits = {
+    "gpt-4-turbo-preview": 128000, # Returns a maximum of 4,096 output tokens.
+    "gpt-4-0125-preview": 128000, # Returns a maximum of 4,096 output tokens.
+    "gpt-4-1106-preview": 128000, # Returns a maximum of 4,096 output tokens.
+    "gpt-3.5-turbo": 16385, # Returns a maximum of 4,096 output tokens.
+    "gpt-3.5-turbo-16k": 16385,
+    "gpt-4": 8192,
+    "gpt-4-32k": 32768,
+}
 
 def check_openai_errors(func):
     def wrapper(*args, **kwargs):
@@ -92,123 +104,182 @@ def check_openai_errors(func):
             return finishError()
     return wrapper
 
+@check_openai_errors
+def riskAssessment(code):
+    content = f"""You are a senior python engineer.
+Assess the risk level of damaging my device upon executing the python code that I will provide for you.
+Answer me either 'high', 'medium' or 'low', without giving me any extra information.
+e.g. file deletions or similar significant impacts are regarded as 'high' level.
+Acess the risk level of this Python code:
+```
+{code}
+```"""
+    try:
+        answer = CallChatGPT.getSingleChatResponse(content, temperature=0.0) if config.llmBackend == "chatgpt" else CallLetMeDoIt.getSingleChatResponse(content, temperature=0.0)
+        if not answer:
+            answer = "high"
+        answer = re.sub("[^A-Za-z]", "", answer).lower()
+        if not answer in ("high", "medium", "low"):
+            answer = "high"
+        return answer
+    except:
+        return "high"
+
+@check_openai_errors
+def autoHealPythonCode(code, trace):
+    for i in range(config.max_consecutive_auto_heal):
+        userInput = f"Original python code:\n```\n{code}\n```\n\nTraceback:\n```\n{trace}\n```"
+        config.print3(f"Auto-correction attempt: {(i + 1)}")
+        function_call_message, function_call_response = CallChatGPT.getSingleFunctionCallResponse(userInput, [config.toolFunctionSchemas["heal_python"]], "heal_python") if config.llmBackend == "chatgpt" else CallLetMeDoIt.getSingleFunctionCallResponse(userInput, [config.toolFunctionSchemas["heal_python"]], "heal_python")
+        # display response
+        config.print(config.divider)
+        if config.developer:
+            print(function_call_response)
+        else:
+            config.print("Executed!" if function_call_response == "EXECUTED" else "Failed!")
+        if function_call_response == "EXECUTED":
+            break
+        else:
+            code = json.loads(function_call_message["function_call"]["arguments"]).get("fix")
+            trace = function_call_response
+        config.print(config.divider)
+    # return information if any
+    if function_call_response == "EXECUTED":
+        pythonFunctionResponse = getPythonFunctionResponse(code)
+        if pythonFunctionResponse:
+            return json.dumps({"information": pythonFunctionResponse})
+        else:
+            return ""
+    # ask if user want to manually edit the code
+    config.print(f"Failed to execute the code {(config.max_consecutive_auto_heal + 1)} times in a row!")
+    config.print("Do you want to manually edit it? [y]es / [N]o")
+    confirmation = prompt(style=config.promptStyle2, default="N")
+    if confirmation.lower() in ("y", "yes"):
+        config.defaultEntry = f"```python\n{code}\n```"
+        return ""
+    else:
+        return "[INVALID]"
+
+def getDynamicTokens(messages, functionSignatures=None):
+    if functionSignatures is None:
+        functionTokens = 0
+    else:
+        functionTokens = CallChatGPT.count_tokens_from_functions(functionSignatures)
+    tokenLimit = tokenLimits[config.chatGPTApiModel]
+    currentMessagesTokens = count_tokens_from_messages(messages) + functionTokens
+    availableTokens = tokenLimit - currentMessagesTokens
+    if availableTokens >= config.chatGPTApiMaxTokens:
+        return config.chatGPTApiMaxTokens
+    elif (config.chatGPTApiMaxTokens > availableTokens > config.chatGPTApiMinTokens):
+        return availableTokens
+    return config.chatGPTApiMinTokens
+
+def setAPIkey():
+    # instantiate a client that can shared with plugins
+    os.environ["OPENAI_API_KEY"] = config.openaiApiKey
+    config.oai_client = OpenAI()
+    # set variable 'OAI_CONFIG_LIST' to work with pyautogen
+    oai_config_list = []
+    for model in tokenLimits.keys():
+        oai_config_list.append({"model": model, "api_key": config.openaiApiKey})
+    os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
+
+def convertFunctionSignaturesIntoTools(functionSignatures):
+    return [{"type": "function", "function": functionSignature} for functionSignature in functionSignatures]
+
+def count_tokens_from_functions(functionSignatures, model=""):
+    count = 0
+    if not model:
+        model = config.chatGPTApiModel
+    try:
+        encoding = tiktoken.encoding_for_model(model)
+    except KeyError:
+        print("Warning: model not found. Using cl100k_base encoding.")
+        encoding = tiktoken.get_encoding("cl100k_base")
+    for i in functionSignatures:
+        count += len(encoding.encode(str(i)))
+    return count
+
+# The following method was modified from source:
+# https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb
+def count_tokens_from_messages(messages, model=""):
+    if not model:
+        model = config.chatGPTApiModel
+
+    """Return the number of tokens used by a list of messages."""
+    try:
+        encoding = tiktoken.encoding_for_model(model)
+    except KeyError:
+        print("Warning: model not found. Using cl100k_base encoding.")
+        encoding = tiktoken.get_encoding("cl100k_base")
+    if model in {
+            "gpt-3.5-turbo",
+            "gpt-3.5-turbo-0125",
+            "gpt-3.5-turbo-1106",
+            "gpt-3.5-turbo-0613",
+            "gpt-3.5-turbo-16k",
+            "gpt-3.5-turbo-16k-0613",
+            "gpt-4-turbo-preview",
+            "gpt-4-0125-preview",
+            "gpt-4-1106-preview",
+            "gpt-4-0314",
+            "gpt-4-32k-0314",
+            "gpt-4",
+            "gpt-4-0613",
+            "gpt-4-32k",
+            "gpt-4-32k-0613",
+        }:
+        tokens_per_message = 3
+        tokens_per_name = 1
+    elif model == "gpt-3.5-turbo-0301":
+        tokens_per_message = 4  # every message follows <|start|>{role/name}\n{content}<|end|>\n
+        tokens_per_name = -1  # if there's a name, the role is omitted
+    elif "gpt-3.5-turbo" in model:
+        #print("Warning: gpt-3.5-turbo may update over time. Returning num tokens assuming gpt-3.5-turbo-0613.")
+        return count_tokens_from_messages(messages, model="gpt-3.5-turbo-0613")
+    elif "gpt-4" in model:
+        #print("Warning: gpt-4 may update over time. Returning num tokens assuming gpt-4-0613.")
+        return count_tokens_from_messages(messages, model="gpt-4-0613")
+    else:
+        raise NotImplementedError(
+            f"""count_tokens_from_messages() is not implemented for model {model}. See https://github.com/openai/openai-python/blob/main/chatml.md for information on how messages are converted to tokens."""
+        )
+    num_tokens = 0
+    for message in messages:
+        num_tokens += tokens_per_message
+        if not "content" in message or not message.get("content", ""):
+            num_tokens += len(encoding.encode(str(message)))
+        else:
+            for key, value in message.items():
+                num_tokens += len(encoding.encode(value))
+                if key == "name":
+                    num_tokens += tokens_per_name
+    num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>
+    return num_tokens
+
+def getToolArgumentsFromStreams(completion):
+    toolArguments = {}
+    for event in completion:
+        delta = event.choices[0].delta
+        if delta and delta.tool_calls:
+            for tool_call in delta.tool_calls:
+                # handle functions
+                if tool_call.function:
+                    func_index = tool_call.index
+                    if func_index in toolArguments:
+                        toolArguments[func_index] += tool_call.function.arguments
+                    else:
+                        toolArguments[func_index] = tool_call.function.arguments
+                # may support non functions later
+    return toolArguments
+
 
 class CallChatGPT:
-
-    # token limit
-    # reference: https://platform.openai.com/docs/models/gpt-4
-    tokenLimits = {
-        "gpt-4-turbo-preview": 128000, # Returns a maximum of 4,096 output tokens.
-        "gpt-4-0125-preview": 128000, # Returns a maximum of 4,096 output tokens.
-        "gpt-4-1106-preview": 128000, # Returns a maximum of 4,096 output tokens.
-        "gpt-3.5-turbo": 16385, # Returns a maximum of 4,096 output tokens.
-        "gpt-3.5-turbo-16k": 16385,
-        "gpt-4": 8192,
-        "gpt-4-32k": 32768,
-    }
-
-    @staticmethod
-    def getDynamicTokens(messages, functionSignatures=None):
-        if functionSignatures is None:
-            functionTokens = 0
-        else:
-            functionTokens = SharedUtil.count_tokens_from_functions(functionSignatures)
-        tokenLimit = CallChatGPT.tokenLimits[config.chatGPTApiModel]
-        currentMessagesTokens = SharedUtil.count_tokens_from_messages(messages) + functionTokens
-        availableTokens = tokenLimit - currentMessagesTokens
-        if availableTokens >= config.chatGPTApiMaxTokens:
-            return config.chatGPTApiMaxTokens
-        elif (config.chatGPTApiMaxTokens > availableTokens > config.chatGPTApiMinTokens):
-            return availableTokens
-        return config.chatGPTApiMinTokens
-
-    @staticmethod
-    def count_tokens_from_functions(functionSignatures, model=""):
-        count = 0
-        if not model:
-            model = config.chatGPTApiModel
-        try:
-            encoding = tiktoken.encoding_for_model(model)
-        except KeyError:
-            print("Warning: model not found. Using cl100k_base encoding.")
-            encoding = tiktoken.get_encoding("cl100k_base")
-        for i in functionSignatures:
-            count += len(encoding.encode(str(i)))
-        return count
-
-    # The following method was modified from source:
-    # https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb
-    @staticmethod
-    def count_tokens_from_messages(messages, model=""):
-        if not model:
-            model = config.chatGPTApiModel
-
-        """Return the number of tokens used by a list of messages."""
-        try:
-            encoding = tiktoken.encoding_for_model(model)
-        except KeyError:
-            print("Warning: model not found. Using cl100k_base encoding.")
-            encoding = tiktoken.get_encoding("cl100k_base")
-        if model in {
-                "gpt-3.5-turbo",
-                "gpt-3.5-turbo-0125",
-                "gpt-3.5-turbo-1106",
-                "gpt-3.5-turbo-0613",
-                "gpt-3.5-turbo-16k",
-                "gpt-3.5-turbo-16k-0613",
-                "gpt-4-turbo-preview",
-                "gpt-4-0125-preview",
-                "gpt-4-1106-preview",
-                "gpt-4-0314",
-                "gpt-4-32k-0314",
-                "gpt-4",
-                "gpt-4-0613",
-                "gpt-4-32k",
-                "gpt-4-32k-0613",
-            }:
-            tokens_per_message = 3
-            tokens_per_name = 1
-        elif model == "gpt-3.5-turbo-0301":
-            tokens_per_message = 4  # every message follows <|start|>{role/name}\n{content}<|end|>\n
-            tokens_per_name = -1  # if there's a name, the role is omitted
-        elif "gpt-3.5-turbo" in model:
-            #print("Warning: gpt-3.5-turbo may update over time. Returning num tokens assuming gpt-3.5-turbo-0613.")
-            return SharedUtil.count_tokens_from_messages(messages, model="gpt-3.5-turbo-0613")
-        elif "gpt-4" in model:
-            #print("Warning: gpt-4 may update over time. Returning num tokens assuming gpt-4-0613.")
-            return SharedUtil.count_tokens_from_messages(messages, model="gpt-4-0613")
-        else:
-            raise NotImplementedError(
-                f"""count_tokens_from_messages() is not implemented for model {model}. See https://github.com/openai/openai-python/blob/main/chatml.md for information on how messages are converted to tokens."""
-            )
-        num_tokens = 0
-        for message in messages:
-            num_tokens += tokens_per_message
-            if not "content" in message or not message.get("content", ""):
-                num_tokens += len(encoding.encode(str(message)))
-            else:
-                for key, value in message.items():
-                    num_tokens += len(encoding.encode(value))
-                    if key == "name":
-                        num_tokens += tokens_per_name
-        num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>
-        return num_tokens
-
-    @staticmethod
-    def setAPIkey():
-        # instantiate a client that can shared with plugins
-        os.environ["OPENAI_API_KEY"] = config.openaiApiKey
-        config.oai_client = OpenAI()
-        # set variable 'OAI_CONFIG_LIST' to work with pyautogen
-        oai_config_list = []
-        for model in CallChatGPT.tokenLimits.keys():
-            oai_config_list.append({"model": model, "api_key": config.openaiApiKey})
-        os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
 
     @staticmethod
     @check_openai_errors
     def checkCompletion():
-        CallChatGPT.setAPIkey()
+        setAPIkey()
         config.oai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content" : "hello"}],
@@ -224,7 +295,7 @@ class CallChatGPT:
             messages=messages,
             n=1,
             temperature=config.llmTemperature,
-            max_tokens=CallChatGPT.getDynamicTokens(messages),
+            max_tokens=getDynamicTokens(messages),
             stream=True,
             **kwargs,
         )
@@ -237,7 +308,7 @@ class CallChatGPT:
             messages=messages,
             n=1,
             temperature=config.llmTemperature,
-            max_tokens=CallChatGPT.getDynamicTokens(messages, [schema]),
+            max_tokens=getDynamicTokens(messages, [schema]),
             tools=[{"type": "function", "function": schema}],
             tool_choice={"type": "function", "function": {"name": schema["name"]}},
             stream=False,
@@ -291,8 +362,8 @@ class CallChatGPT:
             messages=messages,
             n=1,
             temperature=temperature if temperature is not None else config.llmTemperature,
-            max_tokens=CallChatGPT.getDynamicTokens(messages, functionSignatures),
-            tools=SharedUtil.convertFunctionSignaturesIntoTools(functionSignatures),
+            max_tokens=getDynamicTokens(messages, functionSignatures),
+            tools=convertFunctionSignaturesIntoTools(functionSignatures),
             tool_choice={"type": "function", "function": {"name": function_name}},
             stream=False,
             **kwargs,
@@ -322,18 +393,18 @@ class CallChatGPT:
         if function_name == "python":
             notifyDeveloper(function_name)
             python_code = textwrap.dedent(func_arguments)
-            refinedCode = SharedUtil.fineTunePythonCode(python_code)
+            refinedCode = fineTunePythonCode(python_code)
 
             config.print(config.divider)
             config.print2("running python code ...")
-            risk = SharedUtil.riskAssessment(python_code)
-            SharedUtil.showRisk(risk)
+            risk = riskAssessment(python_code)
+            showRisk(risk)
             if config.developer or config.codeDisplay:
                 print("```")
                 #print(python_code)
                 # pygments python style
                 tokens = list(pygments.lex(python_code, lexer=PythonLexer()))
-                print_formatted_text(PygmentsTokens(tokens), style=SharedUtil.getPygmentsStyle())
+                print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
                 print("```")
             config.print(config.divider)
 
@@ -341,7 +412,7 @@ class CallChatGPT:
             if not config.runPython:
                 info = {"information": python_code}
                 return json.dumps(info)
-            elif SharedUtil.confirmExecution(risk):
+            elif confirmExecution(risk):
                 config.print("Do you want to continue? [y]es / [N]o")
                 confirmation = prompt(style=config.promptStyle2, default="y")
                 if not confirmation.lower() in ("y", "yes"):
@@ -349,12 +420,12 @@ class CallChatGPT:
                     return json.dumps(info)
             try:
                 exec(refinedCode, globals())
-                function_response = SharedUtil.getPythonFunctionResponse(refinedCode)
+                function_response = getPythonFunctionResponse(refinedCode)
             except:
                 trace = showErrors()
                 config.print(config.divider)
                 if config.max_consecutive_auto_heal > 0:
-                    return SharedUtil.autoHealPythonCode(refinedCode, trace)
+                    return autoHealPythonCode(refinedCode, trace)
                 else:
                     return "[INVALID]"
             if function_response:
@@ -417,7 +488,7 @@ class CallChatGPT:
                 #tool_parameters = CallChatGPT.extractToolParameters(schema=tool_schema, ongoingMessages=messages)
                 tool_parameters = CallChatGPT.getResponseDict(messages=messages, schema=tool_schema)
                 # 4. Function Execution
-                tool_response = CallLLM.executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
+                tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
             except:
                 print(traceback.format_exc())
                 tool_response = "[INVALID]"
@@ -496,7 +567,7 @@ class CallLetMeDoIt:
     @staticmethod
     @check_openai_errors
     def checkCompletion():
-        CallChatGPT.setAPIkey()
+        setAPIkey()
         config.oai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content" : "hello"}],
@@ -548,10 +619,10 @@ class CallLetMeDoIt:
         completion = config.oai_client.chat.completions.create(
             model=config.chatGPTApiModel,
             messages=messages,
-            max_tokens=CallChatGPT.getDynamicTokens(messages, functionSignatures),
+            max_tokens=getDynamicTokens(messages, functionSignatures),
             temperature=temperature if temperature is not None else config.llmTemperature,
             n=1,
-            tools=SharedUtil.convertFunctionSignaturesIntoTools(functionSignatures),
+            tools=convertFunctionSignaturesIntoTools(functionSignatures),
             tool_choice={"type": "function", "function": {"name": function_name}},
         )
         function_call_message = completion.choices[0].message
@@ -579,18 +650,18 @@ class CallLetMeDoIt:
         if function_name == "python":
             notifyDeveloper(function_name)
             python_code = textwrap.dedent(func_arguments)
-            refinedCode = SharedUtil.fineTunePythonCode(python_code)
+            refinedCode = fineTunePythonCode(python_code)
 
             config.print(config.divider)
             config.print2("running python code ...")
-            risk = SharedUtil.riskAssessment(python_code)
-            SharedUtil.showRisk(risk)
+            risk = riskAssessment(python_code)
+            showRisk(risk)
             if config.developer or config.codeDisplay:
                 print("```")
                 #print(python_code)
                 # pygments python style
                 tokens = list(pygments.lex(python_code, lexer=PythonLexer()))
-                print_formatted_text(PygmentsTokens(tokens), style=SharedUtil.getPygmentsStyle())
+                print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
                 print("```")
             config.print(config.divider)
 
@@ -598,7 +669,7 @@ class CallLetMeDoIt:
             if not config.runPython:
                 info = {"information": python_code}
                 return json.dumps(info)
-            elif SharedUtil.confirmExecution(risk):
+            elif confirmExecution(risk):
                 config.print("Do you want to continue? [y]es / [N]o")
                 confirmation = prompt(style=config.promptStyle2, default="y")
                 if not confirmation.lower() in ("y", "yes"):
@@ -606,12 +677,12 @@ class CallLetMeDoIt:
                     return json.dumps(info)
             try:
                 exec(refinedCode, globals())
-                function_response = SharedUtil.getPythonFunctionResponse(refinedCode)
+                function_response = getPythonFunctionResponse(refinedCode)
             except:
                 trace = showErrors()
                 config.print(config.divider)
                 if config.max_consecutive_auto_heal > 0:
-                    return SharedUtil.autoHealPythonCode(refinedCode, trace)
+                    return autoHealPythonCode(refinedCode, trace)
                 else:
                     return "[INVALID]"
             if function_response:
@@ -651,8 +722,8 @@ class CallLetMeDoIt:
                     messages=thisThisMessage,
                     n=1,
                     temperature=config.llmTemperature,
-                    max_tokens=CallChatGPT.getDynamicTokens(thisThisMessage, toolFunctionSchemas),
-                    tools=SharedUtil.convertFunctionSignaturesIntoTools(toolFunctionSchemas),
+                    max_tokens=getDynamicTokens(thisThisMessage, toolFunctionSchemas),
+                    tools=convertFunctionSignaturesIntoTools(toolFunctionSchemas),
                     tool_choice={"type": "function", "function": {"name": config.runSpecificFuntion}} if config.runSpecificFuntion else config.chatGPTApiFunctionCall,
                     stream=True,
                 )
@@ -661,7 +732,7 @@ class CallLetMeDoIt:
                 messages=thisThisMessage,
                 n=1,
                 temperature=config.llmTemperature,
-                max_tokens=CallChatGPT.getDynamicTokens(thisThisMessage),
+                max_tokens=getDynamicTokens(thisThisMessage),
                 stream=True,
             )
 
@@ -685,7 +756,7 @@ class CallLetMeDoIt:
                     break
 
                 # get all tool arguments, both of functions and non-functions
-                toolArguments = SharedUtil.getToolArgumentsFromStreams(completion)
+                toolArguments = getToolArgumentsFromStreams(completion)
 
                 func_responses = ""
                 bypassFunctionCall = False

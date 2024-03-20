@@ -70,6 +70,41 @@ def extractPythonCode(content):
         content = code_only.group(1)
     return content if isValidPythodCode(content) is not None else ""
 
+def fineTunePythonCode(code):
+    # dedent
+    code = textwrap.dedent(code).rstrip()
+    # capture print output
+    config.pythonFunctionResponse = ""
+    insert_string = "from freegenius import config\nconfig.pythonFunctionResponse = "
+    code = re.sub("^!(.*?)$", r'import os\nos.system(""" \1 """)', code, flags=re.M)
+    if "\n" in code:
+        substrings = code.rsplit("\n", 1)
+        lastLine = re.sub("print\((.*)\)", r"\1", substrings[-1])
+        if lastLine.startswith(" "):
+            lastLine = re.sub("^([ ]+?)([^ ].*?)$", r"\1config.pythonFunctionResponse = \2", lastLine)
+            code = f"from freegenius import config\n{substrings[0]}\n{lastLine}"
+        else:
+            lastLine = f"{insert_string}{lastLine}"
+            code = f"{substrings[0]}\n{lastLine}"
+    else:
+        code = f"{insert_string}{code}"
+    return code
+
+def getPythonFunctionResponse(code):
+    #return str(config.pythonFunctionResponse) if config.pythonFunctionResponse is not None and (type(config.pythonFunctionResponse) in (int, float, str, list, tuple, dict, set, bool) or str(type(config.pythonFunctionResponse)).startswith("<class 'numpy.")) and not ("os.system(" in code) else ""
+    return "" if config.pythonFunctionResponse is None else str(config.pythonFunctionResponse)
+
+def showRisk(risk):
+    if not config.confirmExecution in ("always", "medium_risk_or_above", "high_risk_only", "none"):
+        config.confirmExecution = "always"
+    config.print(f"[risk level: {risk}]")
+
+def confirmExecution(risk):
+    if config.confirmExecution == "always" or (risk == "high" and config.confirmExecution == "high_risk_only") or (not risk == "low" and config.confirmExecution == "medium_risk_or_above"):
+        return True
+    else:
+        return False
+
 # embedding
 
 def getEmbeddingFunction(embeddingModel=None):
@@ -103,7 +138,11 @@ def query_vectors(collection, query, n=1):
         n_results = n,
     )
 
-# error handling
+# display information
+
+def getPygmentsStyle():
+    theme = config.pygments_style if config.pygments_style else "stata-dark" if not config.terminalResourceLinkColor.startswith("ansibright") else "stata-light"
+    return style_from_pygments_cls(get_style_by_name(theme))
 
 def showErrors():
     trace = traceback.format_exc()

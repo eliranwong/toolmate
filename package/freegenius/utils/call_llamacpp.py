@@ -23,6 +23,10 @@ class CallLlamaCpp:
         )
 
     @staticmethod
+    def autoHealPythonCode(code, trace):
+        ...
+
+    @staticmethod
     def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs):
         return config.llamacppDefaultModel.create_chat_completion(
             messages=messages,

@@ -38,6 +38,11 @@ class CallOllama:
 
     @staticmethod
     @check_ollama_errors
+    def autoHealPythonCode(code, trace):
+        ...
+
+    @staticmethod
+    @check_ollama_errors
     def regularCall(messages: dict, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
         return ollama.chat(
             keep_alive=config.ollamaDefaultModel_keep_alive,

@@ -37,6 +37,10 @@ class CallGemini:
         }
 
     @staticmethod
+    def autoHealPythonCode(code, trace):
+        ...
+
+    @staticmethod
     def regularCall(messages: dict, useSystemMessage: bool=True, **kwargs):
         history, systemMessage, lastUserMessage = toGeminiMessages(messages=messages)
         userMessage = f"{systemMessage}\n\nHere is my request:\n{lastUserMessage}" if useSystemMessage and systemMessage else lastUserMessage

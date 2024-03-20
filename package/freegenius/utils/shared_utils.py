@@ -1,9 +1,6 @@
-from freegenius.utils.call_gemini import CallGemini
-from freegenius.utils.call_ollama import CallOllama
-from freegenius.utils.call_llamacpp import CallLlamaCpp
-from freegenius.utils.call_chatgpt import CallChatGPT, CallLetMeDoIt
+from freegenius.utils.call_llm import CallLLM
 
-from freegenius import config
+from freegenius import config, getPythonFunctionResponse
 from freegenius.utils.file_utils import FileUtil
 from packaging import version
 from bs4 import BeautifulSoup
@@ -200,7 +197,7 @@ class SharedUtil:
             print(trace if config.developer else "Error encountered!")
             config.print(config.divider)
             if config.max_consecutive_auto_heal > 0:
-                SharedUtil.autoHealPythonCode(script, trace)
+                CallLLM.autoHealPythonCode(script, trace)
 
     @staticmethod
     def execPythonFile(script="", content=""):
@@ -385,7 +382,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
             trace = SharedUtil.showErrors()
             config.print(config.divider)
             if config.max_consecutive_auto_heal > 0:
-                return SharedUtil.autoHealPythonCode(code, trace)
+                return CallLLM.autoHealPythonCode(code, trace)
             else:
                 return "[INVALID]"
         if not pythonFunctionResponse:
@@ -400,41 +397,6 @@ Always remember that you are much more than a text-based AI. You possess both vi
     def getPythonFunctionResponse(code):
         #return str(config.pythonFunctionResponse) if config.pythonFunctionResponse is not None and (type(config.pythonFunctionResponse) in (int, float, str, list, tuple, dict, set, bool) or str(type(config.pythonFunctionResponse)).startswith("<class 'numpy.")) and not ("os.system(" in code) else ""
         return "" if config.pythonFunctionResponse is None else str(config.pythonFunctionResponse)
-
-    @staticmethod
-    def autoHealPythonCode(code, trace):
-        for i in range(config.max_consecutive_auto_heal):
-            userInput = f"Original python code:\n```\n{code}\n```\n\nTraceback:\n```\n{trace}\n```"
-            config.print3(f"Auto-correction attempt: {(i + 1)}")
-            function_call_message, function_call_response = CallLLM.getSingleFunctionCallResponse(userInput, [config.toolFunctionSchemas["heal_python"]], "heal_python")
-            # display response
-            config.print(config.divider)
-            if config.developer:
-                print(function_call_response)
-            else:
-                config.print("Executed!" if function_call_response == "EXECUTED" else "Failed!")
-            if function_call_response == "EXECUTED":
-                break
-            else:
-                code = json.loads(function_call_message["function_call"]["arguments"]).get("fix")
-                trace = function_call_response
-            config.print(config.divider)
-        # return information if any
-        if function_call_response == "EXECUTED":
-            pythonFunctionResponse = SharedUtil.getPythonFunctionResponse(code)
-            if pythonFunctionResponse:
-                return json.dumps({"information": pythonFunctionResponse})
-            else:
-                return ""
-        # ask if user want to manually edit the code
-        config.print(f"Failed to execute the code {(config.max_consecutive_auto_heal + 1)} times in a row!")
-        config.print("Do you want to manually edit it? [y]es / [N]o")
-        confirmation = prompt(style=config.promptStyle2, default="N")
-        if confirmation.lower() in ("y", "yes"):
-            config.defaultEntry = f"```python\n{code}\n```"
-            return ""
-        else:
-            return "[INVALID]"
 
     @staticmethod
     def fineTunePythonCode(code):
@@ -543,27 +505,6 @@ Always remember that you are much more than a text-based AI. You possess both vi
                         num_tokens += tokens_per_name
         num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>
         return num_tokens
-
-    @staticmethod
-    def riskAssessment(code):
-        content = f"""You are a senior python engineer.
-Assess the risk level of damaging my device upon executing the python code that I will provide for you.
-Answer me either 'high', 'medium' or 'low', without giving me any extra information.
-e.g. file deletions or similar significant impacts are regarded as 'high' level.
-Acess the risk level of this Python code:
-```
-{code}
-```"""
-        try:
-            answer = CallLLM.getSingleChatResponse(content, temperature=0.0)
-            if not answer:
-                answer = "high"
-            answer = re.sub("[^A-Za-z]", "", answer).lower()
-            if not answer in ("high", "medium", "low"):
-                answer = "high"
-            return answer
-        except:
-            return "high"
 
     # streaming
     @staticmethod
@@ -850,141 +791,3 @@ City: {g.city}"""
             "parameters": json.dumps(parameters),
         }
         SharedUtil.add_vector(collection, description, metadata)
-
-class CallLLM:
-
-    @staticmethod
-    def checkCompletion():
-        if config.llmBackend == "ollama":
-            return CallOllama.checkCompletion()
-        elif config.llmBackend == "llamacpp":
-            return CallLlamaCpp.checkCompletion()
-        elif config.llmBackend == "gemini":
-            return CallGemini.checkCompletion()
-        elif config.llmBackend == "chatgpt":
-            return CallChatGPT.checkCompletion()
-        # letmedoit
-        return CallLetMeDoIt.checkCompletion()
-
-    @staticmethod
-    def runSingleFunctionCall(messages, functionSignatures, function_name):
-        if config.llmBackend == "ollama":
-            return CallOllama.runSingleFunctionCall(messages, function_name)
-        elif config.llmBackend == "llamacpp":
-            return CallLlamaCpp.runSingleFunctionCall(messages, function_name)
-        elif config.llmBackend == "gemini":
-            return CallGemini.runSingleFunctionCall(messages, function_name)
-        elif config.llmBackend == "chatgpt":
-            return CallChatGPT.runSingleFunctionCall(messages, functionSignatures, function_name)
-        # letmedoit
-        return CallLetMeDoIt.runSingleFunctionCall(messages, functionSignatures, function_name)
-
-    @staticmethod
-    def getSingleChatResponse(userInput, messages=[], temperature=None):
-        """
-        non-streaming single call
-        """
-        if config.llmBackend == "ollama":
-            return CallOllama.getSingleChatResponse(userInput, messages=messages, temperature=temperature)
-        elif config.llmBackend == "llamacpp":
-            return CallLlamaCpp.getSingleChatResponse(userInput, messages=messages, temperature=temperature)
-        elif config.llmBackend == "gemini":
-            history, *_ = CallLLM.toGeminiMessages(messages=messages)
-            return CallGemini.getSingleChatResponse(userInput, history=history)
-        elif config.llmBackend == "chatgpt":
-            return CallChatGPT.getSingleChatResponse(userInput, messages=messages, temperature=temperature)
-        # letmedoit
-        return CallLetMeDoIt.getSingleChatResponse(userInput, messages=messages, temperature=temperature)
-
-    @staticmethod
-    def getSingleFunctionCallResponse(userInput, functionSignatures, function_name, temperature=None):
-        messages=[{"role": "user", "content" : userInput}]
-        if config.llmBackend == "ollama":
-            return CallOllama.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
-        elif config.llmBackend == "llamacpp":
-            return CallLlamaCpp.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
-        elif config.llmBackend == "gemini":
-            return CallGemini.getSingleFunctionCallResponse(messages, function_name)
-        elif config.llmBackend == "chatgpt":
-            return CallChatGPT.getSingleFunctionCallResponse(messages, functionSignatures, function_name, temperature=temperature)
-        # letmedoit
-        return CallLetMeDoIt.getSingleFunctionCallResponse(messages, functionSignatures, function_name, temperature=temperature)
-
-    @staticmethod
-    def runAutoFunctionCall(messages, noFunctionCall=False):
-        if config.llmBackend == "ollama":
-            return CallOllama.runAutoFunctionCall(messages, noFunctionCall)
-        elif config.llmBackend == "llamacpp":
-            return CallLlamaCpp.runAutoFunctionCall(messages, noFunctionCall)
-        elif config.llmBackend == "gemini":
-            return CallGemini.runAutoFunctionCall(messages, noFunctionCall)
-        elif config.llmBackend == "chatgpt":
-            return CallChatGPT.runAutoFunctionCall(messages, noFunctionCall)
-        # letmedoit
-        return CallLetMeDoIt.runAutoFunctionCall(messages, noFunctionCall)
-
-    @staticmethod
-    def executeToolFunction(func_arguments: dict, function_name: str):
-        def notifyDeveloper(func_name):
-            if config.developer:
-                #config.print(f"running function '{func_name}' ...")
-                print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
-        if not function_name in config.toolFunctionMethods:
-            if config.developer:
-                config.print(f"Unexpected function: {function_name}")
-                config.print(config.divider)
-                print(func_arguments)
-                config.print(config.divider)
-            function_response = "[INVALID]"
-        else:
-            notifyDeveloper(function_name)
-            function_response = config.toolFunctionMethods[function_name](func_arguments)
-        return function_response
-
-    @staticmethod
-    def toParameterSchema(schema) -> dict:
-        """
-        extract parameter schema from full schema
-        """
-        if "parameters" in schema:
-            return schema["parameters"]
-        return schema
-
-    @staticmethod
-    def toGeminiMessages(messages: dict=[]) -> Optional[list]:
-        systemMessage = ""
-        lastUserMessage = ""
-        if messages:
-            history = []
-            for i in config.currentMessages:
-                role = i.get("role", "")
-                content = i.get("content", "")
-                if role in ("user", "assistant"):
-                    history.append(Content(role="user" if role == "user" else "model", parts=[Part.from_text(content)]))
-                    if role == "user":
-                        lastUserMessage = content
-                elif role == "system":
-                    systemMessage = content
-            if history and history[-1].role == "user":
-                history = history[:-1]
-            else:
-                lastUserMessage = ""
-            if not history:
-                history = None
-        else:
-            history = None
-        return history, systemMessage, lastUserMessage
-
-    @staticmethod
-    def isValidPythodCode(code):
-        try:
-            codeObject = compile(code, '<string>', 'exec')
-            return codeObject
-        except:
-            return None
-
-    @staticmethod
-    def extractPythonCode(content):
-        if code_only := re.search('```python\n(.+?)```', content, re.DOTALL):
-            content = code_only.group(1)
-        return content if CallLLM.isValidPythodCode(content) is not None else ""

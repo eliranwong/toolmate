@@ -7,21 +7,22 @@ if os.getcwd() != packageFolder:
 
 from freegenius import config
 config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
-config.letMeDoItAIFolder = packageFolder
-if not hasattr(config, "letMeDoItName") or not config.letMeDoItName:
-    config.letMeDoItName = "FreeGenius AI"
+config.freeGeniusAIFolder = packageFolder
+if not hasattr(config, "freeGeniusAIName") or not config.freeGeniusAIName:
+    config.freeGeniusAIName = "FreeGenius AI"
 from freegenius.utils.config_tools import setConfig
 config.setConfig = setConfig
 ## alternative to include config restoration method
 #from freegenius.utils.config_tools import *
 from freegenius.utils.shared_utils import SharedUtil
+from freegenius.utils.tool_plugins import Plugins
+from freegenius.utils.tool_plugins import ToolStore
 config.includeIpInDeviceInfoTemp = True
-config.getLocalStorage = SharedUtil.getLocalStorage
 config.print = config.print2 = config.print3 = print
-config.addFunctionCall = SharedUtil.addFunctionCall
+config.addFunctionCall = Plugins.addFunctionCall
 config.divider = "--------------------"
 SharedUtil.setOsOpenCmd()
-SharedUtil.setupToolStoreClient()
+ToolStore.setupToolStoreClient()
 os.environ["TOKENIZERS_PARALLELISM"] = config.tokenizers_parallelism
 
 import sys, platform, shutil, webbrowser
@@ -32,11 +33,11 @@ from pathlib import Path
 from functools import partial
 
 
-letMeDoItFile = os.path.realpath(__file__)
-letMeDoItAIFolder = os.path.dirname(letMeDoItFile)
-with open(os.path.join(letMeDoItAIFolder, "package_name.txt"), "r", encoding="utf-8") as fileObj:
+freeGeniusAIFile = os.path.realpath(__file__)
+freeGeniusAIFolder = os.path.dirname(freeGeniusAIFile)
+with open(os.path.join(freeGeniusAIFolder, "package_name.txt"), "r", encoding="utf-8") as fileObj:
     package = fileObj.read()
-iconFile = os.path.join(letMeDoItAIFolder, "icons", "systemtray.png")
+iconFile = os.path.join(freeGeniusAIFolder, "icons", "systemtray.png")
 thisOS = platform.system()
 
 
@@ -110,7 +111,7 @@ class SystemTrayIcon(QSystemTrayIcon):
             with open(filePath, "w", encoding="utf-8") as fileObj:
                 fileObj.write(content)
 
-        shortcut_dir = os.path.join(letMeDoItAIFolder, "shortcuts")
+        shortcut_dir = os.path.join(freeGeniusAIFolder, "shortcuts")
         Path(shortcut_dir).mkdir(parents=True, exist_ok=True)
 
         # The following line does not work on Windows
@@ -124,7 +125,7 @@ class SystemTrayIcon(QSystemTrayIcon):
                     package: "main.py",
                     "etextedit": "eTextEdit.py",
                 }
-                systemTrayFile = os.path.join(letMeDoItAIFolder, filenames.get(command, f"{command}.py"))
+                systemTrayFile = os.path.join(freeGeniusAIFolder, filenames.get(command, f"{command}.py"))
                 content = f'''powershell.exe -NoExit -Command "{sys.executable} '{systemTrayFile}'"'''
                 createShortcutFile(filePath, content)
         elif thisOS == "Darwin":
@@ -132,7 +133,7 @@ class SystemTrayIcon(QSystemTrayIcon):
             filePath = os.path.join(shortcut_dir, f"{command}.command")
             if not os.path.isfile(filePath):
                 content = f"""#!/bin/bash
-cd {letMeDoItAIFolder}
+cd {freeGeniusAIFolder}
 {commandPath}"""
                 createShortcutFile(filePath, content)
                 os.chmod(filePath, 0o755)
@@ -151,7 +152,7 @@ cd {letMeDoItAIFolder}
 Version=1.0
 Type=Application
 Terminal=true
-Path={letMeDoItAIFolder}
+Path={freeGeniusAIFolder}
 Exec={commandPath}
 Icon={iconFile}
 Name={command}"""

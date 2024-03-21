@@ -1,5 +1,7 @@
 from freegenius import config
+from freegenius.utils.call_llm import CallLLM
 from freegenius.utils.shared_utils import SharedUtil
+from freegenius.utils.tool_plugins import Plugins
 from freegenius.gui.worker import Worker
 import json, getpass
 
@@ -21,9 +23,9 @@ class CentralWidget(QWidget):
     def setupVariables(self):
         # username
         self.user = getpass.getuser().split(" ")[0].capitalize()
-        self.assistant = config.letMeDoItName.split(" ")[0]
+        self.assistant = config.freeGeniusAIName.split(" ")[0]
         # load LetMeDoIt AI system message
-        config.currentMessages=SharedUtil.resetMessages()
+        config.currentMessages=CallLLM.resetMessages()
         # thread pool
         self.threadpool = QThreadPool()
         # scroll bar
@@ -217,11 +219,11 @@ class ChatGui(QMainWindow):
         # check if running standalone
         self.standalone = standalone
         # set title
-        self.setWindowTitle(config.letMeDoItName)
+        self.setWindowTitle(config.freeGeniusAIName)
         # set variables
         self.setupVariables()
         # run plugins
-        SharedUtil.runPlugins()
+        Plugins.runPlugins()
         # gui
         self.initUI()
 

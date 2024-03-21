@@ -1,4 +1,4 @@
-from freegenius import config
+from freegenius import config, fineTunePythonCode
 import traceback
 from freegenius.utils.install import installmodule
 from freegenius.utils.shared_utils import SharedUtil
@@ -34,7 +34,7 @@ def heal_python(function_args):
         config.print2("Running improved code ...")
         if config.developer or config.codeDisplay:
             SharedUtil.displayPythonCode(fix)
-        exec(SharedUtil.fineTunePythonCode(fix), globals())
+        exec(fineTunePythonCode(fix), globals())
         return "EXECUTED"
     except:
         return traceback.format_exc()

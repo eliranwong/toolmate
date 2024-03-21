@@ -20,6 +20,7 @@ if not hasattr(config, "currentMessages"):
     #print("Configurations updated!")
 HealthCheck.checkCompletion()
 
+from freegenius import getEmbeddingFunction
 import autogen, os, json, traceback, chromadb, re, zipfile, datetime, traceback
 from chromadb.config import Settings
 from pathlib import Path
@@ -133,7 +134,7 @@ class AutoGenRetriever:
                     "chunk_token_size": 2000, # the chunk token size for the retrieve chat. If key not provided, a default size max_tokens * 0.4 will be used.
                     "model": oai_config_list[0]["model"] if config.llmBackend == "chatgpt" else config.ollamaDefaultModel,
                     "client": client,
-                    "embedding_function": HealthCheck.getEmbeddingFunction(),
+                    "embedding_function": getEmbeddingFunction(),
                     #"embedding_model": "all-mpnet-base-v2", # the embedding model to use for the retrieve chat. If key not provided, a default model all-MiniLM-L6-v2 will be used. All available models can be found at https://www.sbert.net/docs/pretrained_models.html. The default model is a fast model. If you want to use a high performance model, all-mpnet-base-v2 is recommended.
                     "get_or_create": False,  # set to False if you don't want to reuse an existing collection, but you'll need to remove the collection manually
                     "must_break_at_empty_line": False, # (Optional, bool): chunk will only break at empty line if True. Default is True. If chunk_mode is "one_line", this parameter will be ignored.

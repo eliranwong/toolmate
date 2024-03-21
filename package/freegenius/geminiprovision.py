@@ -5,7 +5,7 @@ from vertexai.generative_models._generative_models import (
     HarmCategory,
     HarmBlockThreshold,
 )
-from freegenius import config
+from freegenius import config, showErrors
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.health_check import HealthCheck
 if not hasattr(config, "currentMessages"):
@@ -91,7 +91,7 @@ class GeminiProVision:
                     }
                     self.analyze_images(function_args)
                 except:
-                    HealthCheck.showErrors()
+                    showErrors()
         else:
             HealthCheck.print2("Entered path does not exist!")
         HealthCheck.print2("\nGemini Pro Vision closed!")
@@ -186,7 +186,7 @@ class GeminiProVision:
                         print(StreamingWordWrapper.wrapText(chat_response))
                         return chat_response
                 except:
-                    HealthCheck.showErrors()
+                    showErrors()
                     return ""
         else:
             HealthCheck.print2("No image file is found!")

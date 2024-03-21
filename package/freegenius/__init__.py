@@ -1,9 +1,53 @@
+import os
+thisFile = os.path.realpath(__file__)
+packageFolder = os.path.dirname(thisFile)
+package = os.path.basename(packageFolder)
+if os.getcwd() != packageFolder:
+    os.chdir(packageFolder)
+configFile = os.path.join(packageFolder, "config.py")
+if not os.path.isfile(configFile):
+    open(configFile, "a", encoding="utf-8").close()
 from freegenius import config
-import geocoder, platform, socket, geocoder, datetime, requests, netifaces, getpass, pendulum, traceback, uuid, re
+config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
+
+import os, geocoder, platform, socket, geocoder, datetime, requests, netifaces, getpass, pendulum, traceback, uuid, re, textwrap, glob
 from chromadb.utils import embedding_functions
+from pygments.styles import get_style_by_name
+from prompt_toolkit.styles.pygments import style_from_pygments_cls
 from prompt_toolkit import print_formatted_text, HTML
 from typing import Optional
 from vertexai.preview.generative_models import Content, Part
+from pathlib import Path
+
+
+# files
+
+def fileNamesWithoutExtension(dir, ext):
+    # Note: pathlib.Path(file).stem does not work with file name containg more than one dot, e.g. "*.db.sqlite"
+    files = glob.glob(os.path.join(dir, "*.{0}".format(ext)))
+    return sorted([file[len(dir)+1:-(len(ext)+1)] for file in files if os.path.isfile(file)])
+
+def getLocalStorage():
+    # config.freeGeniusAIName
+    if not hasattr(config, "freeGeniusAIName") or not config.freeGeniusAIName:
+        config.freeGeniusAIName = "FreeGenius AI"
+
+    # option 1: config.storagedirectory; user custom folder
+    if not hasattr(config, "storagedirectory") or (config.storagedirectory and not os.path.isdir(config.storagedirectory)):
+        config.storagedirectory = ""
+    if config.storagedirectory:
+        return config.storagedirectory
+    # option 2: defaultStorageDir; located in user home directory
+    defaultStorageDir = os.path.join(os.path.expanduser('~'), config.freeGeniusAIName.split()[0].lower())
+    try:
+        Path(defaultStorageDir).mkdir(parents=True, exist_ok=True)
+    except:
+        pass
+    if os.path.isdir(defaultStorageDir):
+        return defaultStorageDir
+    # option 3: directory "files" in app directory; to be deleted on every upgrade
+    else:
+        return os.path.join(packageFolder, "files")
 
 # call llm
 
@@ -57,6 +101,23 @@ def toGeminiMessages(messages: dict=[]) -> Optional[list]:
     return history, systemMessage, lastUserMessage
 
 # python code
+
+def execPythonFile(script="", content=""):
+    if script or content:
+        try:
+            def runCode(text):
+                code = compile(text, script, 'exec')
+                exec(code, globals())
+            if content:
+                runCode(content)
+            else:
+                with open(script, 'r', encoding='utf8') as f:
+                    runCode(f.read())
+            return True
+        except:
+            config.print("Failed to run '{0}'!".format(os.path.basename(script)))
+            showErrors()
+    return False
 
 def isValidPythodCode(code):
     try:
@@ -177,6 +238,8 @@ def getDayOfWeek():
     else:
         now = pendulum.now() 
         return now.format('dddd')
+
+# device information
 
 def getDeviceInfo(includeIp=False):
     g = geocoder.ip('me')

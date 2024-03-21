@@ -1,39 +1,13 @@
-from freegenius import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle
-
+from freegenius import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution
 from freegenius import config
-from freegenius.utils.file_utils import FileUtil
-from packaging import version
-from bs4 import BeautifulSoup
-import platform, shutil, subprocess, os, pydoc, webbrowser, re, socket, wcwidth, unicodedata, traceback, html2text, pprint
-import datetime, requests, netifaces, textwrap, json, geocoder, base64, getpass, pendulum, pkg_resources, chromadb, uuid, pygments
+import os, re, traceback, openai
+import textwrap, json, pygments
 from pygments.lexers.python import PythonLexer
-from pygments.styles import get_style_by_name
-from prompt_toolkit.styles.pygments import style_from_pygments_cls
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit import prompt
 import tiktoken
 from openai import OpenAI
-from urllib.parse import quote
-from pathlib import Path
-from PIL import Image
-if not config.isTermux:
-    from autogen.retrieve_utils import TEXT_FORMATS
-from typing import Callable, Optional, List, Dict, Union
-from chromadb.config import Settings
-from chromadb.utils import embedding_functions
-
-import ollama, openai, vertexai
-from llama_cpp import Llama
-from freegenius.utils.download import Downloader
-from ollama import Options
-
-from vertexai.preview.generative_models import GenerativeModel, Content, Part, FunctionDeclaration, Tool
-from vertexai.generative_models._generative_models import (
-    GenerationConfig,
-    HarmCategory,
-    HarmBlockThreshold,
-)
 
 # token limit
 # reference: https://platform.openai.com/docs/models/gpt-4
@@ -105,6 +79,16 @@ def check_openai_errors(func):
     return wrapper
 
 @check_openai_errors
+def checkCompletion():
+    setAPIkey()
+    config.oai_client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content" : "hello"}],
+        n=1,
+        max_tokens=10,
+    )
+
+@check_openai_errors
 def riskAssessment(code):
     content = f"""You are a senior python engineer.
 Assess the risk level of damaging my device upon executing the python code that I will provide for you.
@@ -115,7 +99,7 @@ Acess the risk level of this Python code:
 {code}
 ```"""
     try:
-        answer = CallChatGPT.getSingleChatResponse(content, temperature=0.0) if config.llmBackend == "chatgpt" else CallLetMeDoIt.getSingleChatResponse(content, temperature=0.0)
+        answer = getSingleChatResponse(content, temperature=0.0)
         if not answer:
             answer = "high"
         answer = re.sub("[^A-Za-z]", "", answer).lower()
@@ -273,19 +257,168 @@ def getToolArgumentsFromStreams(completion):
                 # may support non functions later
     return toolArguments
 
+@check_openai_errors
+def getSingleChatResponse(userInput, messages=[], temperature=None):
+    """
+    non-streaming single call
+    """
+    messages.append({"role": "user", "content" : userInput})
+    try:
+        completion = OpenAI().chat.completions.create(
+            model=config.chatGPTApiModel,
+            messages=messages,
+            n=1,
+            temperature=temperature if temperature is not None else config.llmTemperature,
+            max_tokens=config.chatGPTApiMaxTokens,
+        )
+        return completion.choices[0].message.content
+    except:
+        return ""
+
+def runSingleFunctionCall(messages, functionSignatures, function_name):
+    messagesCopy = messages[:]
+    try:
+        function_call_message, function_call_response = getSingleFunctionCallResponse(messages, functionSignatures, function_name)
+        messages.append(function_call_message)
+        messages.append(
+            {
+                "role": "function",
+                "name": function_name,
+                "content": function_call_response if function_call_response else config.tempContent,
+            }
+        )
+        config.tempContent = ""
+    except:
+        showErrors()
+        return messagesCopy
+    return messages
+
+@check_openai_errors
+def getSingleFunctionCallResponse(messages: list[dict], functionSignatures: list[dict], function_name: str, temperature=None, **kwargs):
+    completion = config.oai_client.chat.completions.create(
+        model=config.chatGPTApiModel,
+        messages=messages,
+        n=1,
+        temperature=temperature if temperature is not None else config.llmTemperature,
+        max_tokens=getDynamicTokens(messages, functionSignatures),
+        tools=convertFunctionSignaturesIntoTools(functionSignatures),
+        tool_choice={"type": "function", "function": {"name": function_name}},
+        stream=False,
+        **kwargs,
+    )
+    function_call_message = completion.choices[0].message
+    tool_call = function_call_message.tool_calls[0]
+    func_arguments = tool_call.function.arguments
+    function_call_message_mini = {
+        "role": "assistant",
+        "content": "",
+        "function_call": {
+            "name": tool_call.function.name,
+            "arguments": func_arguments,
+        }
+    }
+    function_call_response = CallChatGPT.finetuneSingleFunctionCallResponse(func_arguments, function_name)
+    return function_call_message_mini, function_call_response
+
+def finetuneSingleFunctionCallResponse(func_arguments, function_name):
+    # fine tune function call response; applied to chatgpt only
+    def notifyDeveloper(func_name):
+        if config.developer:
+            #config.print(f"running function '{func_name}' ...")
+            print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
+    # ChatGPT's built-in function named "python"
+    if function_name == "python":
+        notifyDeveloper(function_name)
+        python_code = textwrap.dedent(func_arguments)
+        refinedCode = fineTunePythonCode(python_code)
+
+        config.print(config.divider)
+        config.print2("running python code ...")
+        risk = riskAssessment(python_code)
+        showRisk(risk)
+        if config.developer or config.codeDisplay:
+            print("```")
+            #print(python_code)
+            # pygments python style
+            tokens = list(pygments.lex(python_code, lexer=PythonLexer()))
+            print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
+            print("```")
+        config.print(config.divider)
+
+        config.stopSpinning()
+        if not config.runPython:
+            info = {"information": python_code}
+            return json.dumps(info)
+        elif confirmExecution(risk):
+            config.print("Do you want to continue? [y]es / [N]o")
+            confirmation = prompt(style=config.promptStyle2, default="y")
+            if not confirmation.lower() in ("y", "yes"):
+                info = {"information": python_code}
+                return json.dumps(info)
+        try:
+            exec(refinedCode, globals())
+            function_response = getPythonFunctionResponse(refinedCode)
+        except:
+            trace = showErrors()
+            config.print(config.divider)
+            if config.max_consecutive_auto_heal > 0:
+                return autoHealPythonCode(refinedCode, trace)
+            else:
+                return "[INVALID]"
+        if function_response:
+            info = {"information": function_response}
+            function_response = json.dumps(info)
+    # known unwanted functions are handled here
+    elif function_name in ("translate_text",):
+        # "translate_text" has two arguments, "text", "target_language"
+        # handle known and unwanted function
+        function_response = "[INVALID]" 
+    # handle unexpected function
+    elif not function_name in config.toolFunctionMethods:
+        if config.developer:
+            config.print(f"Unexpected function: {function_name}")
+            config.print(config.divider)
+            print(func_arguments)
+            config.print(config.divider)
+        function_response = "[INVALID]"
+    else:
+        notifyDeveloper(function_name)
+        fuction_to_call = config.toolFunctionMethods[function_name]
+        # convert the arguments from json into a dict
+        function_args = json.loads(func_arguments)
+        function_response = fuction_to_call(function_args)
+    return function_response
+
 
 class CallChatGPT:
 
     @staticmethod
     @check_openai_errors
     def checkCompletion():
-        setAPIkey()
-        config.oai_client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content" : "hello"}],
-            n=1,
-            max_tokens=10,
-        )
+        checkCompletion()
+
+    @staticmethod
+    @check_openai_errors
+    def autoHealPythonCode(code, trace):
+        return autoHealPythonCode(code, trace)
+
+    @staticmethod
+    @check_openai_errors
+    def getSingleChatResponse(userInput, messages=[], temperature=None):
+        return getSingleChatResponse(userInput, messages, temperature)
+
+    @staticmethod
+    def finetuneSingleFunctionCallResponse(func_arguments, function_name):
+        return finetuneSingleFunctionCallResponse(func_arguments, function_name)
+
+    @staticmethod
+    def runSingleFunctionCall(messages, functionSignatures, function_name):
+        return runSingleFunctionCall(messages, functionSignatures, function_name)
+
+    @staticmethod
+    @check_openai_errors
+    def getSingleFunctionCallResponse(messages: list[dict], functionSignatures: list[dict], function_name: str, temperature=None, **kwargs):
+        return getSingleFunctionCallResponse(messages, functionSignatures, function_name, temperature, **kwargs)
 
     @staticmethod
     @check_openai_errors
@@ -315,142 +448,9 @@ class CallChatGPT:
             **kwargs,
         )
         responseDict = json.loads(completion.choices[0].message.tool_calls[0].function.arguments)
-        if config.developer:
-            pprint.pprint(responseDict)
+        #if config.developer:
+        #    pprint.pprint(responseDict)
         return responseDict
-
-    @staticmethod
-    @check_openai_errors
-    def getSingleChatResponse(userInput, messages=[], temperature=None):
-        """
-        non-streaming single call
-        """
-        messages.append({"role": "user", "content" : userInput})
-        completion = OpenAI().chat.completions.create(
-            model=config.chatGPTApiModel,
-            messages=messages,
-            n=1,
-            temperature=temperature if temperature is not None else config.llmTemperature,
-            max_tokens=config.chatGPTApiMaxTokens,
-        )
-        return completion.choices[0].message.content
-
-    @staticmethod
-    def runSingleFunctionCall(messages, functionSignatures, function_name):
-        messagesCopy = messages[:]
-        try:
-            function_call_message, function_call_response = CallChatGPT.getSingleFunctionCallResponse(messages, functionSignatures, function_name)
-            messages.append(function_call_message)
-            messages.append(
-                {
-                    "role": "function",
-                    "name": function_name,
-                    "content": function_call_response if function_call_response else config.tempContent,
-                }
-            )
-            config.tempContent = ""
-        except:
-            showErrors()
-            return messagesCopy
-        return messages
-
-    @staticmethod
-    @check_openai_errors
-    def getSingleFunctionCallResponse(messages: list[dict], functionSignatures: list[dict], function_name: str, temperature=None, **kwargs):
-        completion = config.oai_client.chat.completions.create(
-            model=config.chatGPTApiModel,
-            messages=messages,
-            n=1,
-            temperature=temperature if temperature is not None else config.llmTemperature,
-            max_tokens=getDynamicTokens(messages, functionSignatures),
-            tools=convertFunctionSignaturesIntoTools(functionSignatures),
-            tool_choice={"type": "function", "function": {"name": function_name}},
-            stream=False,
-            **kwargs,
-        )
-        function_call_message = completion.choices[0].message
-        tool_call = function_call_message.tool_calls[0]
-        func_arguments = tool_call.function.arguments
-        function_call_message_mini = {
-            "role": "assistant",
-            "content": "",
-            "function_call": {
-                "name": tool_call.function.name,
-                "arguments": func_arguments,
-            }
-        }
-        function_call_response = CallChatGPT.finetuneSingleFunctionCallResponse(func_arguments, function_name)
-        return function_call_message_mini, function_call_response
-
-    @staticmethod
-    def finetuneSingleFunctionCallResponse(func_arguments, function_name):
-        # fine tune function call response; applied to chatgpt only
-        def notifyDeveloper(func_name):
-            if config.developer:
-                #config.print(f"running function '{func_name}' ...")
-                print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
-        # ChatGPT's built-in function named "python"
-        if function_name == "python":
-            notifyDeveloper(function_name)
-            python_code = textwrap.dedent(func_arguments)
-            refinedCode = fineTunePythonCode(python_code)
-
-            config.print(config.divider)
-            config.print2("running python code ...")
-            risk = riskAssessment(python_code)
-            showRisk(risk)
-            if config.developer or config.codeDisplay:
-                print("```")
-                #print(python_code)
-                # pygments python style
-                tokens = list(pygments.lex(python_code, lexer=PythonLexer()))
-                print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
-                print("```")
-            config.print(config.divider)
-
-            config.stopSpinning()
-            if not config.runPython:
-                info = {"information": python_code}
-                return json.dumps(info)
-            elif confirmExecution(risk):
-                config.print("Do you want to continue? [y]es / [N]o")
-                confirmation = prompt(style=config.promptStyle2, default="y")
-                if not confirmation.lower() in ("y", "yes"):
-                    info = {"information": python_code}
-                    return json.dumps(info)
-            try:
-                exec(refinedCode, globals())
-                function_response = getPythonFunctionResponse(refinedCode)
-            except:
-                trace = showErrors()
-                config.print(config.divider)
-                if config.max_consecutive_auto_heal > 0:
-                    return autoHealPythonCode(refinedCode, trace)
-                else:
-                    return "[INVALID]"
-            if function_response:
-                info = {"information": function_response}
-                function_response = json.dumps(info)
-        # known unwanted functions are handled here
-        elif function_name in ("translate_text",):
-            # "translate_text" has two arguments, "text", "target_language"
-            # handle known and unwanted function
-            function_response = "[INVALID]" 
-        # handle unexpected function
-        elif not function_name in config.toolFunctionMethods:
-            if config.developer:
-                config.print(f"Unexpected function: {function_name}")
-                config.print(config.divider)
-                print(func_arguments)
-                config.print(config.divider)
-            function_response = "[INVALID]"
-        else:
-            notifyDeveloper(function_name)
-            fuction_to_call = config.toolFunctionMethods[function_name]
-            # convert the arguments from json into a dict
-            function_args = json.loads(func_arguments)
-            function_response = fuction_to_call(function_args)
-        return function_response
 
     # Auto Function Call equivalence
 
@@ -567,147 +567,30 @@ class CallLetMeDoIt:
     @staticmethod
     @check_openai_errors
     def checkCompletion():
-        setAPIkey()
-        config.oai_client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content" : "hello"}],
-            n=1,
-            max_tokens=10,
-        )
+        checkCompletion()
+
+    @staticmethod
+    @check_openai_errors
+    def autoHealPythonCode(code, trace):
+        return autoHealPythonCode(code, trace)
 
     @staticmethod
     @check_openai_errors
     def getSingleChatResponse(userInput, messages=[], temperature=None):
-        """
-        non-streaming single call
-        """
-        messages.append({"role": "user", "content" : userInput})
-        try:
-            completion = OpenAI().chat.completions.create(
-                model=config.chatGPTApiModel,
-                messages=messages,
-                n=1,
-                temperature=temperature if temperature is not None else config.llmTemperature,
-                max_tokens=config.chatGPTApiMaxTokens,
-            )
-            return completion.choices[0].message.content
-        except:
-            return ""
-
-    @staticmethod
-    def runSingleFunctionCall(messages, functionSignatures, function_name):
-        messagesCopy = messages[:]
-        try:
-            function_call_message, function_call_response = CallLetMeDoIt.getSingleFunctionCallResponse(messages, functionSignatures, function_name)
-            messages.append(function_call_message)
-            messages.append(
-                {
-                    "role": "function",
-                    "name": function_name,
-                    "content": function_call_response if function_call_response else config.tempContent,
-                }
-            )
-            config.tempContent = ""
-        except:
-            showErrors()
-            return messagesCopy
-        return messages
-
-    @staticmethod
-    @check_openai_errors
-    def getSingleFunctionCallResponse(messages, functionSignatures, function_name, temperature=None):
-        completion = config.oai_client.chat.completions.create(
-            model=config.chatGPTApiModel,
-            messages=messages,
-            max_tokens=getDynamicTokens(messages, functionSignatures),
-            temperature=temperature if temperature is not None else config.llmTemperature,
-            n=1,
-            tools=convertFunctionSignaturesIntoTools(functionSignatures),
-            tool_choice={"type": "function", "function": {"name": function_name}},
-        )
-        function_call_message = completion.choices[0].message
-        tool_call = function_call_message.tool_calls[0]
-        func_arguments = tool_call.function.arguments
-        function_call_message_mini = {
-            "role": "assistant",
-            "content": "",
-            "function_call": {
-                "name": tool_call.function.name,
-                "arguments": func_arguments,
-            }
-        }
-        function_call_response = CallLetMeDoIt.finetuneSingleFunctionCallResponse(func_arguments, function_name)
-        return function_call_message_mini, function_call_response
+        return getSingleChatResponse(userInput, messages, temperature)
 
     @staticmethod
     def finetuneSingleFunctionCallResponse(func_arguments, function_name):
-        # fine tune function call response; applied to chatgpt only
-        def notifyDeveloper(func_name):
-            if config.developer:
-                #config.print(f"running function '{func_name}' ...")
-                print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
-        # ChatGPT's built-in function named "python"
-        if function_name == "python":
-            notifyDeveloper(function_name)
-            python_code = textwrap.dedent(func_arguments)
-            refinedCode = fineTunePythonCode(python_code)
+        return finetuneSingleFunctionCallResponse(func_arguments, function_name)
 
-            config.print(config.divider)
-            config.print2("running python code ...")
-            risk = riskAssessment(python_code)
-            showRisk(risk)
-            if config.developer or config.codeDisplay:
-                print("```")
-                #print(python_code)
-                # pygments python style
-                tokens = list(pygments.lex(python_code, lexer=PythonLexer()))
-                print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
-                print("```")
-            config.print(config.divider)
+    @staticmethod
+    def runSingleFunctionCall(messages, functionSignatures, function_name):
+        return runSingleFunctionCall(messages, functionSignatures, function_name)
 
-            config.stopSpinning()
-            if not config.runPython:
-                info = {"information": python_code}
-                return json.dumps(info)
-            elif confirmExecution(risk):
-                config.print("Do you want to continue? [y]es / [N]o")
-                confirmation = prompt(style=config.promptStyle2, default="y")
-                if not confirmation.lower() in ("y", "yes"):
-                    info = {"information": python_code}
-                    return json.dumps(info)
-            try:
-                exec(refinedCode, globals())
-                function_response = getPythonFunctionResponse(refinedCode)
-            except:
-                trace = showErrors()
-                config.print(config.divider)
-                if config.max_consecutive_auto_heal > 0:
-                    return autoHealPythonCode(refinedCode, trace)
-                else:
-                    return "[INVALID]"
-            if function_response:
-                info = {"information": function_response}
-                function_response = json.dumps(info)
-        # known unwanted functions are handled here
-        elif function_name in ("translate_text",):
-            # "translate_text" has two arguments, "text", "target_language"
-            # handle known and unwanted function
-            function_response = "[INVALID]" 
-        # handle unexpected function
-        elif not function_name in config.toolFunctionMethods:
-            if config.developer:
-                config.print(f"Unexpected function: {function_name}")
-                config.print(config.divider)
-                print(func_arguments)
-                config.print(config.divider)
-            function_response = "[INVALID]"
-        else:
-            notifyDeveloper(function_name)
-            fuction_to_call = config.toolFunctionMethods[function_name]
-            # convert the arguments from json into a dict
-            function_args = json.loads(func_arguments)
-            function_response = fuction_to_call(function_args)
-        return function_response
+    @staticmethod
+    @check_openai_errors
+    def getSingleFunctionCallResponse(messages: list[dict], functionSignatures: list[dict], function_name: str, temperature=None, **kwargs):
+        return getSingleFunctionCallResponse(messages, functionSignatures, function_name, temperature, **kwargs)
 
     @staticmethod
     @check_openai_errors

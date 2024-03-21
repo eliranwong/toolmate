@@ -1,4 +1,4 @@
-from freegenius import config
+from freegenius import config, getLocalStorage
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.health_check import HealthCheck
 if not hasattr(config, "currentMessages"):
@@ -48,7 +48,7 @@ class ChatGPT:
     def run(self, prompt=""):
         if self.defaultPrompt:
             prompt, self.defaultPrompt = self.defaultPrompt, ""
-        historyFolder = os.path.join(HealthCheck.getLocalStorage(), "history")
+        historyFolder = os.path.join(getLocalStorage(), "history")
         Path(historyFolder).mkdir(parents=True, exist_ok=True)
         chat_history = os.path.join(historyFolder, "chatgpt")
         chat_session = PromptSession(history=FileHistory(chat_history))
@@ -121,7 +121,7 @@ class ChatGPT:
 
         HealthCheck.print2(f"\n{self.name} closed!")
         if hasattr(config, "currentMessages"):
-            HealthCheck.print2(f"Return back to {config.letMeDoItName} prompt ...")
+            HealthCheck.print2(f"Return back to {config.freeGeniusAIName} prompt ...")
 
 def main():
     # Create the parser

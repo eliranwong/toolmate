@@ -1,6 +1,6 @@
 from freegenius import getDeviceInfo, showErrors, get_or_create_collection, query_vectors, toGeminiMessages, executeToolFunction, extractPythonCode
 from freegenius import config
-import traceback, pprint, os
+import traceback, os
 from typing import Optional, List, Dict, Union
 import vertexai
 from vertexai.preview.generative_models import GenerativeModel, FunctionDeclaration, Tool
@@ -77,6 +77,7 @@ class CallGemini:
             )
             responseDict = dict(completion.candidates[0].content.parts[0].function_call.args)
             #if config.developer:
+            #    import pprint
             #    pprint.pprint(responseDict)
             return responseDict
         except:

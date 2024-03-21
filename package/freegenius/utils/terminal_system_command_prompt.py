@@ -1,4 +1,4 @@
-from freegenius import config
+from freegenius import config, getLocalStorage
 import os, platform, subprocess, traceback
 from freegenius.utils.get_path_prompt import GetPath
 from freegenius.utils.prompt_shared_key_bindings import prompt_shared_key_bindings
@@ -30,7 +30,7 @@ class SystemCommandPrompt:
             # Prompt.
             "indicator": config.terminalPromptIndicatorColor2,
         })
-        system_command_history = os.path.join(config.historyParentFolder if config.historyParentFolder else config.letMeDoItAIFolder, "history", "commands")
+        system_command_history = os.path.join(getLocalStorage(), "history", "commands")
         self.terminal_system_command_session = PromptSession(history=FileHistory(system_command_history))
         self.openCommand = config.open
 

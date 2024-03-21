@@ -7,18 +7,18 @@ if os.getcwd() != packageFolder:
 
 from freegenius import config
 config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
-config.letMeDoItAIFolder = packageFolder
-if not hasattr(config, "letMeDoItName") or not config.letMeDoItName:
-    config.letMeDoItName = "FreeGenius AI"
+config.freeGeniusAIFolder = packageFolder
+if not hasattr(config, "freeGeniusAIName") or not config.freeGeniusAIName:
+    config.freeGeniusAIName = "FreeGenius AI"
 from freegenius.utils.config_tools import setConfig
 config.setConfig = setConfig
 ## alternative to include config restoration method
 #from freegenius.utils.config_tools import *
 from freegenius.utils.shared_utils import SharedUtil
+from freegenius.utils.tool_plugins import Plugins
 config.includeIpInDeviceInfoTemp = True
-config.getLocalStorage = SharedUtil.getLocalStorage
 config.print = config.print2 = config.print3 = print
-config.addFunctionCall = SharedUtil.addFunctionCall
+config.addFunctionCall = Plugins.addFunctionCall
 config.divider = "--------------------"
 SharedUtil.setOsOpenCmd()
 

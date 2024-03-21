@@ -1,4 +1,4 @@
-from freegenius import config
+from freegenius import config, getDeviceInfo
 import pydoc, textwrap, re, tiktoken, os
 import speech_recognition as sr
 from prompt_toolkit import prompt
@@ -74,13 +74,13 @@ class Prompts:
                 r = sr.Recognizer()
                 with sr.Microphone() as source:
                     if config.voiceTypingNotification:
-                        TTSUtil.playAudioFile(os.path.join(config.letMeDoItAIFolder, "audio", "notification1_mild.mp3"))
+                        TTSUtil.playAudioFile(os.path.join(config.freeGeniusAIFolder, "audio", "notification1_mild.mp3"))
                     #run_in_terminal(lambda: config.print2("Listensing to your voice ..."))
                     if config.voiceTypingAdjustAmbientNoise:
                         r.adjust_for_ambient_noise(source)
                     audio = r.listen(source)
                 if config.voiceTypingNotification:
-                    TTSUtil.playAudioFile(os.path.join(config.letMeDoItAIFolder, "audio", "notification2_mild.mp3"))
+                    TTSUtil.playAudioFile(os.path.join(config.freeGeniusAIFolder, "audio", "notification2_mild.mp3"))
                 #run_in_terminal(lambda: config.print2("Processing to your voice ..."))
                 if config.voiceTypingPlatform == "google":
                     # recognize speech using Google Speech Recognition
@@ -181,7 +181,7 @@ class Prompts:
             buffer.validate_and_handle()
         @this_key_bindings.add(*config.hotkey_display_device_info)
         def _(_):
-            run_in_terminal(lambda: print(SharedUtil.getDeviceInfo(True)))
+            run_in_terminal(lambda: print(getDeviceInfo(True)))
         @this_key_bindings.add(*config.hotkey_count_tokens)
         def _(event):
             try:
@@ -259,7 +259,7 @@ Available tokens: {estimatedAvailableTokens}
                 run_in_terminal(lambda: config.print3(f"Response Audio: '{'enabled' if config.ttsOutput else 'disabled'}'!"))
         @this_key_bindings.add(*config.hotkey_restart_app)
         def _(_):
-            print(f"Restarting {config.letMeDoItName} ...")
+            print(f"Restarting {config.freeGeniusAIName} ...")
             config.restartApp()
         @this_key_bindings.add(*config.hotkey_toggle_writing_improvement)
         def _(_):

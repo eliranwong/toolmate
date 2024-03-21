@@ -21,8 +21,8 @@ if not hasattr(config, "currentMessages"):
 HealthCheck.checkCompletion()
 
 import autogen, os, json, traceback
+from freegenius import getDeviceInfo
 from freegenius.utils.prompts import Prompts
-from freegenius.utils.shared_utils import SharedUtil
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.styles import Style
 #from prompt_toolkit import PromptSession
@@ -55,7 +55,7 @@ class AutoGenAssistant:
     def getResponse(self, message, auto=False):
 
         message = f"""Current device information is given below:
-{SharedUtil.getDeviceInfo()}
+{getDeviceInfo()}
 
 Below is my message:
 {message}"""
@@ -93,7 +93,7 @@ Below is my message:
             max_consecutive_auto_reply=config.max_consecutive_auto_reply,
             is_termination_msg=lambda x: x.get("content", "").rstrip().endswith("TERMINATE"),
             code_execution_config={
-                "work_dir": os.path.join(config.letMeDoItAIFolder, "coding") if hasattr(config, "letMeDoItAIFolder") else "coding",
+                "work_dir": os.path.join(config.freeGeniusAIFolder, "coding") if hasattr(config, "freeGeniusAIFolder") else "coding",
                 "use_docker": False,  # set to True or image name like "python:3" to use docker
             },
         )

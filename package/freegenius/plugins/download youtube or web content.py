@@ -10,7 +10,7 @@ LetMeDoIt AI Plugin - download youtube or web content
 [FUNCTION_CALL]
 """
 
-from freegenius import config
+from freegenius import config, showErrors, getLocalStorage
 import re, subprocess, os
 from freegenius.utils.shared_utils import SharedUtil
 from pathlib import Path
@@ -41,7 +41,7 @@ def download_web_content(function_args):
                 except:
                     pass
             except:
-                SharedUtil.showErrors() 
+                showErrors() 
         else:
             config.print("Tool 'ffmpeg' is not found on your system!")
             config.print("Read https://github.com/eliranwong/letmedoit/wiki/Install-ffmpeg")
@@ -53,20 +53,20 @@ def download_web_content(function_args):
         format = function_args.get("format") # required
         location = function_args.get("location", "") # optional
         if not (location and os.path.isdir(location)):
-            location = os.path.join(config.getLocalStorage(), "audio" if format == "audio" else "video")
+            location = os.path.join(getLocalStorage(), "audio" if format == "audio" else "video")
             Path(location).mkdir(parents=True, exist_ok=True)
         downloadCommand = "yt-dlp -x --audio-format mp3" if format == "audio" else "yt-dlp -f bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4"
         terminalDownloadYoutubeFile(downloadCommand, url, location)
         return "Finished! Youtube downloader closed!"
     elif SharedUtil.is_valid_url(url):
         try:
-            folder = config.getLocalStorage()
+            folder = getLocalStorage()
             folder = os.path.join(folder, "Downloads")
             Path(folder).mkdir(parents=True, exist_ok=True)
             SharedUtil.downloadWebContent(url, folder=folder, ignoreKind=True)
             return "Downloaded!"
         except:
-            SharedUtil.showErrors()
+            showErrors()
             return "[INVALID]"
     else:
         config.print("invalid link given")

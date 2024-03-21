@@ -6,7 +6,7 @@ Ask Ollama Chat for information
 [FUNCTION_CALL]
 """
 
-from freegenius import config
+from freegenius import config, getLocalStorage
 from freegenius.ollamachat import OllamaChat
 from freegenius.utils.ollama_models import ollama_models
 from prompt_toolkit import PromptSession
@@ -29,7 +29,7 @@ def ask_ollama(function_args):
         # Prompt.
         "indicator": config.terminalPromptIndicatorColor2,
     })
-    historyFolder = os.path.join(HealthCheck.getLocalStorage(), "history")
+    historyFolder = os.path.join(getLocalStorage(), "history")
     Path(historyFolder).mkdir(parents=True, exist_ok=True)
     model_history = os.path.join(historyFolder, "ollama_default")
     model_session = PromptSession(history=FileHistory(model_history))

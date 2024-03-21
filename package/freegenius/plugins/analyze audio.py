@@ -6,7 +6,7 @@ analyze audio file
 [FUNCTION_CALL]
 """
 
-from freegenius import config
+from freegenius import config, showErrors
 from freegenius.utils.shared_utils import SharedUtil
 import os
 
@@ -46,7 +46,7 @@ def analyze_audio(function_args):
                 config.print2("Answer to your enquiry:")
             return transcript
         except:
-            SharedUtil.showErrors()
+            showErrors()
     return "[INVALID]"
 
 # Function Signature

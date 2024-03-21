@@ -10,7 +10,7 @@ from freegenius import config
 import os
 from openai import OpenAI
 from freegenius.utils.shared_utils import SharedUtil
-from freegenius.utils.shared_utils import check_openai_errors
+from freegenius.utils.call_chatgpt import check_openai_errors
 from freegenius.utils.terminal_mode_dialogs import TerminalModeDialogs
 from pathlib import Path
 from base64 import b64decode
@@ -125,7 +125,7 @@ def create_image(description, original_filename):
     )
     # open image
     #imageUrl = response.data[0].url
-    #jsonFile = os.path.join(config.letMeDoItAIFolder, "temp", "openai_image.json")
+    #jsonFile = os.path.join(config.freeGeniusAIFolder, "temp", "openai_image.json")
     #with open(jsonFile, mode="w", encoding="utf-8") as fileObj:
     #    json.dump(response.data[0].b64_json, fileObj)
     image_data = b64decode(response.data[0].b64_json)

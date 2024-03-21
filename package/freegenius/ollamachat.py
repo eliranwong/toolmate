@@ -1,6 +1,6 @@
 import ollama, os, argparse, threading, shutil, json, re
 from ollama import Options, pull
-from freegenius import config
+from freegenius import config, getLocalStorage
 from freegenius.utils.ollama_models import ollama_models
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.health_check import HealthCheck
@@ -119,7 +119,7 @@ Here is my request:
         if not config.ollamaDefaultModel == previoiusModel:
             config.saveConfig()
 
-        historyFolder = os.path.join(HealthCheck.getLocalStorage(), "history")
+        historyFolder = os.path.join(getLocalStorage(), "history")
         Path(historyFolder).mkdir(parents=True, exist_ok=True)
         chat_history = os.path.join(historyFolder, f"ollama_{model}")
         chat_session = PromptSession(history=FileHistory(chat_history))
@@ -198,7 +198,7 @@ Here is my request:
 
         HealthCheck.print2(f"\n{model.capitalize()} closed!")
         if hasattr(config, "currentMessages"):
-            HealthCheck.print2(f"Return back to {config.letMeDoItName} prompt ...")
+            HealthCheck.print2(f"Return back to {config.freeGeniusAIName} prompt ...")
 
 # available cli: 'ollamachat', 'mistral', 'llama2', 'llama213b', 'llama270b', 'gemma2b', 'gemma7b', 'llava', 'phi', 'vicuna'
 
@@ -258,7 +258,7 @@ def main(thisModel=""):
         if args.model and args.model.strip():
             model = args.model.strip()
         else:
-            historyFolder = os.path.join(HealthCheck.getLocalStorage(), "history")
+            historyFolder = os.path.join(getLocalStorage(), "history")
             Path(historyFolder).mkdir(parents=True, exist_ok=True)
             model_history = os.path.join(historyFolder, "ollama_default")
             model_session = PromptSession(history=FileHistory(model_history))

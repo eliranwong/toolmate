@@ -6,7 +6,7 @@ execute python code
 [FUNCTION_CALL]
 """
 
-from freegenius import config
+from freegenius import config, fineTunePythonCode, showRisk, confirmExecution, getPygmentsStyle
 from freegenius.utils.shared_utils import SharedUtil
 from freegenius.health_check import HealthCheck
 import pygments
@@ -20,7 +20,7 @@ def execute_python_code(function_args):
     risk = function_args.get("risk") # required
     title = function_args.get("title") # required
     python_code = function_args.get("code") # required
-    refinedCode = SharedUtil.fineTunePythonCode(python_code)
+    refinedCode = fineTunePythonCode(python_code)
 
     promptStyle = Style.from_dict({
         # User input (default text).
@@ -32,20 +32,20 @@ def execute_python_code(function_args):
     # show pyton code for developer
     config.print(config.divider)
     config.print(f"Python: {title}")
-    SharedUtil.showRisk(risk)
+    showRisk(risk)
     if config.developer or config.codeDisplay:
         config.print("```")
         #print(python_code)
         # pygments python style
         tokens = list(pygments.lex(python_code, lexer=PythonLexer()))
-        print_formatted_text(PygmentsTokens(tokens), style=SharedUtil.getPygmentsStyle())
+        print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
         config.print("```")
     config.print(config.divider)
 
     config.stopSpinning()
     if not config.runPython:
         return "[INVALID]"
-    elif SharedUtil.confirmExecution(risk):
+    elif confirmExecution(risk):
         config.print("Do you want to execute it? [y]es / [N]o")
         confirmation = HealthCheck.simplePrompt(style=promptStyle, default="y")
         if not confirmation.lower() in ("y", "yes"):

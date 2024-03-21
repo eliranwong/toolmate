@@ -6,7 +6,7 @@ Ask SQLite file. To retrieve information from or make changes in a sqlite file, 
 [FUNCTION_CALL]
 """
 
-from freegenius import config
+from freegenius import config, showErrors
 from freegenius.utils.shared_utils import SharedUtil
 from freegenius.utils.shared_utils import CallLLM
 import os, sqlite3, json
@@ -63,7 +63,7 @@ Please consider individual table information below for code generation:
         _, function_call_response = CallLLM.getSingleFunctionCallResponse(userInput, [config.toolFunctionSchemas["execute_python_code"]], "execute_python_code")
         return function_call_response
     except:
-        SharedUtil.showErrors()
+        showErrors()
         return "[INVALID]"
 
 functionSignature = {

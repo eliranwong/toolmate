@@ -106,10 +106,10 @@ def _(event):
 #@prompt_shared_key_bindings.add("escape", "o")
 @prompt_shared_key_bindings.add(*config.hotkey_edit_current_entry)
 def _(event):
-    customTextEditor = config.customTextEditor if config.customTextEditor else f"{sys.executable} {os.path.join(config.letMeDoItAIFolder, 'eTextEdit.py')}"
+    customTextEditor = config.customTextEditor if config.customTextEditor else f"{sys.executable} {os.path.join(config.freeGeniusAIFolder, 'eTextEdit.py')}"
     current_buffer = event.app.current_buffer
     text = current_buffer.text
-    filename = os.path.join(config.letMeDoItAIFolder, "temp", "current_input.txt")
+    filename = os.path.join(config.freeGeniusAIFolder, "temp", "current_input.txt")
     with open(filename, "w", encoding="utf-8") as fileObj:
         fileObj.write(text)
     os.system(f"{customTextEditor} {filename}")
@@ -118,7 +118,7 @@ def _(event):
     editedText = re.sub("\n$", "", editedText)
     current_buffer.text = editedText
     current_buffer.cursor_position = len(editedText)
-    set_title(config.letMeDoItName)
+    set_title(config.freeGeniusAIName)
 
 # swap color theme
 @prompt_shared_key_bindings.add(*config.hotkey_swap_text_brightness)

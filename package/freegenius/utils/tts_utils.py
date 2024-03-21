@@ -26,7 +26,7 @@ class TTSUtil:
             try:
                 # official google-cloud-texttospeech
                 if config.ttsPlatform == "googlecloud" and os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Text-to-Speech" in config.enabledGoogleAPIs:
-                    audioFile = os.path.join(config.letMeDoItAIFolder, "temp", "gctts.mp3")
+                    audioFile = os.path.join(config.freeGeniusAIFolder, "temp", "gctts.mp3")
                     if not language:
                         language = config.gcttsLang
                     elif language == "yue":
@@ -78,7 +78,7 @@ class TTSUtil:
                         language = "zh"
                     elif "-" in language:
                         language = re.sub("^(.*?)\-.*?$", r"\1", language)
-                    audioFile = os.path.join(config.letMeDoItAIFolder, "temp", "gtts.mp3")
+                    audioFile = os.path.join(config.freeGeniusAIFolder, "temp", "gtts.mp3")
                     tts = gTTS(content, lang=language, tld=config.gttsTld) if config.gttsTld else gTTS(content, lang=language)
                     tts.save(audioFile)
                     TTSUtil.playAudioFile(audioFile)
@@ -115,7 +115,7 @@ class TTSUtil:
     # Temporary filepath for tts export
     @staticmethod
     def getGttsFilename():
-        folder = os.path.join(config.letMeDoItAIFolder, "temp")
+        folder = os.path.join(config.freeGeniusAIFolder, "temp")
         if not os.path.isdir(folder):
             os.makedirs(folder, exist_ok=True)
         return os.path.abspath(os.path.join(folder, "gtts.mp3"))

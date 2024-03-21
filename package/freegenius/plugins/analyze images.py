@@ -10,7 +10,7 @@ reference: https://platform.openai.com/docs/guides/vision
 
 from freegenius import config
 from freegenius.utils.shared_utils import SharedUtil
-from freegenius.utils.shared_utils import check_openai_errors
+from freegenius.utils.call_chatgpt import check_openai_errors
 import os
 from openai import OpenAI
 

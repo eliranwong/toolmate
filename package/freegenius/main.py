@@ -10,17 +10,17 @@ elif pythonVersion >= (3, 12):
     print("Some features may not work with python version newer than 3.11!")
 
 # navigate to project directory
-letMeDoItFile = os.path.realpath(__file__)
-letMeDoItAIFolder = os.path.dirname(letMeDoItFile)
-if os.getcwd() != letMeDoItAIFolder:
-    os.chdir(letMeDoItAIFolder)
+freeGeniusAIFile = os.path.realpath(__file__)
+freeGeniusAIFolder = os.path.dirname(freeGeniusAIFile)
+if os.getcwd() != freeGeniusAIFolder:
+    os.chdir(freeGeniusAIFolder)
 
 # check current platform
 thisPlatform = platform.system()
 
 # set up config
 # create config.py if it does not exist
-configFile = os.path.join(letMeDoItAIFolder, "config.py")
+configFile = os.path.join(freeGeniusAIFolder, "config.py")
 if not os.path.isfile(configFile):
     open(configFile, "a", encoding="utf-8").close()
 
@@ -38,21 +38,21 @@ apps = {
     "freegenius": ("FreeGenius", "FreeGenius AI"),
 }
 
-basename = os.path.basename(letMeDoItAIFolder)
-if not hasattr(config, "letMeDoItName") or not config.letMeDoItName:
-    config.letMeDoItName = "FreeGenius AI"
-config.letMeDoItFile = letMeDoItFile
-config.letMeDoItAIFolder = letMeDoItAIFolder
+basename = os.path.basename(freeGeniusAIFolder)
+if not hasattr(config, "freeGeniusAIName") or not config.freeGeniusAIName:
+    config.freeGeniusAIName = "FreeGenius AI"
+config.freeGeniusAIFile = freeGeniusAIFile
+config.freeGeniusAIFolder = freeGeniusAIFolder
 config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
 
 # package name
-#with open(os.path.join(config.letMeDoItAIFolder, "package_name.txt"), "r", encoding="utf-8") as fileObj:
+#with open(os.path.join(config.freeGeniusAIFolder, "package_name.txt"), "r", encoding="utf-8") as fileObj:
 #    package = fileObj.read()
 package = "freegenius"
 
 def restartApp():
-    print(f"Restarting {config.letMeDoItName} ...")
-    os.system(f"{sys.executable} {config.letMeDoItFile}")
+    print(f"Restarting {config.freeGeniusAIName} ...")
+    os.system(f"{sys.executable} {config.freeGeniusAIFile}")
     exit(0)
 config.restartApp = restartApp
 
@@ -88,6 +88,7 @@ def updateApp():
                     print(f"Failed to upgrade '{thisPackage}'!")
 
 # import other libraries
+from freegenius import getLocalStorage
 from freegenius.utils.shortcuts import *
 from freegenius.utils.assistant import LetMeDoItAI
 from freegenius.utils.vlc_utils import VlcUtil
@@ -121,7 +122,7 @@ def set_log_file_max_lines(log_file, max_lines):
             print(f"{num_lines_to_delete} old lines deleted from log file '{filename}'.")
 
 def main():
-    print(f"launching {config.letMeDoItName} ...")
+    print(f"launching {config.freeGeniusAIName} ...")
 
     # Create the parser
     parser = argparse.ArgumentParser(description="LetMeDoIt AI cli options")
@@ -192,7 +193,7 @@ def main():
             config.defaultEntry = ""
         config.accept_default = True if args.runfile else False
         for i in ("selected_files", "selected_text"):
-            shutil.rmtree(os.path.join(os.path.expanduser('~'), config.letMeDoItName.split()[0].lower(), f"{i}.txt"), ignore_errors=True)
+            shutil.rmtree(os.path.join(os.path.expanduser('~'), config.freeGeniusAIName.split()[0].lower(), f"{i}.txt"), ignore_errors=True)
     elif args.run:
         config.defaultEntry = args.run.strip()
         config.accept_default = True
@@ -203,27 +204,28 @@ def main():
         config.defaultEntry = ""
         config.accept_default = False
 
-    set_title(config.letMeDoItName)
+    set_title(config.freeGeniusAIName)
     SharedUtil.setOsOpenCmd(thisPlatform)
     createShortcuts()
     config.excludeConfigList = []
     config.isVlcPlayerInstalled = VlcUtil.isVlcPlayerInstalled()
     # save loaded configs
     config.saveConfig()
+    # local storage
+    storageDir = getLocalStorage()
     # check log files; remove old lines if more than 3000 lines is found in a log file
     for i in ("chats", "paths", "commands"):
-        filepath = os.path.join(config.historyParentFolder if config.historyParentFolder else config.letMeDoItAIFolder, "history", i)
+        filepath = os.path.join(storageDir, "history", i)
         set_log_file_max_lines(filepath, 3000)
     LetMeDoItAI().startChats()
     # Do the following tasks before exit
     # backup configurations
     config.saveConfig()
-    storageDir = SharedUtil.getLocalStorage()
     if os.path.isdir(storageDir):
         shutil.copy(configFile, os.path.join(storageDir, "config_backup.py"))
     # delete temporary content
     try:
-        tempFolder = os.path.join(config.letMeDoItAIFolder, "temp")
+        tempFolder = os.path.join(config.freeGeniusAIFolder, "temp")
         shutil.rmtree(tempFolder, ignore_errors=True)
         Path(tempFolder).mkdir(parents=True, exist_ok=True)
     except:

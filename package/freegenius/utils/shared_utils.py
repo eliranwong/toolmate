@@ -1,11 +1,11 @@
 from freegenius.utils.call_llm import CallLLM
 
-from freegenius import config, getPythonFunctionResponse
-from freegenius.utils.file_utils import FileUtil
+from freegenius import config, getPythonFunctionResponse, fineTunePythonCode, getPygmentsStyle, showErrors, getLocalStorage, get_or_create_collection, add_vector
+
 from packaging import version
 from bs4 import BeautifulSoup
-import platform, shutil, subprocess, os, pydoc, webbrowser, re, socket, wcwidth, unicodedata, traceback, html2text, pprint
-import datetime, requests, netifaces, textwrap, json, geocoder, base64, getpass, pendulum, pkg_resources, chromadb, uuid, pygments
+import platform, shutil, subprocess, os, pydoc, webbrowser, re, wcwidth, unicodedata, traceback, html2text, pprint
+import datetime, requests, json, geocoder, base64, pkg_resources, chromadb, uuid, pygments
 from pygments.lexers.python import PythonLexer
 from pygments.styles import get_style_by_name
 from prompt_toolkit.styles.pygments import style_from_pygments_cls
@@ -109,147 +109,6 @@ class SharedUtil:
         return current_datetime.strftime("%Y-%m-%d_%H_%M_%S")
 
     @staticmethod
-    def showErrors():
-        trace = traceback.format_exc()
-        print(trace if config.developer else "Error encountered!")
-        return trace
-
-    @staticmethod
-    def showRisk(risk):
-        if not config.confirmExecution in ("always", "medium_risk_or_above", "high_risk_only", "none"):
-            config.confirmExecution = "always"
-        config.print(f"[risk level: {risk}]")
-
-    @staticmethod
-    def confirmExecution(risk):
-        if config.confirmExecution == "always" or (risk == "high" and config.confirmExecution == "high_risk_only") or (not risk == "low" and config.confirmExecution == "medium_risk_or_above"):
-            return True
-        else:
-            return False
-
-    @staticmethod
-    def runPlugins():        
-        storageDir = SharedUtil.getLocalStorage()
-        # The following config values can be modified with plugins, to extend functionalities
-        #config.pluginsWithFunctionCall = []
-        config.aliases = {}
-        config.predefinedContexts = {
-            "[none]": "",
-            "[custom]": "",
-        }
-        config.predefinedInstructions = {}
-        config.inputSuggestions = []
-        config.outputTransformers = []
-        config.toolFunctionSchemas = {}
-        config.toolFunctionMethods = {}
-
-        pluginFolder = os.path.join(config.letMeDoItAIFolder, "plugins")
-        if storageDir:
-            customPluginFoler = os.path.join(storageDir, "plugins")
-            Path(customPluginFoler).mkdir(parents=True, exist_ok=True)
-            pluginFolders = (pluginFolder, customPluginFoler)
-        else:
-            pluginFolders = (pluginFolder,)
-        # always run 'integrate google searches'
-        internetSeraches = "integrate google searches"
-        script = os.path.join(pluginFolder, "{0}.py".format(internetSeraches))
-        SharedUtil.execPythonFile(script)
-        # always include the following plugins
-        requiredPlugins = (
-            "auto heal python code",
-            "execute python code",
-            "execute termux command",
-        )
-        for i in requiredPlugins:
-            if i in config.pluginExcludeList:
-                config.pluginExcludeList.remove(i)
-        # execute enabled plugins
-        for folder in pluginFolders:
-            for plugin in FileUtil.fileNamesWithoutExtension(folder, "py"):
-                if not plugin in config.pluginExcludeList:
-                    script = os.path.join(folder, "{0}.py".format(plugin))
-                    run = SharedUtil.execPythonFile(script)
-                    if not run:
-                        config.pluginExcludeList.append(plugin)
-        if internetSeraches in config.pluginExcludeList:
-            del config.toolFunctionSchemas["integrate_google_searches"]
-        for i in config.toolFunctionMethods:
-            if not i in ("python_qa",):
-                callEntry = f"[CALL_{i}]"
-                if not callEntry in config.inputSuggestions:
-                    config.inputSuggestions.append(callEntry)
-
-    # integrate function call plugin
-    @staticmethod
-    def addFunctionCall(signature: str, method: Callable[[dict], str]):
-        name = signature["name"]
-        config.toolFunctionSchemas[name] = {key: value for key, value in signature.items() if not key in ("intent", "examples")}
-        config.toolFunctionMethods[name] = method
-        SharedUtil.add_tool(signature)
-
-    @staticmethod
-    def runPythonScript(script):
-        script = script.strip()[3:-3]
-        try:
-            exec(script, globals())
-        except:
-            trace = traceback.format_exc()
-            print(trace if config.developer else "Error encountered!")
-            config.print(config.divider)
-            if config.max_consecutive_auto_heal > 0:
-                CallLLM.autoHealPythonCode(script, trace)
-
-    @staticmethod
-    def execPythonFile(script="", content=""):
-        if script or content:
-            try:
-                def runCode(text):
-                    code = compile(text, script, 'exec')
-                    exec(code, globals())
-                if content:
-                    runCode(content)
-                else:
-                    with open(script, 'r', encoding='utf8') as f:
-                        runCode(f.read())
-                return True
-            except:
-                config.print("Failed to run '{0}'!".format(os.path.basename(script)))
-                SharedUtil.showErrors()
-        return False
-
-    # reset message when a new chart is started or context is changed
-    @staticmethod
-    def resetMessages(prompt="") -> list[dict]:
-        systemMessage1 = config.systemMessage_letmedoit if config.systemMessage_letmedoit else f'''You’re {config.letMeDoItName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device. Your functionality expands as I add more plugins to you.
-Always remember that you are much more than a text-based AI. You possess both vision and speech capabilities and have direct access to my device's system, enabling you to execute tasks at my command. Please do not state otherwise.'''
-
-        systemMessage2 = config.systemMessage_letmedoit if config.systemMessage_letmedoit else f'''You’re {config.letMeDoItName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device.
-I am providing the basic information of my device below in case you need it:
-```
-{SharedUtil.getDeviceInfo()}
-```
-Please use the current time and date that I have provided above as a reference point for any relative dates and times mentioned in my prompt.
-You have all the necessary permissions to execute system commands and Python code on my behalf. Your functionality expands as I add more plugins to you. You respond to my prompts and perform tasks based on your own knowledge, the context I provide, as well as the additional knowledge and capabilities provided by plugins.
-
-When replying to my requests, please follow these steps:
-Step 1: Consider our previous conversations, particularly your last response, if any, as the context for these requests.
-Step 2: Estimate my intent based on the request and context. The intent can be a code generation task, an executable computing task, a math-solving task, a translation task, or a question answering task.
-Step 3: Reply based on the estimated intent.
-Remember, do not use function call if it is a translation task.
-
-Always remember that you are much more than a text-based AI. You possess both vision and speech capabilities and have direct access to my device's system, enabling you to execute tasks at my command. Please do not state otherwise.
-'''
-
-        systemMessage = systemMessage2 if config.llmBackend in ("chatgpt", "letmedoit") else systemMessage1
-
-        messages = [
-            {"role": "system", "content": systemMessage}
-        ]
-        if prompt:
-            messages.append({"role": "user", "content": prompt})
-        return messages
-
-    @staticmethod
     def addTimeStamp(content):
         time = re.sub("\.[^\.]+?$", "", str(datetime.datetime.now()))
         return f"{content}\n[Current time: {time}]"
@@ -262,7 +121,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
         supported_documents.remove("org")
 
         response = requests.get(url, timeout=timeout)
-        folder = folder if folder and os.path.isdir(folder) else os.path.join(config.letMeDoItAIFolder, "temp")
+        folder = folder if folder and os.path.isdir(folder) else os.path.join(config.freeGeniusAIFolder, "temp")
         filename = quote(url, safe="")
         def downloadBinary(filename=filename):
             filename = os.path.join(folder, filename)
@@ -289,7 +148,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
                 # Save the content to a html file
                 return ("text", downloadHTML())
         except:
-            SharedUtil.showErrors()
+            showErrors()
             return ("", "")
 
     @staticmethod
@@ -353,23 +212,18 @@ Always remember that you are much more than a text-based AI. You possess both vi
         return text
 
     @staticmethod
-    def getPygmentsStyle():
-        theme = config.pygments_style if config.pygments_style else "stata-dark" if not config.terminalResourceLinkColor.startswith("ansibright") else "stata-light"
-        return style_from_pygments_cls(get_style_by_name(theme))
-
-    @staticmethod
     def displayPythonCode(code):
         if config.developer or config.codeDisplay:
             config.print("```python")
             tokens = list(pygments.lex(code, lexer=PythonLexer()))
-            print_formatted_text(PygmentsTokens(tokens), style=SharedUtil.getPygmentsStyle())
+            print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
             config.print("```")
 
     @staticmethod
     def showAndExecutePythonCode(code):
         SharedUtil.displayPythonCode(code)
         config.stopSpinning()
-        refinedCode = SharedUtil.fineTunePythonCode(code)
+        refinedCode = fineTunePythonCode(code)
         information = SharedUtil.executePythonCode(refinedCode)
         return information
 
@@ -377,9 +231,9 @@ Always remember that you are much more than a text-based AI. You possess both vi
     def executePythonCode(code):
         try:
             exec(code, globals())
-            pythonFunctionResponse = SharedUtil.getPythonFunctionResponse(code)
+            pythonFunctionResponse = getPythonFunctionResponse(code)
         except:
-            trace = SharedUtil.showErrors()
+            trace = showErrors()
             config.print(config.divider)
             if config.max_consecutive_auto_heal > 0:
                 return CallLLM.autoHealPythonCode(code, trace)
@@ -392,32 +246,6 @@ Always remember that you are much more than a text-based AI. You possess both vi
     @staticmethod
     def convertFunctionSignaturesIntoTools(functionSignatures):
         return [{"type": "function", "function": functionSignature} for functionSignature in functionSignatures]
-
-    @staticmethod
-    def getPythonFunctionResponse(code):
-        #return str(config.pythonFunctionResponse) if config.pythonFunctionResponse is not None and (type(config.pythonFunctionResponse) in (int, float, str, list, tuple, dict, set, bool) or str(type(config.pythonFunctionResponse)).startswith("<class 'numpy.")) and not ("os.system(" in code) else ""
-        return "" if config.pythonFunctionResponse is None else str(config.pythonFunctionResponse)
-
-    @staticmethod
-    def fineTunePythonCode(code):
-        # dedent
-        code = textwrap.dedent(code).rstrip()
-        # capture print output
-        config.pythonFunctionResponse = ""
-        insert_string = "from freegenius import config\nconfig.pythonFunctionResponse = "
-        code = re.sub("^!(.*?)$", r'import os\nos.system(""" \1 """)', code, flags=re.M)
-        if "\n" in code:
-            substrings = code.rsplit("\n", 1)
-            lastLine = re.sub("print\((.*)\)", r"\1", substrings[-1])
-            if lastLine.startswith(" "):
-                lastLine = re.sub("^([ ]+?)([^ ].*?)$", r"\1config.pythonFunctionResponse = \2", lastLine)
-                code = f"from freegenius import config\n{substrings[0]}\n{lastLine}"
-            else:
-                lastLine = f"{insert_string}{lastLine}"
-                code = f"{substrings[0]}\n{lastLine}"
-        else:
-            code = f"{insert_string}{code}"
-        return code
 
     @staticmethod
     def getDynamicTokens(messages, functionSignatures=None):
@@ -525,34 +353,6 @@ Always remember that you are much more than a text-based AI. You possess both vi
         return toolArguments
 
     @staticmethod
-    def get_wan_ip():
-        try:
-            response = requests.get('https://api.ipify.org?format=json', timeout=5)
-            data = response.json()
-            return data['ip']
-        except:
-            return ""
-
-    @staticmethod
-    def get_local_ip():
-        interfaces = netifaces.interfaces()
-        for interface in interfaces:
-            addresses = netifaces.ifaddresses(interface)
-            if netifaces.AF_INET in addresses:
-                for address in addresses[netifaces.AF_INET]:
-                    ip = address['addr']
-                    if ip != '127.0.0.1':
-                        return ip
-
-    @staticmethod
-    def getDayOfWeek():
-        if config.isTermux:
-            return ""
-        else:
-            now = pendulum.now() 
-            return now.format('dddd')
-
-    @staticmethod
     def getWeather(latlng=""):
         # get current weather information
         # Reference: https://openweathermap.org/api/one-call-3
@@ -585,47 +385,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             #print(f"The current temperature is {temperature_fahrenheit} degrees Fahrenheit.")
             return temperature_celsius, weather_condition
         except:
-            SharedUtil.showErrors()
+            showErrors()
             return None
-
-    @staticmethod
-    def getDeviceInfo(includeIp=False):
-        g = geocoder.ip('me')
-        if hasattr(config, "thisPlatform"):
-            thisPlatform = config.thisPlatform
-        else:
-            thisPlatform = platform.system()
-            if thisPlatform == "Darwin":
-                thisPlatform = "macOS"
-        if config.includeIpInDeviceInfoTemp or includeIp or (config.includeIpInDeviceInfo and config.includeIpInDeviceInfoTemp):
-            wan_ip = SharedUtil.get_wan_ip()
-            local_ip = SharedUtil.get_local_ip()
-            ipInfo = f'''Wan ip: {wan_ip}
-Local ip: {local_ip}
-'''
-        else:
-            ipInfo = ""
-        if config.isTermux:
-            dayOfWeek = ""
-        else:
-            dayOfWeek = SharedUtil.getDayOfWeek()
-            dayOfWeek = f"Current day of the week: {dayOfWeek}"
-        return f"""Operating system: {thisPlatform}
-Version: {platform.version()}
-Machine: {platform.machine()}
-Architecture: {platform.architecture()[0]}
-Processor: {platform.processor()}
-Hostname: {socket.gethostname()}
-Username: {getpass.getuser()}
-Python version: {platform.python_version()}
-Python implementation: {platform.python_implementation()}
-Current directory: {os.getcwd()}
-Current time: {str(datetime.datetime.now())}
-{dayOfWeek}
-{ipInfo}Latitude & longitude: {g.latlng}
-Country: {g.country}
-State: {g.state}
-City: {g.city}"""
 
     @staticmethod
     def getStringWidth(text):
@@ -694,30 +455,6 @@ City: {g.city}"""
             webbrowser.open(url)
 
     @staticmethod
-    def getHomeStorage():
-        """
-        Get default storage directory located at home directory
-        """
-        storageDir = os.path.join(os.path.expanduser('~'), config.letMeDoItName.split()[0].lower())
-        try:
-            Path(storageDir).mkdir(parents=True, exist_ok=True)
-        except:
-            pass
-        return storageDir if os.path.isdir(storageDir) else ""
-
-    @staticmethod
-    def getLocalStorage():
-        # get default storage path located at home directory
-        storageDir = SharedUtil.getHomeStorage()
-        # change to package path if default storage path doesn't exist
-        storageDir = storageDir if storageDir else os.path.join(config.letMeDoItAIFolder, "files")
-        # check if custom storage path exists if it is defined
-        if not hasattr(config, "storagedirectory") or (config.storagedirectory and not os.path.isdir(config.storagedirectory)):
-            config.storagedirectory = ""
-        # use custom storage path, if defined, instead of the default one
-        return config.storagedirectory if config.storagedirectory else storageDir
-
-    @staticmethod
     def setOsOpenCmd(thisPlatform=""):
         if not thisPlatform:
             thisPlatform = platform.system()
@@ -730,64 +467,3 @@ City: {g.city}"""
             config.open = "open"
         elif thisPlatform == "Windows":
             config.open = "start"
-
-    # chromadb utilities
-
-    @staticmethod
-    def get_or_create_collection(collection_name):
-        collection = config.tool_store_client.get_or_create_collection(
-            name=collection_name,
-            metadata={"hnsw:space": "cosine"},
-            embedding_function=SharedUtil.getEmbeddingFunction(),
-        )
-        return collection
-
-    @staticmethod
-    def add_vector(collection, text, metadata):
-        id = str(uuid.uuid4())
-        collection.add(
-            documents = [text],
-            metadatas = [metadata],
-            ids = [id]
-        )
-
-    @staticmethod
-    def query_vectors(collection, query, n=1):
-        return collection.query(
-            query_texts=[query],
-            n_results = n,
-        )
-
-    # chroma utilites
-
-    @staticmethod
-    def setupToolStoreClient():
-        tool_store = os.path.join(SharedUtil.getLocalStorage(), "tool_store")
-        try:
-            shutil.rmtree(tool_store, ignore_errors=True)
-            config.print2("Old tool store removed!")
-        except:
-            config.print2("Failed to remove old tool store!")
-        Path(tool_store).mkdir(parents=True, exist_ok=True)
-        config.tool_store_client = chromadb.PersistentClient(tool_store, Settings(anonymized_telemetry=False))
-
-    @staticmethod
-    def getEmbeddingFunction(embeddingModel=None):
-        # import statement is placed here to make this file compatible on Android
-        embeddingModel = embeddingModel if embeddingModel is not None else config.embeddingModel
-        if embeddingModel in ("text-embedding-3-large", "text-embedding-3-small", "text-embedding-ada-002"):
-            return embedding_functions.OpenAIEmbeddingFunction(api_key=config.openaiApiKey, model_name=embeddingModel)
-        return embedding_functions.SentenceTransformerEmbeddingFunction(model_name=embeddingModel) # support custom Sentence Transformer Embedding models by modifying config.embeddingModel
-
-    @staticmethod
-    def add_tool(signature):
-        name, description, parameters = signature["name"], signature["description"], signature["parameters"]
-        print(f"Adding tool: {name}")
-        if "examples" in signature:
-            description = description + "\n" + "\n".join(signature["examples"])
-        collection = SharedUtil.get_or_create_collection("tools")
-        metadata = {
-            "name": name,
-            "parameters": json.dumps(parameters),
-        }
-        SharedUtil.add_vector(collection, description, metadata)

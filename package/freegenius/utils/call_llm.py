@@ -1,9 +1,42 @@
+from freegenius import config, getDeviceInfo, toGeminiMessages
 from freegenius.utils.call_gemini import CallGemini
 from freegenius.utils.call_ollama import CallOllama
 from freegenius.utils.call_llamacpp import CallLlamaCpp
 from freegenius.utils.call_chatgpt import CallChatGPT, CallLetMeDoIt
 
 class CallLLM:
+
+    # reset message when a new chart is started or context is changed
+    @staticmethod
+    def resetMessages(prompt="") -> list[dict]:
+        systemMessage1 = config.systemMessage_letmedoit if config.systemMessage_letmedoit else f'''You’re {config.freeGeniusAIName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device. Your functionality expands as I add more plugins to you.
+Always remember that you are much more than a text-based AI. You possess both vision and speech capabilities and have direct access to my device's system, enabling you to execute tasks at my command. Please do not state otherwise.'''
+
+        systemMessage2 = config.systemMessage_letmedoit if config.systemMessage_letmedoit else f'''You’re {config.freeGeniusAIName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device.
+I am providing the basic information of my device below in case you need it:
+```
+{getDeviceInfo()}
+```
+Please use the current time and date that I have provided above as a reference point for any relative dates and times mentioned in my prompt.
+You have all the necessary permissions to execute system commands and Python code on my behalf. Your functionality expands as I add more plugins to you. You respond to my prompts and perform tasks based on your own knowledge, the context I provide, as well as the additional knowledge and capabilities provided by plugins.
+
+When replying to my requests, please follow these steps:
+Step 1: Consider our previous conversations, particularly your last response, if any, as the context for these requests.
+Step 2: Estimate my intent based on the request and context. The intent can be a code generation task, an executable computing task, a math-solving task, a translation task, or a question answering task.
+Step 3: Reply based on the estimated intent.
+Remember, do not use function call if it is a translation task.
+
+Always remember that you are much more than a text-based AI. You possess both vision and speech capabilities and have direct access to my device's system, enabling you to execute tasks at my command. Please do not state otherwise.
+'''
+
+        systemMessage = systemMessage2 if config.llmBackend in ("chatgpt", "letmedoit") else systemMessage1
+
+        messages = [
+            {"role": "system", "content": systemMessage}
+        ]
+        if prompt:
+            messages.append({"role": "user", "content": prompt})
+        return messages
 
     @staticmethod
     def checkCompletion():
@@ -26,8 +59,10 @@ class CallLLM:
             return CallLlamaCpp.autoHealPythonCode(code, trace)
         elif config.llmBackend == "gemini":
             return CallGemini.autoHealPythonCode(code, trace)
-        # chatgpt / letmedoit
-        return autoHealPythonCode(code, trace)
+        elif config.llmBackend == "chatgpt":
+            return CallChatGPT.autoHealPythonCode(code, trace)
+        # letmedoit
+        return CallLetMeDoIt.autoHealPythonCode(code, trace)
 
     @staticmethod
     def runSingleFunctionCall(messages, functionSignatures, function_name):
@@ -52,7 +87,7 @@ class CallLLM:
         elif config.llmBackend == "llamacpp":
             return CallLlamaCpp.getSingleChatResponse(userInput, messages=messages, temperature=temperature)
         elif config.llmBackend == "gemini":
-            history, *_ = CallLLM.toGeminiMessages(messages=messages)
+            history, *_ = toGeminiMessages(messages=messages)
             return CallGemini.getSingleChatResponse(userInput, history=history)
         elif config.llmBackend == "chatgpt":
             return CallChatGPT.getSingleChatResponse(userInput, messages=messages, temperature=temperature)

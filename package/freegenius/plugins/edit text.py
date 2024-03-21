@@ -24,7 +24,7 @@ if config.customTextEditor:
         config.customTextEditor = ""
 
 def edit_text(function_args):
-    customTextEditor = config.customTextEditor if config.customTextEditor else f"{sys.executable} {os.path.join(config.letMeDoItAIFolder, 'eTextEdit.py')}"
+    customTextEditor = config.customTextEditor if config.customTextEditor else f"{sys.executable} {os.path.join(config.freeGeniusAIFolder, 'eTextEdit.py')}"
     filename = function_args.get("filename") # required
     # in case folder name is mistaken
     if os.path.isdir(filename):

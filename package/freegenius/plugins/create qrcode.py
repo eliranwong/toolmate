@@ -6,8 +6,7 @@ Create qr code image
 [FUNCTION_CALL]
 """
 
-from freegenius import config
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius import config, getLocalStorage
 import os, qrcode
 
 def create_qrcode(function_args):
@@ -16,7 +15,7 @@ def create_qrcode(function_args):
     qr.add_data(url)
     qr.make(fit=True)
 
-    filepath = os.path.join(SharedUtil.getLocalStorage(), "qrcode.png")
+    filepath = os.path.join(getLocalStorage(), "qrcode.png")
     img = qr.make_image(fill='black', back_color='white')
     img.save(filepath)
     

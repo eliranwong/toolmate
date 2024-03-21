@@ -1,5 +1,5 @@
 from freegenius import config, showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
-import traceback, pprint, json, re
+import traceback, json, re
 from typing import Optional
 from llama_cpp import Llama
 
@@ -51,8 +51,9 @@ class CallLlamaCpp:
             jsonOutput = completion["choices"][0]["message"].get("content", "{}")
             jsonOutput = re.sub("^[^{]*?({.*?})[^}]*?$", r"\1", jsonOutput)
             responseDict = json.loads(jsonOutput)
-            if config.developer:
-                pprint.pprint(responseDict)
+            #if config.developer:
+            #    import pprint
+            #    pprint.pprint(responseDict)
             return responseDict
         except:
             showErrors()

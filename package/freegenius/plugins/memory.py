@@ -8,13 +8,13 @@ modified from source: https://medium.com/@simon_attard/building-a-memory-layer-f
 [FUNCTION_CALL]
 """
 
-from freegenius import config
+from freegenius import config, get_or_create_collection, add_vector, query_vectors, getLocalStorage
 from freegenius.health_check import HealthCheck
 from pathlib import Path
 from chromadb.config import Settings
 import uuid, os, chromadb, getpass, geocoder, datetime, json
 
-memory_store = os.path.join(config.getLocalStorage(), "memory")
+memory_store = os.path.join(getLocalStorage(), "memory")
 Path(memory_store).mkdir(parents=True, exist_ok=True)
 chroma_client = chromadb.PersistentClient(memory_store, Settings(anonymized_telemetry=False))
 
@@ -23,22 +23,6 @@ chroma_client = chromadb.PersistentClient(memory_store, Settings(anonymized_tele
 #def cosine_similarity(A, B):
 #    cosine = np.dot(A, B) / (norm(A) * norm(B))
 #    return cosine
-
-def get_or_create_collection(collection_name):
-    collection = chroma_client.get_or_create_collection(
-        name=collection_name,
-        metadata={"hnsw:space": "cosine"},
-        embedding_function=HealthCheck.getEmbeddingFunction(),
-    )
-    return collection
-
-def add_vector(collection, text, metadata):
-    id = str(uuid.uuid4())
-    collection.add(
-        documents = [text],
-        metadatas = [metadata],
-        ids = [id]
-    )
 
 def save_memory(function_args):
     memory = function_args.get("memory") # required
@@ -66,14 +50,6 @@ def save_memory(function_args):
     add_vector(collection, memory, metadata)
     config.stopSpinning()
     return "I saved it in my memory!"
-
-def query_vectors(collection, query, n):
-    #query_embedding = get_embedding(query)
-    return collection.query(
-        #query_embeddings = [query_embedding],
-        query_texts=[query],
-        n_results = n,
-    )
 
 def retrieve_memory(function_args):
     query = function_args.get("query") # required

@@ -61,7 +61,6 @@ defaultSettings = (
     ('systemMessage_palm2', 'You are a helpful assistant.'), # system message for standalone palm2 chatbot
     ('systemMessage_codey', 'You are an expert on coding.'), # system message for standalone codey chatbot
     ('embeddingModel', 'paraphrase-multilingual-mpnet-base-v2'), # reference: https://www.sbert.net/docs/pretrained_models.html
-    ('historyParentFolder', ""),
     ('customTextEditor', ""), # e.g. 'micro -softwrap true -wordwrap true'; built-in text editor eTextEdit is used when it is not defined.
     ('pagerView', False),
     ('usePygame', False), # force to use pygame for audio playback even VLC player is installed
@@ -225,8 +224,8 @@ temporaryConfigs = [
     "thisPlatform",
     "letMeDoItAI",
     "terminalColors",
-    "letMeDoItFile",
-    "letMeDoItAIFolder",
+    "freeGeniusAIFile",
+    "freeGeniusAIFolder",
     "open",
     "inputSuggestions", # used with plugins; user input suggestions
     "outputTransformers", # used with plugins; transform output message
@@ -251,7 +250,7 @@ temporaryConfigs = [
 ]
 
 def saveConfig():
-    configFile = os.path.join(config.letMeDoItAIFolder, "config.py")
+    configFile = os.path.join(config.freeGeniusAIFolder, "config.py")
     with open(configFile, "w", encoding="utf-8") as fileObj:
         for name in dir(config):
             excludeConfigList = temporaryConfigs + config.excludeConfigList

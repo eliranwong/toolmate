@@ -1,4 +1,6 @@
-from freegenius import config
+from freegenius import config, showErrors, getDayOfWeek, getLocalStorage, fileNamesWithoutExtension
+from freegenius.utils.call_llm import CallLLM
+from freegenius.utils.tool_plugins import ToolStore
 import openai, threading, os, time, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys
 from pathlib import Path
 #from pygments.lexers.python import PythonLexer
@@ -16,9 +18,10 @@ from freegenius.utils.prompts import Prompts
 from freegenius.utils.promptValidator import FloatValidator, TokenValidator
 from freegenius.utils.get_path_prompt import GetPath
 from freegenius.utils.prompt_shared_key_bindings import swapTerminalColors
-from freegenius.utils.file_utils import FileUtil
+
 from freegenius.utils.terminal_system_command_prompt import SystemCommandPrompt
 from freegenius.utils.shared_utils import SharedUtil
+from freegenius.utils.tool_plugins import Plugins
 from freegenius.utils.shared_utils import CallLLM
 from freegenius.utils.tts_utils import TTSUtil
 from freegenius.utils.ttsLanguages import TtsLanguages
@@ -42,11 +45,11 @@ class LetMeDoItAI:
         self.prompts = Prompts()
         self.dialogs = TerminalModeDialogs(self)
         self.setup()
-        SharedUtil.runPlugins()
+        Plugins.runPlugins()
 
     def setup(self):
         # set up tool store client
-        SharedUtil.setupToolStoreClient()
+        ToolStore.setupToolStoreClient()
 
         self.models = list(SharedUtil.tokenLimits.keys())
         config.divider = self.divider = "--------------------"
@@ -63,8 +66,8 @@ class LetMeDoItAI:
         config.pagerContent = ""
         #self.addPagerContent = False
         # share the following methods in config so that they are accessible via plugins
-        config.addFunctionCall = SharedUtil.addFunctionCall
-        config.getLocalStorage = SharedUtil.getLocalStorage
+        config.addFunctionCall = Plugins.addFunctionCall
+        #getLocalStorage = getLocalStorage
         config.stopSpinning = self.stopSpinning
         config.toggleMultiline = self.toggleMultiline
         config.print = self.print
@@ -90,20 +93,18 @@ class LetMeDoItAI:
         )
 
         # local storage directory
-        self.storageDir = SharedUtil.getLocalStorage()
+        self.storageDir = getLocalStorage()
         # hisotry directory
-        if (not config.historyParentFolder or not os.path.isdir(config.historyParentFolder)) and self.storageDir:
-            try:
-                historyParentFolder = os.path.join(self.storageDir, "history")
-                Path(historyParentFolder).mkdir(parents=True, exist_ok=True)
-                for i in ("chats", "paths", "commands"):
-                    historyFile = os.path.join(historyParentFolder, i)
-                    if not os.path.isfile(historyFile):
-                        open(historyFile, "a", encoding="utf-8").close()
-                config.historyParentFolder = self.storageDir
-            except:
-                config.historyParentFolder = ""
-            config.saveConfig()
+        try:
+            historyParentFolder = os.path.join(self.storageDir, "history")
+            Path(historyParentFolder).mkdir(parents=True, exist_ok=True)
+            for i in ("chats", "paths", "commands"):
+                historyFile = os.path.join(historyParentFolder, i)
+                if not os.path.isfile(historyFile):
+                    open(historyFile, "a", encoding="utf-8").close()
+        except:
+            print("Failed saving history!")
+        config.saveConfig()
         
         if not config.openaiApiKey:
             self.changeAPIkey()
@@ -119,7 +120,7 @@ class LetMeDoItAI:
         else:
             SharedUtil.setAPIkey()
 
-        chat_history = os.path.join(config.historyParentFolder if config.historyParentFolder else config.letMeDoItAIFolder, "history", "chats")
+        chat_history = os.path.join(self.storageDir, "history", "chats")
         self.terminal_chat_session = PromptSession(history=FileHistory(chat_history))
 
         # check if tts is ready
@@ -202,7 +203,7 @@ class LetMeDoItAI:
     # Voice Typing Language
     def setSpeechToTextLanguage(self):
         # record in history for easy retrieval by moving arrows upwards / downwards
-        voice_typing_language_history = os.path.join(config.historyParentFolder if config.historyParentFolder else config.letMeDoItAIFolder, "history", "voice_typing_language")
+        voice_typing_language_history = os.path.join(self.storageDir, "history", "voice_typing_language")
         voice_typing_language_session = PromptSession(history=FileHistory(voice_typing_language_history))
         # input suggestion for languages
         languages = tuple(googleSpeeckToTextLanguages.keys()) if config.voiceTypingPlatform in ("google", "googlecloud") else whisperSpeeckToTextLanguages
@@ -229,7 +230,7 @@ class LetMeDoItAI:
     # ElevenLabs Text-to-Speech Voice
     def setElevenlabsVoice(self):
         # record in history for easy retrieval by moving arrows upwards / downwards
-        elevenlabsVoice_history = os.path.join(config.historyParentFolder if config.historyParentFolder else config.letMeDoItAIFolder, "history", "elevenlabsVoice")
+        elevenlabsVoice_history = os.path.join(self.storageDir, "history", "elevenlabsVoice")
         elevenlabsVoice_session = PromptSession(history=FileHistory(elevenlabsVoice_history))
         # input suggestion for options
         options = [voice.name for voice in voices()]
@@ -245,7 +246,7 @@ class LetMeDoItAI:
     # Google Text-to-Speech (Generic)
     def setGttsLanguage(self):
         # record in history for easy retrieval by moving arrows upwards / downwards
-        gtts_language_history = os.path.join(config.historyParentFolder if config.historyParentFolder else config.letMeDoItAIFolder, "history", "gtts_language")
+        gtts_language_history = os.path.join(self.storageDir, "history", "gtts_language")
         gtts_language_session = PromptSession(history=FileHistory(gtts_language_history))
         # input suggestion for languages
         languages = tuple(TtsLanguages.gtts.keys())
@@ -270,7 +271,7 @@ class LetMeDoItAI:
     # Google Cloud Text-to-Speech (API)
     def setGcttsLanguage(self):
         # record in history for easy retrieval by moving arrows upwards / downwards
-        gctts_language_history = os.path.join(config.historyParentFolder if config.historyParentFolder else config.letMeDoItAIFolder, "history", "gctts_language")
+        gctts_language_history = os.path.join(self.storageDir, "history", "gctts_language")
         gctts_language_session = PromptSession(history=FileHistory(gctts_language_history))
         # input suggestion for languages
         languages = tuple(TtsLanguages.gctts.keys())
@@ -349,7 +350,7 @@ class LetMeDoItAI:
     def selectPlugins(self):
         plugins = []
         enabledPlugins = []
-        pluginFolder = os.path.join(config.letMeDoItAIFolder, "plugins")
+        pluginFolder = os.path.join(config.freeGeniusAIFolder, "plugins")
         if self.storageDir:
             customPluginFoler = os.path.join(self.storageDir, "plugins")
             Path(customPluginFoler).mkdir(parents=True, exist_ok=True)
@@ -357,7 +358,7 @@ class LetMeDoItAI:
         else:
             pluginFolders = (pluginFolder,)
         for folder in pluginFolders:
-            for plugin in FileUtil.fileNamesWithoutExtension(folder, "py"):
+            for plugin in fileNamesWithoutExtension(folder, "py"):
                 plugins.append(plugin)
                 if not plugin in config.pluginExcludeList:
                     enabledPlugins.append(plugin)
@@ -373,7 +374,7 @@ class LetMeDoItAI:
                     config.pluginExcludeList.remove(p)
                 elif not p in enabledPlugins and not p in config.pluginExcludeList:
                     config.pluginExcludeList.append(p)
-            SharedUtil.runPlugins()
+            Plugins.runPlugins()
             config.saveConfig()
             self.print("Plugin selection updated!")
 
@@ -488,7 +489,7 @@ class LetMeDoItAI:
             try:
                 if message.get("role", "") == "system":
                     # update system mess
-                    dayOfWeek = SharedUtil.getDayOfWeek()
+                    dayOfWeek = getDayOfWeek()
                     message["content"] = re.sub(
                         """^Current directory: .*?\nCurrent time: .*?\nCurrent day of the week: .*?$""",
                         f"""Current directory: {os.getcwd()}\nCurrent time: {str(datetime.datetime.now())}\nCurrent day of the week: {dayOfWeek}""",
@@ -555,7 +556,7 @@ class LetMeDoItAI:
             feature = self.dialogs.getValidOptions(
                 options=options,
                 descriptions=descriptions,
-                title=config.letMeDoItName,
+                title=config.freeGeniusAIName,
                 default=config.defaultBlankEntryAction,
                 text="Select an action or make changes:",
                 filter=query,
@@ -659,7 +660,7 @@ class LetMeDoItAI:
             descriptions=descriptions,
             title="Latest Online Searches",
             default=config.loadingInternetSearches,
-            text=f"{config.letMeDoItName} can perform online searches.\nHow do you want this feature?",
+            text=f"{config.freeGeniusAIName} can perform online searches.\nHow do you want this feature?",
         )
         if option:
             config.loadingInternetSearches = option
@@ -672,7 +673,7 @@ class LetMeDoItAI:
                 if not "integrate google searches" in config.pluginExcludeList:
                     config.pluginExcludeList.append("integrate google searches")
             # reset plugins
-            SharedUtil.runPlugins()
+            Plugins.runPlugins()
             # notify
             config.saveConfig()
             self.print3(f"Latest Online Searches: {option}")
@@ -691,7 +692,7 @@ class LetMeDoItAI:
             options=options,
             descriptions=descriptions,
             title="Command Confirmation Protocol",
-            text=f"{config.letMeDoItName} is designed to execute commands on your behalf.\nPlease specify when you would prefer\nto receive a confirmation\nbefore commands are executed:\n(Note: Execute commands at your own risk.)",
+            text=f"{config.freeGeniusAIName} is designed to execute commands on your behalf.\nPlease specify when you would prefer\nto receive a confirmation\nbefore commands are executed:\n(Note: Execute commands at your own risk.)",
             default=config.confirmExecution,
         )
         if option:
@@ -745,7 +746,7 @@ class LetMeDoItAI:
                 if not "termux-api" in result.stdout:
                     self.print("Termux:API is not installed!")
             # reset plugins
-            SharedUtil.runPlugins()
+            Plugins.runPlugins()
             config.saveConfig()
             self.print3(f"""Termux API Integration: {"enable" if config.terminalEnableTermuxAPI else "disable"}d!""")
 
@@ -776,22 +777,22 @@ class LetMeDoItAI:
             self.print3(f"Pass Function Call Response to ChatGPT: {'enabled' if config.passFunctionCallReturnToChatGPT else 'disabled'}!")
 
     def editLastResponse(self):
-        customTextEditor = config.customTextEditor if config.customTextEditor else f"{sys.executable} {os.path.join(config.letMeDoItAIFolder, 'eTextEdit.py')}"
+        customTextEditor = config.customTextEditor if config.customTextEditor else f"{sys.executable} {os.path.join(config.freeGeniusAIFolder, 'eTextEdit.py')}"
         pydoc.pipepager(config.pagerContent, cmd=customTextEditor)
-        set_title(config.letMeDoItName)
+        set_title(config.freeGeniusAIName)
 
     # change configs
     def editConfigs(self):
         # file paths
-        configFile = os.path.join(config.letMeDoItAIFolder, "config.py")
-        backupFile = os.path.join(config.getLocalStorage(), "config_backup.py")
+        configFile = os.path.join(config.freeGeniusAIFolder, "config.py")
+        backupFile = os.path.join(getLocalStorage(), "config_backup.py")
         # backup configs
         config.saveConfig()
         shutil.copy(configFile, backupFile)
         # open current configs with built-in text editor
-        customTextEditor = config.customTextEditor if config.customTextEditor else f"{sys.executable} {os.path.join(config.letMeDoItAIFolder, 'eTextEdit.py')}"
+        customTextEditor = config.customTextEditor if config.customTextEditor else f"{sys.executable} {os.path.join(config.freeGeniusAIFolder, 'eTextEdit.py')}"
         os.system(f"{customTextEditor} {configFile}")
-        set_title(config.letMeDoItName)
+        set_title(config.freeGeniusAIName)
         # re-load configs
         try:
             config.loadConfig(configFile)
@@ -878,8 +879,8 @@ class LetMeDoItAI:
             self.print("Do you want to delete them now? [y]es / [N]o")
             confirmation = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default="yes")
             if confirmation.lower() in ("y", "yes"):
-                memory_store = os.path.join(config.getLocalStorage(), "memory")
-                retrieved_collections = os.path.join(config.getLocalStorage(), "autogen", "retriever")
+                memory_store = os.path.join(getLocalStorage(), "memory")
+                retrieved_collections = os.path.join(getLocalStorage(), "autogen", "retriever")
                 for folder in (memory_store, retrieved_collections):
                     shutil.rmtree(folder, ignore_errors=True)
             else:
@@ -897,23 +898,23 @@ class LetMeDoItAI:
 
     def setAssistantName(self):
         self.print("You may modify my name below:")
-        letMeDoItName = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.letMeDoItName)
-        if letMeDoItName and not letMeDoItName.strip().lower() == config.exit_entry:
-            config.letMeDoItName = letMeDoItName
-            self.storageDir = SharedUtil.getLocalStorage()
+        freeGeniusAIName = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.freeGeniusAIName)
+        if freeGeniusAIName and not freeGeniusAIName.strip().lower() == config.exit_entry:
+            config.freeGeniusAIName = freeGeniusAIName
+            self.storageDir = getLocalStorage()
             config.saveConfig()
-            self.print3(f"You have changed my name to: {config.letMeDoItName}")
+            self.print3(f"You have changed my name to: {config.freeGeniusAIName}")
 
     def setCustomSystemMessage(self):
         self.print("You can modify the system message to furnish me with details about my capabilities, constraints, or any pertinent context that may inform our interactions. This will guide me in managing and responding to your requests appropriately.")
         self.print("Please note that altering my system message directly affects my functionality. Handle with care.")
         self.print("Enter custom system message below:")
-        self.print(f"(Keep it blank to use {config.letMeDoItName} default system message.)")
+        self.print(f"(Keep it blank to use {config.freeGeniusAIName} default system message.)")
         message = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.systemMessage_letmedoit)
         if message and not message.strip().lower() == config.exit_entry:
             config.systemMessage_letmedoit = message
             config.saveConfig()
-            self.print3(f"Custom system message: {config.letMeDoItName}")
+            self.print3(f"Custom system message: {config.freeGeniusAIName}")
 
     def setCustomTextEditor(self):
         self.print("Please specify custom text editor command below:")
@@ -946,7 +947,7 @@ class LetMeDoItAI:
             self.print3(f"Number of memory closest matches: {config.memoryClosestMatches}")
 
     def setMaxAutoHeal(self):
-        self.print(f"The auto-heal feature enables {config.letMeDoItName} to automatically fix broken Python code if it was not executed properly.")
+        self.print(f"The auto-heal feature enables {config.freeGeniusAIName} to automatically fix broken Python code if it was not executed properly.")
         self.print("Please specify maximum number of auto-heal attempts below:")
         self.print("(Remarks: Enter '0' if you want to disable auto-heal feature)")
         maxAutoHeal = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.max_consecutive_auto_heal))
@@ -1053,7 +1054,7 @@ class LetMeDoItAI:
                 command = f'''{ttsCommand} "testing"{ttsCommandSuffix}'''
             _, stdErr = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
             if stdErr:
-                SharedUtil.showErrors() if config.developer else self.print("Entered command invalid!")
+                showErrors() if config.developer else self.print("Entered command invalid!")
             else:
                 config.ttsCommand, config.ttsCommandSuffix = ttsCommand, ttsCommandSuffix
                 config.saveConfig()
@@ -1210,7 +1211,7 @@ class LetMeDoItAI:
                     config.save_chat_record(timestamp, order, i)
 
             try:
-                folderPath = os.path.join(SharedUtil.getLocalStorage(), "chats", re.sub("^([0-9]+?\-[0-9]+?)\-.*?$", r"\1", timestamp))
+                folderPath = os.path.join(getLocalStorage(), "chats", re.sub("^([0-9]+?\-[0-9]+?)\-.*?$", r"\1", timestamp))
                 Path(folderPath).mkdir(parents=True, exist_ok=True)
                 if os.path.isdir(folderPath):
                     chatFile = os.path.join(folderPath, f"{timestamp}.txt")
@@ -1218,7 +1219,7 @@ class LetMeDoItAI:
                         fileObj.write(pprint.pformat(messages))
             except:
                 self.print2("Failed to save chat!\n")
-                SharedUtil.showErrors()
+                showErrors()
 
     def exportChat(self, messages, openFile=True):
         if config.conversationStarted:
@@ -1247,7 +1248,7 @@ class LetMeDoItAI:
                 pydoc.pipepager(plainText, cmd="termux-share -a send")
             else:
                 try:
-                    folderPath = os.path.join(SharedUtil.getLocalStorage(), "chats", "export")
+                    folderPath = os.path.join(getLocalStorage(), "chats", "export")
                     Path(folderPath).mkdir(parents=True, exist_ok=True)
                     if os.path.isdir(folderPath):
                         chatFile = os.path.join(folderPath, f"{timestamp}.txt")
@@ -1257,7 +1258,7 @@ class LetMeDoItAI:
                             os.system(f'''{config.open} "{chatFile}"''')
                 except:
                     self.print2("Failed to save chat!\n")
-                    SharedUtil.showErrors()
+                    showErrors()
 
     def runInstruction(self):
         instructions = list(config.predefinedInstructions.keys())
@@ -1309,7 +1310,7 @@ class LetMeDoItAI:
             pass
 
     def showLogo(self):
-        appName = config.letMeDoItName.split()[0].upper()
+        appName = config.freeGeniusAIName.split()[0].upper()
         terminal_width = shutil.get_terminal_size().columns
         try:
             from art import text2art
@@ -1318,11 +1319,22 @@ class LetMeDoItAI:
             elif terminal_width >= 20:
                 logo = text2art(" ".join(appName) + " ", font="white_bubble")
             else:
-                logo = config.letMeDoItName
+                logo = config.freeGeniusAIName
             logo = logo[:-1] # remove the linebreak at the end
         except:
-            logo = config.letMeDoItName
+            logo = config.freeGeniusAIName
         print_formatted_text(HTML(f"<{config.terminalCommandEntryColor2}>{logo}</{config.terminalCommandEntryColor2}>"))
+
+    def runPythonScript(self, script):
+        script = script.strip()[3:-3]
+        try:
+            exec(script, globals())
+        except:
+            trace = traceback.format_exc()
+            print(trace if config.developer else "Error encountered!")
+            config.print(config.divider)
+            if config.max_consecutive_auto_heal > 0:
+                CallLLM.autoHealPythonCode(script, trace)
 
     def startChats(self):
         tokenValidator = TokenValidator()
@@ -1334,9 +1346,9 @@ class LetMeDoItAI:
             self.showLogo()
             self.showCurrentContext()
             # go to startup directory
-            storagedirectory = SharedUtil.getLocalStorage()
+            storagedirectory = getLocalStorage()
             os.chdir(storagedirectory)
-            messages = SharedUtil.resetMessages()
+            messages = CallLLM.resetMessages()
             #self.print(f"startup directory:\n{storagedirectory}")
             print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Directory:</{config.terminalPromptIndicatorColor2}> {storagedirectory}"))
             self.print(self.divider)
@@ -1449,7 +1461,7 @@ class LetMeDoItAI:
                 print("")
             elif config.developer and userInput.startswith("```") and userInput.endswith("```") and not userInput == "``````":
                 userInput = re.sub("```python", "```", userInput)
-                SharedUtil.runPythonScript(userInput)
+                self.runPythonScript(userInput)
                 print("")
             elif userInputLower == config.exit_entry:
                 self.saveChat(config.currentMessages)
@@ -1479,7 +1491,7 @@ class LetMeDoItAI:
                         if config.isTermux:
                             day_of_week = ""
                         else:
-                            day_of_week = f"today is {SharedUtil.getDayOfWeek()} and "
+                            day_of_week = f"today is {getDayOfWeek()} and "
                         improvedVersion = CallLLM.getSingleChatResponse(f"""Improve the following writing, according to {config.improvedWritingSytle}
 In addition, I would like you to help me with converting relative dates and times, if any, into exact dates and times based on the reference that {day_of_week}current datetime is {str(datetime.datetime.now())}.
 Remember, provide me with the improved writing only, enclosed in triple quotes ``` and without any additional information or comments.
@@ -1544,7 +1556,7 @@ My writing:
                             config.currentMessages = CallLLM.runSingleFunctionCall(config.currentMessages, [config.toolFunctionSchemas["integrate_google_searches"]], "integrate_google_searches")
                         except:
                             self.print("Unable to load internet resources.")
-                            SharedUtil.showErrors()
+                            showErrors()
 
                     completion = CallLLM.runAutoFunctionCall(config.currentMessages, noFunctionCall)
                     
@@ -1639,7 +1651,7 @@ My writing:
                     pydoc.pager(pagerContent)
             except:
                 config.pagerView = False
-                SharedUtil.showErrors()
+                showErrors()
 
     # wrap html text at spaces
     def getWrappedHTMLText(self, text, terminal_width=None):

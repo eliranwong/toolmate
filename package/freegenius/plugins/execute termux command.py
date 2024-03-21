@@ -7,7 +7,7 @@ execute termux command
 [FUNCTION_CALL]
 """
 
-from freegenius import config
+from freegenius import config, showRisk, confirmExecution, getPygmentsStyle, showErrors
 from freegenius.utils.shared_utils import SharedUtil
 from freegenius.health_check import HealthCheck
 import textwrap, re, pygments, json, pydoc
@@ -40,17 +40,17 @@ if config.terminalEnableTermuxAPI:
         # show Termux command for developer
         config.print(config.divider)
         config.print(f"Termux: {title}")
-        SharedUtil.showRisk(risk)
+        showRisk(risk)
         if config.developer or config.codeDisplay:
             config.print("```")
             #print(function_args)
             tokens = list(pygments.lex(function_args, lexer=BashLexer()))
-            print_formatted_text(PygmentsTokens(tokens), style=SharedUtil.getPygmentsStyle())
+            print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
             config.print("```")
         config.print(config.divider)
 
         config.stopSpinning()
-        if SharedUtil.confirmExecution(risk):
+        if confirmExecution(risk):
             config.print("Do you want to execute it? [y]es / [N]o")
             confirmation = HealthCheck.simplePrompt(style=promptStyle, default="y")
             if not confirmation.lower() in ("y", "yes"):
@@ -65,7 +65,7 @@ if config.terminalEnableTermuxAPI:
                 function_response = SharedUtil.runSystemCommand(function_args)
             config.print(function_response)
         except:
-            SharedUtil.showErrors()
+            showErrors()
             config.print(config.divider)
             return "[INVALID]"
         info = {"information": function_response}

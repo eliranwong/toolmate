@@ -7,7 +7,7 @@ if os.getcwd() != packageFolder:
 configFile = os.path.join(packageFolder, "config.py")
 if not os.path.isfile(configFile):
     open(configFile, "a", encoding="utf-8").close()
-from freegenius import config
+from freegenius import config, getLocalStorage
 config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
 
 import traceback, json, pprint, wcwidth, textwrap, threading, time, shutil
@@ -95,7 +95,7 @@ class HealthCheck:
     def setBasicConfig():
         if not hasattr(config, "setBasicConfigDone") or not config.setBasicConfigDone:
             # package folder
-            config.letMeDoItAIFolder = packageFolder
+            config.freeGeniusAIFolder = packageFolder
             config.excludeConfigList = []
             # Default Settings
             for key, value in defaultSettings:
@@ -109,7 +109,7 @@ class HealthCheck:
             if config.google_cloud_credentials and os.path.isfile(config.google_cloud_credentials):
                 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = config.google_cloud_credentials
             else:
-                files = HealthCheck.getLocalStorage()
+                files = getLocalStorage()
                 gccfile1 = os.path.join(files, "credentials_google_cloud.json")
                 gccfile2 = os.path.join(files, "credentials_googleaistudio.json")
                 gccfile3 = os.path.join(files, "credentials_googletts.json")
@@ -320,29 +320,6 @@ class HealthCheck:
     def getPygmentsStyle():
         theme = config.pygments_style if hasattr(config, "pygments_style") and config.pygments_style else "stata-dark" if not config.terminalResourceLinkColor.startswith("ansibright") else "stata-light"
         return style_from_pygments_cls(get_style_by_name(theme))
-
-    @staticmethod
-    def getLocalStorage():
-        # config.letMeDoItName
-        if not hasattr(config, "letMeDoItName") or not config.letMeDoItName:
-            config.letMeDoItName = "FreeGenius AI"
-
-        # option 1: config.storagedirectory; user custom folder
-        if not hasattr(config, "storagedirectory") or (config.storagedirectory and not os.path.isdir(config.storagedirectory)):
-            config.storagedirectory = ""
-        if config.storagedirectory:
-            return config.storagedirectory
-        # option 2: defaultStorageDir; located in user home directory
-        defaultStorageDir = os.path.join(os.path.expanduser('~'), config.letMeDoItName.split()[0].lower())
-        try:
-            Path(defaultStorageDir).mkdir(parents=True, exist_ok=True)
-        except:
-            pass
-        if os.path.isdir(defaultStorageDir):
-            return defaultStorageDir
-        # option 3: directory "files" in app directory; to be deleted on every upgrade
-        else:
-            return os.path.join(packageFolder, "files")
 
     @staticmethod
     def setPrint():

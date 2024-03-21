@@ -1,6 +1,6 @@
 import vertexai, os, traceback, argparse
 from vertexai.language_models import CodeChatModel, ChatMessage
-from freegenius import config
+from freegenius import config, getPygmentsStyle, getLocalStorage
 from freegenius.health_check import HealthCheck
 if not hasattr(config, "currentMessages"):
     HealthCheck.setBasicConfig()
@@ -36,7 +36,7 @@ class Codey:
         self.name = name
 
     def run(self, prompt="", model="codechat-bison-32k", temperature=0.2, max_output_tokens=2048):
-        historyFolder = os.path.join(HealthCheck.getLocalStorage(), "history")
+        historyFolder = os.path.join(getLocalStorage(), "history")
         Path(historyFolder).mkdir(parents=True, exist_ok=True)
         chat_history = os.path.join(historyFolder, self.name.replace(" ", "_"))
         chat_session = PromptSession(history=FileHistory(chat_history))
@@ -106,7 +106,7 @@ class Codey:
                     config.pagerContent = response.text.strip()
                     # color response with markdown style
                     tokens = list(pygments.lex(config.pagerContent, lexer=MarkdownLexer()))
-                    print_formatted_text(PygmentsTokens(tokens), style=HealthCheck.getPygmentsStyle())
+                    print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
                     # integrate messages into LetMeDoIt messages
                     if hasattr(config, "currentMessages") and config.pagerContent:
                         config.currentMessages.append({"role": "assistant", "content": config.pagerContent})
@@ -118,7 +118,7 @@ class Codey:
 
         HealthCheck.print2(f"\n{self.name} closed!")
         if hasattr(config, "currentMessages"):
-            HealthCheck.print2(f"Return back to {config.letMeDoItName} prompt ...")
+            HealthCheck.print2(f"Return back to {config.freeGeniusAIName} prompt ...")
 
 def main():
     # Create the parser

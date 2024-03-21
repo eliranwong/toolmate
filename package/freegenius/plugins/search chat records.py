@@ -6,39 +6,17 @@ search and open old chat records
 [FUNCTION_CALL]
 """
 
-from freegenius import config
-from freegenius.health_check import HealthCheck
+from freegenius import config, get_or_create_collection, add_vector, query_vectors, showErrors, getLocalStorage
 from pathlib import Path
 from chromadb.config import Settings
 import uuid, os, chromadb, re
 from freegenius.utils.shared_utils import SharedUtil
 from prompt_toolkit import print_formatted_text, HTML
 
-chat_store = os.path.join(config.getLocalStorage(), "chats")
+chat_store = os.path.join(getLocalStorage(), "chats")
 Path(chat_store).mkdir(parents=True, exist_ok=True)
 chroma_client = chromadb.PersistentClient(chat_store, Settings(anonymized_telemetry=False))
 
-def get_or_create_collection(collection_name):
-    collection = chroma_client.get_or_create_collection(
-        name=collection_name,
-        metadata={"hnsw:space": "cosine"},
-        embedding_function=HealthCheck.getEmbeddingFunction(),
-    )
-    return collection
-
-def add_vector(collection, text, metadata):
-    id = str(uuid.uuid4())
-    collection.add(
-        documents = [text],
-        metadatas = [metadata],
-        ids = [id]
-    )
-
-def query_vectors(collection, query, n):
-    return collection.query(
-        query_texts=[query],
-        n_results = n,
-    )
 
 def save_chat_record(timestamp, order, record):
     role = record.get("role", "")
@@ -86,7 +64,7 @@ def load_chats(function_args):
             isfile = True
         elif re.search("^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9]_[0-9][0-9]_[0-9][0-9]$", chatFile):
             # match chat id format
-            folderPath = os.path.join(config.getLocalStorage(), "chats", re.sub("^([0-9]+?\-[0-9]+?)\-.*?$", r"\1", chatFile))
+            folderPath = os.path.join(getLocalStorage(), "chats", re.sub("^([0-9]+?\-[0-9]+?)\-.*?$", r"\1", chatFile))
             chatFile = os.path.join(folderPath, f"{chatFile}.txt")
             if os.path.isfile(chatFile):
                 isfile = True
@@ -128,7 +106,7 @@ def load_chats(function_args):
             config.print3(f"Failed to load chat records '{timestamp}' due to invalid format!")
     except:
         config.print3(f"Failed to load chat records: {timestamp}\n")
-        SharedUtil.showErrors()
+        showErrors()
     return "[INVALID]"
 
 functionSignature1 = {

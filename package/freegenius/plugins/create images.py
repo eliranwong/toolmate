@@ -6,11 +6,11 @@ generate images with model "dall-e-3"
 [FUNCTION_CALL]
 """
 
-from freegenius import config
+from freegenius import config, getLocalStorage
 import os
 from base64 import b64decode
 from freegenius.utils.shared_utils import SharedUtil
-from freegenius.utils.shared_utils import check_openai_errors
+from freegenius.utils.call_chatgpt import check_openai_errors
 from freegenius.utils.terminal_mode_dialogs import TerminalModeDialogs
 from openai import OpenAI
 from pathlib import Path
@@ -54,10 +54,10 @@ def create_image(function_args):
     )
     # open image
     #imageUrl = response.data[0].url
-    #jsonFile = os.path.join(config.letMeDoItAIFolder, "temp", "openai_image.json")
+    #jsonFile = os.path.join(config.freeGeniusAIFolder, "temp", "openai_image.json")
     #with open(jsonFile, mode="w", encoding="utf-8") as fileObj:
     #    json.dump(response.data[0].b64_json, fileObj)
-    folder = config.getLocalStorage()
+    folder = getLocalStorage()
     folder = os.path.join(folder, "images")
     Path(folder).mkdir(parents=True, exist_ok=True)
     imageFile = os.path.join(folder, f"{SharedUtil.getCurrentDateTime()}.png")

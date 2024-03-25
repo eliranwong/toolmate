@@ -26,7 +26,7 @@ if config.isTermux:
 
 defaultSettings = (
     # unique configs in FreeGenius AI
-    ('llmBackend', "ollama" if shutil.which("ollama") else "llamacpp"), # "ollama", "llamacpp", "gemini", "chatgpt", letmedoit
+    ('llmBackend', "llamacpp"), # "ollama", "llamacpp", "gemini", "chatgpt", letmedoit
     ('intent_screening', False), # set True to increase both reliability and waiting time
     ('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools
     ('tokenizers_parallelism', 'true'), # 'true' / 'false'
@@ -182,7 +182,6 @@ temporaryConfigs = [
     "freeGeniusActionExamples",
     "freeGeniusActionParameters",
     "freeGeniusActionMethods",
-    "setBasicConfigDone",
     "google_cloud_credentials_file",
     "actionHelp",
     "isTermux",
@@ -215,7 +214,7 @@ temporaryConfigs = [
     "isVlcPlayerInstalled",
     "accept_default",
     "defaultEntry",
-    "pipIsUpdated",
+    "isPipUpdated",
     "setConfig",
     "excludeConfigList",
     "tempContent",
@@ -235,13 +234,10 @@ temporaryConfigs = [
     "toolFunctionSchemas",
     "toolFunctionMethods",
     "pythonFunctionResponse", # used with plugins; function call when function name is 'python'
-    # LetMeDoItAI methods shared from Class LetMeDoItAI
+    # FreeGenius methods shared from Class FreeGenius
     "getLocalStorage",
     "stopSpinning",
     "toggleMultiline",
-    "print",
-    "print2",
-    "print3",
     "getWrappedHTMLText",
     "fineTuneUserInput",
     "launchPager",

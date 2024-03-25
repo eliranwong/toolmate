@@ -1,7 +1,7 @@
 from freegenius import config, fineTunePythonCode
 from freegenius import print1, print2, print3
 import traceback
-from freegenius.utils.install import installmodule
+from freegenius import installPipPackage
 from freegenius.utils.shared_utils import SharedUtil
 
 """
@@ -31,7 +31,7 @@ def heal_python(function_args):
         if missing:
             print2("Installing missing packages ...")
             for i in missing:
-                installmodule(f"--upgrade {i}")
+                installPipPackage(f"--upgrade {i}")
         print2("Running improved code ...")
         if config.developer or config.codeDisplay:
             SharedUtil.displayPythonCode(fix)

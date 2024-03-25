@@ -10,7 +10,7 @@ LetMeDoIt AI Plugin - download youtube or web content
 [FUNCTION_CALL]
 """
 
-from freegenius import config, showErrors, getLocalStorage
+from freegenius import config, showErrors, getLocalStorage, isCommandInstalled, print1, print3
 import re, subprocess, os
 from freegenius.utils.shared_utils import SharedUtil
 from pathlib import Path
@@ -33,7 +33,7 @@ def download_web_content(function_args):
                 print1("--------------------")
                 # use os.system, as it displays download status ...
                 os.system("cd {2}; {0} {1}".format(downloadCommand, url_string, outputFolder))
-                if SharedUtil.isPackageInstalled("pkill"):
+                if isCommandInstalled("pkill"):
                     os.system("pkill yt-dlp")
                 print3(f"Downloaded in: '{outputFolder}'")
                 try:

@@ -1,7 +1,6 @@
 from freegenius import config
-from freegenius import print1, print2, print3
-from freegenius.utils.install import installmodule
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius import print1, print2, print3, isCommandInstalled
+from freegenius import installPipPackage
 import os
 
 # For more information, read https://github.com/Uberi/speech_recognition#pyaudio-for-microphone-users
@@ -17,19 +16,19 @@ except:
         config.pyaudioInstalled = False
         #print2("Installing 'portaudio' and 'Pyaudio' ...")
         #os.system("pkg install portaudio")
-        #config.pyaudioInstalled = True if installmodule("--upgrade PyAudio") else False
-    elif SharedUtil.isPackageInstalled("apt"):
+        #config.pyaudioInstalled = True if installPipPackage("--upgrade PyAudio") else False
+    elif isCommandInstalled("apt"):
         print2("Installing 'portaudio19-dev' and 'Pyaudio' ...")
         os.system("sudo apt update && sudo apt install portaudio19-dev")
-        config.pyaudioInstalled = True if installmodule("--upgrade PyAudio") else False
-    elif SharedUtil.isPackageInstalled("dnf"):
+        config.pyaudioInstalled = True if installPipPackage("--upgrade PyAudio") else False
+    elif isCommandInstalled("dnf"):
         print2("Installing 'portaudio-devel' and 'Pyaudio' ...")
         os.system("sudo dnf update && sudo dnf install portaudio-devel")
-        config.pyaudioInstalled = True if installmodule("--upgrade PyAudio") else False
-    elif SharedUtil.isPackageInstalled("brew"):
+        config.pyaudioInstalled = True if installPipPackage("--upgrade PyAudio") else False
+    elif isCommandInstalled("brew"):
         print2("Installing 'portaudio' and 'Pyaudio' ...")
         os.system("brew install portaudio")
-        config.pyaudioInstalled = True if installmodule("--upgrade PyAudio") else False
+        config.pyaudioInstalled = True if installPipPackage("--upgrade PyAudio") else False
     else:
         config.pyaudioInstalled = False
 

@@ -11,15 +11,9 @@ from freegenius import config
 if not hasattr(config, "max_consecutive_auto_reply"):
     config.max_consecutive_auto_reply = 10
 
-from freegenius import print1, print2, print3
-from freegenius.health_check import HealthCheck
-if not hasattr(config, "currentMessages"):
-    HealthCheck.setBasicConfig()
-    if not hasattr(config, "openaiApiKey") or not config.openaiApiKey:
-        HealthCheck.changeAPIkey()
-    config.saveConfig()
-    #print("Configurations updated!")
-HealthCheck.checkCompletion()
+from freegenius import print1, print2, print3, tokenLimits
+from freegenius.utils.call_llm import CallLLM
+CallLLM.checkCompletion()
 
 from freegenius import getEmbeddingFunction
 import autogen, os, json, traceback, chromadb, re, zipfile, datetime, traceback
@@ -42,9 +36,9 @@ class AutoGenRetriever:
         #    api_version=None,
         #)
         oai_config_list = []
-        for model in HealthCheck.tokenLimits.keys():
+        for model in tokenLimits.keys():
             oai_config_list.append({"model": model, "api_key": config.openaiApiKey})
-        if not config.chatGPTApiModel in HealthCheck.tokenLimits:
+        if not config.chatGPTApiModel in tokenLimits:
             oai_config_list.append({"model": config.chatGPTApiModel, "api_key": config.openaiApiKey})
         os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
         """

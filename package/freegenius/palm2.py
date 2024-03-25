@@ -3,11 +3,7 @@ from vertexai.language_models import ChatModel, ChatMessage
 from freegenius import config, getLocalStorage
 from freegenius import print1, print2, print3
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
-from freegenius.health_check import HealthCheck
-if not hasattr(config, "currentMessages"):
-    HealthCheck.setBasicConfig()
-    config.saveConfig()
-    #print("Configurations updated!")
+from freegenius.utils.single_prompt import SinglePrompt
 from prompt_toolkit.styles import Style
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
@@ -91,11 +87,11 @@ class Palm2:
         print(f"(To exit, enter '{config.exit_entry}')\n")
         while True:
             if not prompt:
-                prompt = HealthCheck.simplePrompt(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar)
+                prompt = SinglePrompt.run(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar)
                 if prompt and not prompt in (".new", config.exit_entry) and hasattr(config, "currentMessages"):
                     config.currentMessages.append({"content": prompt, "role": "user"})
             else:
-                prompt = HealthCheck.simplePrompt(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar, default=prompt, accept_default=True)
+                prompt = SinglePrompt.run(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar, default=prompt, accept_default=True)
             if prompt == config.exit_entry:
                 break
             elif prompt == ".new" and not hasattr(config, "currentMessages"):

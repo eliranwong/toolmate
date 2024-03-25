@@ -7,6 +7,7 @@ Create qr code image
 """
 
 from freegenius import config, getLocalStorage
+from freegenius import print1, print2, print3
 import os, qrcode
 
 def create_qrcode(function_args):

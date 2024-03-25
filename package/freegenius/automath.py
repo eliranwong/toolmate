@@ -7,16 +7,10 @@ if os.getcwd() != packageFolder:
 configFile = os.path.join(packageFolder, "config.py")
 if not os.path.isfile(configFile):
     open(configFile, "a", encoding="utf-8").close()
-from freegenius import config
+from freegenius import config, tokenLimits
 
-from freegenius.health_check import HealthCheck
-if not hasattr(config, "currentMessages"):
-    HealthCheck.setBasicConfig()
-    if not hasattr(config, "openaiApiKey") or not config.openaiApiKey:
-        HealthCheck.changeAPIkey()
-    config.saveConfig()
-    #print("Configurations updated!")
-HealthCheck.checkCompletion()
+from freegenius.utils.call_llm import CallLLM
+CallLLM.checkCompletion()
 
 import autogen, os, json, traceback
 from freegenius.utils.prompts import Prompts
@@ -35,9 +29,9 @@ class AutoGenMath:
         #    api_version=None,
         #)
         oai_config_list = []
-        for model in HealthCheck.tokenLimits.keys():
+        for model in tokenLimits.keys():
             oai_config_list.append({"model": model, "api_key": config.openaiApiKey})
-        if not config.chatGPTApiModel in HealthCheck.tokenLimits:
+        if not config.chatGPTApiModel in tokenLimits:
             oai_config_list.append({"model": config.chatGPTApiModel, "api_key": config.openaiApiKey})
         os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
         """

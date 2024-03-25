@@ -7,14 +7,14 @@ install python package into the environment that runs LetMeDoIt AI
 """
 
 from freegenius import config
-from freegenius.utils.install import installmodule
+from freegenius import installPipPackage
 
 # Function method
 def install_package(function_args):
     package = function_args.get("package") # required
     if package:
         config.stopSpinning()
-        install = installmodule(f"--upgrade {package}")
+        install = installPipPackage(f"--upgrade {package}")
         return "Installed!" if install else f"Failed to install '{package}'!"
     return ""
 

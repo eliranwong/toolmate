@@ -16,14 +16,8 @@ if not hasattr(config, "use_oai_assistant"):
     config.use_oai_assistant = False
 
 from freegenius import print1, print2, print3
-from freegenius.health_check import HealthCheck
-if not hasattr(config, "currentMessages"):
-    HealthCheck.setBasicConfig()
-    if not hasattr(config, "openaiApiKey") or not config.openaiApiKey:
-        HealthCheck.changeAPIkey()
-    config.saveConfig()
-    #print("Configurations updated!")
-HealthCheck.checkCompletion()
+from freegenius.utils.call_llm import CallLLM
+CallLLM.checkCompletion()
 
 from autogen.agentchat.contrib.agent_builder import AgentBuilder
 #from freegenius.utils.agent_builder import AgentBuilder

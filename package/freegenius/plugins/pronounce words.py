@@ -9,8 +9,8 @@ pronunce words
 try:
     from gtts import gTTS
 except:
-    from freegenius.utils.install import installmodule
-    installmodule(f"--upgrade gTTS")
+    from freegenius import installPipPackage
+    installPipPackage(f"--upgrade gTTS")
 
 from freegenius import config
 from freegenius.utils.tts_utils import TTSUtil

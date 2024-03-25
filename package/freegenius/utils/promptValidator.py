@@ -1,4 +1,4 @@
-from freegenius import config
+from freegenius import config, count_tokens_from_messages, count_tokens_from_functions, tokenLimits
 from freegenius.utils.shared_utils import SharedUtil
 from prompt_toolkit.validation import Validator, ValidationError
 from prompt_toolkit.application import run_in_terminal
@@ -23,10 +23,10 @@ class TokenValidator(Validator):
                 #currentInput = currentInput.replace("[NO_FUNCTION_CALL]", "")
                 currentInput = re.sub(no_function_call_pattern, "", currentInput)
             else:
-                availableFunctionTokens = SharedUtil.count_tokens_from_functions(config.toolFunctionSchemas)
+                availableFunctionTokens = count_tokens_from_functions(config.toolFunctionSchemas)
             currentInputTokens = len(encoding.encode(config.fineTuneUserInput(currentInput)))
-            loadedMessageTokens = SharedUtil.count_tokens_from_messages(config.currentMessages)
-            selectedModelLimit = SharedUtil.tokenLimits[config.chatGPTApiModel]
+            loadedMessageTokens = count_tokens_from_messages(config.currentMessages)
+            selectedModelLimit = tokenLimits[config.chatGPTApiModel]
             #estimatedAvailableTokens = selectedModelLimit - availableFunctionTokens - loadedMessageTokens - currentInputTokens
 
             config.dynamicToolBarText = f""" Tokens: {(availableFunctionTokens + loadedMessageTokens + currentInputTokens)}/{selectedModelLimit} {str(config.hotkey_display_key_combo).replace("'", "")} shortcuts """

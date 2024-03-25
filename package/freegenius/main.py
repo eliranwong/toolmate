@@ -1,107 +1,11 @@
-import os, sys, platform, shutil, argparse
+from freegenius import config
 
-# requires python 3.8+; required by package 'tiktoken'
-pythonVersion = sys.version_info
-if pythonVersion < (3, 8):
-    print("Python version higher than 3.8 is required!")
-    print("Closing ...")
-    exit(1)
-elif pythonVersion >= (3, 12):
-    print("Some features may not work with python version newer than 3.11!")
-
-# navigate to project directory
-freeGeniusAIFile = os.path.realpath(__file__)
-freeGeniusAIFolder = os.path.dirname(freeGeniusAIFile)
-if os.getcwd() != freeGeniusAIFolder:
-    os.chdir(freeGeniusAIFolder)
-
-# check current platform
-thisPlatform = platform.system()
-
-# set up config
-# create config.py if it does not exist
-configFile = os.path.join(freeGeniusAIFolder, "config.py")
-if not os.path.isfile(configFile):
-    open(configFile, "a", encoding="utf-8").close()
-
-# import config and setup default
-#import traceback
-try:
-    from freegenius import config
-except:
-    # write off problematic configFile
-    open(configFile, "w", encoding="utf-8").close()
-    from freegenius import config
+import os, shutil, argparse
 from pathlib import Path
 
-apps = {
-    "freegenius": ("FreeGenius", "FreeGenius AI"),
-}
-
-basename = os.path.basename(freeGeniusAIFolder)
-if not hasattr(config, "freeGeniusAIName") or not config.freeGeniusAIName:
-    config.freeGeniusAIName = "FreeGenius AI"
-config.freeGeniusAIFile = freeGeniusAIFile
-config.freeGeniusAIFolder = freeGeniusAIFolder
-config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
-
-# package name
-#with open(os.path.join(config.freeGeniusAIFolder, "package_name.txt"), "r", encoding="utf-8") as fileObj:
-#    package = fileObj.read()
-package = "freegenius"
-
-def restartApp():
-    print(f"Restarting {config.freeGeniusAIName} ...")
-    os.system(f"{sys.executable} {config.freeGeniusAIFile}")
-    exit(0)
-config.restartApp = restartApp
-
-from freegenius.utils.config_tools import *
-from freegenius.utils.install import installmodule
-from freegenius.utils.shared_utils import SharedUtil
-
-# automatic update
-config.pipIsUpdated = False
-def updateApp():
-    thisPackage = f"{package}_android" if config.isTermux else package
-    print(f"Checking '{thisPackage}' version ...")
-    installed_version = SharedUtil.getPackageInstalledVersion(thisPackage)
-    if installed_version is None:
-        print("Installed version information is not accessible!")
-    else:
-        print(f"Installed version: {installed_version}")
-    latest_version = SharedUtil.getPackageLatestVersion(thisPackage)
-    if latest_version is None:
-        print("Latest version information is not accessible at the moment!")
-    elif installed_version is not None:
-        print(f"Latest version: {latest_version}")
-        if latest_version > installed_version:
-            if thisPlatform == "Windows":
-                print("Automatic upgrade feature is yet to be supported on Windows!")
-                print(f"Run 'pip install --upgrade {thisPackage}' to manually upgrade this app!")
-            else:
-                try:
-                    # upgrade package
-                    installmodule(f"--upgrade {thisPackage}")
-                    restartApp()
-                except:
-                    print(f"Failed to upgrade '{thisPackage}'!")
-
-# import other libraries
-from freegenius import getLocalStorage
-from freegenius.utils.shortcuts import *
-from freegenius.utils.assistant import LetMeDoItAI
-from freegenius.utils.vlc_utils import VlcUtil
+from freegenius import getLocalStorage, updateApp, configFile
+from freegenius.utils.assistant import FreeGenius
 from prompt_toolkit.shortcuts import set_title, clear_title
-try:
-    # hide pygame welcome message
-    os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
-    import pygame
-    pygame.mixer.init()
-    config.isPygameInstalled = True
-except:
-    config.isPygameInstalled = False
-os.environ["TOKENIZERS_PARALLELISM"] = config.tokenizers_parallelism
 
 def set_log_file_max_lines(log_file, max_lines):
     if os.path.isfile(log_file):
@@ -204,20 +108,16 @@ def main():
         config.defaultEntry = ""
         config.accept_default = False
 
+    # set window title
     set_title(config.freeGeniusAIName)
-    SharedUtil.setOsOpenCmd(thisPlatform)
-    createShortcuts()
-    config.excludeConfigList = []
-    config.isVlcPlayerInstalled = VlcUtil.isVlcPlayerInstalled()
-    # save loaded configs
-    config.saveConfig()
+
     # local storage
     storageDir = getLocalStorage()
     # check log files; remove old lines if more than 3000 lines is found in a log file
     for i in ("chats", "paths", "commands"):
         filepath = os.path.join(storageDir, "history", i)
         set_log_file_max_lines(filepath, 3000)
-    LetMeDoItAI().startChats()
+    FreeGenius().startChats()
     # Do the following tasks before exit
     # backup configurations
     config.saveConfig()

@@ -120,7 +120,7 @@ class CentralWidget(QWidget):
             messages=config.currentMessages,
             n=1,
             temperature=config.llmTemperature,
-            max_tokens=SharedUtil.getDynamicTokens(config.currentMessages, config.toolFunctionSchemas.values()),
+            max_tokens=getDynamicTokens(config.currentMessages, config.toolFunctionSchemas.values()),
             stream=True,
         )
         # display response
@@ -144,8 +144,8 @@ class CentralWidget(QWidget):
             messages=messages,
             n=1,
             temperature=config.llmTemperature,
-            max_tokens=SharedUtil.getDynamicTokens(messages, config.toolFunctionSchemas.values()),
-            tools=SharedUtil.convertFunctionSignaturesIntoTools(config.toolFunctionSchemas.values()),
+            max_tokens=getDynamicTokens(messages, config.toolFunctionSchemas.values()),
+            tools=convertFunctionSignaturesIntoTools(config.toolFunctionSchemas.values()),
             tool_choice="auto",
             stream=True,
         )
@@ -156,7 +156,7 @@ class CentralWidget(QWidget):
 
         if first_delta.tool_calls:
             function_calls = [i for i in first_delta.tool_calls if i.type == "function"]
-            function_arguments = SharedUtil.getToolArgumentsFromStreams(completion)
+            function_arguments = getToolArgumentsFromStreams(completion)
             for function_call in function_calls:
                 function_index = function_call.index
                 function_name = function_call.function.name
@@ -234,12 +234,6 @@ class ChatGui(QMainWindow):
             # hiding it, instead of closing it, to save from reloading time
             event.ignore()
             self.hide()
-
-    def setupVariables(self):
-        SharedUtil.setAPIkey()
-        def stopSpinning():
-            ...
-        config.stopSpinning = stopSpinning
 
     def initUI(self):
         self.centralWidget = CentralWidget(self)

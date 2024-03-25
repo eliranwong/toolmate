@@ -4,11 +4,7 @@ from freegenius import config, getLocalStorage, is_valid_image_file
 from freegenius import print1, print2, print3
 from freegenius.utils.ollama_models import ollama_models
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
-from freegenius.health_check import HealthCheck
-if not hasattr(config, "currentMessages"):
-    HealthCheck.setBasicConfig()
-    config.saveConfig()
-    #print("Configurations updated!")
+from freegenius.utils.single_prompt import SinglePrompt
 from prompt_toolkit.styles import Style
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
@@ -144,11 +140,11 @@ Here is my request:
 
         while True:
             if not prompt:
-                prompt = HealthCheck.simplePrompt(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar)
+                prompt = SinglePrompt.run(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar)
                 if prompt and not prompt in (".new", config.exit_entry) and hasattr(config, "currentMessages"):
                     config.currentMessages.append({"content": prompt, "role": "user"})
             else:
-                prompt = HealthCheck.simplePrompt(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar, default=prompt, accept_default=True)
+                prompt = SinglePrompt.run(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar, default=prompt, accept_default=True)
             if prompt == config.exit_entry:
                 break
             elif prompt == ".new" and not hasattr(config, "currentMessages"):
@@ -269,7 +265,7 @@ def main(thisModel=""):
             print2("Ollama chat launched!")
             print("Select a model below:")
             print("Note: You should have at least 8 GB of RAM available to run the 7B models, 16 GB to run the 13B models, and 32 GB to run the 33B models.")
-            model = HealthCheck.simplePrompt(style=promptStyle, promptSession=model_session, bottom_toolbar=bottom_toolbar, default=config.ollamaDefaultModel, completer=completer)
+            model = SinglePrompt.run(style=promptStyle, promptSession=model_session, bottom_toolbar=bottom_toolbar, default=config.ollamaDefaultModel, completer=completer)
             if model and model.lower() == config.exit_entry:
                 print2("\nOllama chat closed!")
                 return None

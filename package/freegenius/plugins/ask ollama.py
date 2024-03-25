@@ -14,7 +14,7 @@ from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.completion import WordCompleter, FuzzyCompleter
 from prompt_toolkit.styles import Style
-from freegenius.health_check import HealthCheck
+from freegenius.utils.single_prompt import SinglePrompt
 from pathlib import Path
 import os
 
@@ -40,7 +40,7 @@ def ask_ollama(function_args):
     print2("Ollama chat launched!")
     print("Select a model below:")
     print("Note: You should have at least 8 GB of RAM available to run the 7B models, 16 GB to run the 13B models, and 32 GB to run the 33B models.")
-    model = HealthCheck.simplePrompt(style=promptStyle, promptSession=model_session, bottom_toolbar=bottom_toolbar, default=config.ollamaDefaultModel, completer=completer)
+    model = SinglePrompt.run(style=promptStyle, promptSession=model_session, bottom_toolbar=bottom_toolbar, default=config.ollamaDefaultModel, completer=completer)
     if model:
         if model.lower() == config.exit_entry:
             return ""

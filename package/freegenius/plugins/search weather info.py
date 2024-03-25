@@ -11,6 +11,7 @@ if not config.openweathermapApi:
 
 if config.openweathermapApi:
     from freegenius import config
+    from freegenius import print1, print2, print3
     from freegenius.utils.shared_utils import SharedUtil
     import json
 

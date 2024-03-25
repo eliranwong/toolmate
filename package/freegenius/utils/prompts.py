@@ -1,5 +1,5 @@
-from freegenius import config, getDeviceInfo
-from freegenius import print1, print2, print3
+from freegenius import config, getDeviceInfo, restartApp, count_tokens_from_messages, isCommandInstalled
+from freegenius import print1, print2, print3, count_tokens_from_functions, tokenLimits
 import pydoc, textwrap, re, tiktoken, os
 import speech_recognition as sr
 from prompt_toolkit import prompt
@@ -198,10 +198,10 @@ class Prompts:
                     #currentInput = currentInput.replace("[NO_FUNCTION_CALL]", "")
                     currentInput = re.sub(no_function_call_pattern, "", currentInput)
                 else:
-                    availableFunctionTokens = SharedUtil.count_tokens_from_functions(config.toolFunctionSchemas)
+                    availableFunctionTokens = count_tokens_from_functions(config.toolFunctionSchemas)
                 currentInputTokens = len(encoding.encode(config.fineTuneUserInput(currentInput)))
-                loadedMessageTokens = SharedUtil.count_tokens_from_messages(config.currentMessages)
-                selectedModelLimit = SharedUtil.tokenLimits[config.chatGPTApiModel]
+                loadedMessageTokens = count_tokens_from_messages(config.currentMessages)
+                selectedModelLimit = tokenLimits[config.chatGPTApiModel]
                 estimatedAvailableTokens = selectedModelLimit - availableFunctionTokens - loadedMessageTokens - currentInputTokens
 
                 content = f"""{config.divider}
@@ -261,7 +261,7 @@ Available tokens: {estimatedAvailableTokens}
         @this_key_bindings.add(*config.hotkey_restart_app)
         def _(_):
             print(f"Restarting {config.freeGeniusAIName} ...")
-            config.restartApp()
+            restartApp()
         @this_key_bindings.add(*config.hotkey_toggle_writing_improvement)
         def _(_):
             config.displayImprovedWriting = not config.displayImprovedWriting
@@ -340,8 +340,8 @@ Available tokens: {estimatedAvailableTokens}
             str(config.hotkey_restart_app): "restart letmedoit",
         }
         textEditor = config.customTextEditor.split(" ", 1)[0]
-        bindings[str(config.hotkey_edit_current_entry)] = f"""edit current input with '{config.customTextEditor if textEditor and SharedUtil.isPackageInstalled(textEditor) else "eTextEdit"}'"""
-        bindings[str(config.hotkey_edit_last_response)] = f"""edit the previous response with '{config.customTextEditor if textEditor and SharedUtil.isPackageInstalled(textEditor) else "eTextEdit"}'"""
+        bindings[str(config.hotkey_edit_current_entry)] = f"""edit current input with '{config.customTextEditor if textEditor and isCommandInstalled(textEditor) else "eTextEdit"}'"""
+        bindings[str(config.hotkey_edit_last_response)] = f"""edit the previous response with '{config.customTextEditor if textEditor and isCommandInstalled(textEditor) else "eTextEdit"}'"""
         multilineBindings = {
             "[enter]": "new line",
             "[escape, enter]": "complete entry",
@@ -382,7 +382,7 @@ Available tokens: {estimatedAvailableTokens}
         keyHelp += config.actionHelp
         keyHelp += f"\n{config.divider}\n"
 
-        if SharedUtil.isPackageInstalled("less"):
+        if isCommandInstalled("less"):
             pydoc.pipepager(f"To close this help page, press 'q'\n\n{keyHelp}\nTo close this help page, press 'q'", cmd='less -R')
         else:
             print(keyHelp)

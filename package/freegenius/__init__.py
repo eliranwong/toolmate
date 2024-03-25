@@ -1,24 +1,47 @@
-import os
+import os, sys, platform
+
+# check python version
+# requires python 3.8+; required by package 'tiktoken'
+pythonVersion = sys.version_info
+if pythonVersion < (3, 8):
+    print("Python version higher than 3.8 is required!")
+    print("Closing ...")
+    exit(1)
+elif pythonVersion >= (3, 12):
+    print("Some features may not work with python version newer than 3.11!")
+
+# check package path
 thisFile = os.path.realpath(__file__)
 packageFolder = os.path.dirname(thisFile)
 package = os.path.basename(packageFolder)
+
+# set current directory
 if os.getcwd() != packageFolder:
     os.chdir(packageFolder)
+
+# create conifg.py in case it is deleted due to errors
 configFile = os.path.join(packageFolder, "config.py")
 if not os.path.isfile(configFile):
     open(configFile, "a", encoding="utf-8").close()
-from freegenius import config
-config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
 
-import os, geocoder, platform, socket, geocoder, datetime, requests, netifaces, getpass, pendulum, traceback, uuid, re, textwrap, glob, wcwidth, shutil, threading, time
+# import other libraries
+
+import os, geocoder, platform, socket, geocoder, datetime, requests, netifaces, getpass, pendulum, pkg_resources
+import traceback, uuid, re, textwrap, glob, wcwidth, shutil, threading, time, tiktoken, subprocess, json
+from packaging import version
 from chromadb.utils import embedding_functions
 from pygments.styles import get_style_by_name
 from prompt_toolkit.styles.pygments import style_from_pygments_cls
 from prompt_toolkit import print_formatted_text, HTML
+from prompt_toolkit import prompt
 from typing import Optional
 from vertexai.preview.generative_models import Content, Part
 from pathlib import Path
 from PIL import Image
+from openai import OpenAI
+
+# a dummy import line to resolve ALSA error display
+import sounddevice
 
 
 # files
@@ -362,3 +385,306 @@ Current time: {str(datetime.datetime.now())}
 Country: {g.country}
 State: {g.state}
 City: {g.city}"""
+
+# token management
+
+# token limit
+# reference: https://platform.openai.com/docs/models/gpt-4
+tokenLimits = {
+    "gpt-4-turbo-preview": 128000, # Returns a maximum of 4,096 output tokens.
+    "gpt-4-0125-preview": 128000, # Returns a maximum of 4,096 output tokens.
+    "gpt-4-1106-preview": 128000, # Returns a maximum of 4,096 output tokens.
+    "gpt-3.5-turbo": 16385, # Returns a maximum of 4,096 output tokens.
+    "gpt-3.5-turbo-16k": 16385,
+    "gpt-4": 8192,
+    "gpt-4-32k": 32768,
+}
+
+def getDynamicTokens(messages, functionSignatures=None):
+    if functionSignatures is None:
+        functionTokens = 0
+    else:
+        functionTokens = count_tokens_from_functions(functionSignatures)
+    tokenLimit = tokenLimits[config.chatGPTApiModel]
+    currentMessagesTokens = count_tokens_from_messages(messages) + functionTokens
+    availableTokens = tokenLimit - currentMessagesTokens
+    if availableTokens >= config.chatGPTApiMaxTokens:
+        return config.chatGPTApiMaxTokens
+    elif (config.chatGPTApiMaxTokens > availableTokens > config.chatGPTApiMinTokens):
+        return availableTokens
+    return config.chatGPTApiMinTokens
+
+def count_tokens_from_functions(functionSignatures, model=""):
+    count = 0
+    if not model:
+        model = config.chatGPTApiModel
+    try:
+        encoding = tiktoken.encoding_for_model(model)
+    except KeyError:
+        print("Warning: model not found. Using cl100k_base encoding.")
+        encoding = tiktoken.get_encoding("cl100k_base")
+    for i in functionSignatures:
+        count += len(encoding.encode(str(i)))
+    return count
+
+# The following method was modified from source:
+# https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb
+def count_tokens_from_messages(messages, model=""):
+    if not model:
+        model = config.chatGPTApiModel
+
+    """Return the number of tokens used by a list of messages."""
+    try:
+        encoding = tiktoken.encoding_for_model(model)
+    except KeyError:
+        print("Warning: model not found. Using cl100k_base encoding.")
+        encoding = tiktoken.get_encoding("cl100k_base")
+    if model in {
+            "gpt-3.5-turbo",
+            "gpt-3.5-turbo-0125",
+            "gpt-3.5-turbo-1106",
+            "gpt-3.5-turbo-0613",
+            "gpt-3.5-turbo-16k",
+            "gpt-3.5-turbo-16k-0613",
+            "gpt-4-turbo-preview",
+            "gpt-4-0125-preview",
+            "gpt-4-1106-preview",
+            "gpt-4-0314",
+            "gpt-4-32k-0314",
+            "gpt-4",
+            "gpt-4-0613",
+            "gpt-4-32k",
+            "gpt-4-32k-0613",
+        }:
+        tokens_per_message = 3
+        tokens_per_name = 1
+    elif model == "gpt-3.5-turbo-0301":
+        tokens_per_message = 4  # every message follows <|start|>{role/name}\n{content}<|end|>\n
+        tokens_per_name = -1  # if there's a name, the role is omitted
+    elif "gpt-3.5-turbo" in model:
+        #print("Warning: gpt-3.5-turbo may update over time. Returning num tokens assuming gpt-3.5-turbo-0613.")
+        return count_tokens_from_messages(messages, model="gpt-3.5-turbo-0613")
+    elif "gpt-4" in model:
+        #print("Warning: gpt-4 may update over time. Returning num tokens assuming gpt-4-0613.")
+        return count_tokens_from_messages(messages, model="gpt-4-0613")
+    else:
+        raise NotImplementedError(
+            f"""count_tokens_from_messages() is not implemented for model {model}. See https://github.com/openai/openai-python/blob/main/chatml.md for information on how messages are converted to tokens."""
+        )
+    num_tokens = 0
+    for message in messages:
+        num_tokens += tokens_per_message
+        if not "content" in message or not message.get("content", ""):
+            num_tokens += len(encoding.encode(str(message)))
+        else:
+            for key, value in message.items():
+                num_tokens += len(encoding.encode(value))
+                if key == "name":
+                    num_tokens += tokens_per_name
+    num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>
+    return num_tokens
+
+# API keys / credentials
+
+def changeChatGPTAPIkey():
+    print("Enter your OpenAI API Key [optional]:")
+    apikey = prompt(default=config.openaiApiKey, is_password=True)
+    if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+        config.openaiApiKey = apikey
+    else:
+        config.openaiApiKey = "freegenius"
+    setChatGPTAPIkey()
+
+def setChatGPTAPIkey():
+    # instantiate a client that can shared with plugins
+    os.environ["OPENAI_API_KEY"] = config.openaiApiKey
+    config.oai_client = OpenAI()
+    # set variable 'OAI_CONFIG_LIST' to work with pyautogen
+    oai_config_list = []
+    for model in tokenLimits.keys():
+        oai_config_list.append({"model": model, "api_key": config.openaiApiKey})
+    os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
+
+def setGoogleCredentials():
+    config.google_cloud_credentials_file = os.path.join(storageDir, "credentials_google_cloud.json")
+    if config.google_cloud_credentials and os.path.isfile(config.google_cloud_credentials):
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = config.google_cloud_credentials
+    else:
+        gccfile2 = os.path.join(storageDir, "credentials_googleaistudio.json")
+        gccfile3 = os.path.join(storageDir, "credentials_googletts.json")
+
+        if os.path.isfile(config.google_cloud_credentials_file):
+            config.google_cloud_credentials = config.google_cloud_credentials_file
+        elif os.path.isfile(gccfile2):
+            config.google_cloud_credentials = gccfile2
+        elif os.path.isfile(gccfile3):
+            config.google_cloud_credentials = gccfile3
+        else:
+            config.google_cloud_credentials = ""
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = config.google_cloud_credentials if config.google_cloud_credentials else ""
+
+# package management
+
+def isCommandInstalled(package):
+    return True if shutil.which(package.split(" ", 1)[0]) else False
+
+def getPackageInstalledVersion(package):
+    try:
+        installed_version = pkg_resources.get_distribution(package).version
+        return version.parse(installed_version)
+    except pkg_resources.DistributionNotFound:
+        return None
+
+def getPackageLatestVersion(package):
+    try:
+        response = requests.get(f"https://pypi.org/pypi/{package}/json", timeout=10)
+        latest_version = response.json()['info']['version']
+        return version.parse(latest_version)
+    except:
+        return None
+
+def restartApp():
+    print(f"Restarting {config.freeGeniusAIName} ...")
+    os.system(f"{sys.executable} {config.freeGeniusAIFile}")
+    exit(0)
+
+def updateApp():
+    thisPackage = f"{package}_android" if config.isTermux else package
+    print(f"Checking '{thisPackage}' version ...")
+    installed_version = getPackageInstalledVersion(thisPackage)
+    if installed_version is None:
+        print("Installed version information is not accessible!")
+    else:
+        print(f"Installed version: {installed_version}")
+    latest_version = getPackageLatestVersion(thisPackage)
+    if latest_version is None:
+        print("Latest version information is not accessible at the moment!")
+    elif installed_version is not None:
+        print(f"Latest version: {latest_version}")
+        if latest_version > installed_version:
+            if thisPlatform == "Windows":
+                print("Automatic upgrade feature is yet to be supported on Windows!")
+                print(f"Run 'pip install --upgrade {thisPackage}' to manually upgrade this app!")
+            else:
+                try:
+                    # upgrade package
+                    installPipPackage(f"--upgrade {thisPackage}")
+                    restartApp()
+                except:
+                    print(f"Failed to upgrade '{thisPackage}'!")
+
+def installPipPackage(module, update=True):
+    #executablePath = os.path.dirname(sys.executable)
+    #pippath = os.path.join(executablePath, "pip")
+    #pip = pippath if os.path.isfile(pippath) else "pip"
+    #pip3path = os.path.join(executablePath, "pip3")
+    #pip3 = pip3path if os.path.isfile(pip3path) else "pip3"
+
+    if not hasattr(config, "isPipUpdated"):
+        config.isPipUpdated = False
+
+    if isCommandInstalled("pip"):
+        pipInstallCommand = f"{sys.executable} -m pip install"
+
+        if update:
+            from freegenius import config
+            if not config.isPipUpdated:
+                pipFailedUpdated = "pip tool failed to be updated!"
+                try:
+                    # Update pip tool in case it is too old
+                    updatePip = subprocess.Popen(f"{pipInstallCommand} --upgrade pip", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    *_, stderr = updatePip.communicate()
+                    if not stderr:
+                        print("pip tool updated!")
+                    else:
+                        print(pipFailedUpdated)
+                except:
+                    print(pipFailedUpdated)
+                config.isPipUpdated = True
+        try:
+            upgrade = (module.startswith("-U ") or module.startswith("--upgrade "))
+            if upgrade:
+                moduleName = re.sub("^[^ ]+? (.+?)$", r"\1", module)
+            else:
+                moduleName = module
+            print(f"{'Upgrading' if upgrade else 'Installing'} '{moduleName}' ...")
+            installNewModule = subprocess.Popen(f"{pipInstallCommand} {module}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            *_, stderr = installNewModule.communicate()
+            if not stderr:
+                print(f"Package '{moduleName}' {'upgraded' if upgrade else 'installed'}!")
+            else:
+                print(f"Failed {'upgrading' if upgrade else 'installing'} package '{moduleName}'!")
+                if config.developer:
+                    print(stderr)
+            return True
+        except:
+            return False
+
+    else:
+        print("pip command is not found!")
+        return False
+
+# import config module
+from freegenius import config
+
+# set up shared configs
+
+config.freeGeniusAIFolder = packageFolder
+config.freeGeniusAIFile = os.path.join(config.freeGeniusAIFolder, "main.py")
+if not hasattr(config, "freeGeniusAIName") or not config.freeGeniusAIName:
+    config.freeGeniusAIName = "FreeGenius AI"
+
+config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
+
+config.stopSpinning = stopSpinning
+config.localStorage = getLocalStorage()
+
+from freegenius.utils.config_tools import *
+config.loadConfig = loadConfig
+config.setConfig = setConfig
+
+from freegenius.utils.tool_plugins import Plugins
+config.addFunctionCall = Plugins.addFunctionCall
+
+from freegenius.utils.vlc_utils import VlcUtil
+config.isVlcPlayerInstalled = VlcUtil.isVlcPlayerInstalled()
+
+try:
+    # hide pygame welcome message
+    os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+    import pygame
+    pygame.mixer.init()
+    config.isPygameInstalled = True
+except:
+    config.isPygameInstalled = False
+
+thisPlatform = platform.system()
+config.thisPlatform = "macOS" if thisPlatform == "Darwin" else thisPlatform
+if config.terminalEnableTermuxAPI:
+    config.open = "termux-share"
+elif thisPlatform == "Linux":
+    config.open = "xdg-open"
+elif thisPlatform == "Darwin":
+    config.open = "open"
+elif thisPlatform == "Windows":
+    config.open = "start"
+
+config.excludeConfigList = []
+config.includeIpInDeviceInfoTemp = config.includeIpInDeviceInfo
+config.divider = "--------------------"
+config.tts = False if not config.isVlcPlayerInstalled and not config.isPygameInstalled and not config.ttsCommand and not config.elevenlabsApi else True
+config.outputTransformers = []
+
+# save loaded configs
+config.saveConfig()
+
+# environment variables
+os.environ["TOKENIZERS_PARALLELISM"] = config.tokenizers_parallelism
+
+# create shortcuts
+from freegenius.utils.shortcuts import createShortcuts
+createShortcuts()
+
+# setup optional credentials
+setChatGPTAPIkey()
+setGoogleCredentials()

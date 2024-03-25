@@ -8,8 +8,9 @@ execute termux command
 """
 
 from freegenius import config, showRisk, confirmExecution, getPygmentsStyle, showErrors
+from freegenius import print1, print2, print3
 from freegenius.utils.shared_utils import SharedUtil
-from freegenius.health_check import HealthCheck
+from freegenius.utils.single_prompt import SinglePrompt
 import textwrap, re, pygments, json, pydoc
 from pygments.lexers.shell import BashLexer
 from prompt_toolkit.formatted_text import PygmentsTokens
@@ -52,7 +53,7 @@ if config.terminalEnableTermuxAPI:
         config.stopSpinning()
         if confirmExecution(risk):
             print1("Do you want to execute it? [y]es / [N]o")
-            confirmation = HealthCheck.simplePrompt(style=promptStyle, default="y")
+            confirmation = SinglePrompt.run(style=promptStyle, default="y")
             if not confirmation.lower() in ("y", "yes"):
                 return "[INVALID]"
 

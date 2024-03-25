@@ -1,5 +1,5 @@
 from freegenius import config, showErrors, getDayOfWeek, getLocalStorage, fileNamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation
-from freegenius import print1, print2, print3
+from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, tokenLimits
 from freegenius.utils.call_llm import CallLLM
 from freegenius.utils.tool_plugins import ToolStore
 import openai, threading, os, time, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys
@@ -30,7 +30,7 @@ from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.text_utils import TextUtil
 from freegenius.utils.sttLanguages import googleSpeeckToTextLanguages, whisperSpeeckToTextLanguages
 from freegenius.chatgpt import ChatGPT
-from freegenius.utils.install import installmodule
+from freegenius import installPipPackage
 if not config.isTermux:
     from freegenius.autobuilder import AutoGenBuilder
     from freegenius.geminipro import GeminiPro
@@ -39,7 +39,7 @@ if not config.isTermux:
 from elevenlabs import generate, voices
 
 
-class LetMeDoItAI:
+class FreeGenius:
 
     def __init__(self):
         #config.letMeDoItAI = self
@@ -52,7 +52,7 @@ class LetMeDoItAI:
         # set up tool store client
         ToolStore.setupToolStoreClient()
 
-        self.models = list(SharedUtil.tokenLimits.keys())
+        self.models = list(tokenLimits.keys())
         config.divider = self.divider = "--------------------"
         config.runPython = True
         if not hasattr(config, "accept_default"):
@@ -67,9 +67,7 @@ class LetMeDoItAI:
         config.pagerContent = ""
         #self.addPagerContent = False
         # share the following methods in config so that they are accessible via plugins
-        config.addFunctionCall = Plugins.addFunctionCall
         #getLocalStorage = getLocalStorage
-        config.stopSpinning = stopSpinning
         config.toggleMultiline = self.toggleMultiline
         config.getWrappedHTMLText = self.getWrappedHTMLText
         config.fineTuneUserInput = self.fineTuneUserInput
@@ -105,7 +103,7 @@ class LetMeDoItAI:
         config.saveConfig()
         
         if not config.openaiApiKey:
-            self.changeAPIkey()
+            self.changeChatGPTAPIkey()
 
         if not config.openaiApiKey:
             print2("ChatGPT API key not found!")
@@ -115,8 +113,6 @@ class LetMeDoItAI:
         # initial completion check at startup
         if config.initialCompletionCheck:
             CallLLM.checkCompletion()
-        else:
-            SharedUtil.setAPIkey()
 
         chat_history = os.path.join(self.storageDir, "history", "chats")
         self.terminal_chat_session = PromptSession(history=FileHistory(chat_history))
@@ -130,7 +126,7 @@ class LetMeDoItAI:
             ".export": (f"export content {str(config.hotkey_export)}", lambda: self.exportChat(config.currentMessages)),
             ".context": (f"change chat context {str(config.hotkey_select_context)}", None),
             ".contextintegration": ("change chat context integration", self.setContextIntegration),
-            ".changeapikey": ("change OpenAI API key", self.changeAPIkey),
+            ".changeapikey": ("change OpenAI API key", self.changeChatGPTAPIkey),
             ".functionmodel": ("change function call model", self.setLlmModel),
             ".chatmodel": ("change chat-only model", self.setChatbot),
             ".embeddingmodel": ("change embedding model", self.setEmbeddingModel),
@@ -391,7 +387,7 @@ class LetMeDoItAI:
         except:
             return False
 
-    def changeAPIkey(self):
+    def changeChatGPTAPIkey(self):
         if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
             print1("Enter your OpenAI API Key [optional]:")
             apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.openaiApiKey, is_password=True)
@@ -406,6 +402,7 @@ class LetMeDoItAI:
             CallLLM.checkCompletion()
             config.saveConfig()
             print2("Configurations updated!")
+            setChatGPTAPIkey()
 
     def changeOpenweathermapApi(self):
         if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
@@ -780,7 +777,7 @@ class LetMeDoItAI:
         package = self.prompts.simplePrompt(style=self.prompts.promptStyle2)
         if package:
             print1(f"Installing '{package}' ...")
-            installmodule(f"--upgrade {package}")
+            installPipPackage(f"--upgrade {package}")
 
     def setTemperature(self):
         print1("Enter a value between 0.0 and 2.0:")
@@ -890,7 +887,7 @@ class LetMeDoItAI:
         customTextEditor = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.customTextEditor)
         if customTextEditor and not customTextEditor.strip().lower() == config.exit_entry:
             textEditor = re.sub(" .*?$", "", customTextEditor)
-            if not textEditor or not SharedUtil.isPackageInstalled(textEditor):
+            if not textEditor or not isCommandInstalled(textEditor):
                 print2("Command not found on your device!")
             else:
                 config.customTextEditor = customTextEditor
@@ -934,8 +931,8 @@ class LetMeDoItAI:
             print3(f"Minimum tokens: {config.chatGPTApiMinTokens}")
 
     def getMaxTokens(self):
-        contextWindowLimit = SharedUtil.tokenLimits[config.chatGPTApiModel]
-        functionTokens = SharedUtil.count_tokens_from_functions(config.toolFunctionSchemas.values())
+        contextWindowLimit = tokenLimits[config.chatGPTApiModel]
+        functionTokens = count_tokens_from_functions(config.toolFunctionSchemas.values())
         maxToken = contextWindowLimit - functionTokens - config.chatGPTApiMinTokens
         if maxToken > 4096 and config.chatGPTApiModel in (
             "gpt-4-turbo-preview",
@@ -1121,7 +1118,7 @@ class LetMeDoItAI:
                 print3("Read: https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup")
                 print3("Voice typing platform changed to: Google Speech-to-Text (Generic)")
                 config.voiceTypingPlatform = "google"
-            elif voiceTypingPlatform == "whisper" and not SharedUtil.isPackageInstalled("ffmpeg"):
+            elif voiceTypingPlatform == "whisper" and not isCommandInstalled("ffmpeg"):
                 print2("Install 'ffmpeg' first to use offline openai whisper model!")
                 print3("Read: https://github.com/openai/whisper#setup")
                 print3("Voice typing platform changed to: Google Speech-to-Text (Generic)")

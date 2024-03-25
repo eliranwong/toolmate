@@ -1,8 +1,7 @@
-from freegenius import config
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius import print1, print3, isCommandInstalled
 import os
 
-if not SharedUtil.isPackageInstalled("ffmpeg"):
+if not isCommandInstalled("ffmpeg"):
 
     checks = {
         "pkg": "pkg install ffmpeg", # Android Termux
@@ -17,11 +16,11 @@ if not SharedUtil.isPackageInstalled("ffmpeg"):
     }
 
     for command, commandline in checks.items():
-        if SharedUtil.isPackageInstalled(command):
+        if isCommandInstalled(command):
             os.system(commandline)
-            if SharedUtil.isPackageInstalled("ffmpeg"):
+            if isCommandInstalled("ffmpeg"):
                 break
 
-    if not SharedUtil.isPackageInstalled("ffmpeg"):
+    if not isCommandInstalled("ffmpeg"):
         print3("Note: 'ffmpeg' is not installed.")
         print1("It is essential for voice typing with openai whisper offline model, downloading YouTube media, video / audio conversion, etc.")

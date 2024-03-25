@@ -11,17 +11,11 @@ from freegenius import config
 if not hasattr(config, "max_consecutive_auto_reply"):
     config.max_consecutive_auto_reply = 10
 
-from freegenius.health_check import HealthCheck
-if not hasattr(config, "currentMessages"):
-    HealthCheck.setBasicConfig()
-    if not hasattr(config, "openaiApiKey") or not config.openaiApiKey:
-        HealthCheck.changeAPIkey()
-    config.saveConfig()
-    #print("Configurations updated!")
-HealthCheck.checkCompletion()
+from freegenius.utils.call_llm import CallLLM
+CallLLM.checkCompletion()
 
 import autogen, os, json, traceback
-from freegenius import getDeviceInfo
+from freegenius import getDeviceInfo, tokenLimits
 from freegenius.utils.prompts import Prompts
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.styles import Style
@@ -38,9 +32,9 @@ class AutoGenAssistant:
         #    api_version=None,
         #)
         oai_config_list = []
-        for model in HealthCheck.tokenLimits.keys():
+        for model in tokenLimits.keys():
             oai_config_list.append({"model": model, "api_key": config.openaiApiKey})
-        if not config.chatGPTApiModel in HealthCheck.tokenLimits:
+        if not config.chatGPTApiModel in tokenLimits:
             oai_config_list.append({"model": config.chatGPTApiModel, "api_key": config.openaiApiKey})
         os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
         """

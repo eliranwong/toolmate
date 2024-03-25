@@ -6,12 +6,7 @@ from vertexai.generative_models._generative_models import (
     HarmBlockThreshold,
 )
 from freegenius import config, showErrors, is_valid_image_file, is_valid_image_url, wrapText, print1, print2, print3
-from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
-from freegenius.health_check import HealthCheck
-if not hasattr(config, "currentMessages"):
-    HealthCheck.setBasicConfig()
-    config.saveConfig()
-    #print("Configurations updated!")
+from freegenius.utils.single_prompt import SinglePrompt
 
 import shutil, textwrap
 from PIL import Image as im
@@ -72,7 +67,7 @@ class GeminiProVision:
         print(f"""[press '{str(config.hotkey_exit).replace("'", "")[1:-1]}' to exit]""")
         if not files:
             print2("Enter image path below (file / folder):")
-            files = HealthCheck.simplePrompt(style=promptStyle)
+            files = SinglePrompt.run(style=promptStyle)
         if files:
             # handle path dragged to terminal
             files = self.refinePath(files)
@@ -82,7 +77,7 @@ class GeminiProVision:
             files = [files]
             if not query:
                 print2("Enter your query below:")
-                query = HealthCheck.simplePrompt(style=promptStyle)
+                query = SinglePrompt.run(style=promptStyle)
             if query and not query == config.exit_entry:
                 try:
                     function_args = {

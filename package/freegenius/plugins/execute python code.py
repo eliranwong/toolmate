@@ -7,8 +7,9 @@ execute python code
 """
 
 from freegenius import config, fineTunePythonCode, showRisk, confirmExecution, getPygmentsStyle
+from freegenius import print1, print2, print3
 from freegenius.utils.shared_utils import SharedUtil
-from freegenius.health_check import HealthCheck
+from freegenius.utils.single_prompt import SinglePrompt
 import pygments
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit.formatted_text import PygmentsTokens
@@ -47,7 +48,7 @@ def execute_python_code(function_args):
         return "[INVALID]"
     elif confirmExecution(risk):
         print1("Do you want to execute it? [y]es / [N]o")
-        confirmation = HealthCheck.simplePrompt(style=promptStyle, default="y")
+        confirmation = SinglePrompt.run(style=promptStyle, default="y")
         if not confirmation.lower() in ("y", "yes"):
             config.runPython = False
             return "[INVALID]"

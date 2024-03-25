@@ -48,13 +48,13 @@ Please kindly report of any issues at https://github.com/eliranwong/freegenius/i
 
 LLM Backend is determined by the value of config.llmBackend
 
-Default: 'ollama' if Ollama is installed else 'llamacpp'
+Default: 'llamacpp'
 
 Testing:
 
-* [Ollama](https://ollama.com/) / [Ollama Hosted models](https://ollama.com/library)
-
 * [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/)
+
+* [Ollama](https://ollama.com/) / [Ollama Hosted models](https://ollama.com/library)
 
 * [Google Vertex AI](https://cloud.google.com/vertex-ai) / [Gemini Pro & Gemini Pro Vision](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
 

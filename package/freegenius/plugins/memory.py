@@ -9,7 +9,7 @@ modified from source: https://medium.com/@simon_attard/building-a-memory-layer-f
 """
 
 from freegenius import config, get_or_create_collection, add_vector, query_vectors, getLocalStorage
-from freegenius.health_check import HealthCheck
+from freegenius import print1, print2, print3
 from pathlib import Path
 from chromadb.config import Settings
 import uuid, os, chromadb, getpass, geocoder, datetime, json

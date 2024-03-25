@@ -1,6 +1,6 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution
 from freegenius import config
-from freegenius import print1, print2, print3
+from freegenius import print1, print2, print3, count_tokens_from_messages, getDynamicTokens
 import os, re, traceback, openai
 import textwrap, json, pygments
 from pygments.lexers.python import PythonLexer
@@ -45,7 +45,6 @@ def check_openai_errors(func):
             print("Error: Your API key or token was invalid, expired, or revoked.")
             print("Solution: Check your API key or token and make sure it is correct and active. You may need to generate a new one from your account dashboard.")
             return finishError()
-            #HealthCheck.changeAPIkey()
         except openai.BadRequestError as e:
             print("Error: Your request was malformed or missing some required parameters, such as a token or an input.")
             print("Solution: The error message should advise you on the specific error made. Check the [documentation](https://platform.openai.com/docs/api-reference/) for the specific API method you are calling and make sure you are sending valid and complete parameters. You may also need to check the encoding, format, or size of your request data.")
@@ -81,7 +80,6 @@ def check_openai_errors(func):
 
 @check_openai_errors
 def checkCompletion():
-    setAPIkey()
     config.oai_client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "user", "content" : "hello"}],
@@ -145,102 +143,8 @@ def autoHealPythonCode(code, trace):
     else:
         return "[INVALID]"
 
-def getDynamicTokens(messages, functionSignatures=None):
-    if functionSignatures is None:
-        functionTokens = 0
-    else:
-        functionTokens = CallChatGPT.count_tokens_from_functions(functionSignatures)
-    tokenLimit = tokenLimits[config.chatGPTApiModel]
-    currentMessagesTokens = count_tokens_from_messages(messages) + functionTokens
-    availableTokens = tokenLimit - currentMessagesTokens
-    if availableTokens >= config.chatGPTApiMaxTokens:
-        return config.chatGPTApiMaxTokens
-    elif (config.chatGPTApiMaxTokens > availableTokens > config.chatGPTApiMinTokens):
-        return availableTokens
-    return config.chatGPTApiMinTokens
-
-def setAPIkey():
-    # instantiate a client that can shared with plugins
-    os.environ["OPENAI_API_KEY"] = config.openaiApiKey
-    config.oai_client = OpenAI()
-    # set variable 'OAI_CONFIG_LIST' to work with pyautogen
-    oai_config_list = []
-    for model in tokenLimits.keys():
-        oai_config_list.append({"model": model, "api_key": config.openaiApiKey})
-    os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
-
 def convertFunctionSignaturesIntoTools(functionSignatures):
     return [{"type": "function", "function": functionSignature} for functionSignature in functionSignatures]
-
-def count_tokens_from_functions(functionSignatures, model=""):
-    count = 0
-    if not model:
-        model = config.chatGPTApiModel
-    try:
-        encoding = tiktoken.encoding_for_model(model)
-    except KeyError:
-        print("Warning: model not found. Using cl100k_base encoding.")
-        encoding = tiktoken.get_encoding("cl100k_base")
-    for i in functionSignatures:
-        count += len(encoding.encode(str(i)))
-    return count
-
-# The following method was modified from source:
-# https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb
-def count_tokens_from_messages(messages, model=""):
-    if not model:
-        model = config.chatGPTApiModel
-
-    """Return the number of tokens used by a list of messages."""
-    try:
-        encoding = tiktoken.encoding_for_model(model)
-    except KeyError:
-        print("Warning: model not found. Using cl100k_base encoding.")
-        encoding = tiktoken.get_encoding("cl100k_base")
-    if model in {
-            "gpt-3.5-turbo",
-            "gpt-3.5-turbo-0125",
-            "gpt-3.5-turbo-1106",
-            "gpt-3.5-turbo-0613",
-            "gpt-3.5-turbo-16k",
-            "gpt-3.5-turbo-16k-0613",
-            "gpt-4-turbo-preview",
-            "gpt-4-0125-preview",
-            "gpt-4-1106-preview",
-            "gpt-4-0314",
-            "gpt-4-32k-0314",
-            "gpt-4",
-            "gpt-4-0613",
-            "gpt-4-32k",
-            "gpt-4-32k-0613",
-        }:
-        tokens_per_message = 3
-        tokens_per_name = 1
-    elif model == "gpt-3.5-turbo-0301":
-        tokens_per_message = 4  # every message follows <|start|>{role/name}\n{content}<|end|>\n
-        tokens_per_name = -1  # if there's a name, the role is omitted
-    elif "gpt-3.5-turbo" in model:
-        #print("Warning: gpt-3.5-turbo may update over time. Returning num tokens assuming gpt-3.5-turbo-0613.")
-        return count_tokens_from_messages(messages, model="gpt-3.5-turbo-0613")
-    elif "gpt-4" in model:
-        #print("Warning: gpt-4 may update over time. Returning num tokens assuming gpt-4-0613.")
-        return count_tokens_from_messages(messages, model="gpt-4-0613")
-    else:
-        raise NotImplementedError(
-            f"""count_tokens_from_messages() is not implemented for model {model}. See https://github.com/openai/openai-python/blob/main/chatml.md for information on how messages are converted to tokens."""
-        )
-    num_tokens = 0
-    for message in messages:
-        num_tokens += tokens_per_message
-        if not "content" in message or not message.get("content", ""):
-            num_tokens += len(encoding.encode(str(message)))
-        else:
-            for key, value in message.items():
-                num_tokens += len(encoding.encode(value))
-                if key == "name":
-                    num_tokens += tokens_per_name
-    num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>
-    return num_tokens
 
 def getToolArgumentsFromStreams(completion):
     toolArguments = {}

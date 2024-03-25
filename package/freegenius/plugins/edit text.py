@@ -6,9 +6,8 @@ edit text files
 [FUNCTION_CALL]
 """
 
-from freegenius import config
+from freegenius import config, isCommandInstalled
 import os, re, sys
-from freegenius.utils.shared_utils import SharedUtil
 
 # persistent
 # users can customise 'textEditor' and 'textFileExtensions' in config.py
@@ -20,7 +19,7 @@ config.setConfig(persistentConfigs)
 
 if config.customTextEditor:
     textEditor = re.sub(" .*?$", "", config.customTextEditor)
-    if not textEditor or not SharedUtil.isPackageInstalled(textEditor):
+    if not textEditor or not isCommandInstalled(textEditor):
         config.customTextEditor = ""
 
 def edit_text(function_args):

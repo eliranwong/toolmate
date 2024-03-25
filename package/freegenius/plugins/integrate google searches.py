@@ -7,6 +7,7 @@ Search internet for keywords when ChatGPT lacks information or when user ask abo
 """
 
 from freegenius import config
+from freegenius import print1, print2, print3
 import json, googlesearch
 
 # pip3 install googlesearch-python

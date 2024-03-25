@@ -1,9 +1,4 @@
 from freegenius import config
-from freegenius.health_check import HealthCheck
-if not hasattr(config, "currentMessages"):
-    HealthCheck.setBasicConfig()
-    config.saveConfig()
-    #print("Configurations updated!")
 from freegenius.utils.prompts import Prompts
 from freegenius.utils.terminal_system_command_prompt import SystemCommandPrompt
 import platform

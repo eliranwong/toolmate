@@ -1,7 +1,6 @@
 from freegenius import config, getLocalStorage
 import pprint, re, os, shutil
 from freegenius.utils.config_essential import defaultSettings
-from freegenius.utils.shared_utils import SharedUtil
 from prompt_toolkit.shortcuts import yes_no_dialog
 
 def loadConfig(configPath):
@@ -9,7 +8,6 @@ def loadConfig(configPath):
         configs = fileObj.read()
     configs = "from freegenius import config\n" + re.sub("^([A-Za-z])", r"config.\1", configs, flags=re.M)
     exec(configs, globals())
-config.loadConfig = loadConfig
 
 def setConfig(defaultSettings, thisTranslation={}, temporary=False):
     for key, value in defaultSettings:
@@ -22,9 +20,10 @@ def setConfig(defaultSettings, thisTranslation={}, temporary=False):
         for i in thisTranslation:
             if not i in config.thisTranslation:
                 config.thisTranslation[i] = thisTranslation[i]
-config.setConfig = setConfig
 
 storageDir = getLocalStorage()
+
+# restore configs from backup
 if os.path.isdir(storageDir):
     configFile = os.path.join(config.freeGeniusAIFolder, "config.py")
     if os.path.getsize(configFile) == 0:
@@ -56,23 +55,6 @@ if os.path.isdir(storageDir):
                     #config.restartApp()
                 except:
                     print("Failed to restore backup!")
+
+# load new / unsaved configs
 setConfig(defaultSettings)
-# Google Credentials
-# set required file
-
-config.google_cloud_credentials_file = os.path.join(storageDir, "credentials_google_cloud.json")
-if config.google_cloud_credentials and os.path.isfile(config.google_cloud_credentials):
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = config.google_cloud_credentials
-else:
-    gccfile2 = os.path.join(storageDir, "credentials_googleaistudio.json")
-    gccfile3 = os.path.join(storageDir, "credentials_googletts.json")
-
-    if os.path.isfile(config.google_cloud_credentials_file):
-        config.google_cloud_credentials = config.google_cloud_credentials_file
-    elif os.path.isfile(gccfile2):
-        config.google_cloud_credentials = gccfile2
-    elif os.path.isfile(gccfile3):
-        config.google_cloud_credentials = gccfile3
-    else:
-        config.google_cloud_credentials = ""
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = config.google_cloud_credentials if config.google_cloud_credentials else ""

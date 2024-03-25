@@ -1,14 +1,9 @@
-from freegenius import config, getLocalStorage
-from freegenius import print1, print2, print3
+from freegenius import config, getLocalStorage, count_tokens_from_messages
+from freegenius import print1, print2, print3, tokenLimits
+from freegenius.utils.call_llm import CallLLM
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
-from freegenius.health_check import HealthCheck
-if not hasattr(config, "currentMessages"):
-    HealthCheck.setBasicConfig()
-    if not hasattr(config, "openaiApiKey") or not config.openaiApiKey:
-        HealthCheck.changeAPIkey()
-    config.saveConfig()
-    #print("Configurations updated!")
-HealthCheck.checkCompletion()
+from freegenius.utils.single_prompt import SinglePrompt
+CallLLM.checkCompletion()
 
 from openai import OpenAI
 from prompt_toolkit.styles import Style
@@ -37,8 +32,8 @@ class ChatGPT:
         return [{"role": "system", "content": config.systemMessage_chatgpt},]
 
     def getDynamicTokens(self):
-        tokenLimit = HealthCheck.tokenLimits[config.chatGPTApiModel]
-        currentMessagesTokens = HealthCheck.count_tokens_from_messages(self.messages)
+        tokenLimit = tokenLimits[config.chatGPTApiModel]
+        currentMessagesTokens = count_tokens_from_messages(self.messages)
         availableTokens = tokenLimit - currentMessagesTokens
         if availableTokens >= self.max_output_tokens:
             return self.max_output_tokens
@@ -70,13 +65,13 @@ class ChatGPT:
         print(f"(To exit, enter '{config.exit_entry}')\n")
         while True:
             if not prompt:
-                prompt = HealthCheck.simplePrompt(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar)
+                prompt = SinglePrompt.run(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar)
                 userMessage = {"role": "user", "content": prompt}
                 self.messages.append(userMessage)
                 if prompt and not prompt in (".new", config.exit_entry) and hasattr(config, "currentMessages"):
                     config.currentMessages.append(userMessage)
             else:
-                prompt = HealthCheck.simplePrompt(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar, default=prompt, accept_default=True)
+                prompt = SinglePrompt.run(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar, default=prompt, accept_default=True)
                 userMessage = {"role": "user", "content": prompt}
                 self.messages.append(userMessage)
                 config.currentMessages.append(userMessage)

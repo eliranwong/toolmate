@@ -1,11 +1,10 @@
-from freegenius import config
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius import isCommandInstalled, print1, print3
 import os
 
 macVlc = "/Applications/VLC.app/Contents/MacOS/VLC"
 windowsVlc = r'C:\Program Files\VideoLAN\VLC\vlc.exe'
 
-if not SharedUtil.isPackageInstalled("vlc") and not os.path.isfile(macVlc) and not os.path.isfile(windowsVlc):
+if not isCommandInstalled("vlc") and not os.path.isfile(macVlc) and not os.path.isfile(windowsVlc):
 
     checks = {
         "pkg": "pkg install vlc", # Android Termux
@@ -20,11 +19,11 @@ if not SharedUtil.isPackageInstalled("vlc") and not os.path.isfile(macVlc) and n
     }
 
     for command, commandline in checks.items():
-        if SharedUtil.isPackageInstalled(command):
+        if isCommandInstalled(command):
             os.system(commandline)
-            if SharedUtil.isPackageInstalled("vlc"):
+            if isCommandInstalled("vlc"):
                 break
 
-    if not SharedUtil.isPackageInstalled("vlc") and not os.path.isfile(macVlc) and not os.path.isfile(windowsVlc):
+    if not isCommandInstalled("vlc") and not os.path.isfile(macVlc) and not os.path.isfile(windowsVlc):
         print3("Note: 'vlc' is not installed.")
         print1("It is nice to have VLC player installed for video / audio playback. It is required if you want to control the LetMeDoIt AI audio response speed.")

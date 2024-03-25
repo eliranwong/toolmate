@@ -1,6 +1,7 @@
 import ollama, os, argparse, threading, shutil, json, re
 from ollama import Options, pull
-from freegenius import config, getLocalStorage
+from freegenius import config, getLocalStorage, is_valid_image_file
+from freegenius import print1, print2, print3
 from freegenius.utils.ollama_models import ollama_models
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.health_check import HealthCheck
@@ -36,7 +37,7 @@ class OllamaChat:
             self.runnable = False
 
     def installModel(self, model):
-        HealthCheck.print3(f"Downloading '{model}' ...")
+        print3(f"Downloading '{model}' ...")
         
         #https://github.com/ollama/ollama-python/blob/main/examples/pull-progress/main.py
         current_digest, bars = '', {}
@@ -96,10 +97,10 @@ Here is my request:
             )
             output = json.loads(completion["message"]["content"])
             if config.developer:
-                HealthCheck.print2("Input:")
+                print2("Input:")
                 print(output)
             imageList = output["imageList"]
-            images = [i for i in imageList if os.path.isfile(i) and HealthCheck.is_valid_image_file(i)]
+            images = [i for i in imageList if os.path.isfile(i) and is_valid_image_file(i)]
 
             return images
 
@@ -124,7 +125,7 @@ Here is my request:
         chat_history = os.path.join(historyFolder, f"ollama_{model}")
         chat_session = PromptSession(history=FileHistory(chat_history))
 
-        HealthCheck.print2(f"\n{model.capitalize()} loaded!")
+        print2(f"\n{model.capitalize()} loaded!")
 
         # history
         messages = []
@@ -161,7 +162,7 @@ Here is my request:
                     images = extractImages(prompt)
                     if images:
                         messages.append({'role': 'user', 'content': prompt, 'images': images})
-                        HealthCheck.print3(f"Analyzing image: {str(images)}")
+                        print3(f"Analyzing image: {str(images)}")
                     else:
                         messages.append({'role': 'user', 'content': prompt})
                 else:
@@ -196,9 +197,9 @@ Here is my request:
 
             prompt = ""
 
-        HealthCheck.print2(f"\n{model.capitalize()} closed!")
+        print2(f"\n{model.capitalize()} closed!")
         if hasattr(config, "currentMessages"):
-            HealthCheck.print2(f"Return back to {config.freeGeniusAIName} prompt ...")
+            print2(f"Return back to {config.freeGeniusAIName} prompt ...")
 
 # available cli: 'ollamachat', 'mistral', 'llama2', 'llama213b', 'llama270b', 'gemma2b', 'gemma7b', 'llava', 'phi', 'vicuna'
 
@@ -265,12 +266,12 @@ def main(thisModel=""):
             completer = FuzzyCompleter(WordCompleter(sorted(ollama_models), ignore_case=True))
             bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
 
-            HealthCheck.print2("Ollama chat launched!")
+            print2("Ollama chat launched!")
             print("Select a model below:")
             print("Note: You should have at least 8 GB of RAM available to run the 7B models, 16 GB to run the 13B models, and 32 GB to run the 33B models.")
             model = HealthCheck.simplePrompt(style=promptStyle, promptSession=model_session, bottom_toolbar=bottom_toolbar, default=config.ollamaDefaultModel, completer=completer)
             if model and model.lower() == config.exit_entry:
-                HealthCheck.print2("\nOllama chat closed!")
+                print2("\nOllama chat closed!")
                 return None
 
     if not model:

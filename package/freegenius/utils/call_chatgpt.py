@@ -1,5 +1,6 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution
 from freegenius import config
+from freegenius import print1, print2, print3
 import os, re, traceback, openai
 import textwrap, json, pygments
 from pygments.lexers.python import PythonLexer
@@ -113,20 +114,20 @@ Acess the risk level of this Python code:
 def autoHealPythonCode(code, trace):
     for i in range(config.max_consecutive_auto_heal):
         userInput = f"Original python code:\n```\n{code}\n```\n\nTraceback:\n```\n{trace}\n```"
-        config.print3(f"Auto-correction attempt: {(i + 1)}")
+        print3(f"Auto-correction attempt: {(i + 1)}")
         function_call_message, function_call_response = CallChatGPT.getSingleFunctionCallResponse(userInput, [config.toolFunctionSchemas["heal_python"]], "heal_python") if config.llmBackend == "chatgpt" else CallLetMeDoIt.getSingleFunctionCallResponse(userInput, [config.toolFunctionSchemas["heal_python"]], "heal_python")
         # display response
-        config.print(config.divider)
+        print1(config.divider)
         if config.developer:
             print(function_call_response)
         else:
-            config.print("Executed!" if function_call_response == "EXECUTED" else "Failed!")
+            print1("Executed!" if function_call_response == "EXECUTED" else "Failed!")
         if function_call_response == "EXECUTED":
             break
         else:
             code = json.loads(function_call_message["function_call"]["arguments"]).get("fix")
             trace = function_call_response
-        config.print(config.divider)
+        print1(config.divider)
     # return information if any
     if function_call_response == "EXECUTED":
         pythonFunctionResponse = getPythonFunctionResponse(code)
@@ -135,8 +136,8 @@ def autoHealPythonCode(code, trace):
         else:
             return ""
     # ask if user want to manually edit the code
-    config.print(f"Failed to execute the code {(config.max_consecutive_auto_heal + 1)} times in a row!")
-    config.print("Do you want to manually edit it? [y]es / [N]o")
+    print1(f"Failed to execute the code {(config.max_consecutive_auto_heal + 1)} times in a row!")
+    print1("Do you want to manually edit it? [y]es / [N]o")
     confirmation = prompt(style=config.promptStyle2, default="N")
     if confirmation.lower() in ("y", "yes"):
         config.defaultEntry = f"```python\n{code}\n```"
@@ -324,7 +325,7 @@ def finetuneSingleFunctionCallResponse(func_arguments, function_name):
     # fine tune function call response; applied to chatgpt only
     def notifyDeveloper(func_name):
         if config.developer:
-            #config.print(f"running function '{func_name}' ...")
+            #print1(f"running function '{func_name}' ...")
             print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
     # ChatGPT's built-in function named "python"
     if function_name == "python":
@@ -332,8 +333,8 @@ def finetuneSingleFunctionCallResponse(func_arguments, function_name):
         python_code = textwrap.dedent(func_arguments)
         refinedCode = fineTunePythonCode(python_code)
 
-        config.print(config.divider)
-        config.print2("running python code ...")
+        print1(config.divider)
+        print2("running python code ...")
         risk = riskAssessment(python_code)
         showRisk(risk)
         if config.developer or config.codeDisplay:
@@ -343,14 +344,14 @@ def finetuneSingleFunctionCallResponse(func_arguments, function_name):
             tokens = list(pygments.lex(python_code, lexer=PythonLexer()))
             print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
             print("```")
-        config.print(config.divider)
+        print1(config.divider)
 
         config.stopSpinning()
         if not config.runPython:
             info = {"information": python_code}
             return json.dumps(info)
         elif confirmExecution(risk):
-            config.print("Do you want to continue? [y]es / [N]o")
+            print1("Do you want to continue? [y]es / [N]o")
             confirmation = prompt(style=config.promptStyle2, default="y")
             if not confirmation.lower() in ("y", "yes"):
                 info = {"information": python_code}
@@ -360,7 +361,7 @@ def finetuneSingleFunctionCallResponse(func_arguments, function_name):
             function_response = getPythonFunctionResponse(refinedCode)
         except:
             trace = showErrors()
-            config.print(config.divider)
+            print1(config.divider)
             if config.max_consecutive_auto_heal > 0:
                 return autoHealPythonCode(refinedCode, trace)
             else:
@@ -376,10 +377,10 @@ def finetuneSingleFunctionCallResponse(func_arguments, function_name):
     # handle unexpected function
     elif not function_name in config.toolFunctionMethods:
         if config.developer:
-            config.print(f"Unexpected function: {function_name}")
-            config.print(config.divider)
+            print1(f"Unexpected function: {function_name}")
+            print1(config.divider)
             print(func_arguments)
-            config.print(config.divider)
+            print1(config.divider)
         function_response = "[INVALID]"
     else:
         notifyDeveloper(function_name)
@@ -460,14 +461,14 @@ class CallChatGPT:
         if config.intent_screening:
             # 1. Intent Screening
             if config.developer:
-                config.print("screening ...")
+                print1("screening ...")
             noFunctionCall = True if noFunctionCall else CallChatGPT.screen_user_request(messages=messages)
         if noFunctionCall:
             return CallChatGPT.regularCall(messages)
         else:
             # 2. Tool Selection
             if config.developer:
-                config.print("selecting tool ...")
+                print1("selecting tool ...")
             tool_collection = get_or_create_collection("tools")
             search_result = query_vectors(tool_collection, user_request)
             if not search_result:
@@ -480,10 +481,10 @@ class CallChatGPT:
             tool_name = metadatas["name"]
             tool_schema = config.toolFunctionSchemas[tool_name]
             if config.developer:
-                config.print3(f"Selected: {tool_name} ({semantic_distance})")
+                print3(f"Selected: {tool_name} ({semantic_distance})")
             # 3. Parameter Extraction
             if config.developer:
-                config.print("extracting parameters ...")
+                print1("extracting parameters ...")
             try:
                 #tool_parameters = CallChatGPT.extractToolParameters(schema=tool_schema, ongoingMessages=messages)
                 tool_parameters = CallChatGPT.getResponseDict(messages=messages, schema=tool_schema)
@@ -498,10 +499,10 @@ class CallChatGPT:
                 return CallChatGPT.regularCall(messages)
             elif tool_response:
                 if config.developer:
-                    config.print2(config.divider)
-                    config.print2("Tool output:")
+                    print2(config.divider)
+                    print2("Tool output:")
                     print(tool_response)
-                    config.print2(config.divider)
+                    print2(config.divider)
                 # update message chain
                 messages.append(
                     {
@@ -689,7 +690,7 @@ class CallLetMeDoIt:
                 # 2. config.passFunctionCallReturnToChatGPT = False
                 elif not config.passFunctionCallReturnToChatGPT or not func_responses:
                     if func_responses:
-                        config.print(f"{config.divider}\n{func_responses}")
+                        print1(f"{config.divider}\n{func_responses}")
                     # A break here means that no information from the called function is passed back to ChatGPT
                     # 1. config.passFunctionCallReturnToChatGPT is set to True
                     # 2. func_responses = "" or None; can be specified in plugins

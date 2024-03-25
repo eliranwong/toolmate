@@ -1,4 +1,5 @@
-from freegenius import config, showErrors, getDayOfWeek, getLocalStorage, fileNamesWithoutExtension
+from freegenius import config, showErrors, getDayOfWeek, getLocalStorage, fileNamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation
+from freegenius import print1, print2, print3
 from freegenius.utils.call_llm import CallLLM
 from freegenius.utils.tool_plugins import ToolStore
 import openai, threading, os, time, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys
@@ -68,11 +69,8 @@ class LetMeDoItAI:
         # share the following methods in config so that they are accessible via plugins
         config.addFunctionCall = Plugins.addFunctionCall
         #getLocalStorage = getLocalStorage
-        config.stopSpinning = self.stopSpinning
+        config.stopSpinning = stopSpinning
         config.toggleMultiline = self.toggleMultiline
-        config.print = self.print
-        config.print2 = self.print2
-        config.print3 = self.print3
         config.getWrappedHTMLText = self.getWrappedHTMLText
         config.fineTuneUserInput = self.fineTuneUserInput
         config.launchPager = self.launchPager
@@ -110,8 +108,8 @@ class LetMeDoItAI:
             self.changeAPIkey()
 
         if not config.openaiApiKey:
-            self.print2("ChatGPT API key not found!")
-            self.print3("Read: https://github.com/eliranwong/letmedoit/wiki/ChatGPT-API-Key")
+            print2("ChatGPT API key not found!")
+            print3("Read: https://github.com/eliranwong/letmedoit/wiki/ChatGPT-API-Key")
             exit(0)
 
         # initial completion check at startup
@@ -218,7 +216,7 @@ class LetMeDoItAI:
             default = "English (United States)" if config.voiceTypingPlatform in ("google", "googlecloud") else "english"
         # completer
         completer = FuzzyCompleter(WordCompleter(languages, ignore_case=True))
-        self.print("Please specify the voice typing language:")
+        print1("Please specify the voice typing language:")
         language = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=default, promptSession=voice_typing_language_session, completer=completer)
         if language and not language in (config.exit_entry, config.cancel_entry):
             config.voiceTypingLanguage = language
@@ -238,7 +236,7 @@ class LetMeDoItAI:
         default = config.elevenlabsVoice if config.elevenlabsVoice in options else "Rachel"
         # completer
         completer = FuzzyCompleter(WordCompleter(options, ignore_case=True))
-        self.print("Please specify ElevenLabs Text-to-Speech Voice:")
+        print1("Please specify ElevenLabs Text-to-Speech Voice:")
         option = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=default, promptSession=elevenlabsVoice_session, completer=completer)
         if option and not option in (config.exit_entry, config.cancel_entry):
             config.elevenlabsVoice = option if option in options else "Rachel"
@@ -259,7 +257,7 @@ class LetMeDoItAI:
             default = "en"
         # completer
         completer = FuzzyCompleter(WordCompleter(languages, ignore_case=True))
-        self.print("Please specify Google Text-to-Speech language:")
+        print1("Please specify Google Text-to-Speech language:")
         language = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=default, promptSession=gtts_language_session, completer=completer)
         if language and not language in (config.exit_entry, config.cancel_entry):
             config.gttsLang = language
@@ -284,7 +282,7 @@ class LetMeDoItAI:
             default = "en-US"
         # completer
         completer = FuzzyCompleter(WordCompleter(languages, ignore_case=True))
-        self.print("Please specify Google Cloud Text-to-Speech language:")
+        print1("Please specify Google Cloud Text-to-Speech language:")
         language = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=default, promptSession=gctts_language_session, completer=completer)
         if language and not language in (config.exit_entry, config.cancel_entry):
             config.gcttsLang = language
@@ -295,8 +293,8 @@ class LetMeDoItAI:
 
     def setVlcSpeed(self):
         if config.isVlcPlayerInstalled and not config.usePygame:
-            self.print("Specify VLC player playback speed:")
-            self.print("(between 0.1 and 2.0)")
+            print1("Specify VLC player playback speed:")
+            print1("(between 0.1 and 2.0)")
             vlcSpeed = self.prompts.simplePrompt(style=self.prompts.promptStyle2, validator=FloatValidator(), default=str(config.vlcSpeed))
             if vlcSpeed and not vlcSpeed.strip().lower() == config.exit_entry:
                 vlcSpeed = float(vlcSpeed)
@@ -305,11 +303,11 @@ class LetMeDoItAI:
                 elif vlcSpeed > 2:
                     vlcSpeed = 2
                 config.vlcSpeed = round(vlcSpeed, 1)
-                self.print3(f"VLC player playback speed: {vlcSpeed}")
+                print3(f"VLC player playback speed: {vlcSpeed}")
 
     def setGcttsSpeed(self):
-        self.print("Specify Google Cloud Text-to-Speech playback speed:")
-        self.print("(between 0.1 and 2.0)")
+        print1("Specify Google Cloud Text-to-Speech playback speed:")
+        print1("(between 0.1 and 2.0)")
         gcttsSpeed = self.prompts.simplePrompt(style=self.prompts.promptStyle2, validator=FloatValidator(), default=str(config.gcttsSpeed))
         if gcttsSpeed and not gcttsSpeed.strip().lower() == config.exit_entry:
             gcttsSpeed = float(gcttsSpeed)
@@ -318,7 +316,7 @@ class LetMeDoItAI:
             elif gcttsSpeed > 2:
                 gcttsSpeed = 2
             config.gcttsSpeed = round(gcttsSpeed, 1)
-            self.print3(f"Google Cloud Text-to-Speech playback speed: {gcttsSpeed}")
+            print3(f"Google Cloud Text-to-Speech playback speed: {gcttsSpeed}")
 
     def selectGoogleAPIs(self):
         if os.environ["GOOGLE_APPLICATION_CREDENTIALS"]:
@@ -332,17 +330,17 @@ class LetMeDoItAI:
                 config.enabledGoogleAPIs = enabledGoogleAPIs
         else:
             config.enabledGoogleAPIs = ["Vertex AI"]
-            self.print(f"API key json file '{config.google_cloud_credentials_file}' not found!")
-            self.print("Read https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup for setting up Google API.")
+            print1(f"API key json file '{config.google_cloud_credentials_file}' not found!")
+            print1("Read https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup for setting up Google API.")
         if "Speech-to-Text" in config.enabledGoogleAPIs:
             if not config.voiceTypingPlatform == "googlecloud":
                 config.voiceTypingPlatform = "googlecloud"
-                self.print3("Voice typing platform changed to: Google Text-to-Speech (API)")
+                print3("Voice typing platform changed to: Google Text-to-Speech (API)")
             self.setSpeechToTextLanguage()
         if "Text-to-Speech" in config.enabledGoogleAPIs:
             if not config.ttsPlatform == "googlecloud":
                 config.ttsPlatform = "googlecloud"
-                self.print3("Text-to-Speech platform changed to: Google Text-to-Speech (API)")
+                print3("Text-to-Speech platform changed to: Google Text-to-Speech (API)")
             self.setGcttsLanguage()
             self.setGcttsSpeed()
         config.saveConfig()
@@ -376,7 +374,7 @@ class LetMeDoItAI:
                     config.pluginExcludeList.append(p)
             Plugins.runPlugins()
             config.saveConfig()
-            self.print("Plugin selection updated!")
+            print1("Plugin selection updated!")
 
     def getCliOutput(self, cli):
         try:
@@ -395,39 +393,39 @@ class LetMeDoItAI:
 
     def changeAPIkey(self):
         if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
-            self.print("Enter your OpenAI API Key [optional]:")
+            print1("Enter your OpenAI API Key [optional]:")
             apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.openaiApiKey, is_password=True)
             if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
                 config.openaiApiKey = apikey
             else:
                 config.openaiApiKey = "freegenius"
-            #self.print("Enter your Organization ID [optional]:")
+            #print1("Enter your Organization ID [optional]:")
             #oid = self.prompts.simplePrompt(default=config.openaiApiOrganization, is_password=True)
             #if oid and not oid.strip().lower() in (config.cancel_entry, config.exit_entry):
             #    config.openaiApiOrganization = oid
             CallLLM.checkCompletion()
             config.saveConfig()
-            self.print2("Configurations updated!")
+            print2("Configurations updated!")
 
     def changeOpenweathermapApi(self):
         if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
-            self.print("To set up OpenWeatherMap API Key, read:\nhttps://github.com/eliranwong/letmedoit/wiki/OpenWeatherMap-API-Setup\n")
-            self.print("Enter your OpenWeatherMap API Key:")
+            print1("To set up OpenWeatherMap API Key, read:\nhttps://github.com/eliranwong/letmedoit/wiki/OpenWeatherMap-API-Setup\n")
+            print1("Enter your OpenWeatherMap API Key:")
             print()
             apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.openweathermapApi, is_password=True)
             if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
                 config.openweathermapApi = apikey
             if SharedUtil.getWeather() is not None:
                 config.saveConfig()
-                self.print2("Configurations updated!")
+                print2("Configurations updated!")
             else:
                 config.openweathermapApi = ""
-                self.print2("Invalid API key entered!")
+                print2("Invalid API key entered!")
 
     def changeElevenlabsApi(self):
         if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
-            self.print("To set up ElevenLabs API Key, read:\nhttps://elevenlabs.io/docs/api-reference/text-to-speech#authentication\n")
-            self.print("Enter your ElevenLabs API Key:")
+            print1("To set up ElevenLabs API Key, read:\nhttps://elevenlabs.io/docs/api-reference/text-to-speech#authentication\n")
+            print1("Enter your ElevenLabs API Key:")
             print()
             apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.elevenlabsApi, is_password=True)
             if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
@@ -441,47 +439,16 @@ class LetMeDoItAI:
                     model="eleven_multilingual_v2"
                 )
                 config.saveConfig()
-                self.print2("Configurations updated!")
+                print2("Configurations updated!")
             except:
                 config.elevenlabsApi = ""
-                self.print2("Invalid API key entered!")
+                print2("Invalid API key entered!")
 
     def exitAction(self):
         message = "closing ..."
-        self.print2(message)
-        self.print(self.divider)
+        print2(message)
+        print1(self.divider)
         return ""
-
-    def print(self, content):
-        content = SharedUtil.transformText(content)
-        if config.wrapWords:
-            # wrap words to fit terminal width
-            terminal_width = shutil.get_terminal_size().columns
-            print(StreamingWordWrapper.wrapText(content, terminal_width))
-            # remarks: 'fold' or 'fmt' does not work on Windows
-            # pydoc.pipepager(f"{content}\n", cmd=f"fold -s -w {terminal_width}")
-            # pydoc.pipepager(f"{content}\n", cmd=f"fmt -w {terminal_width}")
-        else:
-            print(content)
-
-    def print2(self, content):
-        print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>{content}</{config.terminalPromptIndicatorColor2}>"))
-
-    def print3(self, content):
-        splittedContent = content.split(": ", 1)
-        if len(splittedContent) == 2:
-            key, value = splittedContent
-            print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>{key}:</{config.terminalPromptIndicatorColor2}> {value}"))
-        else:
-            self.print2(splittedContent)
-
-    def spinning_animation(self, stop_event):
-        while not stop_event.is_set():
-            for symbol in "|/-\\":
-                print(symbol, end="\r")
-                time.sleep(0.1)
-        #print("\r", end="")
-        #print(" ", end="")
 
     # update system message
     def updateSystemMessage(self, messages):
@@ -509,9 +476,9 @@ class LetMeDoItAI:
 
     def getCurrentContext(self):
         if not config.predefinedContext in config.predefinedContexts:
-            self.print2(f"'{config.predefinedContext}' not defined!")
+            print2(f"'{config.predefinedContext}' not defined!")
             config.predefinedContext = config.predefinedContextTemp if config.predefinedContextTemp and config.predefinedContextTemp in config.predefinedContexts else "[none]"
-            self.print3(f"Predefined context changed to: {config.predefinedContext}")
+            print3(f"Predefined context changed to: {config.predefinedContext}")
         if config.predefinedContext == "[none]":
             # no context
             context = ""
@@ -527,9 +494,9 @@ class LetMeDoItAI:
         description = self.getCurrentContext()
         if description:
             description = f"\n{description}"
-        self.print(self.divider)
-        self.print3(f"Context: {config.predefinedContext}{description}")
-        self.print(self.divider)
+        print1(self.divider)
+        print3(f"Context: {config.predefinedContext}{description}")
+        print1(self.divider)
 
     def fineTuneUserInput(self, userInput):
         # customise chat context
@@ -583,7 +550,7 @@ class LetMeDoItAI:
         if option:
             config.autoUpgrade = (option == "enable")
             config.saveConfig()
-            self.print3(f"Automatic Upgrade: {option}d!")
+            print3(f"Automatic Upgrade: {option}d!")
 
     def setDynamicTokenCount(self):
         options = ("enable", "disable")
@@ -596,7 +563,7 @@ class LetMeDoItAI:
         if option:
             config.dynamicTokenCount = (option == "enable")
             config.saveConfig()
-            self.print3(f"Dynamic token count: {option}d!")
+            print3(f"Dynamic token count: {option}d!")
 
     def setIncludeIpInSystemMessage(self):
         options = ("enable", "disable")
@@ -609,7 +576,7 @@ class LetMeDoItAI:
         if option:
             config.includeIpInDeviceInfo = (option == "enable")
             config.saveConfig()
-            self.print3(f"Include IP information: {option}d!")
+            print3(f"Include IP information: {option}d!")
 
     def setCodeDisplay(self):
         options = ("enable", "disable")
@@ -622,7 +589,7 @@ class LetMeDoItAI:
         if option:
             config.codeDisplay = (option == "enable")
             config.saveConfig()
-            self.print3(f"Code display: {option}d!")
+            print3(f"Code display: {option}d!")
 
     def setContextIntegration(self):
         options = ("the first input only", "all inputs")
@@ -635,18 +602,18 @@ class LetMeDoItAI:
         if option:
             config.applyPredefinedContextAlways = True if option == "all inputs" else False
             config.saveConfig()
-            self.print3(f"Predefined Context Integration: {option}!")
+            print3(f"Predefined Context Integration: {option}!")
 
     def setStorageDirectory(self):
         try:
             folder = self.getFolderPath(default=config.storagedirectory)
         except:
-            self.print2(f"Given path not accessible!")
+            print2(f"Given path not accessible!")
             folder = ""
         if folder and os.path.isdir(folder):
             config.storagedirectory = folder
             config.saveConfig()
-            self.print3(f"Startup directory:\n{folder}")
+            print3(f"Startup directory:\n{folder}")
 
     def setLatestSearches(self):
         options = ("always", "auto", "none")
@@ -676,7 +643,7 @@ class LetMeDoItAI:
             Plugins.runPlugins()
             # notify
             config.saveConfig()
-            self.print3(f"Latest Online Searches: {option}")
+            print3(f"Latest Online Searches: {option}")
 
     def setUserConfirmation(self):
         options = ("always", "medium_risk_or_above", "high_risk_only", "none")
@@ -698,7 +665,7 @@ class LetMeDoItAI:
         if option:
             config.confirmExecution = option
             config.saveConfig()
-            self.print3(f"Command Confirmation Protocol: {option}")
+            print3(f"Command Confirmation Protocol: {option}")
 
     def setPagerView(self):
         manuel = f"""manual '{str(config.hotkey_launch_pager_view).replace("'", "")}'"""
@@ -711,7 +678,7 @@ class LetMeDoItAI:
         if option:
             config.pagerView = (option == "auto")
             config.saveConfig()
-            self.print3(f"Pager View: {option}!")
+            print3(f"Pager View: {option}!")
 
     def setDeveloperMode(self):
         options = ("enable", "disable")
@@ -724,7 +691,7 @@ class LetMeDoItAI:
         if option:
             config.developer = (option == "enable")
             config.saveConfig()
-            self.print3(f"Developer Mode: {option}d!")
+            print3(f"Developer Mode: {option}d!")
 
     def setTermuxApi(self):
         options = ("enable", "disable")
@@ -738,17 +705,17 @@ class LetMeDoItAI:
             config.terminalEnableTermuxAPI = (option == "enable")
             if config.terminalEnableTermuxAPI and not os.path.isdir("/data/data/com.termux/files/home/"):
                 config.terminalEnableTermuxAPI = False
-                self.print("Termux is not installed!")
+                print1("Termux is not installed!")
             if config.terminalEnableTermuxAPI:
                 # Check if Termux API package is installed
                 result = subprocess.run(['pkg', 'list-installed', 'termux-api'], capture_output=True, text=True)
                 # Check if the package is installed
                 if not "termux-api" in result.stdout:
-                    self.print("Termux:API is not installed!")
+                    print1("Termux:API is not installed!")
             # reset plugins
             Plugins.runPlugins()
             config.saveConfig()
-            self.print3(f"""Termux API Integration: {"enable" if config.terminalEnableTermuxAPI else "disable"}d!""")
+            print3(f"""Termux API Integration: {"enable" if config.terminalEnableTermuxAPI else "disable"}d!""")
 
     def setFunctionCall(self):
         calls = ("auto", "none")
@@ -761,7 +728,7 @@ class LetMeDoItAI:
         if call:
             config.chatGPTApiFunctionCall = call
             config.saveConfig()
-            self.print3(f"ChaptGPT function call: {'enabled' if config.chatGPTApiFunctionCall == 'auto' else 'disabled'}!")
+            print3(f"ChaptGPT function call: {'enabled' if config.chatGPTApiFunctionCall == 'auto' else 'disabled'}!")
 
     def setFunctionResponse(self):
         calls = ("enable", "disable")
@@ -774,7 +741,7 @@ class LetMeDoItAI:
         if call:
             config.passFunctionCallReturnToChatGPT = (call == "enable")
             config.saveConfig()
-            self.print3(f"Pass Function Call Response to ChatGPT: {'enabled' if config.passFunctionCallReturnToChatGPT else 'disabled'}!")
+            print3(f"Pass Function Call Response to ChatGPT: {'enabled' if config.passFunctionCallReturnToChatGPT else 'disabled'}!")
 
     def editLastResponse(self):
         customTextEditor = config.customTextEditor if config.customTextEditor else f"{sys.executable} {os.path.join(config.freeGeniusAIFolder, 'eTextEdit.py')}"
@@ -796,28 +763,28 @@ class LetMeDoItAI:
         # re-load configs
         try:
             config.loadConfig(configFile)
-            self.print2("Changes loaded!")
+            print2("Changes loaded!")
         except:
-            self.print2("Failed to load your changes!")
+            print2("Failed to load your changes!")
             print(traceback.format_exc())
             try:
-                self.print2("Restoring backup ...")
+                print2("Restoring backup ...")
                 config.loadConfig(backupFile)
                 shutil.copy(backupFile, configFile)
-                self.print2("Restored!")
+                print2("Restored!")
             except:
-                self.print2("Failed to restore backup!")
+                print2("Failed to restore backup!")
 
     def installPythonPackage(self):
-        self.print("Enter a python package name:")
+        print1("Enter a python package name:")
         package = self.prompts.simplePrompt(style=self.prompts.promptStyle2)
         if package:
-            self.print(f"Installing '{package}' ...")
+            print1(f"Installing '{package}' ...")
             installmodule(f"--upgrade {package}")
 
     def setTemperature(self):
-        self.print("Enter a value between 0.0 and 2.0:")
-        self.print("(Lower values for temperature result in more consistent outputs, while higher values generate more diverse and creative results. Select a temperature value based on the desired trade-off between coherence and creativity for your specific application.)")
+        print1("Enter a value between 0.0 and 2.0:")
+        print1("(Lower values for temperature result in more consistent outputs, while higher values generate more diverse and creative results. Select a temperature value based on the desired trade-off between coherence and creativity for your specific application.)")
         temperature = self.prompts.simplePrompt(style=self.prompts.promptStyle2, validator=FloatValidator(), default=str(config.llmTemperature))
         if temperature and not temperature.strip().lower() == config.exit_entry:
             temperature = float(temperature)
@@ -827,7 +794,7 @@ class LetMeDoItAI:
                 temperature = 2
             config.llmTemperature = round(temperature, 1)
             config.saveConfig()
-            self.print3(f"LLM Temperature: {temperature}")
+            print3(f"LLM Temperature: {temperature}")
 
     def setLlmModel(self):
         model = self.dialogs.getValidOptions(
@@ -838,11 +805,11 @@ class LetMeDoItAI:
         )
         if model:
             config.chatGPTApiModel = model
-            self.print3(f"ChatGPT model: {model}")
+            print3(f"ChatGPT model: {model}")
             # set max tokens
             config.chatGPTApiMaxTokens = self.getMaxTokens()[-1]
             config.saveConfig()
-            self.print3(f"Maximum response tokens: {config.chatGPTApiMaxTokens}")
+            print3(f"Maximum response tokens: {config.chatGPTApiMaxTokens}")
 
     def setChatbot(self):
         model = self.dialogs.getValidOptions(
@@ -853,7 +820,7 @@ class LetMeDoItAI:
         )
         if model:
             config.chatbot = model
-            self.print3(f"Chat-only model: {model}")
+            print3(f"Chat-only model: {model}")
 
     def setEmbeddingModel(self):
         oldEmbeddingModel = config.embeddingModel
@@ -865,18 +832,18 @@ class LetMeDoItAI:
         )
         if model:
             if model == "custom":
-                self.print("Enter OpenAI or Sentence Transformer Embedding model:")
-                self.print("Read more at: https://www.sbert.net/docs/pretrained_models.html")
+                print1("Enter OpenAI or Sentence Transformer Embedding model:")
+                print1("Read more at: https://www.sbert.net/docs/pretrained_models.html")
                 customModel = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.embeddingModel)
                 if customModel and not customModel.strip().lower() == config.exit_entry:
                     config.embeddingModel = customModel 
             else:
                 config.embeddingModel = model
-            self.print3(f"Embedding model: {model}")
+            print3(f"Embedding model: {model}")
         if not oldEmbeddingModel == config.embeddingModel:
-            self.print(f"You've change the embedding model from '{oldEmbeddingModel}' to '{config.embeddingModel}'.")
-            self.print("To work with the newly selected model, previous memory store and retrieved collections need to be deleted.")
-            self.print("Do you want to delete them now? [y]es / [N]o")
+            print1(f"You've change the embedding model from '{oldEmbeddingModel}' to '{config.embeddingModel}'.")
+            print1("To work with the newly selected model, previous memory store and retrieved collections need to be deleted.")
+            print1("Do you want to delete them now? [y]es / [N]o")
             confirmation = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default="yes")
             if confirmation.lower() in ("y", "yes"):
                 memory_store = os.path.join(getLocalStorage(), "memory")
@@ -884,11 +851,11 @@ class LetMeDoItAI:
                 for folder in (memory_store, retrieved_collections):
                     shutil.rmtree(folder, ignore_errors=True)
             else:
-                self.print(f"Do you want to change back the embedding model from '{config.embeddingModel}' to '{oldEmbeddingModel}'? [y]es / [N]o")
+                print1(f"Do you want to change back the embedding model from '{config.embeddingModel}' to '{oldEmbeddingModel}'? [y]es / [N]o")
                 confirmation = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default="yes")
                 if not confirmation.lower() in ("y", "yes"):
                     config.embeddingModel = oldEmbeddingModel
-                    self.print3(f"Embedding model: {oldEmbeddingModel}")
+                    print3(f"Embedding model: {oldEmbeddingModel}")
         if not oldEmbeddingModel == config.embeddingModel:
             config.saveConfig()
 
@@ -897,74 +864,74 @@ class LetMeDoItAI:
             AutoGenBuilder().promptConfig()
 
     def setAssistantName(self):
-        self.print("You may modify my name below:")
+        print1("You may modify my name below:")
         freeGeniusAIName = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.freeGeniusAIName)
         if freeGeniusAIName and not freeGeniusAIName.strip().lower() == config.exit_entry:
             config.freeGeniusAIName = freeGeniusAIName
             self.storageDir = getLocalStorage()
             config.saveConfig()
-            self.print3(f"You have changed my name to: {config.freeGeniusAIName}")
+            print3(f"You have changed my name to: {config.freeGeniusAIName}")
 
     def setCustomSystemMessage(self):
-        self.print("You can modify the system message to furnish me with details about my capabilities, constraints, or any pertinent context that may inform our interactions. This will guide me in managing and responding to your requests appropriately.")
-        self.print("Please note that altering my system message directly affects my functionality. Handle with care.")
-        self.print("Enter custom system message below:")
-        self.print(f"(Keep it blank to use {config.freeGeniusAIName} default system message.)")
+        print1("You can modify the system message to furnish me with details about my capabilities, constraints, or any pertinent context that may inform our interactions. This will guide me in managing and responding to your requests appropriately.")
+        print1("Please note that altering my system message directly affects my functionality. Handle with care.")
+        print1("Enter custom system message below:")
+        print1(f"(Keep it blank to use {config.freeGeniusAIName} default system message.)")
         message = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.systemMessage_letmedoit)
         if message and not message.strip().lower() == config.exit_entry:
             config.systemMessage_letmedoit = message
             config.saveConfig()
-            self.print3(f"Custom system message: {config.freeGeniusAIName}")
+            print3(f"Custom system message: {config.freeGeniusAIName}")
 
     def setCustomTextEditor(self):
-        self.print("Please specify custom text editor command below:")
-        self.print("e.g. 'micro -softwrap true -wordwrap true'")
-        self.print("Leave it blank to use our built-in text editor 'eTextEdit' by default.")
+        print1("Please specify custom text editor command below:")
+        print1("e.g. 'micro -softwrap true -wordwrap true'")
+        print1("Leave it blank to use our built-in text editor 'eTextEdit' by default.")
         customTextEditor = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.customTextEditor)
         if customTextEditor and not customTextEditor.strip().lower() == config.exit_entry:
             textEditor = re.sub(" .*?$", "", customTextEditor)
             if not textEditor or not SharedUtil.isPackageInstalled(textEditor):
-                self.print2("Command not found on your device!")
+                print2("Command not found on your device!")
             else:
                 config.customTextEditor = customTextEditor
                 config.saveConfig()
-                self.print3(f"Custom text editor: {config.customTextEditor}")
+                print3(f"Custom text editor: {config.customTextEditor}")
 
     def setChatRecordClosestMatches(self):
-        self.print("Please specify the number of closest matches in each memory retrieval:")
+        print1("Please specify the number of closest matches in each memory retrieval:")
         chatRecordClosestMatches = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.chatRecordClosestMatches))
         if chatRecordClosestMatches and not chatRecordClosestMatches.strip().lower() == config.exit_entry and int(chatRecordClosestMatches) >= 0:
             config.chatRecordClosestMatches = int(chatRecordClosestMatches)
             config.saveConfig()
-            self.print3(f"Number of memory closest matches: {config.chatRecordClosestMatches}")
+            print3(f"Number of memory closest matches: {config.chatRecordClosestMatches}")
 
     def setMemoryClosestMatches(self):
-        self.print("Please specify the number of closest matches in each memory retrieval:")
+        print1("Please specify the number of closest matches in each memory retrieval:")
         memoryClosestMatches = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.memoryClosestMatches))
         if memoryClosestMatches and not memoryClosestMatches.strip().lower() == config.exit_entry and int(memoryClosestMatches) >= 0:
             config.memoryClosestMatches = int(memoryClosestMatches)
             config.saveConfig()
-            self.print3(f"Number of memory closest matches: {config.memoryClosestMatches}")
+            print3(f"Number of memory closest matches: {config.memoryClosestMatches}")
 
     def setMaxAutoHeal(self):
-        self.print(f"The auto-heal feature enables {config.freeGeniusAIName} to automatically fix broken Python code if it was not executed properly.")
-        self.print("Please specify maximum number of auto-heal attempts below:")
-        self.print("(Remarks: Enter '0' if you want to disable auto-heal feature)")
+        print1(f"The auto-heal feature enables {config.freeGeniusAIName} to automatically fix broken Python code if it was not executed properly.")
+        print1("Please specify maximum number of auto-heal attempts below:")
+        print1("(Remarks: Enter '0' if you want to disable auto-heal feature)")
         maxAutoHeal = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.max_consecutive_auto_heal))
         if maxAutoHeal and not maxAutoHeal.strip().lower() == config.exit_entry and int(maxAutoHeal) >= 0:
             config.max_consecutive_auto_heal = int(maxAutoHeal)
             config.saveConfig()
-            self.print3(f"Maximum consecutive auto-heal: {config.max_consecutive_auto_heal}")
+            print3(f"Maximum consecutive auto-heal: {config.max_consecutive_auto_heal}")
 
     def setMinTokens(self):
-        self.print("Please specify minimum response tokens below:")
+        print1("Please specify minimum response tokens below:")
         mintokens = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.chatGPTApiMinTokens))
         if mintokens and not mintokens.strip().lower() == config.exit_entry and int(mintokens) > 0:
             config.chatGPTApiMinTokens = int(mintokens)
             if config.chatGPTApiMinTokens > config.chatGPTApiMaxTokens:
                 config.chatGPTApiMinTokens = config.chatGPTApiMaxTokens
             config.saveConfig()
-            self.print3(f"Minimum tokens: {config.chatGPTApiMinTokens}")
+            print3(f"Minimum tokens: {config.chatGPTApiMinTokens}")
 
     def getMaxTokens(self):
         contextWindowLimit = SharedUtil.tokenLimits[config.chatGPTApiModel]
@@ -982,24 +949,24 @@ class LetMeDoItAI:
     def setMaxTokens(self):
         contextWindowLimit, functionTokens, tokenLimit = self.getMaxTokens()
         if tokenLimit < config.chatGPTApiMinTokens:
-            self.print2(f"Function tokens [{functionTokens}] exceed {config.chatGPTApiModel} response token limit.")
-            self.print("Either change to a model with higher token limit or disable unused function-call plguins.")
+            print2(f"Function tokens [{functionTokens}] exceed {config.chatGPTApiModel} response token limit.")
+            print1("Either change to a model with higher token limit or disable unused function-call plguins.")
         else:
-            self.print(self.divider)
-            self.print("GPT and embeddings models process text in chunks called tokens. As a rough rule of thumb, 1 token is approximately 4 characters or 0.75 words for English text. One limitation to keep in mind is that for a GPT model the prompt and the generated output combined must be no more than the model's maximum context length.")
-            self.print3(f"Current GPT model: {config.chatGPTApiModel}")
-            self.print3(f"Maximum context length: {contextWindowLimit}")
-            self.print3(f"Current function tokens: {functionTokens}")
-            self.print3(f"Maximum response token allowed (excl. functions): {tokenLimit}")
-            self.print(self.divider)
-            self.print("Please specify maximum response tokens below:")
+            print1(self.divider)
+            print1("GPT and embeddings models process text in chunks called tokens. As a rough rule of thumb, 1 token is approximately 4 characters or 0.75 words for English text. One limitation to keep in mind is that for a GPT model the prompt and the generated output combined must be no more than the model's maximum context length.")
+            print3(f"Current GPT model: {config.chatGPTApiModel}")
+            print3(f"Maximum context length: {contextWindowLimit}")
+            print3(f"Current function tokens: {functionTokens}")
+            print3(f"Maximum response token allowed (excl. functions): {tokenLimit}")
+            print1(self.divider)
+            print1("Please specify maximum response tokens below:")
             maxtokens = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.chatGPTApiMaxTokens))
             if maxtokens and not maxtokens.strip().lower() == config.exit_entry and int(maxtokens) > 0:
                 config.chatGPTApiMaxTokens = int(maxtokens)
                 if config.chatGPTApiMaxTokens > tokenLimit:
                     config.chatGPTApiMaxTokens = tokenLimit
                 config.saveConfig()
-                self.print3(f"Maximum tokens: {config.chatGPTApiMaxTokens}")
+                print3(f"Maximum tokens: {config.chatGPTApiMaxTokens}")
 
     def runSystemCommand(self, command):
         command = command.strip()[1:]
@@ -1012,14 +979,14 @@ class LetMeDoItAI:
 
     def toggleMultiline(self):
         config.multilineInput = not config.multilineInput
-        run_in_terminal(lambda: self.print(f"Multi-line input {'enabled' if config.multilineInput else 'disabled'}!"))
+        run_in_terminal(lambda: print1(f"Multi-line input {'enabled' if config.multilineInput else 'disabled'}!"))
         if config.multilineInput:
-            run_in_terminal(lambda: self.print("Use 'escape + enter' to complete your entry."))
+            run_in_terminal(lambda: print1("Use 'escape + enter' to complete your entry."))
 
     def isTtsAvailable(self):
         if not config.isVlcPlayerInstalled and not config.isPygameInstalled and not config.ttsCommand and not config.elevenlabsApi:
-            self.print2("Text-to-speech feature is not enabled!")
-            self.print3("Read: https://github.com/eliranwong/letmedoit/wiki/letMeDoIt-Speaks")
+            print2("Text-to-speech feature is not enabled!")
+            print3("Read: https://github.com/eliranwong/letmedoit/wiki/letMeDoIt-Speaks")
             config.tts = False
         else:
             config.tts = True
@@ -1029,23 +996,23 @@ class LetMeDoItAI:
         if self.isTtsAvailable:
             config.ttsInput = not config.ttsInput
             config.saveConfig()
-            self.print3(f"Input Audio: '{'enabled' if config.ttsInput else 'disabled'}'!")
+            print3(f"Input Audio: '{'enabled' if config.ttsInput else 'disabled'}'!")
 
     def toggleresponseaudio(self):
         if self.isTtsAvailable:
             config.ttsOutput = not config.ttsOutput
             config.saveConfig()
-            self.print3(f"Response Audio: '{'enabled' if config.ttsOutput else 'disabled'}'!")
+            print3(f"Response Audio: '{'enabled' if config.ttsOutput else 'disabled'}'!")
 
     def defineTtsCommand(self):
-        self.print("Define custom text-to-speech command below:")
-        self.print("""* on macOS ['say -v "?"' to check voices], e.g.:\n'say' or 'say -r 200 -v Daniel'""")
-        self.print("* on Ubuntu ['espeak --voices' to check voices], e.g.:\n'espeak' or 'espeak -s 175 -v en-gb'")
-        self.print("* on Windows, simply enter 'windows' here to use Windows built-in speech engine") # letmedoit.ai will handle the command for Windows users
-        self.print("remarks: always place the voice option, if any, at the end")
+        print1("Define custom text-to-speech command below:")
+        print1("""* on macOS ['say -v "?"' to check voices], e.g.:\n'say' or 'say -r 200 -v Daniel'""")
+        print1("* on Ubuntu ['espeak --voices' to check voices], e.g.:\n'espeak' or 'espeak -s 175 -v en-gb'")
+        print1("* on Windows, simply enter 'windows' here to use Windows built-in speech engine") # letmedoit.ai will handle the command for Windows users
+        print1("remarks: always place the voice option, if any, at the end")
         ttsCommand = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.ttsCommand)
         if ttsCommand:
-            self.print("Specify command suffix below, if any [leave it blank if N/A]:")
+            print1("Specify command suffix below, if any [leave it blank if N/A]:")
             ttsCommandSuffix = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.ttsCommandSuffix)
             if ttsCommand.lower() == "windows":
                 command = f'''PowerShell -Command "Add-Type –AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak('testing');"'''
@@ -1054,7 +1021,7 @@ class LetMeDoItAI:
                 command = f'''{ttsCommand} "testing"{ttsCommandSuffix}'''
             _, stdErr = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
             if stdErr:
-                showErrors() if config.developer else self.print("Entered command invalid!")
+                showErrors() if config.developer else print1("Entered command invalid!")
             else:
                 config.ttsCommand, config.ttsCommandSuffix = ttsCommand, ttsCommandSuffix
                 config.saveConfig()
@@ -1064,22 +1031,22 @@ class LetMeDoItAI:
     def toggleWordWrap(self):
         config.wrapWords = not config.wrapWords
         config.saveConfig()
-        self.print3(f"Word Wrap: '{'enabled' if config.wrapWords else 'disabled'}'!")
+        print3(f"Word Wrap: '{'enabled' if config.wrapWords else 'disabled'}'!")
 
     def toggleMouseSupport(self):
         config.mouseSupport = not config.mouseSupport
         config.saveConfig()
-        self.print3(f"Entry Mouse Support: '{'enabled' if config.mouseSupport else 'disabled'}'!")
+        print3(f"Entry Mouse Support: '{'enabled' if config.mouseSupport else 'disabled'}'!")
 
     def toggleImprovedWriting(self):
         config.displayImprovedWriting = not config.displayImprovedWriting
         if config.displayImprovedWriting:
-            self.print("Please specify the writing style below:")
+            print1("Please specify the writing style below:")
             style = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.improvedWritingSytle)
             if style and not style in (config.exit_entry, config.cancel_entry):
                 config.improvedWritingSytle = style
                 config.saveConfig()
-        self.print3(f"Improved Writing Display: '{'enabled' if config.displayImprovedWriting else 'disabled'}'!")
+        print3(f"Improved Writing Display: '{'enabled' if config.displayImprovedWriting else 'disabled'}'!")
 
     def setAudioPlaybackTool(self):
         playback = self.dialogs.getValidOptions(
@@ -1092,8 +1059,8 @@ class LetMeDoItAI:
         if playback:
             if playback == "vlc":
                 if not config.isVlcPlayerInstalled:
-                    self.print("VLC player not found! Install it first!")
-                    self.print3("Text-to-Speech Playback changed to: PyGame")
+                    print1("VLC player not found! Install it first!")
+                    print3("Text-to-Speech Playback changed to: PyGame")
                     config.usePygame = True
                 else:
                     config.usePygame = False
@@ -1110,9 +1077,9 @@ class LetMeDoItAI:
         )
         if ttsPlatform:
             if ttsPlatform == "googlecloud" and not (os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Text-to-Speech" in config.enabledGoogleAPIs):
-                self.print2("Google Cloud Text-to-Speech feature is not enabled!")
-                self.print3("Read: https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup")
-                self.print3("Text-to-Speech platform changed to: Google Text-to-Speech (Generic)")
+                print2("Google Cloud Text-to-Speech feature is not enabled!")
+                print3("Read: https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup")
+                print3("Text-to-Speech platform changed to: Google Text-to-Speech (Generic)")
                 config.ttsPlatform = "google"
             else:
                 config.ttsPlatform = ttsPlatform
@@ -1130,8 +1097,8 @@ class LetMeDoItAI:
             if not config.elevenlabsApi:
                 self.changeElevenlabsApi()
             if not config.elevenlabsApi:
-                self.print("ElevenLabs API key not found!")
-                self.print3("Text-to-Speech platform changed to: Google Text-to-Speech (Generic)")
+                print1("ElevenLabs API key not found!")
+                print3("Text-to-Speech platform changed to: Google Text-to-Speech (Generic)")
                 config.ttsPlatform = "google"
             else:
                 self.setElevenlabsVoice()
@@ -1150,14 +1117,14 @@ class LetMeDoItAI:
         )
         if voiceTypingPlatform:
             if voiceTypingPlatform == "googlecloud" and not (os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Speech-to-Text" in config.enabledGoogleAPIs):
-                self.print2("Google Cloud Speech-to-Text feature is not enabled!")
-                self.print3("Read: https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup")
-                self.print3("Voice typing platform changed to: Google Speech-to-Text (Generic)")
+                print2("Google Cloud Speech-to-Text feature is not enabled!")
+                print3("Read: https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup")
+                print3("Voice typing platform changed to: Google Speech-to-Text (Generic)")
                 config.voiceTypingPlatform = "google"
             elif voiceTypingPlatform == "whisper" and not SharedUtil.isPackageInstalled("ffmpeg"):
-                self.print2("Install 'ffmpeg' first to use offline openai whisper model!")
-                self.print3("Read: https://github.com/openai/whisper#setup")
-                self.print3("Voice typing platform changed to: Google Speech-to-Text (Generic)")
+                print2("Install 'ffmpeg' first to use offline openai whisper model!")
+                print3("Read: https://github.com/openai/whisper#setup")
+                print3("Voice typing platform changed to: Google Speech-to-Text (Generic)")
                 config.voiceTypingPlatform = "google"
             else:
                 config.voiceTypingPlatform = voiceTypingPlatform
@@ -1193,11 +1160,11 @@ class LetMeDoItAI:
             config.voiceTypingAutoComplete = True if voiceTypingAutoComplete == "Yes" else False
         # notify
         print("")
-        self.print3(f"Voice Typing Model: {config.voiceTypingPlatform}")
-        self.print3(f"Voice Typing Language: {config.voiceTypingLanguage}")
-        self.print3(f"Ambient Noise Adjustment: {config.voiceTypingAdjustAmbientNoise}")
-        self.print3(f"Audio Notification: {config.voiceTypingNotification}")
-        self.print3(f"Auto Completion: {config.voiceTypingAutoComplete}")
+        print3(f"Voice Typing Model: {config.voiceTypingPlatform}")
+        print3(f"Voice Typing Language: {config.voiceTypingLanguage}")
+        print3(f"Ambient Noise Adjustment: {config.voiceTypingAdjustAmbientNoise}")
+        print3(f"Audio Notification: {config.voiceTypingNotification}")
+        print3(f"Auto Completion: {config.voiceTypingAutoComplete}")
         # save configs
         config.saveConfig()
 
@@ -1218,7 +1185,7 @@ class LetMeDoItAI:
                     with open(chatFile, "w", encoding="utf-8") as fileObj:
                         fileObj.write(pprint.pformat(messages))
             except:
-                self.print2("Failed to save chat!\n")
+                print2("Failed to save chat!\n")
                 showErrors()
 
     def exportChat(self, messages, openFile=True):
@@ -1257,7 +1224,7 @@ class LetMeDoItAI:
                         if openFile and os.path.isfile(chatFile):
                             os.system(f'''{config.open} "{chatFile}"''')
                 except:
-                    self.print2("Failed to save chat!\n")
+                    print2("Failed to save chat!\n")
                     showErrors()
 
     def runInstruction(self):
@@ -1282,7 +1249,7 @@ class LetMeDoItAI:
         if predefinedContext:
             config.predefinedContext = predefinedContext
             if config.predefinedContext == "[custom]":
-                self.print("Edit custom context below:")
+                print1("Edit custom context below:")
                 customContext = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.customPredefinedContext)
                 if customContext and not customContext.strip().lower() == config.exit_entry:
                     config.customPredefinedContext = customContext.strip()
@@ -1301,13 +1268,6 @@ class LetMeDoItAI:
             elif os.path.isfile(f):
                 directoryList.append(f)
         return directoryList
-
-    def stopSpinning(self):
-        try:
-            config.stop_event.set()
-            config.spinner_thread.join()
-        except:
-            pass
 
     def showLogo(self):
         appName = config.freeGeniusAIName.split()[0].upper()
@@ -1332,7 +1292,7 @@ class LetMeDoItAI:
         except:
             trace = traceback.format_exc()
             print(trace if config.developer else "Error encountered!")
-            config.print(config.divider)
+            print1(config.divider)
             if config.max_consecutive_auto_heal > 0:
                 CallLLM.autoHealPythonCode(script, trace)
 
@@ -1342,16 +1302,16 @@ class LetMeDoItAI:
             return config.dynamicToolBarText
         def startChat():
             clear()
-            self.print(self.divider)
+            print1(self.divider)
             self.showLogo()
             self.showCurrentContext()
             # go to startup directory
             storagedirectory = getLocalStorage()
             os.chdir(storagedirectory)
             messages = CallLLM.resetMessages()
-            #self.print(f"startup directory:\n{storagedirectory}")
+            #print1(f"startup directory:\n{storagedirectory}")
             print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Directory:</{config.terminalPromptIndicatorColor2}> {storagedirectory}"))
-            self.print(self.divider)
+            print1(self.divider)
 
             config.conversationStarted = False
             return (storagedirectory, messages)
@@ -1368,9 +1328,9 @@ class LetMeDoItAI:
             # display current directory if changed
             currentDirectory = os.getcwd()
             if not currentDirectory == storagedirectory:
-                #self.print(self.divider)
-                self.print3(f"Current directory: {currentDirectory}")
-                self.print(self.divider)
+                #print1(self.divider)
+                print3(f"Current directory: {currentDirectory}")
+                print1(self.divider)
                 storagedirectory = currentDirectory
             # default input entry
             accept_default = config.accept_default
@@ -1427,7 +1387,7 @@ class LetMeDoItAI:
             elif os.path.isdir(docs_path):
                 try:
                     os.chdir(docs_path)
-                    self.print3(f"Directory changed to: {docs_path}")
+                    print3(f"Directory changed to: {docs_path}")
                     self.getPath.displayDirectoryContent()
                     continue
                 except:
@@ -1498,7 +1458,7 @@ Remember, provide me with the improved writing only, enclosed in triple quotes `
 My writing:
 {userInput}""")
                         if improvedVersion and improvedVersion.startswith("```") and improvedVersion.endswith("```"):
-                            self.print(improvedVersion)
+                            print1(improvedVersion)
                             userInput = improvedVersion[3:-3]
                             if config.ttsOutput:
                                 TTSUtil.play(userInput)
@@ -1508,7 +1468,7 @@ My writing:
                     fineTunedUserInput = self.fineTuneUserInput(userInput)
                     # in case of translation
                     if config.predefinedContext == "Let me Translate" and fineTunedUserInput.startswith("Assist me by acting as a translator.\nPlease translate"):
-                        self.print("Please specify below the language you would like the content to be translated into:")
+                        print1("Please specify below the language you would like the content to be translated into:")
                         language = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.translateToLanguage)
                         if language and not language.strip().lower() in (config.cancel_entry, config.exit_entry):
                             fineTunedUserInput = f"{fineTunedUserInput}\n\nPlease translate the content into <language>{language}</language>."
@@ -1540,14 +1500,14 @@ My writing:
                     checkCallSpecificFunction = re.search("\[CALL_([^\[\]]+?)\]", fineTunedUserInput)
                     config.runSpecificFuntion = checkCallSpecificFunction.group(1) if checkCallSpecificFunction and checkCallSpecificFunction.group(1) in config.toolFunctionMethods else ""
                     if config.developer and config.runSpecificFuntion:
-                        #self.print(f"calling function '{config.runSpecificFuntion}' ...")
+                        #print1(f"calling function '{config.runSpecificFuntion}' ...")
                         print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Calling function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{config.runSpecificFuntion}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
                     fineTunedUserInput = re.sub(specialEntryPattern, "", fineTunedUserInput)
                     config.currentMessages.append({"role": "user", "content": fineTunedUserInput})
 
                     # start spinning
                     config.stop_event = threading.Event()
-                    config.spinner_thread = threading.Thread(target=self.spinning_animation, args=(config.stop_event,))
+                    config.spinner_thread = threading.Thread(target=spinning_animation, args=(config.stop_event,))
                     config.spinner_thread.start()
 
                     # force loading internet searches
@@ -1555,14 +1515,14 @@ My writing:
                         try:
                             config.currentMessages = CallLLM.runSingleFunctionCall(config.currentMessages, [config.toolFunctionSchemas["integrate_google_searches"]], "integrate_google_searches")
                         except:
-                            self.print("Unable to load internet resources.")
+                            print1("Unable to load internet resources.")
                             showErrors()
 
                     completion = CallLLM.runAutoFunctionCall(config.currentMessages, noFunctionCall)
                     
                     # stop spinning
                     config.runPython = True
-                    self.stopSpinning()
+                    stopSpinning()
 
                     if completion is not None:
                         # Create a new thread for the streaming task
@@ -1580,31 +1540,31 @@ My writing:
 
                 # error codes: https://platform.openai.com/docs/guides/error-codes/python-library-error-types
                 except openai.APIError as e:
-                    self.stopSpinning()
+                    stopSpinning()
                     #Handle API error here, e.g. retry or log
-                    self.print(f"OpenAI API returned an API Error: {e}")
+                    print1(f"OpenAI API returned an API Error: {e}")
                 except openai.APIConnectionError as e:
-                    self.stopSpinning()
+                    stopSpinning()
                     #Handle connection error here
-                    self.print(f"Failed to connect to OpenAI API: {e}")
+                    print1(f"Failed to connect to OpenAI API: {e}")
                 except openai.RateLimitError as e:
-                    self.stopSpinning()
+                    stopSpinning()
                     #Handle rate limit error (we recommend using exponential backoff)
-                    self.print(f"OpenAI API request exceeded rate limit: {e}")
+                    print1(f"OpenAI API request exceeded rate limit: {e}")
                 except:
-                    self.stopSpinning()
+                    stopSpinning()
                     trace = traceback.format_exc()
                     if "Please reduce the length of the messages or completion" in trace:
-                        self.print("Maximum tokens reached!")
+                        print1("Maximum tokens reached!")
                     elif config.developer:
-                        self.print(self.divider)
-                        self.print(trace)
-                        self.print(self.divider)
+                        print1(self.divider)
+                        print1(trace)
+                        print1(self.divider)
                     else:
-                        self.print("Error encountered!")
+                        print1("Error encountered!")
 
                     config.defaultEntry = userInput
-                    self.print("starting a new chat!")
+                    print1("starting a new chat!")
                     self.saveChat(config.currentMessages)
                     storagedirectory, config.currentMessages = startChat()
 
@@ -1669,7 +1629,7 @@ My writing:
                 if SharedUtil.is_CJK(item):
                     for iIndex, i in enumerate(item):
                         isSpaceItem = (not isLastItem and (len(item) - iIndex == 1))
-                        iWidth = SharedUtil.getStringWidth(i)
+                        iWidth = getStringWidth(i)
                         if isSpaceItem:
                             newLineWidth = self.lineWidth + iWidth + 1
                         else:
@@ -1681,7 +1641,7 @@ My writing:
                             self.wrappedText += f"{i} " if isSpaceItem else i
                             self.lineWidth += iWidth + 1 if isSpaceItem else iWidth
                 else:
-                    itemWidth = SharedUtil.getStringWidth(item)
+                    itemWidth = getStringWidth(item)
                     if isLastItem:
                         newLineWidth = self.lineWidth + itemWidth
                     else:

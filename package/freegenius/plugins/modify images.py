@@ -6,7 +6,7 @@ modify the given images according to changes specified by users
 [FUNCTION_CALL]
 """
 
-from freegenius import config
+from freegenius import config, is_valid_image_file, is_valid_image_url
 import os
 from openai import OpenAI
 from freegenius.utils.shared_utils import SharedUtil
@@ -50,7 +50,7 @@ Make the following changes:
             else:
                 description = f"Image description:\n{description}"
             if config.developer:
-                config.print(description)
+                print1(description)
             response = create_image(description, filename)
             if response == "[INVALID]" and len(files) == 1:
                 return response
@@ -60,10 +60,10 @@ Make the following changes:
 def get_description(filename):
     content = []
     # validate image path
-    if SharedUtil.is_valid_image_url(filename):
+    if is_valid_image_url(filename):
         content.append({"type": "image_url", "image_url": {"url": filename,},})
         filename = quote(filename, safe="")
-    elif SharedUtil.is_valid_image_file(filename):
+    elif is_valid_image_file(filename):
         content.append({"type": "image_url", "image_url": SharedUtil.encode_image(filename),})
 
     if content:

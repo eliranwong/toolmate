@@ -23,5 +23,5 @@ if not SharedUtil.isPackageInstalled("ffmpeg"):
                 break
 
     if not SharedUtil.isPackageInstalled("ffmpeg"):
-        config.print3("Note: 'ffmpeg' is not installed.")
-        config.print("It is essential for voice typing with openai whisper offline model, downloading YouTube media, video / audio conversion, etc.")
+        print3("Note: 'ffmpeg' is not installed.")
+        print1("It is essential for voice typing with openai whisper offline model, downloading YouTube media, video / audio conversion, etc.")

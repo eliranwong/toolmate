@@ -51,7 +51,7 @@ class SystemCommandPrompt:
         self.runSystemCommandPrompt = True
         # initial message
         print_formatted_text(HTML(f"<{config.terminalCommandEntryColor1}>You are currently running system command prompt!</{config.terminalCommandEntryColor1}>"))
-        config.print(f"""To exit, either press '{str(config.hotkey_exit).replace("'", "")[1:-1]}' or enter '{config.exit_entry}'.""")
+        print1(f"""To exit, either press '{str(config.hotkey_exit).replace("'", "")[1:-1]}' or enter '{config.exit_entry}'.""")
         # keep current path in case users change directory
         startupDirectory = self.previousDirectory = self.currentDirectory = os.getcwd()
 
@@ -68,7 +68,7 @@ class SystemCommandPrompt:
             buffer.reset()
         @this_key_bindings.add(*config.hotkey_list_directory_content)
         def _(_):
-            config.print("")
+            print1("")
             run_in_terminal(lambda: self.getPath.displayDirectoryContent())
         @this_key_bindings.add(*config.hotkey_insert_filepath)
         def _(event):
@@ -84,7 +84,7 @@ class SystemCommandPrompt:
         @this_key_bindings.add(*config.hotkey_toggle_mouse_support)
         def _(_):
             config.mouseSupport = not config.mouseSupport
-            run_in_terminal(lambda: config.print(f"Entry Mouse Support '{'enabled' if config.mouseSupport else 'disabled'}'!"))
+            run_in_terminal(lambda: print1(f"Entry Mouse Support '{'enabled' if config.mouseSupport else 'disabled'}'!"))
 
         this_key_bindings = merge_key_bindings([
             this_key_bindings,

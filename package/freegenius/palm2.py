@@ -1,6 +1,7 @@
 import vertexai, os, traceback, argparse, threading
 from vertexai.language_models import ChatModel, ChatMessage
 from freegenius import config, getLocalStorage
+from freegenius import print1, print2, print3
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.health_check import HealthCheck
 if not hasattr(config, "currentMessages"):
@@ -81,7 +82,7 @@ class Palm2:
             #    ),
             #],
         )
-        HealthCheck.print2(f"\n{self.name} loaded!")
+        print2(f"\n{self.name} loaded!")
         if hasattr(config, "currentMessages"):
             bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
         else:
@@ -120,13 +121,13 @@ class Palm2:
                     self.streaming_thread.join()
                 except:
                     self.streaming_thread.join()
-                    HealthCheck.print2(traceback.format_exc())
+                    print2(traceback.format_exc())
 
             prompt = ""
 
-        HealthCheck.print2(f"\n{self.name} closed!")
+        print2(f"\n{self.name} closed!")
         if hasattr(config, "currentMessages"):
-            HealthCheck.print2(f"Return back to {config.freeGeniusAIName} prompt ...")
+            print2(f"Return back to {config.freeGeniusAIName} prompt ...")
 
 def main():
     # Create the parser

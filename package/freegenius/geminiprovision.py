@@ -5,7 +5,7 @@ from vertexai.generative_models._generative_models import (
     HarmCategory,
     HarmBlockThreshold,
 )
-from freegenius import config, showErrors
+from freegenius import config, showErrors, is_valid_image_file, is_valid_image_url, wrapText, print1, print2, print3
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.health_check import HealthCheck
 if not hasattr(config, "currentMessages"):
@@ -68,10 +68,10 @@ class GeminiProVision:
             "indicator": config.terminalPromptIndicatorColor2,
         })
 
-        HealthCheck.print2("\nGemini Pro Vision loaded!")
+        print2("\nGemini Pro Vision loaded!")
         print(f"""[press '{str(config.hotkey_exit).replace("'", "")[1:-1]}' to exit]""")
         if not files:
-            HealthCheck.print2("Enter image path below (file / folder):")
+            print2("Enter image path below (file / folder):")
             files = HealthCheck.simplePrompt(style=promptStyle)
         if files:
             # handle path dragged to terminal
@@ -81,7 +81,7 @@ class GeminiProVision:
         elif files and os.path.exists(files):
             files = [files]
             if not query:
-                HealthCheck.print2("Enter your query below:")
+                print2("Enter your query below:")
                 query = HealthCheck.simplePrompt(style=promptStyle)
             if query and not query == config.exit_entry:
                 try:
@@ -93,8 +93,8 @@ class GeminiProVision:
                 except:
                     showErrors()
         else:
-            HealthCheck.print2("Entered path does not exist!")
-        HealthCheck.print2("\nGemini Pro Vision closed!")
+            print2("Entered path does not exist!")
+        print2("\nGemini Pro Vision closed!")
 
     def analyze_images(self, function_args):
         def is_valid_url(url: str) -> bool:
@@ -107,31 +107,11 @@ class GeminiProVision:
                 r'(/.*)?$'  # optional path
             )
             return bool(re.match(pattern, url))
-        def is_valid_image_url(url: str) -> bool:
-            try: 
-                response = requests.head(url, timeout=30)
-                content_type = response.headers['content-type'] 
-                if 'image' in content_type: 
-                    return True 
-                else: 
-                    return False 
-            except requests.exceptions.RequestException: 
-                return False
         def load_image_from_url(image_url: str) -> Image:
             with urllib.request.urlopen(image_url) as response:
                 response = typing.cast(http.client.HTTPResponse, response)
                 image_bytes = response.read()
             return Image.from_bytes(image_bytes)
-        def is_valid_image_file(file_path: str) -> bool:
-            try:
-                # Open the image file
-                with im.open(file_path) as img:
-                    # Check if the file format is supported by PIL
-                    img.verify()
-                    return True
-            except (IOError, SyntaxError) as e:
-                # The file path is not a valid image file path
-                return False
         def load_image_from_file(file_path: str) -> Image:
             with open(file_path, "rb") as file:
                 image_bytes = file.read()
@@ -172,7 +152,7 @@ class GeminiProVision:
         content.append(f"{query} Please give your answer in as much detail as possible.")
 
         if imageFiles:
-            HealthCheck.print3(f"Reading: '{', '.join(imageFiles)}'")
+            print3(f"Reading: '{', '.join(imageFiles)}'")
             model = GenerativeModel("gemini-pro-vision")
             response = model.generate_content(
                 content,
@@ -183,13 +163,13 @@ class GeminiProVision:
                 try:
                     chat_response = response.text.strip()
                     if chat_response:
-                        print(StreamingWordWrapper.wrapText(chat_response))
+                        print(wrapText(chat_response))
                         return chat_response
                 except:
                     showErrors()
                     return ""
         else:
-            HealthCheck.print2("No image file is found!")
+            print2("No image file is found!")
         return ""
 
 def main():

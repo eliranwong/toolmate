@@ -38,20 +38,20 @@ if config.terminalEnableTermuxAPI:
         })
 
         # show Termux command for developer
-        config.print(config.divider)
-        config.print(f"Termux: {title}")
+        print1(config.divider)
+        print1(f"Termux: {title}")
         showRisk(risk)
         if config.developer or config.codeDisplay:
-            config.print("```")
+            print1("```")
             #print(function_args)
             tokens = list(pygments.lex(function_args, lexer=BashLexer()))
             print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
-            config.print("```")
-        config.print(config.divider)
+            print1("```")
+        print1(config.divider)
 
         config.stopSpinning()
         if confirmExecution(risk):
-            config.print("Do you want to execute it? [y]es / [N]o")
+            print1("Do you want to execute it? [y]es / [N]o")
             confirmation = HealthCheck.simplePrompt(style=promptStyle, default="y")
             if not confirmation.lower() in ("y", "yes"):
                 return "[INVALID]"
@@ -63,10 +63,10 @@ if config.terminalEnableTermuxAPI:
             else:
                 # display both output and error
                 function_response = SharedUtil.runSystemCommand(function_args)
-            config.print(function_response)
+            print1(function_response)
         except:
             showErrors()
-            config.print(config.divider)
+            print1(config.divider)
             return "[INVALID]"
         info = {"information": function_response}
         function_response = json.dumps(info)

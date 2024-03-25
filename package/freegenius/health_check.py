@@ -8,6 +8,7 @@ configFile = os.path.join(packageFolder, "config.py")
 if not os.path.isfile(configFile):
     open(configFile, "a", encoding="utf-8").close()
 from freegenius import config, getLocalStorage
+from freegenius import print1, print2, print3
 config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
 
 import traceback, json, pprint, wcwidth, textwrap, threading, time, shutil
@@ -32,48 +33,6 @@ import speech_recognition as sr
 # a dummy import line to resolve ALSA error display
 import sounddevice
 
-
-def check_openai_errors(func):
-    def wrapper(*args, **kwargs):
-        try: 
-            return func(*args, **kwargs)
-        except openai.APIError as e:
-            print("Error: Issue on OpenAI side.")
-            print("Solution: Retry your request after a brief wait and contact us if the issue persists.")
-        except openai.APIConnectionError as e:
-            print("Error: Issue connecting to our services.")
-            print("Solution: Check your network settings, proxy configuration, SSL certificates, or firewall rules.")
-        except openai.APITimeoutError as e:
-            print("Error: Request timed out.")
-            print("Solution: Retry your request after a brief wait and contact us if the issue persists.")
-        except openai.AuthenticationError as e:
-            print("Error: Your API key or token was invalid, expired, or revoked.")
-            print("Solution: Check your API key or token and make sure it is correct and active. You may need to generate a new one from your account dashboard.")
-            HealthCheck.changeAPIkey()
-        except openai.BadRequestError as e:
-            print("Error: Your request was malformed or missing some required parameters, such as a token or an input.")
-            print("Solution: The error message should advise you on the specific error made. Check the [documentation](https://platform.openai.com/docs/api-reference/) for the specific API method you are calling and make sure you are sending valid and complete parameters. You may also need to check the encoding, format, or size of your request data.")
-        except openai.ConflictError as e:
-            print("Error: The resource was updated by another request.")
-            print("Solution: Try to update the resource again and ensure no other requests are trying to update it.")
-        except openai.InternalServerError as e:
-            print("Error: Issue on OpenAI servers.")
-            print("Solution: Retry your request after a brief wait and contact us if the issue persists. Check the [status page](https://status.openai.com).")
-        except openai.NotFoundError as e:
-            print("Error: Requested resource does not exist.")
-            print("Solution: Ensure you are the correct resource identifier.")
-        except openai.PermissionDeniedError as e:
-            print("Error: You don't have access to the requested resource.")
-            print("Solution: Ensure you are using the correct API key, organization ID, and resource ID.")
-        except openai.RateLimitError as e:
-            print("Error: You have hit your assigned rate limit.")
-            print("Solution: Pace your requests. Read more in OpenAI [Rate limit guide](https://platform.openai.com/docs/guides/rate-limits).")
-        except openai.UnprocessableEntityError as e:
-            print("Error: Unable to process the request despite the format being correct.")
-            print("Solution: Please try the request again.")
-        except:
-            print(traceback.format_exc())
-    return wrapper
 
 class HealthCheck:
 
@@ -131,46 +90,6 @@ class HealthCheck:
 
             config.setBasicConfigDone = True
 
-    @staticmethod
-    def showErrors():
-        trace = traceback.format_exc()
-        print(trace if config.developer else "Error encountered!")
-        return trace
-
-    @staticmethod
-    def spinning_animation(stop_event):
-        while not stop_event.is_set():
-            for symbol in "|/-\\":
-                print(symbol, end="\r")
-                time.sleep(0.1)
-        #print("\r", end="")
-        #print(" ", end="")
-
-    @staticmethod
-    def startSpinning():
-        config.stop_event = threading.Event()
-        config.spinner_thread = threading.Thread(target=HealthCheck.spinning_animation, args=(config.stop_event,))
-        config.spinner_thread.start()
-
-    @staticmethod
-    def stopSpinning():
-        try:
-            config.stop_event.set()
-            config.spinner_thread.join()
-        except:
-            pass
-
-    @staticmethod
-    def is_valid_image_file(file_path):
-        try:
-            # Open the image file
-            with Image.open(file_path) as img:
-                # Check if the file format is supported by PIL
-                img.verify()
-                return True
-        except (IOError, SyntaxError) as e:
-            # The file path is not a valid image file path
-            return False
 
     @staticmethod
     def simplePrompt(inputIndicator="", validator=None, default="", accept_default=False, completer=None, promptSession=None, style=None, is_password=False, bottom_toolbar=None):
@@ -207,13 +126,13 @@ class HealthCheck:
                 with sr.Microphone() as source:
                     if config.voiceTypingNotification:
                         TTSUtil.playAudioFilePygame(os.path.join(packageFolder, "audio", "notification1_mild.mp3"))
-                    #run_in_terminal(lambda: config.print2("Listensing to your voice ..."))
+                    #run_in_terminal(lambda: print2("Listensing to your voice ..."))
                     if config.voiceTypingAdjustAmbientNoise:
                         r.adjust_for_ambient_noise(source)
                     audio = r.listen(source)
                 if config.voiceTypingNotification:
                     TTSUtil.playAudioFilePygame(os.path.join(packageFolder, "audio", "notification2_mild.mp3"))
-                #run_in_terminal(lambda: config.print2("Processing to your voice ..."))
+                #run_in_terminal(lambda: print2("Processing to your voice ..."))
                 if config.voiceTypingPlatform == "google":
                     # recognize speech using Google Speech Recognition
                     try:
@@ -256,7 +175,7 @@ class HealthCheck:
                 else:
                     buffer.cursor_position = buffer.cursor_position + buffer.document.get_end_of_line_position()
             else:
-                run_in_terminal(lambda: config.print2("Install PyAudio first to enable voice entry!"))
+                run_in_terminal(lambda: print2("Install PyAudio first to enable voice entry!"))
 
         if hasattr(config, "currentMessages"):
             from freegenius.utils.prompt_shared_key_bindings import prompt_shared_key_bindings
@@ -310,45 +229,11 @@ class HealthCheck:
         return userInput if hasattr(config, "addPathAt") and config.addPathAt else userInput.strip()
 
     @staticmethod
-    def getStringWidth(text):
-        width = 0
-        for character in text:
-            width += wcwidth.wcwidth(character)
-        return width
-
-    @staticmethod
-    def getPygmentsStyle():
-        theme = config.pygments_style if hasattr(config, "pygments_style") and config.pygments_style else "stata-dark" if not config.terminalResourceLinkColor.startswith("ansibright") else "stata-light"
-        return style_from_pygments_cls(get_style_by_name(theme))
-
-    @staticmethod
     def setPrint():
         if not hasattr(config, "print2"):
-            config.print2 = HealthCheck.print2
+            config.print2 = print2
         if not hasattr(config, "print3"):
-            config.print3 = HealthCheck.print3
-
-    @staticmethod
-    def print2(content):
-        print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>{content}</{config.terminalPromptIndicatorColor2}>"))
-
-    @staticmethod
-    def print3(content):
-        splittedContent = content.split(": ", 1)
-        if len(splittedContent) == 2:
-            key, value = splittedContent
-            print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>{key}:</{config.terminalPromptIndicatorColor2}> {value}"))
-        else:
-            config.print2(splittedContent)
-
-    @staticmethod
-    def getEmbeddingFunction(embeddingModel=None):
-        # import statement is placed here to make this file compatible on Android
-        from chromadb.utils import embedding_functions
-        embeddingModel = embeddingModel if embeddingModel is not None else config.embeddingModel
-        if embeddingModel in ("text-embedding-3-large", "text-embedding-3-small", "text-embedding-ada-002"):
-            return embedding_functions.OpenAIEmbeddingFunction(api_key=config.openaiApiKey, model_name=embeddingModel)
-        return embedding_functions.SentenceTransformerEmbeddingFunction(model_name=embeddingModel) # support custom Sentence Transformer Embedding models by modifying config.embeddingModel
+            config.print3 = print3
 
     @staticmethod
     def changeAPIkey():
@@ -361,7 +246,6 @@ class HealthCheck:
         #HealthCheck.checkCompletion()
 
     @staticmethod
-    @check_openai_errors
     def checkCompletion():
         os.environ["OPENAI_API_KEY"] = config.openaiApiKey
 

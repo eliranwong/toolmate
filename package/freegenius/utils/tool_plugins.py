@@ -1,4 +1,5 @@
 from freegenius import config, getLocalStorage, get_or_create_collection, add_vector, fileNamesWithoutExtension
+from freegenius import print1, print2, print3
 from pathlib import Path
 from chromadb.config import Settings
 import os, shutil, chromadb, json
@@ -77,9 +78,9 @@ class ToolStore:
         tool_store = os.path.join(getLocalStorage(), "tool_store")
         try:
             shutil.rmtree(tool_store, ignore_errors=True)
-            config.print2("Old tool store removed!")
+            print2("Old tool store removed!")
         except:
-            config.print2("Failed to remove old tool store!")
+            print2("Failed to remove old tool store!")
         Path(tool_store).mkdir(parents=True, exist_ok=True)
         config.tool_store_client = chromadb.PersistentClient(tool_store, Settings(anonymized_telemetry=False))
 

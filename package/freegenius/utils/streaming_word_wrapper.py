@@ -1,5 +1,4 @@
-from freegenius import config
-from freegenius.health_check import HealthCheck
+from freegenius import config, getStringWidth, wrapText
 from freegenius.utils.tts_utils import TTSUtil
 #import pygments
 #from pygments.lexers.markup import MarkdownLexer
@@ -16,12 +15,6 @@ class StreamingWordWrapper:
         self.streaming_finished = False
         config.tempChunk = ""
 
-    @staticmethod
-    def wrapText(content, terminal_width=None):
-        if terminal_width is None:
-            terminal_width = shutil.get_terminal_size().columns
-        return "\n".join([textwrap.fill(line, width=terminal_width) for line in content.split("\n")])
-
     def wrapStreamWords(self, answer, terminal_width):
         if " " in answer:
             if answer == " ":
@@ -32,7 +25,7 @@ class StreamingWordWrapper:
                 answers = answer.split(" ")
                 for index, item in enumerate(answers):
                     isLastItem = (len(answers) - index == 1)
-                    itemWidth = HealthCheck.getStringWidth(item)
+                    itemWidth = getStringWidth(item)
                     newLineWidth = (self.lineWidth + itemWidth) if isLastItem else (self.lineWidth + itemWidth + 1)
                     if isLastItem:
                         if newLineWidth > terminal_width:
@@ -52,7 +45,7 @@ class StreamingWordWrapper:
                             print(f"{item} ", end='', flush=True)
                             self.lineWidth += (itemWidth + 1)
         else:
-            answerWidth = HealthCheck.getStringWidth(answer)
+            answerWidth = getStringWidth(answer)
             newLineWidth = self.lineWidth + answerWidth
             if newLineWidth > terminal_width:
                 print(f"\n{answer}", end='', flush=True)
@@ -100,7 +93,7 @@ class StreamingWordWrapper:
                 config.currentMessages.append({"role": "assistant", "content": chat_response})
             # auto pager feature
             if hasattr(config, "pagerView"):
-                config.pagerContent += StreamingWordWrapper.wrapText(chat_response, terminal_width) if config.wrapWords else chat_response
+                config.pagerContent += wrapText(chat_response, terminal_width) if config.wrapWords else chat_response
                 #self.addPagerContent = False
                 if config.pagerView:
                     config.launchPager(config.pagerContent)

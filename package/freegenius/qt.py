@@ -6,6 +6,7 @@ if os.getcwd() != packageFolder:
     os.chdir(packageFolder)
 
 from freegenius import config
+from freegenius import print1, print2, print3
 config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
 config.freeGeniusAIFolder = packageFolder
 if not hasattr(config, "freeGeniusAIName") or not config.freeGeniusAIName:
@@ -17,7 +18,7 @@ config.setConfig = setConfig
 from freegenius.utils.shared_utils import SharedUtil
 from freegenius.utils.tool_plugins import Plugins
 config.includeIpInDeviceInfoTemp = True
-config.print = config.print2 = config.print3 = print
+
 config.addFunctionCall = Plugins.addFunctionCall
 config.divider = "--------------------"
 SharedUtil.setOsOpenCmd()

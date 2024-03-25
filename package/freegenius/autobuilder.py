@@ -15,6 +15,7 @@ if not hasattr(config, "max_group_chat_round"):
 if not hasattr(config, "use_oai_assistant"):
     config.use_oai_assistant = False
 
+from freegenius import print1, print2, print3
 from freegenius.health_check import HealthCheck
 if not hasattr(config, "currentMessages"):
     HealthCheck.setBasicConfig()
@@ -170,7 +171,7 @@ class AutoGenBuilder:
                 self.print(traceback.format_exc())
                 break
 
-        HealthCheck.print2("\n\nAutoGen Agent Builder closed!")
+        print2("\n\nAutoGen Agent Builder closed!")
 
 
 
@@ -195,13 +196,13 @@ def main():
         try:
             config.max_agents = int(args.agents)
         except:
-            config.print2("Integer required for setting number of agents!")
+            print2("Integer required for setting number of agents!")
 
     if args.round:
         try:
             config.max_group_chat_round = int(args.round)
         except:
-            config.print2("Integer required for setting round of group chat!")
+            print2("Integer required for setting round of group chat!")
 
     if oaiassistant := args.oaiassistant:
         oaiassistant = oaiassistant.lower().strip()
@@ -211,7 +212,7 @@ def main():
             config.use_oai_assistant = False
 
     if args.config and not os.path.isfile(args.config):
-        config.print2(f"'{args.config}' does not exist!")
+        print2(f"'{args.config}' does not exist!")
 
     if args.config and os.path.isfile(args.config):
         task = args.default if args.default else ""
@@ -220,7 +221,7 @@ def main():
         if task.strip():
             builder.getResponse(task=task.strip(), load_path=args.config)
         else:
-            config.print2("Task not specified!")
+            print2("Task not specified!")
     elif args.default:
         builder.getResponse(task=args.default)
     else:

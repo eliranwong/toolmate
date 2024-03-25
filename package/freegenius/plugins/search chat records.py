@@ -7,6 +7,7 @@ search and open old chat records
 """
 
 from freegenius import config, get_or_create_collection, add_vector, query_vectors, showErrors, getLocalStorage
+from freegenius import print1, print2, print3
 from pathlib import Path
 from chromadb.config import Settings
 import uuid, os, chromadb, re
@@ -33,27 +34,27 @@ config.save_chat_record = save_chat_record
 
 def search_chats(function_args):
     query = function_args.get("query") # required
-    config.print3(f"""Query: {query}""")
+    print3(f"""Query: {query}""")
     collection = get_or_create_collection("chats")
     res = query_vectors(collection, query, config.chatRecordClosestMatches)
     config.stopSpinning()
     if res:
         exampleID = ""
         # display search results
-        config.print2(config.divider)
+        print2(config.divider)
         print(">>> retrieved chat records: ")
         for metadata, document in zip(res["metadatas"][0], res["documents"][0]):
-            config.print(config.divider)
-            config.print3(f"""Chat ID: {metadata["timestamp"]}""")
+            print1(config.divider)
+            print3(f"""Chat ID: {metadata["timestamp"]}""")
             if not exampleID:
                 exampleID = metadata["timestamp"]
-            config.print3(f"""Order: {metadata["order"]}""")
-            config.print3(f"""Role: {metadata["role"]}""")
-            config.print3(f"""Content: {document}""")
-        config.print(config.divider)
-        config.print2("Tips: You can load old chat records by quoting a chat ID or timestamp, e.g.")
-        config.print(f">>> Load chat records with this ID: {exampleID}")
-        config.print2(config.divider)
+            print3(f"""Order: {metadata["order"]}""")
+            print3(f"""Role: {metadata["role"]}""")
+            print3(f"""Content: {document}""")
+        print1(config.divider)
+        print2("Tips: You can load old chat records by quoting a chat ID or timestamp, e.g.")
+        print1(f">>> Load chat records with this ID: {exampleID}")
+        print2(config.divider)
     return ""
 
 def load_chats(function_args):
@@ -78,10 +79,10 @@ def load_chats(function_args):
     timestamp = function_args.get("id") # required
     isfile, chatFile = validateChatFile(timestamp)
     if not isfile:
-        config.print3(f"Invalid chat ID / file path: {timestamp}")
+        print3(f"Invalid chat ID / file path: {timestamp}")
         return "[INVALID]"
 
-    config.print3(f"Loading chat records: {timestamp} ...")
+    print3(f"Loading chat records: {timestamp} ...")
 
     try:
         with open(chatFile, "r", encoding="utf-8") as fileObj:
@@ -98,14 +99,14 @@ def load_chats(function_args):
                     if role == "user":
                         print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor1}>>>> </{config.terminalPromptIndicatorColor1}><{config.terminalCommandEntryColor1}>{content}</{config.terminalCommandEntryColor1}>"))
                     else:
-                        config.print(content)
+                        print1(content)
                     if role == 'assistant' and not index == len(config.currentMessages) - 2:
                         print("")
             return ""
         else:
-            config.print3(f"Failed to load chat records '{timestamp}' due to invalid format!")
+            print3(f"Failed to load chat records '{timestamp}' due to invalid format!")
     except:
-        config.print3(f"Failed to load chat records: {timestamp}\n")
+        print3(f"Failed to load chat records: {timestamp}\n")
         showErrors()
     return "[INVALID]"
 

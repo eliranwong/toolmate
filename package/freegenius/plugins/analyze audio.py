@@ -7,6 +7,7 @@ analyze audio file
 """
 
 from freegenius import config, showErrors
+from freegenius import print1, print2, print3
 from freegenius.utils.shared_utils import SharedUtil
 import os
 
@@ -26,10 +27,10 @@ def analyze_audio(function_args):
 
     if audio_file and os.path.isfile(audio_file):
         if not check_file_format(audio_file):
-            config.print3("This feature supports the following input file types only: '.mp3', '.mp4', '.mpeg', '.mpga', '.m4a', '.wav', '.webm'!")
+            print3("This feature supports the following input file types only: '.mp3', '.mp4', '.mpeg', '.mpga', '.m4a', '.wav', '.webm'!")
             return ""
         elif os.path.getsize(audio_file) / (1024*1024) > 25:
-            config.print3("Audio files are currently limited to 25 MB!")
+            print3("Audio files are currently limited to 25 MB!")
             return ""
         try:
             with open(audio_file, "rb") as audio_file:
@@ -40,10 +41,10 @@ def analyze_audio(function_args):
                 )
             transcript = f"The transcript of the audio is: {transcript}"
             if config.developer:
-                config.print2(config.divider)
-                config.print3(transcript)
-                config.print2(config.divider)
-                config.print2("Answer to your enquiry:")
+                print2(config.divider)
+                print3(transcript)
+                print2(config.divider)
+                print2("Answer to your enquiry:")
             return transcript
         except:
             showErrors()

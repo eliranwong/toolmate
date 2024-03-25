@@ -1,4 +1,5 @@
 from freegenius import config, fineTunePythonCode
+from freegenius import print1, print2, print3
 import traceback
 from freegenius.utils.install import installmodule
 from freegenius.utils.shared_utils import SharedUtil
@@ -19,7 +20,7 @@ The default value of config.max_consecutive_auto_heal is 3.
 def heal_python(function_args):
     # get the sql query statement
     issue = function_args.get("issue") # required
-    config.print3(f"Issue: {issue}")
+    print3(f"Issue: {issue}")
 
     fix = function_args.get("fix") # required
     missing = function_args.get("missing") # required
@@ -28,10 +29,10 @@ def heal_python(function_args):
 
     try:
         if missing:
-            config.print2("Installing missing packages ...")
+            print2("Installing missing packages ...")
             for i in missing:
                 installmodule(f"--upgrade {i}")
-        config.print2("Running improved code ...")
+        print2("Running improved code ...")
         if config.developer or config.codeDisplay:
             SharedUtil.displayPythonCode(fix)
         exec(fineTunePythonCode(fix), globals())

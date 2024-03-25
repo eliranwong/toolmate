@@ -11,6 +11,7 @@ from freegenius import config
 if not hasattr(config, "max_consecutive_auto_reply"):
     config.max_consecutive_auto_reply = 10
 
+from freegenius import print1, print2, print3
 from freegenius.health_check import HealthCheck
 if not hasattr(config, "currentMessages"):
     HealthCheck.setBasicConfig()
@@ -57,7 +58,7 @@ class AutoGenRetriever:
 
     def getResponse(self, docs_path, message, auto=False):
         if not os.path.exists(docs_path):
-            config.print2("Invalid path!")
+            print2("Invalid path!")
             return None
 
         package = os.path.basename(packageFolder)
@@ -76,7 +77,7 @@ class AutoGenRetriever:
         if file_extension.lower() == ".zip":
             currentTime = re.sub("[\. :]", "_", str(datetime.datetime.now()))
             extract_to_path = os.path.join(db, "unpacked", currentTime)
-            config.print3(f"Unpacking content to: {extract_to_path}")
+            print3(f"Unpacking content to: {extract_to_path}")
             if not os.path.isdir(extract_to_path):
                 Path(db).mkdir(parents=True, exist_ok=True)
             with zipfile.ZipFile(docs_path) as zip_ref:
@@ -85,7 +86,7 @@ class AutoGenRetriever:
         # check if file format is supported
         if os.path.isfile(docs_path):
             if not file_extension[1:] in TEXT_FORMATS:
-                config.print2("File format not supported!")
+                print2("File format not supported!")
                 return None
 
         oai_config_list = autogen.config_list_from_json(

@@ -42,11 +42,11 @@ def save_memory(function_args):
         "location": f"{g.city}, {g.state}, {g.country}",
     }
     if config.developer:
-        config.print(config.divider)
+        print1(config.divider)
         print(">>> saving memory: ")
-        config.print(f"memory: {memory}")
+        print1(f"memory: {memory}")
         print(metadata)
-        config.print(config.divider)
+        print1(config.divider)
     add_vector(collection, memory, metadata)
     config.stopSpinning()
     return "I saved it in my memory!"
@@ -56,10 +56,10 @@ def retrieve_memory(function_args):
     collection = get_or_create_collection("memories")
     res = query_vectors(collection, query, config.memoryClosestMatches)
     if config.developer:
-        config.print(config.divider)
+        print1(config.divider)
         print(">>> retrieved memories: ") 
         print(res["documents"])
-        config.print(config.divider)
+        print1(config.divider)
     info = {}
     for index, description in enumerate(res["documents"][0]):
         info[f"memory {index}"] = {

@@ -1,4 +1,5 @@
 from freegenius import getDeviceInfo, showErrors, get_or_create_collection, query_vectors, toGeminiMessages, executeToolFunction, extractPythonCode
+from freegenius import print1, print2, print3
 from freegenius import config
 import traceback, os
 from typing import Optional, List, Dict, Union
@@ -139,14 +140,14 @@ class CallGemini:
         if config.intent_screening:
             # 1. Intent Screening
             if config.developer:
-                config.print("screening ...")
+                print1("screening ...")
             noFunctionCall = True if noFunctionCall else CallGemini.screen_user_request(messages=messages, user_request=user_request)
         if noFunctionCall:
             return CallGemini.regularCall(messages)
         else:
             # 2. Tool Selection
             if config.developer:
-                config.print("selecting tool ...")
+                print1("selecting tool ...")
             tool_collection = get_or_create_collection("tools")
             search_result = query_vectors(tool_collection, user_request)
             if not search_result:
@@ -159,10 +160,10 @@ class CallGemini:
             tool_name = metadatas["name"]
             tool_schema = config.toolFunctionSchemas[tool_name]
             if config.developer:
-                config.print3(f"Selected: {tool_name} ({semantic_distance})")
+                print3(f"Selected: {tool_name} ({semantic_distance})")
             # 3. Parameter Extraction
             if config.developer:
-                config.print("extracting parameters ...")
+                print1("extracting parameters ...")
             try:
                 tool_parameters = CallGemini.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
                 # 4. Function Execution
@@ -176,10 +177,10 @@ class CallGemini:
                 return CallGemini.regularCall(messages)
             elif tool_response:
                 if config.developer:
-                    config.print2(config.divider)
-                    config.print2("Tool output:")
+                    print2(config.divider)
+                    print2("Tool output:")
                     print(tool_response)
-                    config.print2(config.divider)
+                    print2(config.divider)
                 messages[-1]["content"] = f"""Describe the query and response below in your own words in detail, without comment about your ability.
 
 My query:

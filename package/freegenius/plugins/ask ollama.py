@@ -7,6 +7,7 @@ Ask Ollama Chat for information
 """
 
 from freegenius import config, getLocalStorage
+from freegenius import print1, print2, print3
 from freegenius.ollamachat import OllamaChat
 from freegenius.utils.ollama_models import ollama_models
 from prompt_toolkit import PromptSession
@@ -36,7 +37,7 @@ def ask_ollama(function_args):
     completer = FuzzyCompleter(WordCompleter(sorted(ollama_models), ignore_case=True))
     bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
 
-    HealthCheck.print2("Ollama chat launched!")
+    print2("Ollama chat launched!")
     print("Select a model below:")
     print("Note: You should have at least 8 GB of RAM available to run the 7B models, 16 GB to run the 13B models, and 32 GB to run the 33B models.")
     model = HealthCheck.simplePrompt(style=promptStyle, promptSession=model_session, bottom_toolbar=bottom_toolbar, default=config.ollamaDefaultModel, completer=completer)

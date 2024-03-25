@@ -1,5 +1,5 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
-
+from freegenius import print1, print2, print3
 from freegenius import config
 import shutil, re, traceback, json, ollama
 from typing import Optional
@@ -15,7 +15,7 @@ def check_ollama_errors(func):
         try:
             return func(*args, **kwargs)
         except ollama.ResponseError as e:
-            config.print('Error:', e.error)
+            print1('Error:', e.error)
             return finishError()
         except:
             print(traceback.format_exc())
@@ -146,14 +146,14 @@ class CallOllama:
         if config.intent_screening:
             # 1. Intent Screening
             if config.developer:
-                config.print("screening ...")
+                print1("screening ...")
             noFunctionCall = True if noFunctionCall else CallOllama.screen_user_request(messages=messages, user_request=user_request)
         if noFunctionCall:
             return CallOllama.regularCall(messages)
         else:
             # 2. Tool Selection
             if config.developer:
-                config.print("selecting tool ...")
+                print1("selecting tool ...")
             tool_collection = get_or_create_collection("tools")
             search_result = query_vectors(tool_collection, user_request)
             if not search_result:
@@ -165,10 +165,10 @@ class CallOllama:
             metadatas = search_result["metadatas"][0][0]
             tool_name, tool_schema = metadatas["name"], json.loads(metadatas["parameters"])
             if config.developer:
-                config.print3(f"Selected: {tool_name} ({semantic_distance})")
+                print3(f"Selected: {tool_name} ({semantic_distance})")
             # 3. Parameter Extraction
             if config.developer:
-                config.print("extracting parameters ...")
+                print1("extracting parameters ...")
             try:
                 tool_parameters = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
                 # 4. Function Execution
@@ -182,10 +182,10 @@ class CallOllama:
                 return CallOllama.regularCall(messages)
             elif tool_response:
                 if config.developer:
-                    config.print2(config.divider)
-                    config.print2("Tool output:")
+                    print2(config.divider)
+                    print2("Tool output:")
                     print(tool_response)
-                    config.print2(config.divider)
+                    print2(config.divider)
                 messages[-1]["content"] = f"""Describe the query and response below in your own words in detail, without comment about your ability.
 
 My query:

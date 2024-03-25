@@ -56,7 +56,7 @@ class GetPath:
     def displayDirectoryContent(self, display_dir_only=False):
 
         def printDirsFiles(display_dir_only=display_dir_only):
-            config.print(config.divider)
+            print1(config.divider)
             dirs, files = self.listDirectoryContent()
             if dirs:
                 print("Directories:")
@@ -64,7 +64,7 @@ class GetPath:
             if files and not display_dir_only:
                 print("Files:")
                 print(" | ".join(sorted(files)))
-            config.print(config.divider)
+            print1(config.divider)
 
         def printFormattedDirsFiles(display_dir_only=display_dir_only):
             # require prompt-toolkit
@@ -175,7 +175,7 @@ class GetPath:
                 @this_key_bindings.add(*config.hotkey_toggle_mouse_support)
                 def _(_):
                     config.mouseSupport = not config.mouseSupport
-                    run_in_terminal(lambda: config.print(f"Entry Mouse Support '{'enabled' if config.mouseSupport else 'disabled'}'!"))
+                    run_in_terminal(lambda: print1(f"Entry Mouse Support '{'enabled' if config.mouseSupport else 'disabled'}'!"))
 
                 inputIndicator = [("class:indicator", indicator)]
                 completer = PathCompleter()

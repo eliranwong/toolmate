@@ -8,7 +8,7 @@ reference: https://platform.openai.com/docs/guides/vision
 [FUNCTION_CALL]
 """
 
-from freegenius import config
+from freegenius import config, is_valid_image_file, is_valid_image_url
 from freegenius.utils.shared_utils import SharedUtil
 from freegenius.utils.call_chatgpt import check_openai_errors
 import os
@@ -38,9 +38,9 @@ def analyze_images(function_args):
     content = []
     # valid image paths
     for i in files:
-        if SharedUtil.is_valid_url(i) and SharedUtil.is_valid_image_url(i):
+        if SharedUtil.is_valid_url(i) and is_valid_image_url(i):
             content.append({"type": "image_url", "image_url": {"url": i,},})
-        elif os.path.isfile(i) and SharedUtil.is_valid_image_file(i):
+        elif os.path.isfile(i) and is_valid_image_file(i):
             content.append({"type": "image_url", "image_url": SharedUtil.encode_image(i),})
 
     if content:
@@ -57,7 +57,7 @@ def analyze_images(function_args):
             max_tokens=4096,
         )
         answer = response.choices[0].message.content
-        config.print(answer)
+        print1(answer)
         config.tempContent = answer
         return ""
 

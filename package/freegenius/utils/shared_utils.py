@@ -1,7 +1,7 @@
 from freegenius.utils.call_llm import CallLLM
 
-from freegenius import config, getPythonFunctionResponse, fineTunePythonCode, getPygmentsStyle, showErrors, getLocalStorage, get_or_create_collection, add_vector
-
+from freegenius import config, getPythonFunctionResponse, fineTunePythonCode, getPygmentsStyle, showErrors, is_valid_image_url
+from freegenius import print1, print2, print3
 from packaging import version
 from bs4 import BeautifulSoup
 import platform, shutil, subprocess, os, pydoc, webbrowser, re, wcwidth, unicodedata, traceback, html2text, pprint
@@ -115,7 +115,7 @@ class SharedUtil:
 
     @staticmethod
     def downloadWebContent(url, timeout=60, folder="", ignoreKind=False):
-        config.print2("Downloading web content ...")
+        print2("Downloading web content ...")
         hasExt = re.search("\.([^\./]+?)$", url)
         supported_documents = TEXT_FORMATS[:]
         supported_documents.remove("org")
@@ -137,11 +137,11 @@ class SharedUtil:
         try:
             if ignoreKind:
                 filename = downloadBinary()
-                config.print3(f"Downloaded at: {filename}")
+                print3(f"Downloaded at: {filename}")
                 return ("any", filename)
             elif hasExt and hasExt.group(1) in supported_documents:
                 return ("document", downloadBinary())
-            elif SharedUtil.is_valid_image_url(url):
+            elif is_valid_image_url(url):
                 return ("image", downloadBinary())
             else:
                 # download content as text
@@ -163,29 +163,6 @@ class SharedUtil:
         )
         return bool(re.match(pattern, url))
 
-    @staticmethod
-    def is_valid_image_url(url): 
-        try: 
-            response = requests.head(url, timeout=30)
-            content_type = response.headers['content-type'] 
-            if 'image' in content_type: 
-                return True 
-            else: 
-                return False 
-        except requests.exceptions.RequestException: 
-            return False
-
-    @staticmethod
-    def is_valid_image_file(file_path):
-        try:
-            # Open the image file
-            with Image.open(file_path) as img:
-                # Check if the file format is supported by PIL
-                img.verify()
-                return True
-        except (IOError, SyntaxError) as e:
-            # The file path is not a valid image file path
-            return False
 
     # Function to encode the image
     @staticmethod
@@ -206,18 +183,12 @@ class SharedUtil:
             return ""
 
     @staticmethod
-    def transformText(text):
-        for transformer in config.outputTransformers:
-                text = transformer(text)
-        return text
-
-    @staticmethod
     def displayPythonCode(code):
         if config.developer or config.codeDisplay:
-            config.print("```python")
+            print1("```python")
             tokens = list(pygments.lex(code, lexer=PythonLexer()))
             print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
-            config.print("```")
+            print1("```")
 
     @staticmethod
     def showAndExecutePythonCode(code):
@@ -234,7 +205,7 @@ class SharedUtil:
             pythonFunctionResponse = getPythonFunctionResponse(code)
         except:
             trace = showErrors()
-            config.print(config.divider)
+            print1(config.divider)
             if config.max_consecutive_auto_heal > 0:
                 return CallLLM.autoHealPythonCode(code, trace)
             else:
@@ -387,13 +358,6 @@ class SharedUtil:
         except:
             showErrors()
             return None
-
-    @staticmethod
-    def getStringWidth(text):
-        width = 0
-        for character in text:
-            width += wcwidth.wcwidth(character)
-        return width
 
     @staticmethod
     def is_CJK(text):

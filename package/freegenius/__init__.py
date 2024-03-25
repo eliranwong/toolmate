@@ -10,7 +10,7 @@ if not os.path.isfile(configFile):
 from freegenius import config
 config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
 
-import os, geocoder, platform, socket, geocoder, datetime, requests, netifaces, getpass, pendulum, traceback, uuid, re, textwrap, glob
+import os, geocoder, platform, socket, geocoder, datetime, requests, netifaces, getpass, pendulum, traceback, uuid, re, textwrap, glob, wcwidth, shutil, threading, time
 from chromadb.utils import embedding_functions
 from pygments.styles import get_style_by_name
 from prompt_toolkit.styles.pygments import style_from_pygments_cls
@@ -18,6 +18,7 @@ from prompt_toolkit import print_formatted_text, HTML
 from typing import Optional
 from vertexai.preview.generative_models import Content, Part
 from pathlib import Path
+from PIL import Image
 
 
 # files
@@ -49,19 +50,43 @@ def getLocalStorage():
     else:
         return os.path.join(packageFolder, "files")
 
+# image
+
+def is_valid_image_url(url): 
+    try: 
+        response = requests.head(url, timeout=30)
+        content_type = response.headers['content-type'] 
+        if 'image' in content_type: 
+            return True 
+        else: 
+            return False 
+    except requests.exceptions.RequestException: 
+        return False
+
+def is_valid_image_file(file_path):
+    try:
+        # Open the image file
+        with Image.open(file_path) as img:
+            # Check if the file format is supported by PIL
+            img.verify()
+            return True
+    except (IOError, SyntaxError) as e:
+        # The file path is not a valid image file path
+        return False
+
 # call llm
 
 def executeToolFunction(func_arguments: dict, function_name: str):
     def notifyDeveloper(func_name):
         if config.developer:
-            #config.print(f"running function '{func_name}' ...")
+            #print1(f"running function '{func_name}' ...")
             print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
     if not function_name in config.toolFunctionMethods:
         if config.developer:
-            config.print(f"Unexpected function: {function_name}")
-            config.print(config.divider)
+            print1(f"Unexpected function: {function_name}")
+            print1(config.divider)
             print(func_arguments)
-            config.print(config.divider)
+            print1(config.divider)
         function_response = "[INVALID]"
     else:
         notifyDeveloper(function_name)
@@ -115,7 +140,7 @@ def execPythonFile(script="", content=""):
                     runCode(f.read())
             return True
         except:
-            config.print("Failed to run '{0}'!".format(os.path.basename(script)))
+            print1("Failed to run '{0}'!".format(os.path.basename(script)))
             showErrors()
     return False
 
@@ -158,7 +183,7 @@ def getPythonFunctionResponse(code):
 def showRisk(risk):
     if not config.confirmExecution in ("always", "medium_risk_or_above", "high_risk_only", "none"):
         config.confirmExecution = "always"
-    config.print(f"[risk level: {risk}]")
+    print1(f"[risk level: {risk}]")
 
 def confirmExecution(risk):
     if config.confirmExecution == "always" or (risk == "high" and config.confirmExecution == "high_risk_only") or (not risk == "low" and config.confirmExecution == "medium_risk_or_above"):
@@ -199,7 +224,66 @@ def query_vectors(collection, query, n=1):
         n_results = n,
     )
 
+# spinning
+
+def spinning_animation(stop_event):
+    while not stop_event.is_set():
+        for symbol in "|/-\\":
+            print(symbol, end="\r")
+            time.sleep(0.1)
+
+def startSpinning():
+    config.stop_event = threading.Event()
+    config.spinner_thread = threading.Thread(target=spinning_animation, args=(config.stop_event,))
+    config.spinner_thread.start()
+
+def stopSpinning():
+    try:
+        config.stop_event.set()
+        config.spinner_thread.join()
+    except:
+        pass
+
 # display information
+
+def wrapText(content, terminal_width=None):
+    if terminal_width is None:
+        terminal_width = shutil.get_terminal_size().columns
+    return "\n".join([textwrap.fill(line, width=terminal_width) for line in content.split("\n")])
+
+def transformText(text):
+    for transformer in config.outputTransformers:
+            text = transformer(text)
+    return text
+
+def print1(content):
+    content = transformText(content)
+    if config.wrapWords:
+        # wrap words to fit terminal width
+        terminal_width = shutil.get_terminal_size().columns
+        print(wrapText(content, terminal_width))
+        # remarks: 'fold' or 'fmt' does not work on Windows
+        # pydoc.pipepager(f"{content}\n", cmd=f"fold -s -w {terminal_width}")
+        # pydoc.pipepager(f"{content}\n", cmd=f"fmt -w {terminal_width}")
+    else:
+        print(content)
+
+def print2(content):
+    print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>{content}</{config.terminalPromptIndicatorColor2}>"))
+
+def print3(content):
+    splittedContent = content.split(": ", 1)
+    if len(splittedContent) == 2:
+        key, value = splittedContent
+        print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>{key}:</{config.terminalPromptIndicatorColor2}> {value}"))
+    else:
+        print2(splittedContent)
+
+def getStringWidth(text):
+    width = 0
+    for character in text:
+        width += wcwidth.wcwidth(character)
+    return width
 
 def getPygmentsStyle():
     theme = config.pygments_style if config.pygments_style else "stata-dark" if not config.terminalResourceLinkColor.startswith("ansibright") else "stata-light"

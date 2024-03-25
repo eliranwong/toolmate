@@ -7,23 +7,14 @@ analyze files with integrated "AutoGen Retriever"
 """
 
 
-from freegenius import config
+from freegenius import config, is_valid_image_file
+from freegenius import print1, print2, print3
 import os
 from freegenius.autoretriever import AutoGenRetriever
 from PIL import Image
 
 
 def analyze_files(function_args):
-    def is_valid_image_file(file_path):
-        try:
-            # Open the image file
-            with Image.open(file_path) as img:
-                # Check if the file format is supported by PIL
-                img.verify()
-                return True
-        except (IOError, SyntaxError) as e:
-            # The file path is not a valid image file path
-            return False
 
     query = function_args.get("query") # required
     files = function_args.get("files") # required
@@ -34,13 +25,13 @@ def analyze_files(function_args):
                 "query": query,
                 "files": [files],
             }
-            config.print3("Running function: 'analyze_images'")
+            print3("Running function: 'analyze_images'")
             return config.toolFunctionMethods["analyze_images"](function_args)
         config.stopSpinning()
-        config.print2("AutoGen Retriever launched!")
+        print2("AutoGen Retriever launched!")
         last_message = AutoGenRetriever().getResponse(files, query, True)
         config.currentMessages += last_message
-        config.print2("AutoGen Retriever closed!")
+        print2("AutoGen Retriever closed!")
         return ""
 
     return "[INVALID]"

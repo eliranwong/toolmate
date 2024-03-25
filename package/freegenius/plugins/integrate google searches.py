@@ -17,7 +17,7 @@ def integrate_google_searches(function_args):
     #print(function_args)
     keywords = function_args.get("keywords") # required
 
-    config.print("Loading internet searches ...")
+    print1("Loading internet searches ...")
 
     info = {}
     for index, item in enumerate(googlesearch.search(keywords, advanced=True, num_results=config.maximumInternetSearchResults)):
@@ -27,7 +27,7 @@ def integrate_google_searches(function_args):
             "description": item.description,
         }
 
-    config.print("Loaded!\n")
+    print1("Loaded!\n")
 
     return json.dumps(info)
 

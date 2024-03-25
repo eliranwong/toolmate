@@ -25,7 +25,7 @@ def setOsOpenCmd():
 
 def main():
     config.systemCommandPromptEntry = ""
-    config.print = print
+    print1 = print
     setOsOpenCmd()
     Prompts()
     SystemCommandPrompt().run(allowPathChanges=True)

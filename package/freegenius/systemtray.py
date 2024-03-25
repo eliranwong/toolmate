@@ -18,7 +18,7 @@ from freegenius.utils.shared_utils import SharedUtil
 from freegenius.utils.tool_plugins import Plugins
 from freegenius.utils.tool_plugins import ToolStore
 config.includeIpInDeviceInfoTemp = True
-config.print = config.print2 = config.print3 = print
+from freegenius import print1, print2, print3
 config.addFunctionCall = Plugins.addFunctionCall
 config.divider = "--------------------"
 SharedUtil.setOsOpenCmd()

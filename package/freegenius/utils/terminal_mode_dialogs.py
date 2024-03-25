@@ -93,7 +93,7 @@ class TerminalModeDialogs:
         ).run()
         if result:
             notice = f"You've chosen: {result}"
-            config.print3(notice)
+            print3(notice)
             return result
         return ""
 

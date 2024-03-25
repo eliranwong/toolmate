@@ -8,6 +8,7 @@ build a group of agents to execute a task with integrated "AutoGen Agent Builder
 
 
 from freegenius import config
+from freegenius import print1, print2, print3
 from freegenius.autobuilder import AutoGenBuilder
 
 def build_agents(function_args):
@@ -15,15 +16,15 @@ def build_agents(function_args):
         return "OpenAI API key not found! This feature works with ChatGPT models only!"
     task = function_args.get("task") # required
     title = function_args.get("title") # required
-    config.print2("AutoGen Agent Builder launched!")
-    config.print3(f"Title: {title}")
-    config.print3(f"Description: {task}")
+    print2("AutoGen Agent Builder launched!")
+    print3(f"Title: {title}")
+    print3(f"Description: {task}")
     messages = AutoGenBuilder().getResponse(task, title)
     if not messages[-1]["content"]:
         del messages[-1]
     # add context to the message chain
     config.currentMessages += messages
-    config.print2("\nAutoGen Agent Builder closed!")
+    print2("\nAutoGen Agent Builder closed!")
     return ""
 
 functionSignature = {

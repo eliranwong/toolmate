@@ -26,5 +26,5 @@ if not SharedUtil.isPackageInstalled("vlc") and not os.path.isfile(macVlc) and n
                 break
 
     if not SharedUtil.isPackageInstalled("vlc") and not os.path.isfile(macVlc) and not os.path.isfile(windowsVlc):
-        config.print3("Note: 'vlc' is not installed.")
-        config.print("It is nice to have VLC player installed for video / audio playback. It is required if you want to control the LetMeDoIt AI audio response speed.")
+        print3("Note: 'vlc' is not installed.")
+        print1("It is nice to have VLC player installed for video / audio playback. It is required if you want to control the LetMeDoIt AI audio response speed.")

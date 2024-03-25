@@ -30,12 +30,12 @@ def download_web_content(function_args):
     def terminalDownloadYoutubeFile(downloadCommand, url_string, outputFolder):
         if isFfmpegInstalled():
             try:
-                config.print("--------------------")
+                print1("--------------------")
                 # use os.system, as it displays download status ...
                 os.system("cd {2}; {0} {1}".format(downloadCommand, url_string, outputFolder))
                 if SharedUtil.isPackageInstalled("pkill"):
                     os.system("pkill yt-dlp")
-                config.print3(f"Downloaded in: '{outputFolder}'")
+                print3(f"Downloaded in: '{outputFolder}'")
                 try:
                     os.system(f'''{config.open} {outputFolder}''')
                 except:
@@ -43,13 +43,13 @@ def download_web_content(function_args):
             except:
                 showErrors() 
         else:
-            config.print("Tool 'ffmpeg' is not found on your system!")
-            config.print("Read https://github.com/eliranwong/letmedoit/wiki/Install-ffmpeg")
+            print1("Tool 'ffmpeg' is not found on your system!")
+            print1("Read https://github.com/eliranwong/letmedoit/wiki/Install-ffmpeg")
 
 
     url = function_args.get("url") # required
     if is_youtube_url(url):
-        config.print("Loading youtube downloader ...")
+        print1("Loading youtube downloader ...")
         format = function_args.get("format") # required
         location = function_args.get("location", "") # optional
         if not (location and os.path.isdir(location)):
@@ -69,7 +69,7 @@ def download_web_content(function_args):
             showErrors()
             return "[INVALID]"
     else:
-        config.print("invalid link given")
+        print1("invalid link given")
         return "[INVALID]"
 
 functionSignature = {

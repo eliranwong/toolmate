@@ -21,7 +21,7 @@ from gtts import gTTS
 def pronunce_words(function_args):
     words = function_args.get("words") # required
     language = function_args.get("language") # required
-    config.print("Loading speech feature ...")
+    print1("Loading speech feature ...")
     TTSUtil.play(words, language)
     return "Finished! Speech engine closed!"
 

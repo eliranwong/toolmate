@@ -7,7 +7,7 @@ Ask SQLite file. To retrieve information from or make changes in a sqlite file, 
 """
 
 from freegenius import config, showErrors
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius import print1, print2, print3
 from freegenius.utils.shared_utils import CallLLM
 import os, sqlite3, json
 
@@ -18,7 +18,7 @@ def search_sqlite(function_args):
         return "[INVALID]"
     try:
         info = {}
-        config.print2("Reading table information ...")
+        print2("Reading table information ...")
         with sqlite3.connect(db) as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
@@ -47,7 +47,7 @@ def search_sqlite(function_args):
                     "table schema": rows,
                 }"""
         #if config.developer:
-        #    config.print2("# Table information")
+        #    print2("# Table information")
         #    pprint.pprint(info)
         info = json.dumps(info)
 

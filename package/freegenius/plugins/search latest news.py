@@ -7,6 +7,7 @@ search latest news
 """
 
 from freegenius import config
+from freegenius import print1, print2, print3
 import feedparser, re
 
 # Function method to get the latest news from a specific RSS feed
@@ -17,18 +18,18 @@ def search_latest_news(function_args: dict) -> str:
 
     # Print the title and link of each news item
     config.stopSpinning()
-    config.print2(config.divider)
+    print2(config.divider)
     for index, entry in enumerate(feed.entries):
         if index < 10:
             if not index == 0:
-                config.print2(config.divider)
+                print2(config.divider)
             # title
             title = re.sub("<[^<>]*?>", "", entry.title)
-            config.print3(f"Title: {title}")
+            print3(f"Title: {title}")
             # link
             link = re.sub("<[^<>]*?>", "", entry.link)
-            config.print3(f"Link: {link}")
-    config.print2(config.divider)
+            print3(f"Link: {link}")
+    print2(config.divider)
     return ""
 
 # Function signature to work with ChatGPT function calling

@@ -1,6 +1,7 @@
 import vertexai, os, traceback, argparse
 from vertexai.language_models import CodeChatModel, ChatMessage
-from freegenius import config, getPygmentsStyle, getLocalStorage
+from freegenius import config, getPygmentsStyle, getLocalStorage, startSpinning, stopSpinning
+from freegenius import print1, print2, print3
 from freegenius.health_check import HealthCheck
 if not hasattr(config, "currentMessages"):
     HealthCheck.setBasicConfig()
@@ -76,7 +77,7 @@ class Codey:
             context=config.systemMessage_codey,
             message_history=history,
         )
-        HealthCheck.print2(f"\n{self.name} loaded!")
+        print2(f"\n{self.name} loaded!")
         if hasattr(config, "currentMessages"):
             bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
         else:
@@ -98,11 +99,11 @@ class Codey:
                 print("New chat started!")
             elif prompt := prompt.strip():
                 try:
-                    HealthCheck.startSpinning()
+                    startSpinning()
                     response = chat.send_message(
                         prompt, **parameters
                     )
-                    HealthCheck.stopSpinning()
+                    stopSpinning()
                     config.pagerContent = response.text.strip()
                     # color response with markdown style
                     tokens = list(pygments.lex(config.pagerContent, lexer=MarkdownLexer()))
@@ -111,14 +112,14 @@ class Codey:
                     if hasattr(config, "currentMessages") and config.pagerContent:
                         config.currentMessages.append({"role": "assistant", "content": config.pagerContent})
                 except:
-                    HealthCheck.stopSpinning()
-                    HealthCheck.print2(traceback.format_exc())
+                    stopSpinning()
+                    print2(traceback.format_exc())
 
             prompt = ""
 
-        HealthCheck.print2(f"\n{self.name} closed!")
+        print2(f"\n{self.name} closed!")
         if hasattr(config, "currentMessages"):
-            HealthCheck.print2(f"Return back to {config.freeGeniusAIName} prompt ...")
+            print2(f"Return back to {config.freeGeniusAIName} prompt ...")
 
 def main():
     # Create the parser

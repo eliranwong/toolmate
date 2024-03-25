@@ -1,4 +1,5 @@
 from freegenius import config, getDeviceInfo
+from freegenius import print1, print2, print3
 import pydoc, textwrap, re, tiktoken, os
 import speech_recognition as sr
 from prompt_toolkit import prompt
@@ -75,13 +76,13 @@ class Prompts:
                 with sr.Microphone() as source:
                     if config.voiceTypingNotification:
                         TTSUtil.playAudioFile(os.path.join(config.freeGeniusAIFolder, "audio", "notification1_mild.mp3"))
-                    #run_in_terminal(lambda: config.print2("Listensing to your voice ..."))
+                    #run_in_terminal(lambda: print2("Listensing to your voice ..."))
                     if config.voiceTypingAdjustAmbientNoise:
                         r.adjust_for_ambient_noise(source)
                     audio = r.listen(source)
                 if config.voiceTypingNotification:
                     TTSUtil.playAudioFile(os.path.join(config.freeGeniusAIFolder, "audio", "notification2_mild.mp3"))
-                #run_in_terminal(lambda: config.print2("Processing to your voice ..."))
+                #run_in_terminal(lambda: print2("Processing to your voice ..."))
                 if config.voiceTypingPlatform == "google":
                     # recognize speech using Google Speech Recognition
                     try:
@@ -124,7 +125,7 @@ class Prompts:
                 else:
                     buffer.cursor_position = buffer.cursor_position + buffer.document.get_end_of_line_position()
             else:
-                run_in_terminal(lambda: config.print2("Install PyAudio first to enable voice entry!"))
+                run_in_terminal(lambda: print2("Install PyAudio first to enable voice entry!"))
         @this_key_bindings.add(*config.hotkey_voice_entry_config)
         def _(event):
             buffer = event.app.current_buffer
@@ -172,7 +173,7 @@ class Prompts:
             config.predefinedContext = "[none]"
             buffer.text = ".new"
             buffer.validate_and_handle()
-            run_in_terminal(lambda: config.print3("Predefined context temporarily changed to: [none]"))
+            run_in_terminal(lambda: print3("Predefined context temporarily changed to: [none]"))
         @this_key_bindings.add(*config.hotkey_export)
         def _(event):
             buffer = event.app.current_buffer
@@ -217,7 +218,7 @@ Available tokens: {estimatedAvailableTokens}
 """
             except:
                 content = "Required package 'tiktoken' not found!"
-            run_in_terminal(lambda: config.print(content))
+            run_in_terminal(lambda: print1(content))
         @this_key_bindings.add(*config.hotkey_launch_pager_view)
         def _(_):
             config.launchPager()
@@ -225,7 +226,7 @@ Available tokens: {estimatedAvailableTokens}
         def _(_):
             config.developer = not config.developer
             config.saveConfig()
-            run_in_terminal(lambda: config.print3(f"Developer mode: {'enabled' if config.developer else 'disabled'}!"))
+            run_in_terminal(lambda: print3(f"Developer mode: {'enabled' if config.developer else 'disabled'}!"))
         @this_key_bindings.add(*config.hotkey_toggle_multiline_entry)
         def _(_):
             config.toggleMultiline()
@@ -250,13 +251,13 @@ Available tokens: {estimatedAvailableTokens}
             if config.tts:
                 config.ttsInput = not config.ttsInput
                 config.saveConfig()
-                run_in_terminal(lambda: config.print3(f"Input Audio: '{'enabled' if config.ttsInput else 'disabled'}'!"))
+                run_in_terminal(lambda: print3(f"Input Audio: '{'enabled' if config.ttsInput else 'disabled'}'!"))
         @this_key_bindings.add(*config.hotkey_toggle_response_audio)
         def _(_):
             if config.tts:
                 config.ttsOutput = not config.ttsOutput
                 config.saveConfig()
-                run_in_terminal(lambda: config.print3(f"Response Audio: '{'enabled' if config.ttsOutput else 'disabled'}'!"))
+                run_in_terminal(lambda: print3(f"Response Audio: '{'enabled' if config.ttsOutput else 'disabled'}'!"))
         @this_key_bindings.add(*config.hotkey_restart_app)
         def _(_):
             print(f"Restarting {config.freeGeniusAIName} ...")
@@ -265,17 +266,17 @@ Available tokens: {estimatedAvailableTokens}
         def _(_):
             config.displayImprovedWriting = not config.displayImprovedWriting
             config.saveConfig()
-            run_in_terminal(lambda: config.print3(f"Improved Writing Display: '{'enabled' if config.displayImprovedWriting else 'disabled'}'!"))
+            run_in_terminal(lambda: print3(f"Improved Writing Display: '{'enabled' if config.displayImprovedWriting else 'disabled'}'!"))
         @this_key_bindings.add(*config.hotkey_toggle_word_wrap)
         def _(_):
             config.wrapWords = not config.wrapWords
             config.saveConfig()
-            run_in_terminal(lambda: config.print3(f"Word Wrap: '{'enabled' if config.wrapWords else 'disabled'}'!"))
+            run_in_terminal(lambda: print3(f"Word Wrap: '{'enabled' if config.wrapWords else 'disabled'}'!"))
         @this_key_bindings.add(*config.hotkey_toggle_mouse_support)
         def _(_):
             config.mouseSupport = not config.mouseSupport
             config.saveConfig()
-            run_in_terminal(lambda: config.print3(f"Entry Mouse Support: '{'enabled' if config.mouseSupport else 'disabled'}'!"))
+            run_in_terminal(lambda: print3(f"Entry Mouse Support: '{'enabled' if config.mouseSupport else 'disabled'}'!"))
         # edit the last response in built-in or custom text editor
         @this_key_bindings.add(*config.hotkey_edit_last_response)
         def _(event):

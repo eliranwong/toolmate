@@ -9,14 +9,14 @@ class CallLlamaFile:
         if config.intent_screening:
             # 1. Intent Screening
             if config.developer:
-                config.print("screening ...")
+                print1("screening ...")
             noFunctionCall = True if noFunctionCall else CallOllama.screen_user_request(messages=messages, user_request=user_request, model=config.ollamaDefaultModel)
         if noFunctionCall:
             return CallOllama.regularCall(messages)
         else:
             # 2. Tool Selection
             if config.developer:
-                config.print("selecting tool ...")
+                print1("selecting tool ...")
             tool_collection = SharedUtil.get_or_create_collection("tools")
             search_result = SharedUtil.query_vectors(tool_collection, user_request)
             if not search_result:
@@ -28,10 +28,10 @@ class CallLlamaFile:
             metadatas = search_result["metadatas"][0][0]
             tool_name, tool_schema = metadatas["name"], json.loads(metadatas["parameters"])
             if config.developer:
-                config.print3(f"Selected: {tool_name} ({semantic_distance})")
+                print3(f"Selected: {tool_name} ({semantic_distance})")
             # 3. Parameter Extraction
             if config.developer:
-                config.print("extracting parameters ...")
+                print1("extracting parameters ...")
             try:
                 tool_parameters = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
                 # 4. Function Execution
@@ -45,10 +45,10 @@ class CallLlamaFile:
                 return CallOllama.regularCall(messages)
             elif tool_response:
                 if config.developer:
-                    config.print2(config.divider)
-                    config.print2("Tool output:")
+                    print2(config.divider)
+                    print2("Tool output:")
                     print(tool_response)
-                    config.print2(config.divider)
+                    print2(config.divider)
                 messages[-1]["content"] = f"""Describe the query and response below in your own words in detail, without comment about your ability.
 
 Query:
@@ -192,14 +192,14 @@ Remember, answer in JSON with the filled template ONLY.""",
     def executeToolFunction(func_arguments, function_name):
         def notifyDeveloper(func_name):
             if config.developer:
-                #config.print(f"running function '{func_name}' ...")
+                #print1(f"running function '{func_name}' ...")
                 print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
         if not function_name in config.toolFunctionMethods:
             if config.developer:
-                config.print(f"Unexpected function: {function_name}")
-                config.print(config.divider)
+                print1(f"Unexpected function: {function_name}")
+                print1(config.divider)
                 print(func_arguments)
-                config.print(config.divider)
+                print1(config.divider)
             function_response = "[INVALID]"
         else:
             notifyDeveloper(function_name)

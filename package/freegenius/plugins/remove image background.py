@@ -6,7 +6,8 @@ Remove image background
 [FUNCTION_CALL]
 """
 
-from freegenius import config
+from freegenius import config, is_valid_image_file
+from freegenius import print1, print2, print3
 from freegenius.utils.shared_utils import SharedUtil
 import os, json, rembg
 
@@ -30,16 +31,16 @@ def remove_image_background(function_args):
             files.remove(item)
 
     for input_path in files:
-        if SharedUtil.is_valid_image_file(input_path):
+        if is_valid_image_file(input_path):
             output_path = f"{input_path}_no_bg.png"
             with open(input_path, 'rb') as i:
                 with open(output_path, 'wb') as o:
-                    config.print3(f"Reading image file: {input_path}")
+                    print3(f"Reading image file: {input_path}")
                     img = rembg.remove(i.read())
                     o.write(img)
-                    config.print3(f"File saved at: {output_path}")
+                    print3(f"File saved at: {output_path}")
         else:
-            config.print2(f"'{input_path}' is not an image file!")
+            print2(f"'{input_path}' is not an image file!")
 
 def remove_image_background2(function_args):
     code = function_args.get("code") # required
@@ -47,7 +48,7 @@ def remove_image_background2(function_args):
     if information:
         filepath = json.loads(information)["information"]
         if os.path.isfile(filepath):
-            config.print3(f"File saved at: {filepath}")
+            print3(f"File saved at: {filepath}")
             try:
                 os.system(f'''{config.open} "{filepath}"''')
             except:

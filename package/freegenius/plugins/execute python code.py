@@ -30,23 +30,23 @@ def execute_python_code(function_args):
     })
 
     # show pyton code for developer
-    config.print(config.divider)
-    config.print(f"Python: {title}")
+    print1(config.divider)
+    print1(f"Python: {title}")
     showRisk(risk)
     if config.developer or config.codeDisplay:
-        config.print("```")
+        print1("```")
         #print(python_code)
         # pygments python style
         tokens = list(pygments.lex(python_code, lexer=PythonLexer()))
         print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
-        config.print("```")
-    config.print(config.divider)
+        print1("```")
+    print1(config.divider)
 
     config.stopSpinning()
     if not config.runPython:
         return "[INVALID]"
     elif confirmExecution(risk):
-        config.print("Do you want to execute it? [y]es / [N]o")
+        print1("Do you want to execute it? [y]es / [N]o")
         confirmation = HealthCheck.simplePrompt(style=promptStyle, default="y")
         if not confirmation.lower() in ("y", "yes"):
             config.runPython = False

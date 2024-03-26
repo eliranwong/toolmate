@@ -66,27 +66,59 @@ Testing:
 
 For now, you need to manually edit the value of 'llmBackend' in config.py
 
-Accepted values: 'ollama', 'llamacpp'
-
-Pending: 'chatgpt', 'gemini'
+Accepted values: 'llamacpp',  'ollama', 'gemini', 'chatgpt", "letmedoit"
 
 ## How to Change Models?
 
-While the app is still in testing stage, you need to edit manually the folloinwg values in config.py:
+We will add uer interface for users to change backends / models.
 
-* ollamaDefaultModel
+Meanwhile, you need to edit manually the folloinwg values in config.py:
 
-* ollamaCodeModel
+(Remarks: Edit config.py only when the app is closed)
 
-* llamacppDefaultModel_repo_id
+### llmBackend = 'ollama' 
 
-* llamacppDefaultModel_filename
+(check available models at: https://ollama.com/library)
 
-* llamacppCodeModel_repo_id
+* ollamaDefaultModel, e.g. 'phi' (default), 'mistral', 'llama2', e.g.
 
-* llamacppCodeModel_filename
+* ollamaCodeModel, e.g. 'phi' (default), 'codellama', 'starcoder2', e.g.
 
-Remarks: Edit config.py only when the app is closed.
+### llmBackend = 'llamacpp'
+
+(check available *gguf models at: https://huggingface.co/)
+
+* llamacppDefaultModel_repo_id, e.g. 'TheBloke/phi-2-GGUF' (default), 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
+
+* llamacppDefaultModel_filename, e.g. 'phi-2.Q4_K_M.gguf' (default), 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
+
+* llamacppCodeModel_repo_id, e.g. 'TheBloke/phi-2-GGUF' (default), 'TheBloke/CodeLlama-7B-Python-GGUF'
+
+* llamacppCodeModel_filename, e.g. 'phi-2.Q4_K_M.gguf' (default), 'codellama-7b-python.Q4_K_M.gguf'
+
+Remarks: match repo_id and filename reasonably that sepecified filename have to be available for download in the specified repo_id
+
+## llmBackend = 'gemini'
+
+Current available option is Google Gemini Pro
+
+## llmBackend = 'chatgpt'
+
+Edit the value of 'chatGPTApiModel'.  Its default value is 'gpt-3.5-turbo'
+
+## llmBackend = 'letmedoit'
+
+Edit the value of 'chatGPTApiModel'.  Its default value is 'gpt-3.5-turbo'
+
+# How to Set up Google / OpenAI Credentials? [Optional]
+
+Google credentials / OpenAI keys are optional.
+
+We will add user interface for users to specify OpenAI API / Google credentials.
+
+We will also add documentation about this.  Meanwhile, read https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup for Google credential setup.
+
+To add / change OpenAI API key, enter '.changeapikey' in FreeGenius AI prompt.  Alternately, edit the value of 'openaiApiKey' in config.py.
 
 # Approach to Run Function Calling Equivalent Features Offline with Affordable Hardwares
 
@@ -192,3 +224,29 @@ Pending ...
 Most current features follow https://github.com/eliranwong/letmedoit/wiki
 
 Particularly, plugin structure follows https://github.com/eliranwong/letmedoit/wiki/Plugins-%E2%80%90-Overview
+
+# TODO
+
+* add documentation
+
+* add support of custom LLM path to be used with llama.cpp
+
+* add support use of Ollama hosted models with llama.cpp: It appears that models are easily to be selected and downloaded with Ollama, but inference is faster with llama.cpp.  We will add UI to download LLMs via Ollama and used them with llama.cpp
+
+* add TUI dialogs to change llm backends / models
+
+* ui to change tool dependence
+
+* add tool selection threshold to allow users to select tool from closest matches tools
+
+* improve tool selection based on users interactions
+
+* test and fine-tune all plugins with all supported backends (... in progress ...)
+
+* integrate llama.cpp with AutoGen features
+
+* add support of code auto-heal features like we implemented in LetMeDoIt AI
+
+* add qt-based GUI
+
+* more to come

@@ -26,7 +26,7 @@ if config.isTermux:
 
 defaultSettings = (
     # unique configs in FreeGenius AI
-    ('llmBackend', "llamacpp"), # "ollama", "llamacpp", "gemini", "chatgpt", letmedoit
+    ('llmBackend', "llamacpp"), # "ollama", "llamacpp", "gemini", "chatgpt", "letmedoit"
     ('intent_screening', False), # set True to increase both reliability and waiting time
     ('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools
     ('tokenizers_parallelism', 'true'), # 'true' / 'false'
@@ -39,12 +39,12 @@ defaultSettings = (
     ('ollamaCodeModel', 'phi'), # ollama model used for code generation
     ('ollamaCodeModel_num_ctx', 100000), # ollama code model context window
     ('ollamaCodeModel_num_predict', -1), # ollama code model maximum tokens
-    ('llamacppDefaultModel_repo_id', 'TheBloke/phi-2-GGUF'), # llama.cpp model used for general purposes
-    ('llamacppDefaultModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for general purposes
+    ('llamacppDefaultModel_repo_id', 'TheBloke/phi-2-GGUF'), # llama.cpp model used for general purposes, e.g. 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
+    ('llamacppDefaultModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for general purposes, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
     ('llamacppDefaultModel_n_ctx', 4096), # llama.cpp default model context window
     ('llamacppDefaultModel_max_tokens', 10000), # llama.cpp default model maximum tokens
-    ('llamacppCodeModel_repo_id', 'TheBloke/phi-2-GGUF'), # llama.cpp model used for code generation
-    ('llamacppCodeModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for code generation
+    ('llamacppCodeModel_repo_id', 'TheBloke/phi-2-GGUF'), # llama.cpp model used for code generation, e.g. 'TheBloke/CodeLlama-7B-Python-GGUF'
+    ('llamacppCodeModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for code generation, e.g. 'codellama-7b-python.Q4_K_M.gguf'
     ('llamacppCodeModel_n_ctx', 4096), # llama.cpp code model context window
     ('llamacppCodeModel_max_tokens', 10000), # llama.cpp code model maximum tokens
     ('geminipro_max_output_tokens', 8192), # check supported value at https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models

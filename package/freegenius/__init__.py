@@ -47,6 +47,51 @@ from freegenius.utils.terminal_mode_dialogs import TerminalModeDialogs
 # a dummy import line to resolve ALSA error display on Linux
 import sounddevice
 
+# local llm
+
+def getOllamaModelDir():
+    # read https://github.com/ollama/ollama/blob/main/docs/faq.md#where-are-models-stored
+    OLLAMA_MODELS = os.getenv("OLLAMA_MODELS")
+    if not OLLAMA_MODELS or (OLLAMA_MODELS and not os.path.isdir(OLLAMA_MODELS)):
+        os.environ['OLLAMA_MODELS'] = ""
+
+    if os.environ['OLLAMA_MODELS']:
+        return os.environ['OLLAMA_MODELS']
+    elif config.thisPlatform == "Windows":
+        modelDir = os.path.expanduser("~\.ollama\models")
+    elif config.thisPlatform == "macOS":
+        modelDir = os.path.expanduser("~/.ollama/models")
+    elif config.thisPlatform == "Linux":
+        modelDir = "/usr/share/ollama/.ollama/models"
+    
+    if os.path.isdir(modelDir):
+        return modelDir
+    return ""
+
+def getDownloadedOllamaModels() -> dict:
+    models = {}
+    if modelDir := getOllamaModelDir():
+        library = os.path.join(modelDir, "manifests", "registry.ollama.ai", "library")
+        if os.path.isdir(library):
+            for d in os.listdir(library):
+                model_dir = os.path.join(library, d)
+                if os.path.isdir(model_dir):
+                    for f in os.listdir(model_dir):
+                        manifest = os.path.join(model_dir, f)
+                        if os.path.isfile(manifest):
+                            try:
+                                with open(manifest, "r", encoding="utf-8") as fileObj:
+                                    content = fileObj.read()
+                                model_file = re.search('''vnd.ollama.image.model","digest":"(.*?)"''', content)
+                                if model_file:
+                                    model_file = os.path.join(modelDir, "blobs", model_file.group(1))
+                                    if os.path.isfile(model_file):
+                                        model_tag = f"{d}:{f}"
+                                        models[model_tag] = model_file
+                            except:
+                                pass
+    return models
+
 # tool selection
 
 def selectTool(search_result, closest_distance) -> Optional[int]:

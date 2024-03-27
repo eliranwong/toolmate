@@ -30,7 +30,7 @@ class CallLlamaCpp:
                 chat_format="chatml",
                 n_ctx=config.llamacppDefaultModel_n_ctx,
                 verbose=False,
-                # n_gpu_layers=-1, # Uncomment to use GPU acceleration,
+                n_gpu_layers=config.llamacppDefaultModel_n_gpu_layers,
             )
         else:
             config.llamacppDefaultModel = Llama.from_pretrained(
@@ -41,7 +41,7 @@ class CallLlamaCpp:
                 chat_format="chatml",
                 n_ctx=config.llamacppDefaultModel_n_ctx,
                 verbose=False,
-                # n_gpu_layers=-1, # Uncomment to use GPU acceleration,
+                n_gpu_layers=config.llamacppDefaultModel_n_gpu_layers,
             )
 
         # llamacppCodeModel_model_path
@@ -51,7 +51,7 @@ class CallLlamaCpp:
                 chat_format="chatml",
                 n_ctx=config.llamacppCodeModel_n_ctx,
                 verbose=False,
-                # n_gpu_layers=-1, # Uncomment to use GPU acceleration,
+                n_gpu_layers=config.llamacppCodeModel_n_gpu_layers,
             )
         else:
             config.llamacppCodeModel = Llama.from_pretrained(
@@ -62,7 +62,7 @@ class CallLlamaCpp:
                 chat_format="chatml",
                 n_ctx=config.llamacppCodeModel_n_ctx,
                 verbose=False,
-                # n_gpu_layers=-1, # Uncomment to use GPU acceleration,
+                n_gpu_layers=config.llamacppCodeModel_n_gpu_layers,
             )
 
     @staticmethod

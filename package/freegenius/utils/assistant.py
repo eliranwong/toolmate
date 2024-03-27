@@ -1,5 +1,5 @@
 from freegenius import config, showErrors, getDayOfWeek, getLocalStorage, fileNamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation
-from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, tokenLimits
+from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits
 from freegenius.utils.call_llm import CallLLM
 from freegenius.utils.tool_plugins import ToolStore
 import openai, threading, os, time, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys
@@ -1371,7 +1371,10 @@ class FreeGenius:
             elif userInputLower.startswith(".") and not userInputLower in (config.exit_entry, config.cancel_entry, ".new", ".context"):
                 userInput = userInputLower = self.runActions("...", userInput)
 
-            # replace alias, if any with full entry
+            if setToolDependence(userInput):
+                continue
+
+            # replace alias, if any, with full entry
             for alias, fullEntry in config.aliases.items():
                 #userInput = re.sub(alias, fullEntry, userInput) # error on Windows coz of Windows path
                 userInput = userInput.replace(alias, fullEntry)
@@ -1510,7 +1513,7 @@ My writing:
                     # force loading internet searches
                     if config.loadingInternetSearches == "always":
                         try:
-                            config.currentMessages = CallLLM.runSingleFunctionCall(config.currentMessages, [config.toolFunctionSchemas["integrate_google_searches"]], "integrate_google_searches")
+                            config.currentMessages = CallLLM.runSingleFunctionCall(config.currentMessages, "integrate_google_searches")
                         except:
                             print1("Unable to load internet resources.")
                             showErrors()

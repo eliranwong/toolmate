@@ -60,7 +60,7 @@ And run python code to resolve my request: {request}
 
 Please consider individual table information below for code generation:
 {info}"""
-        _, function_call_response = CallLLM.getSingleFunctionCallResponse(userInput, [config.toolFunctionSchemas["execute_python_code"]], "execute_python_code")
+        _, function_call_response = CallLLM.getSingleFunctionCallResponse(userInput, "execute_python_code")
         return function_call_response
     except:
         showErrors()

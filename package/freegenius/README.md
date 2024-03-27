@@ -62,31 +62,17 @@ Testing:
 
 * [LetMeDoIt mode](https://github.com/eliranwong/freegenius/wiki/LetMeDoIt-Mode) / [ChatGPT models](https://platform.openai.com/docs/models)
 
-## How to Change LLM Backend?
+# How to Change LLM Backend?
 
-For now, you need to manually edit the value of 'llmBackend' in config.py
+https://github.com/eliranwong/freegenius/wiki/Change-LLM-Backend
 
-Accepted values: 'ollama', 'llamacpp'
+# How to Change Models?
 
-Pending: 'chatgpt', 'gemini'
+https://github.com/eliranwong/freegenius/wiki/Change-Model
 
-## How to Change Models?
+# How to Set up Google or OpenAI Credentials? [Optional]
 
-While the app is still in testing stage, you need to edit manually the folloinwg values in config.py:
-
-* ollamaDefaultModel
-
-* ollamaCodeModel
-
-* llamacppDefaultModel_repo_id
-
-* llamacppDefaultModel_filename
-
-* llamacppCodeModel_repo_id
-
-* llamacppCodeModel_filename
-
-Remarks: Edit config.py only when the app is closed.
+https://github.com/eliranwong/freegenius/wiki/Set-up-Optional-Credentials
 
 # Approach to Run Function Calling Equivalent Features Offline with Affordable Hardwares
 
@@ -192,3 +178,7 @@ Pending ...
 Most current features follow https://github.com/eliranwong/letmedoit/wiki
 
 Particularly, plugin structure follows https://github.com/eliranwong/letmedoit/wiki/Plugins-%E2%80%90-Overview
+
+# TODO
+
+https://github.com/eliranwong/freegenius/issues/4

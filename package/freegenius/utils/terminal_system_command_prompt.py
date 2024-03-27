@@ -1,4 +1,4 @@
-from freegenius import config, getLocalStorage
+from freegenius import config, getLocalStorage, print1
 import os, platform, subprocess, traceback
 from freegenius.utils.get_path_prompt import GetPath
 from freegenius.utils.prompt_shared_key_bindings import prompt_shared_key_bindings

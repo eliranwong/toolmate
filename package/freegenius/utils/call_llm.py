@@ -65,7 +65,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
         return CallLetMeDoIt.autoHealPythonCode(code, trace)
 
     @staticmethod
-    def runSingleFunctionCall(messages, functionSignatures, function_name):
+    def runSingleFunctionCall(messages, function_name):
         if config.llmBackend == "ollama":
             return CallOllama.runSingleFunctionCall(messages, function_name)
         elif config.llmBackend == "llamacpp":
@@ -73,9 +73,9 @@ Always remember that you are much more than a text-based AI. You possess both vi
         elif config.llmBackend == "gemini":
             return CallGemini.runSingleFunctionCall(messages, function_name)
         elif config.llmBackend == "chatgpt":
-            return CallChatGPT.runSingleFunctionCall(messages, functionSignatures, function_name)
+            return CallChatGPT.runSingleFunctionCall(messages, function_name)
         # letmedoit
-        return CallLetMeDoIt.runSingleFunctionCall(messages, functionSignatures, function_name)
+        return CallLetMeDoIt.runSingleFunctionCall(messages, function_name)
 
     @staticmethod
     def getSingleChatResponse(userInput, messages=[], temperature=None):
@@ -95,8 +95,9 @@ Always remember that you are much more than a text-based AI. You possess both vi
         return CallLetMeDoIt.getSingleChatResponse(userInput, messages=messages, temperature=temperature)
 
     @staticmethod
-    def getSingleFunctionCallResponse(userInput, functionSignatures, function_name, temperature=None):
-        messages=[{"role": "user", "content" : userInput}]
+    def getSingleFunctionCallResponse(messages, function_name, temperature=None):
+        if isinstance(messages, str):
+            messages = [{"role": "user", "content" : messages}]
         if config.llmBackend == "ollama":
             return CallOllama.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmBackend == "llamacpp":
@@ -104,9 +105,9 @@ Always remember that you are much more than a text-based AI. You possess both vi
         elif config.llmBackend == "gemini":
             return CallGemini.getSingleFunctionCallResponse(messages, function_name)
         elif config.llmBackend == "chatgpt":
-            return CallChatGPT.getSingleFunctionCallResponse(messages, functionSignatures, function_name, temperature=temperature)
+            return CallChatGPT.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         # letmedoit
-        return CallLetMeDoIt.getSingleFunctionCallResponse(messages, functionSignatures, function_name, temperature=temperature)
+        return CallLetMeDoIt.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
 
     @staticmethod
     def runAutoFunctionCall(messages, noFunctionCall=False):

@@ -1,13 +1,12 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution
 from freegenius import config
-from freegenius import print1, print2, print3, count_tokens_from_messages, getDynamicTokens
-import os, re, traceback, openai
+from freegenius import print1, print2, print3, getDynamicTokens, selectTool
+import re, traceback, openai
 import textwrap, json, pygments
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit import prompt
-import tiktoken
 from openai import OpenAI
 
 # token limit
@@ -112,8 +111,9 @@ Acess the risk level of this Python code:
 def autoHealPythonCode(code, trace):
     for i in range(config.max_consecutive_auto_heal):
         userInput = f"Original python code:\n```\n{code}\n```\n\nTraceback:\n```\n{trace}\n```"
+        messages = [{"role": "user", "content" : userInput}]
         print3(f"Auto-correction attempt: {(i + 1)}")
-        function_call_message, function_call_response = CallChatGPT.getSingleFunctionCallResponse(userInput, [config.toolFunctionSchemas["heal_python"]], "heal_python") if config.llmBackend == "chatgpt" else CallLetMeDoIt.getSingleFunctionCallResponse(userInput, [config.toolFunctionSchemas["heal_python"]], "heal_python")
+        function_call_message, function_call_response = CallChatGPT.getSingleFunctionCallResponse(messages, "heal_python") if config.llmBackend == "chatgpt" else CallLetMeDoIt.getSingleFunctionCallResponse(messages, "heal_python")
         # display response
         print1(config.divider)
         if config.developer:
@@ -180,10 +180,10 @@ def getSingleChatResponse(userInput, messages=[], temperature=None):
     except:
         return ""
 
-def runSingleFunctionCall(messages, functionSignatures, function_name):
+def runSingleFunctionCall(messages, function_name):
     messagesCopy = messages[:]
     try:
-        function_call_message, function_call_response = getSingleFunctionCallResponse(messages, functionSignatures, function_name)
+        function_call_message, function_call_response = getSingleFunctionCallResponse(messages, function_name)
         messages.append(function_call_message)
         messages.append(
             {
@@ -199,7 +199,8 @@ def runSingleFunctionCall(messages, functionSignatures, function_name):
     return messages
 
 @check_openai_errors
-def getSingleFunctionCallResponse(messages: list[dict], functionSignatures: list[dict], function_name: str, temperature=None, **kwargs):
+def getSingleFunctionCallResponse(messages: list[dict], function_name: str, temperature=None, **kwargs):
+    functionSignatures = [config.toolFunctionSchemas[function_name]]
     completion = config.oai_client.chat.completions.create(
         model=config.chatGPTApiModel,
         messages=messages,
@@ -317,13 +318,13 @@ class CallChatGPT:
         return finetuneSingleFunctionCallResponse(func_arguments, function_name)
 
     @staticmethod
-    def runSingleFunctionCall(messages, functionSignatures, function_name):
-        return runSingleFunctionCall(messages, functionSignatures, function_name)
+    def runSingleFunctionCall(messages, function_name):
+        return runSingleFunctionCall(messages, function_name)
 
     @staticmethod
     @check_openai_errors
-    def getSingleFunctionCallResponse(messages: list[dict], functionSignatures: list[dict], function_name: str, temperature=None, **kwargs):
-        return getSingleFunctionCallResponse(messages, functionSignatures, function_name, temperature, **kwargs)
+    def getSingleFunctionCallResponse(messages: list[dict], function_name: str, temperature=None, **kwargs):
+        return getSingleFunctionCallResponse(messages, function_name, temperature, **kwargs)
 
     @staticmethod
     @check_openai_errors
@@ -367,21 +368,34 @@ class CallChatGPT:
             if config.developer:
                 print1("screening ...")
             noFunctionCall = True if noFunctionCall else CallChatGPT.screen_user_request(messages=messages)
-        if noFunctionCall:
+        if noFunctionCall or config.tool_dependence <= 0.0:
             return CallChatGPT.regularCall(messages)
         else:
             # 2. Tool Selection
             if config.developer:
                 print1("selecting tool ...")
             tool_collection = get_or_create_collection("tools")
-            search_result = query_vectors(tool_collection, user_request)
+            search_result = query_vectors(tool_collection, user_request, config.tool_selection_max_choices)
+            
+            # no tool is available; return a regular call instead
             if not search_result:
-                # no tool is available; return a regular call instead
                 return CallChatGPT.regularCall(messages)
-            semantic_distance = search_result["distances"][0][0]
-            if semantic_distance > config.tool_dependence:
+
+            # check the closest distance
+            closest_distance = search_result["distances"][0][0]
+            
+            # when a tool is irrelevant
+            if closest_distance > config.tool_dependence:
                 return CallChatGPT.regularCall(messages)
-            metadatas = search_result["metadatas"][0][0]
+
+            # auto or manual selection
+            selected_index = selectTool(search_result, closest_distance)
+            if selected_index is None:
+                return CallChatGPT.regularCall(messages)
+            else:
+                semantic_distance = search_result["distances"][0][selected_index]
+                metadatas = search_result["metadatas"][0][selected_index]
+
             tool_name = metadatas["name"]
             tool_schema = config.toolFunctionSchemas[tool_name]
             if config.developer:
@@ -489,13 +503,13 @@ class CallLetMeDoIt:
         return finetuneSingleFunctionCallResponse(func_arguments, function_name)
 
     @staticmethod
-    def runSingleFunctionCall(messages, functionSignatures, function_name):
-        return runSingleFunctionCall(messages, functionSignatures, function_name)
+    def runSingleFunctionCall(messages, function_name):
+        return runSingleFunctionCall(messages, function_name)
 
     @staticmethod
     @check_openai_errors
-    def getSingleFunctionCallResponse(messages: list[dict], functionSignatures: list[dict], function_name: str, temperature=None, **kwargs):
-        return getSingleFunctionCallResponse(messages, functionSignatures, function_name, temperature, **kwargs)
+    def getSingleFunctionCallResponse(messages: list[dict], function_name: str, temperature=None, **kwargs):
+        return getSingleFunctionCallResponse(messages, function_name, temperature, **kwargs)
 
     @staticmethod
     @check_openai_errors

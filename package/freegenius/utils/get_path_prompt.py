@@ -29,7 +29,7 @@ For example, we integrate this utility into a text editor we developed:
 https://github.com/eliranwong/UniqueBible/blob/main/util/terminal_text_editor.py
 """
 
-from freegenius import config, getLocalStorage
+from freegenius import config, getLocalStorage, print1
 import platform, os, subprocess
 
 class GetPath:

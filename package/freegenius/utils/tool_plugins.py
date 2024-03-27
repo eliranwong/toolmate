@@ -1,5 +1,5 @@
 from freegenius import config, getLocalStorage, get_or_create_collection, add_vector, fileNamesWithoutExtension
-from freegenius import print1, print2, print3
+from freegenius import print2
 from pathlib import Path
 from chromadb.config import Settings
 import os, shutil, chromadb, json
@@ -67,9 +67,11 @@ class Plugins:
     @staticmethod
     def addFunctionCall(signature: str, method: Callable[[dict], str]):
         name = signature["name"]
-        config.toolFunctionSchemas[name] = {key: value for key, value in signature.items() if not key in ("intent", "examples")}
-        config.toolFunctionMethods[name] = method
-        ToolStore.add_tool(signature)
+        if not name in config.toolFunctionSchemas:
+            # prevent duplication
+            config.toolFunctionSchemas[name] = {key: value for key, value in signature.items() if not key in ("intent", "examples")}
+            config.toolFunctionMethods[name] = method
+            ToolStore.add_tool(signature)
 
 class ToolStore:
 

@@ -20,9 +20,9 @@ The default value of config.max_consecutive_auto_heal is 3.
 def heal_python(function_args):
     # get the sql query statement
     issue = function_args.get("issue") # required
-    print3(f"Issue: {issue}")
+    print(f"Issue: {issue}")
 
-    fix = function_args.get("fix") # required
+    fix = function_args.get("code") # required
     missing = function_args.get("missing") # required
     if isinstance(missing, str):
         missing = eval(missing)
@@ -52,7 +52,7 @@ functionSignature = {
     "parameters": {
         "type": "object",
         "properties": {
-            "fix": {
+            "code": {
                 "type": "string",
                 "description": "Improved version of python code that resolved the traceback error. Return the original code instead only if traceback shows an import error.",
             },
@@ -65,7 +65,7 @@ functionSignature = {
                 "description": """Briefly explain the error""",
             },
         },
-        "required": ["fix", "missing", "issue"],
+        "required": ["code", "missing", "issue"],
     },
 }
 

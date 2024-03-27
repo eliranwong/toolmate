@@ -4,6 +4,10 @@ FreeGenius AI is an ambitious project sparked by the pioneering work of [LetMeDo
 
 As with [LetMeDoIt AI](https://github.com/eliranwong/letmedoit), FreeGenius AI is designed to be capable of engaging in intuitive conversations, executing codes, providing up-to-date information, and performing a wide range of tasks. It's designed to learn, adapt, and grow with the user, offering personalized experiences and interactions.
 
+# Status
+
+This project is still in early development and testing, not for production yet.
+
 # Beyond LetMeDoIt AI
 
 The genesis of this project stems from our aspiration to augment the capabilities of [LetMeDoIt AI](https://github.com/eliranwong/letmedoit) significantly.
@@ -29,10 +33,6 @@ The author aims to equip FreeGenius AI, as an AI suite that is able to:
 - support current LetMeDoIt AI equivalent features
 - devlops strategies plugin framework to execute multi-step generation or task execution
 - run with common computer hardwares with reasonable and affordable cost
-
-# In Testing Stage; Not for Production Yet
-
-Please kindly note that the project is still in testing phrase. It is not for production yet.
 
 ## For Testing and Contributions
 
@@ -62,63 +62,17 @@ Testing:
 
 * [LetMeDoIt mode](https://github.com/eliranwong/freegenius/wiki/LetMeDoIt-Mode) / [ChatGPT models](https://platform.openai.com/docs/models)
 
-## How to Change LLM Backend?
+# How to Change LLM Backend?
 
-For now, you need to manually edit the value of 'llmBackend' in config.py
+https://github.com/eliranwong/freegenius/wiki/Change-LLM-Backend
 
-Accepted values: 'llamacpp',  'ollama', 'gemini', 'chatgpt", "letmedoit"
+# How to Change Models?
 
-## How to Change Models?
+https://github.com/eliranwong/freegenius/wiki/Change-Model
 
-We will add uer interface for users to change backends / models.
+# How to Set up Google or OpenAI Credentials? [Optional]
 
-Meanwhile, you need to edit manually the folloinwg values in config.py:
-
-(Remarks: Edit config.py only when the app is closed)
-
-### llmBackend = 'ollama' 
-
-(check available models at: https://ollama.com/library)
-
-* ollamaDefaultModel, e.g. 'phi' (default), 'mistral', 'llama2', e.g.
-
-* ollamaCodeModel, e.g. 'phi' (default), 'codellama', 'starcoder2', e.g.
-
-### llmBackend = 'llamacpp'
-
-(check available *gguf models at: https://huggingface.co/)
-
-* llamacppDefaultModel_repo_id, e.g. 'TheBloke/phi-2-GGUF' (default), 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
-
-* llamacppDefaultModel_filename, e.g. 'phi-2.Q4_K_M.gguf' (default), 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
-
-* llamacppCodeModel_repo_id, e.g. 'TheBloke/phi-2-GGUF' (default), 'TheBloke/CodeLlama-7B-Python-GGUF'
-
-* llamacppCodeModel_filename, e.g. 'phi-2.Q4_K_M.gguf' (default), 'codellama-7b-python.Q4_K_M.gguf'
-
-Remarks: match repo_id and filename reasonably that sepecified filename have to be available for download in the specified repo_id
-
-## llmBackend = 'gemini'
-
-Current available option is Google Gemini Pro
-
-## llmBackend = 'chatgpt'
-
-Edit the value of 'chatGPTApiModel'.  Its default value is 'gpt-3.5-turbo'
-
-## llmBackend = 'letmedoit'
-
-Edit the value of 'chatGPTApiModel'.  Its default value is 'gpt-3.5-turbo'
-
-# How to Set up Google / OpenAI Credentials? [Optional]
-
-Google credentials / OpenAI keys are optional.
-
-We will add user interface for users to specify OpenAI API / Google credentials.
-
-We will also add documentation about this.  Meanwhile, read https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup for Google credential setup.
-
-To add / change OpenAI API key, enter '.changeapikey' in FreeGenius AI prompt.  Alternately, edit the value of 'openaiApiKey' in config.py.
+https://github.com/eliranwong/freegenius/wiki/Set-up-Optional-Credentials
 
 # Approach to Run Function Calling Equivalent Features Offline with Affordable Hardwares
 
@@ -227,26 +181,4 @@ Particularly, plugin structure follows https://github.com/eliranwong/letmedoit/w
 
 # TODO
 
-* add documentation
-
-* add support of custom LLM path to be used with llama.cpp
-
-* add support use of Ollama hosted models with llama.cpp: It appears that models are easily to be selected and downloaded with Ollama, but inference is faster with llama.cpp.  We will add UI to download LLMs via Ollama and used them with llama.cpp
-
-* add TUI dialogs to change llm backends / models
-
-* ui to change tool dependence
-
-* add tool selection threshold to allow users to select tool from closest matches tools
-
-* improve tool selection based on users interactions
-
-* test and fine-tune all plugins with all supported backends (... in progress ...)
-
-* integrate llama.cpp with AutoGen features
-
-* add support of code auto-heal features like we implemented in LetMeDoIt AI
-
-* add qt-based GUI
-
-* more to come
+https://github.com/eliranwong/freegenius/issues/4

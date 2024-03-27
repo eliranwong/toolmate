@@ -1,5 +1,5 @@
 from freegenius import getDeviceInfo, showErrors, get_or_create_collection, query_vectors, toGeminiMessages, executeToolFunction, extractPythonCode
-from freegenius import print1, print2, print3
+from freegenius import print1, print2, print3, selectTool
 from freegenius import config
 import traceback, os
 from typing import Optional, List, Dict, Union
@@ -142,21 +142,34 @@ class CallGemini:
             if config.developer:
                 print1("screening ...")
             noFunctionCall = True if noFunctionCall else CallGemini.screen_user_request(messages=messages, user_request=user_request)
-        if noFunctionCall:
+        if noFunctionCall or config.tool_dependence <= 0.0:
             return CallGemini.regularCall(messages)
         else:
             # 2. Tool Selection
             if config.developer:
                 print1("selecting tool ...")
             tool_collection = get_or_create_collection("tools")
-            search_result = query_vectors(tool_collection, user_request)
+            search_result = query_vectors(tool_collection, user_request, config.tool_selection_max_choices)
+            
+            # no tool is available; return a regular call instead
             if not search_result:
-                # no tool is available; return a regular call instead
                 return CallGemini.regularCall(messages)
-            semantic_distance = search_result["distances"][0][0]
-            if semantic_distance > config.tool_dependence:
+
+            # check the closest distance
+            closest_distance = search_result["distances"][0][0]
+            
+            # when a tool is irrelevant
+            if closest_distance > config.tool_dependence:
                 return CallGemini.regularCall(messages)
-            metadatas = search_result["metadatas"][0][0]
+
+            # auto or manual selection
+            selected_index = selectTool(search_result, closest_distance)
+            if selected_index is None:
+                return CallGemini.regularCall(messages)
+            else:
+                semantic_distance = search_result["distances"][0][selected_index]
+                metadatas = search_result["metadatas"][0][selected_index]
+
             tool_name = metadatas["name"]
             tool_schema = config.toolFunctionSchemas[tool_name]
             if config.developer:

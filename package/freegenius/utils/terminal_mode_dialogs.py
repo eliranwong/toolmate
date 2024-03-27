@@ -1,9 +1,7 @@
 from freegenius import config
-from prompt_toolkit.formatted_text import HTML
+from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.styles import Style
-from prompt_toolkit.shortcuts import input_dialog, radiolist_dialog, checkboxlist_dialog, message_dialog
-from prompt_toolkit.completion import WordCompleter, FuzzyCompleter
-from freegenius.utils.promptValidator import NumberValidator
+from prompt_toolkit.shortcuts import radiolist_dialog, checkboxlist_dialog
 
 
 class TerminalModeDialogs:
@@ -40,36 +38,6 @@ class TerminalModeDialogs:
             }
         )
 
-    # a wrapper to standard input_dialog; open radiolist_dialog showing available options when user input is not a valid option.
-    def searchableInput(self, title="Text Entry", text="Enter / Search:", default="", completer=None, options=[], descriptions=[], validator=None, numberOnly=False, password=False, ok_text="OK", cancel_text="Cancel"):
-        if completer is None and options:
-            completer = FuzzyCompleter(WordCompleter(options, ignore_case=True))
-        if validator is None and numberOnly:
-            validator=NumberValidator()
-        result = input_dialog(
-            title=title,
-            text=text,
-            default=default,
-            completer=completer,
-            validator=validator,
-            password=password,
-            ok_text=ok_text,
-            cancel_text=cancel_text,
-            style=self.style,
-        ).run().strip()
-        if result.lower() == config.cancel_entry:
-            return result
-        if options:
-            if result and result in options:
-                return result
-            else:
-                return self.getValidOptions(options=options, descriptions=descriptions, filter=result, default=default)
-        else:
-            if result:
-                return result
-            else:
-                return ""
-
     def getValidOptions(self, options=[], descriptions=[], bold_descriptions=False, filter="", default="", title="Available Options", text="Select an option:"):
         if not options:
             return ""
@@ -93,7 +61,9 @@ class TerminalModeDialogs:
         ).run()
         if result:
             notice = f"You've chosen: {result}"
-            print3(notice)
+            splittedContent = notice.split(": ", 1)
+            key, value = splittedContent
+            print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>{key}:</{config.terminalPromptIndicatorColor2}> {value}"))
             return result
         return ""
 

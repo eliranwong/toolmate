@@ -24,6 +24,9 @@ configFile = os.path.join(packageFolder, "config.py")
 if not os.path.isfile(configFile):
     open(configFile, "a", encoding="utf-8").close()
 
+# import config module
+from freegenius import config
+
 # import other libraries
 
 import os, geocoder, platform, socket, geocoder, datetime, requests, netifaces, getpass, pendulum, pkg_resources
@@ -34,15 +37,40 @@ from pygments.styles import get_style_by_name
 from prompt_toolkit.styles.pygments import style_from_pygments_cls
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit import prompt
-from typing import Optional
+from typing import Optional, Any
 from vertexai.preview.generative_models import Content, Part
 from pathlib import Path
 from PIL import Image
 from openai import OpenAI
+from freegenius.utils.terminal_mode_dialogs import TerminalModeDialogs
 
-# a dummy import line to resolve ALSA error display
+# a dummy import line to resolve ALSA error display on Linux
 import sounddevice
 
+# tool selection
+
+def selectTool(search_result, closest_distance) -> Optional[int]:
+    if closest_distance <= config.tool_auto_selection_threshold:
+        # auto
+        return 0
+    else:
+        # manual
+        tool_options = []
+        tool_descriptions = []
+        for index, item in enumerate(search_result["metadatas"][0]):
+            tool_options.append(str(index))
+            tool_descriptions.append(item["name"].replace("_", " "))
+        stopSpinning()
+        tool = TerminalModeDialogs(None).getValidOptions(
+            title="Tool Selection",
+            text="Select a tool:",
+            options=tool_options,
+            descriptions=tool_descriptions,
+            default=tool_options[0],
+        )
+        if tool:
+            return int(tool)
+    return None
 
 # files
 
@@ -571,6 +599,8 @@ def updateApp():
                     installPipPackage(f"--upgrade {thisPackage}")
                     restartApp()
                 except:
+                    if config.developer:
+                        print(traceback.format_exc())
                     print(f"Failed to upgrade '{thisPackage}'!")
 
 def installPipPackage(module, update=True):
@@ -579,9 +609,6 @@ def installPipPackage(module, update=True):
     #pip = pippath if os.path.isfile(pippath) else "pip"
     #pip3path = os.path.join(executablePath, "pip3")
     #pip3 = pip3path if os.path.isfile(pip3path) else "pip3"
-
-    if not hasattr(config, "isPipUpdated"):
-        config.isPipUpdated = False
 
     if isCommandInstalled("pip"):
         pipInstallCommand = f"{sys.executable} -m pip install"
@@ -624,8 +651,20 @@ def installPipPackage(module, update=True):
         print("pip command is not found!")
         return False
 
-# import config module
-from freegenius import config
+# config
+
+def setToolDependence(entry: Any) -> bool:
+    try:
+        entry = float(entry)
+        if 0 <= entry <=1.0:
+            config.tool_dependence = entry
+            print3(f"Tool dependence changed to: {entry}")
+            return True
+    except:
+        pass
+    return False
+
+##########
 
 # set up shared configs
 
@@ -635,6 +674,9 @@ if not hasattr(config, "freeGeniusAIName") or not config.freeGeniusAIName:
     config.freeGeniusAIName = "FreeGenius AI"
 
 config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
+
+if not hasattr(config, "isPipUpdated"):
+    config.isPipUpdated = False
 
 config.stopSpinning = stopSpinning
 config.localStorage = getLocalStorage()

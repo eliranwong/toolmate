@@ -1,5 +1,5 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
-from freegenius import print1, print2, print3
+from freegenius import print1, print2, print3, selectTool
 from freegenius import config
 import shutil, re, traceback, json, ollama
 from typing import Optional
@@ -148,21 +148,34 @@ class CallOllama:
             if config.developer:
                 print1("screening ...")
             noFunctionCall = True if noFunctionCall else CallOllama.screen_user_request(messages=messages, user_request=user_request)
-        if noFunctionCall:
+        if noFunctionCall or config.tool_dependence <= 0.0:
             return CallOllama.regularCall(messages)
         else:
             # 2. Tool Selection
             if config.developer:
                 print1("selecting tool ...")
             tool_collection = get_or_create_collection("tools")
-            search_result = query_vectors(tool_collection, user_request)
+            search_result = query_vectors(tool_collection, user_request, config.tool_selection_max_choices)
+            
+            # no tool is available; return a regular call instead
             if not search_result:
-                # no tool is available; return a regular call instead
                 return CallOllama.regularCall(messages)
-            semantic_distance = search_result["distances"][0][0]
-            if semantic_distance > config.tool_dependence:
+
+            # check the closest distance
+            closest_distance = search_result["distances"][0][0]
+            
+            # when a tool is irrelevant
+            if closest_distance > config.tool_dependence:
                 return CallOllama.regularCall(messages)
-            metadatas = search_result["metadatas"][0][0]
+
+            # auto or manual selection
+            selected_index = selectTool(search_result, closest_distance)
+            if selected_index is None:
+                return CallOllama.regularCall(messages)
+            else:
+                semantic_distance = search_result["distances"][0][selected_index]
+                metadatas = search_result["metadatas"][0][selected_index]
+
             tool_name, tool_schema = metadatas["name"], json.loads(metadatas["parameters"])
             if config.developer:
                 print3(f"Selected: {tool_name} ({semantic_distance})")

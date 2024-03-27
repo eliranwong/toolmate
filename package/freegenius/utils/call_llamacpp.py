@@ -1,8 +1,9 @@
 from freegenius import config, showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
-from freegenius import print1, print2, print3
+from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse
 import traceback, json, re
 from typing import Optional
 from llama_cpp import Llama
+from prompt_toolkit import prompt
 
 class CallLlamaCpp:
 
@@ -25,6 +26,42 @@ class CallLlamaCpp:
 
     @staticmethod
     def autoHealPythonCode(code, trace):
+        for i in range(config.max_consecutive_auto_heal):
+            userInput = f"Original python code:\n```\n{code}\n```\n\nTraceback:\n```\n{trace}\n```"
+            messages = [{"role": "user", "content" : userInput}]
+            print3(f"Auto-correction attempt: {(i + 1)}")
+            function_call_message, function_call_response = CallLlamaCpp.getSingleFunctionCallResponse(messages, "heal_python")
+            # display response
+            print1(config.divider)
+            if config.developer:
+                print(function_call_response)
+            else:
+                print1("Executed!" if function_call_response == "EXECUTED" else "Failed!")
+            if function_call_response == "EXECUTED":
+                break
+            else:
+                code = json.loads(function_call_message["function_call"]["arguments"]).get("fix")
+                trace = function_call_response
+            print1(config.divider)
+        # return information if any
+        if function_call_response == "EXECUTED":
+            pythonFunctionResponse = getPythonFunctionResponse(code)
+            if pythonFunctionResponse:
+                return json.dumps({"information": pythonFunctionResponse})
+            else:
+                return ""
+        # ask if user want to manually edit the code
+        print1(f"Failed to execute the code {(config.max_consecutive_auto_heal + 1)} times in a row!")
+        print1("Do you want to manually edit it? [y]es / [N]o")
+        confirmation = prompt(style=config.promptStyle2, default="N")
+        if confirmation.lower() in ("y", "yes"):
+            config.defaultEntry = f"```python\n{code}\n```"
+            return ""
+        else:
+            return "[INVALID]"
+
+
+    def autoHealPythonCode2(code, trace):
         ...
 
     @staticmethod
@@ -117,21 +154,34 @@ class CallLlamaCpp:
             if config.developer:
                 print1("screening ...")
             noFunctionCall = True if noFunctionCall else CallLlamaCpp.screen_user_request(messages=messages, user_request=user_request)
-        if noFunctionCall:
+        if noFunctionCall or config.tool_dependence <= 0.0:
             return CallLlamaCpp.regularCall(messages)
         else:
             # 2. Tool Selection
             if config.developer:
                 print1("selecting tool ...")
             tool_collection = get_or_create_collection("tools")
-            search_result = query_vectors(tool_collection, user_request)
+            search_result = query_vectors(tool_collection, user_request, config.tool_selection_max_choices)
+            
+            # no tool is available; return a regular call instead
             if not search_result:
-                # no tool is available; return a regular call instead
                 return CallLlamaCpp.regularCall(messages)
-            semantic_distance = search_result["distances"][0][0]
-            if semantic_distance > config.tool_dependence:
+
+            # check the closest distance
+            closest_distance = search_result["distances"][0][0]
+            
+            # when a tool is irrelevant
+            if closest_distance > config.tool_dependence:
                 return CallLlamaCpp.regularCall(messages)
-            metadatas = search_result["metadatas"][0][0]
+
+            # auto or manual selection
+            selected_index = selectTool(search_result, closest_distance)
+            if selected_index is None:
+                return CallLlamaCpp.regularCall(messages)
+            else:
+                semantic_distance = search_result["distances"][0][selected_index]
+                metadatas = search_result["metadatas"][0][selected_index]
+
             tool_name, tool_schema = metadatas["name"], json.loads(metadatas["parameters"])
             if config.developer:
                 print3(f"Selected: {tool_name} ({semantic_distance})")
@@ -240,7 +290,7 @@ Remember, response in JSON with the filled template ONLY.""",
         schema = toParameterSchema(schema)
         deviceInfo = f"""\n\nMy device information:\n{getDeviceInfo()}""" if config.includeDeviceInfoInContext else ""
         if "code" in schema["properties"]:
-            enforceCodeOutput = """ Remember, you should format the requested information, if any, into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."""
+            enforceCodeOutput = """The python script is run as main program, so do NOT use `if __name__ == "__main__"` block. Remember, you should format the requested information, if any, into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."""
             schema["properties"]["code"]["description"] += enforceCodeOutput
             code_instruction = f"""\n\nParticularly, generate python code as the value of the JSON key "code" based on the following instruction:\n{schema["properties"]["code"]["description"]}"""
         else:

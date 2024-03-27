@@ -11,9 +11,7 @@ from freegenius import config
 if not hasattr(config, "max_consecutive_auto_reply"):
     config.max_consecutive_auto_reply = 10
 
-from freegenius import print1, print2, print3, tokenLimits
-from freegenius.utils.call_llm import CallLLM
-CallLLM.checkCompletion()
+from freegenius import print2, print3, tokenLimits
 
 from freegenius import getEmbeddingFunction
 import autogen, os, json, traceback, chromadb, re, zipfile, datetime, traceback

@@ -41,14 +41,17 @@ defaultSettings = (
     ('ollamaCodeModel', 'phi'), # ollama model used for code generation
     ('ollamaCodeModel_num_ctx', 100000), # ollama code model context window
     ('ollamaCodeModel_num_predict', -1), # ollama code model maximum tokens
+    ('llamacppDefaultModel_model_path', ''), # specify file path of llama.cpp model for general purpose
     ('llamacppDefaultModel_repo_id', 'TheBloke/phi-2-GGUF'), # llama.cpp model used for general purposes, e.g. 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
     ('llamacppDefaultModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for general purposes, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
-    ('llamacppDefaultModel_n_ctx', 4096), # llama.cpp default model context window
+    ('llamacppDefaultModel_n_ctx', 0), # llama.cpp default model context window
     ('llamacppDefaultModel_max_tokens', 10000), # llama.cpp default model maximum tokens
+    ('llamacppCodeModel_model_path', ''), # specify file path of llama.cpp model for code generation
     ('llamacppCodeModel_repo_id', 'TheBloke/phi-2-GGUF'), # llama.cpp model used for code generation, e.g. 'TheBloke/CodeLlama-7B-Python-GGUF'
     ('llamacppCodeModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for code generation, e.g. 'codellama-7b-python.Q4_K_M.gguf'
-    ('llamacppCodeModel_n_ctx', 4096), # llama.cpp code model context window
+    ('llamacppCodeModel_n_ctx', 0), # llama.cpp code model context window
     ('llamacppCodeModel_max_tokens', 10000), # llama.cpp code model maximum tokens
+    ('store_llm_in_user_dir', True), # when True downloaded llms are stored in "~/freegenius/LLMs/" to improve portability
     ('geminipro_max_output_tokens', 8192), # check supported value at https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
     # common configs as in LetMeDoIt AI
     ('translateToLanguage', ''),

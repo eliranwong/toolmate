@@ -11,9 +11,6 @@ from freegenius import config
 if not hasattr(config, "max_consecutive_auto_reply"):
     config.max_consecutive_auto_reply = 10
 
-from freegenius.utils.call_llm import CallLLM
-CallLLM.checkCompletion()
-
 import autogen, os, json, traceback
 from freegenius import getDeviceInfo, tokenLimits
 from freegenius.utils.prompts import Prompts

@@ -9,9 +9,6 @@ if not os.path.isfile(configFile):
     open(configFile, "a", encoding="utf-8").close()
 from freegenius import config, tokenLimits
 
-from freegenius.utils.call_llm import CallLLM
-CallLLM.checkCompletion()
-
 import autogen, os, json, traceback
 from freegenius.utils.prompts import Prompts
 from prompt_toolkit import print_formatted_text, HTML

@@ -15,9 +15,7 @@ if not hasattr(config, "max_group_chat_round"):
 if not hasattr(config, "use_oai_assistant"):
     config.use_oai_assistant = False
 
-from freegenius import print1, print2, print3
-from freegenius.utils.call_llm import CallLLM
-CallLLM.checkCompletion()
+from freegenius import print2
 
 from autogen.agentchat.contrib.agent_builder import AgentBuilder
 #from freegenius.utils.agent_builder import AgentBuilder

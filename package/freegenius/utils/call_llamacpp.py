@@ -1,28 +1,69 @@
 from freegenius import config, showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
-from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse
-import traceback, json, re
+from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, getLocalStorage
+import traceback, json, re, os
 from typing import Optional
 from llama_cpp import Llama
 from prompt_toolkit import prompt
+from pathlib import Path
+
 
 class CallLlamaCpp:
 
     @staticmethod
     def checkCompletion():
-        config.llamacppDefaultModel = Llama.from_pretrained(
-            repo_id=config.llamacppDefaultModel_repo_id,
-            filename=config.llamacppDefaultModel_filename,
-            chat_format="chatml",
-            n_ctx=config.llamacppDefaultModel_n_ctx,
-            verbose=False,
-        )
-        config.llamacppCodeModel = Llama.from_pretrained(
-            repo_id=config.llamacppCodeModel_repo_id,
-            filename=config.llamacppCodeModel_filename,
-            chat_format="chatml",
-            n_ctx=config.llamacppCodeModel_n_ctx,
-            verbose=False,
-        )
+        # llm directory
+        llm_directory = os.path.join(getLocalStorage(), "LLMs", "huggingface")
+        Path(llm_directory).mkdir(parents=True, exist_ok=True)
+
+        # check available model files in FreeGenius directory
+        llamacppDefaultModel_model_path = os.path.join(llm_directory, config.llamacppDefaultModel_filename)
+        if (not config.llamacppDefaultModel_model_path or not os.path.isfile(config.llamacppDefaultModel_model_path)) and os.path.isfile(llamacppDefaultModel_model_path):
+            config.llamacppDefaultModel_model_path = llamacppDefaultModel_model_path
+        llamacppCodeModel_model_path = os.path.join(llm_directory, config.llamacppCodeModel_filename)
+        if (not config.llamacppCodeModel_model_path or not os.path.isfile(config.llamacppCodeModel_model_path)) and os.path.isfile(llamacppCodeModel_model_path):
+            config.llamacppCodeModel_model_path = llamacppCodeModel_model_path
+        
+        # llamacppDefaultModel
+        if config.llamacppDefaultModel_model_path and os.path.isfile(config.llamacppDefaultModel_model_path):
+            config.llamacppDefaultModel = Llama(
+                model_path=config.llamacppDefaultModel_model_path,
+                chat_format="chatml",
+                n_ctx=config.llamacppDefaultModel_n_ctx,
+                verbose=False,
+                # n_gpu_layers=-1, # Uncomment to use GPU acceleration,
+            )
+        else:
+            config.llamacppDefaultModel = Llama.from_pretrained(
+                repo_id=config.llamacppDefaultModel_repo_id,
+                filename=config.llamacppDefaultModel_filename,
+                local_dir=llm_directory,
+                local_dir_use_symlinks=False if config.store_llm_in_user_dir else True,
+                chat_format="chatml",
+                n_ctx=config.llamacppDefaultModel_n_ctx,
+                verbose=False,
+                # n_gpu_layers=-1, # Uncomment to use GPU acceleration,
+            )
+
+        # llamacppCodeModel_model_path
+        if config.llamacppCodeModel_model_path and os.path.isfile(config.llamacppCodeModel_model_path):
+            config.llamacppCodeModel = Llama(
+                model_path=config.llamacppCodeModel_model_path,
+                chat_format="chatml",
+                n_ctx=config.llamacppCodeModel_n_ctx,
+                verbose=False,
+                # n_gpu_layers=-1, # Uncomment to use GPU acceleration,
+            )
+        else:
+            config.llamacppCodeModel = Llama.from_pretrained(
+                repo_id=config.llamacppCodeModel_repo_id,
+                filename=config.llamacppCodeModel_filename,
+                local_dir=llm_directory,
+                local_dir_use_symlinks=False if config.store_llm_in_user_dir else True,
+                chat_format="chatml",
+                n_ctx=config.llamacppCodeModel_n_ctx,
+                verbose=False,
+                # n_gpu_layers=-1, # Uncomment to use GPU acceleration,
+            )
 
     @staticmethod
     def autoHealPythonCode(code, trace):

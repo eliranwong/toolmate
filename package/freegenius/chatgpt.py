@@ -1,9 +1,7 @@
 from freegenius import config, getLocalStorage, count_tokens_from_messages
-from freegenius import print1, print2, print3, tokenLimits
-from freegenius.utils.call_llm import CallLLM
+from freegenius import print2, tokenLimits
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
-CallLLM.checkCompletion()
 
 from openai import OpenAI
 from prompt_toolkit.styles import Style

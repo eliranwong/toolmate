@@ -8,7 +8,7 @@ analyze files with integrated "AutoGen Retriever"
 
 
 from freegenius import config, is_valid_image_file
-from freegenius import print1, print2, print3
+from freegenius import print2, print3
 import os
 from freegenius.autoretriever import AutoGenRetriever
 from PIL import Image

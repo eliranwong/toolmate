@@ -88,8 +88,18 @@ def getDownloadedOllamaModels() -> dict:
                                     if os.path.isfile(model_file):
                                         model_tag = f"{d}:{f}"
                                         models[model_tag] = model_file
+                                        if f == "latest":
+                                            models[d] = model_file
                             except:
                                 pass
+    return models
+
+def getDownloadedGgufModels() -> dict:
+    # support when config.store_llm_in_user_dir is set to True
+    llm_directory = os.path.join(getLocalStorage(), "LLMs", "gguf")
+    models = {}
+    for f in getFilenamesWithoutExtension(llm_directory, "gguf"):
+        models[f] = os.path.join(llm_directory, f"{f}.gguf")
     return models
 
 # tool selection
@@ -117,12 +127,23 @@ def selectTool(search_result, closest_distance) -> Optional[int]:
             return int(tool)
     return None
 
+# connectivity
+
+def isUrlAlive(url):
+    #print(urllib.request.urlopen("https://letmedoit.ai").getcode())
+    try:
+        request = requests.get(url, timeout=5)
+    except:
+        return False
+    return True if request.status_code == 200 else False
+
 # files
 
-def fileNamesWithoutExtension(dir, ext):
+def getFilenamesWithoutExtension(dir, ext):
     # Note: pathlib.Path(file).stem does not work with file name containg more than one dot, e.g. "*.db.sqlite"
-    files = glob.glob(os.path.join(dir, "*.{0}".format(ext)))
-    return sorted([file[len(dir)+1:-(len(ext)+1)] for file in files if os.path.isfile(file)])
+    #files = glob.glob(os.path.join(dir, "*.{0}".format(ext)))
+    #return sorted([file[len(dir)+1:-(len(ext)+1)] for file in files if os.path.isfile(file)])
+    return sorted([f[:-(len(ext)+1)] for f in os.listdir(dir) if f.lower().endswith(f".{ext}") and os.path.isfile(os.path.join(dir, f))])
 
 def getLocalStorage():
     # config.freeGeniusAIName
@@ -699,11 +720,29 @@ def installPipPackage(module, update=True):
 # config
 
 def setToolDependence(entry: Any) -> bool:
+    """
+    A quick way to change config.tool_dependence and config.tool_auto_selection_threshold
+    """
     try:
-        entry = float(entry)
-        if 0 <= entry <=1.0:
-            config.tool_dependence = entry
-            print3(f"Tool dependence changed to: {entry}")
+        splits = entry.split("!", 1)
+        if len(splits) == 2:
+            tool_dependence, tool_auto_selection_threshold = splits
+        else:
+            tool_dependence = entry
+            tool_auto_selection_threshold = None
+        tool_dependence = float(tool_dependence)
+        if 0 <= tool_dependence <=1.0:
+            config.tool_dependence = tool_dependence
+            print3(f"Tool dependence changed to: {tool_dependence}")
+
+            if tool_auto_selection_threshold is not None:
+                tool_auto_selection_threshold = float(tool_auto_selection_threshold)
+                if 0 <= tool_auto_selection_threshold <=1.0:
+                    config.tool_auto_selection_threshold = tool_auto_selection_threshold
+                    print3(f"Tool auto selection threshold changed to: {tool_auto_selection_threshold}")
+
+            config.saveConfig()
+
             return True
     except:
         pass

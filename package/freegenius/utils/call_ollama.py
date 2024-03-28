@@ -1,5 +1,5 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
-from freegenius import print1, print2, print3, selectTool
+from freegenius import print1, print2, print3, selectTool, restartApp
 from freegenius import config
 import shutil, re, traceback, json, ollama
 from typing import Optional
@@ -34,7 +34,11 @@ class CallOllama:
         else:
             print("Ollama not found! Install it first!")
             print("Check https://ollama.com")
-            exit(0)
+            config.llmBackend = "llamacpp"
+            config.saveConfig()
+            print("LLM backend changed back to 'llamacpp'")
+            print("Restarting 'FreeGenius AI' ...")
+            restartApp()
 
     @staticmethod
     @check_ollama_errors

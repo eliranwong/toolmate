@@ -1,9 +1,12 @@
-from freegenius import config, showErrors, getDayOfWeek, getLocalStorage, fileNamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation
+from freegenius import config, showErrors, getDayOfWeek, getLocalStorage, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation
 from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits
+from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels
 from freegenius.utils.call_llm import CallLLM
 from freegenius.utils.tool_plugins import ToolStore
-import openai, threading, os, time, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys
+import openai, threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys
 from pathlib import Path
+from freegenius.utils.download import Downloader
+from freegenius.utils.ollama_models import ollama_models
 #from pygments.lexers.python import PythonLexer
 #from pygments.lexers.shell import BashLexer
 #from pygments.lexers.markup import MarkdownLexer
@@ -30,7 +33,6 @@ from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.text_utils import TextUtil
 from freegenius.utils.sttLanguages import googleSpeeckToTextLanguages, whisperSpeeckToTextLanguages
 from freegenius.chatgpt import ChatGPT
-from freegenius import installPipPackage
 if not config.isTermux:
     from freegenius.autobuilder import AutoGenBuilder
     from freegenius.geminipro import GeminiPro
@@ -126,10 +128,10 @@ class FreeGenius:
             ".export": (f"export content {str(config.hotkey_export)}", lambda: self.exportChat(config.currentMessages)),
             ".context": (f"change chat context {str(config.hotkey_select_context)}", None),
             ".contextintegration": ("change chat context integration", self.setContextIntegration),
+            ".model": ("change large language model", self.setLlmModel),
+            #".chatmodel": ("change chat-only model", self.setChatbot),
+            ".embedding": ("change embedding model", self.setEmbeddingModel),
             ".changeapikey": ("change OpenAI API key", self.changeChatGPTAPIkey),
-            ".functionmodel": ("change function call model", self.setLlmModel),
-            ".chatmodel": ("change chat-only model", self.setChatbot),
-            ".embeddingmodel": ("change embedding model", self.setEmbeddingModel),
             ".temperature": ("change temperature", self.setTemperature),
             ".maxtokens": ("change maximum response tokens", self.setMaxTokens),
             ".mintokens": ("change minimum response tokens", self.setMinTokens),
@@ -179,20 +181,6 @@ class FreeGenius:
         for key, value in self.actions.items():
             config.actionHelp += f"{key}: {value[0]}\n"
         config.actionHelp += "\n## Read more at:\nhttps://github.com/eliranwong/letmedoit/wiki/Action-Menu"
-
-    def getFolderPath(self, default=""):
-        return self.getPath.getFolderPath(
-            check_isdir=True,
-            display_dir_only=True,
-            create_dirs_if_not_exist=True,
-            empty_to_cancel=True,
-            list_content_on_directory_change=True,
-            keep_startup_directory=True,
-            message=f"{self.divider}\nSetting a startup directory ...\nEnter a folder name or path below:",
-            bottom_toolbar="",
-            promptIndicator = "",
-            default=default,
-        )
 
     # Voice Typing Language
     def setSpeechToTextLanguage(self):
@@ -352,7 +340,7 @@ class FreeGenius:
         else:
             pluginFolders = (pluginFolder,)
         for folder in pluginFolders:
-            for plugin in fileNamesWithoutExtension(folder, "py"):
+            for plugin in getFilenamesWithoutExtension(folder, "py"):
                 plugins.append(plugin)
                 if not plugin in config.pluginExcludeList:
                     enabledPlugins.append(plugin)
@@ -603,7 +591,16 @@ class FreeGenius:
 
     def setStorageDirectory(self):
         try:
-            folder = self.getFolderPath(default=config.storagedirectory)
+            folder = self.getPath.getFolderPath(
+                check_isdir=True,
+                display_dir_only=True,
+                create_dirs_if_not_exist=True,
+                empty_to_cancel=True,
+                list_content_on_directory_change=True,
+                keep_startup_directory=True,
+                message=f"{self.divider}\nSetting a startup directory ...\nEnter a folder name or path below:",
+                default=config.storagedirectory,
+            )
         except:
             print2(f"Given path not accessible!")
             folder = ""
@@ -793,7 +790,179 @@ class FreeGenius:
             config.saveConfig()
             print3(f"LLM Temperature: {temperature}")
 
+    def selectLlmBackend(self):
+        options = {
+            "llamacpp": "Llama.cpp",
+            "ollama": "Ollama LLM",
+            "gemini": "Google Gemini",
+            "chatgpt": "OpenAI ChatGPT",
+            "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",
+        }
+        llmBackend = self.dialogs.getValidOptions(
+            options=options.keys(),
+            descriptions=options.values(),
+            title="LLM Backend",
+            default=config.llmBackend,
+            text="Select a backend:",
+        )
+        if llmBackend:
+            config.llmBackend = llmBackend
+            CallLLM.checkCompletion()
+
     def setLlmModel(self):
+        self.selectLlmBackend()
+        if config.llmBackend == "ollama":
+            print2("# For general purpose")
+            self.setLlmModel_ollama()
+            print2("# For code generation")
+            self.setLlmModel_ollama("code")
+        elif config.llmBackend == "llamacpp":
+            print2("# For general purpose")
+            self.setLlmModel_llamacpp()
+            print2("# For code generation")
+            self.setLlmModel_llamacpp("code")
+        elif config.llmBackend == "gemini":
+            print3("Model selected: Google Gemini Pro")
+        else:
+            self.setLlmModel_chatgpt()
+        config.saveConfig()
+
+    def selectOllamaModel(self, message="Select a model from Ollama Library:", feature="default") -> str:
+        # history session
+        historyFolder = os.path.join(getLocalStorage(), "history")
+        Path(historyFolder).mkdir(parents=True, exist_ok=True)
+        model_history = os.path.join(historyFolder, "ollama_code" if feature == "code" else "ollama_default")
+        model_session = PromptSession(history=FileHistory(model_history))
+        completer = FuzzyCompleter(WordCompleter(sorted(ollama_models), ignore_case=True))
+        bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
+        # prompt
+        print1(message)
+        print1("(For details, visit https://ollama.com/library)")
+        model = self.prompts.simplePrompt(style=self.prompts.promptStyle2, promptSession=model_session, bottom_toolbar=bottom_toolbar, default=config.ollamaCodeModel if feature == "code" else config.ollamaDefaultModel, completer=completer)
+        if model and not model.lower() == config.exit_entry:
+            return model
+        return ""
+
+    def setLlmModel_ollama(self, feature="default"):
+        model = self.selectOllamaModel(feature=feature)
+        downloadedOllamaModels = getDownloadedOllamaModels()
+        if model in downloadedOllamaModels:
+            if feature == "default":
+                config.ollamaDefaultModel = model
+            elif feature == "code":
+                config.ollamaCodeModel = model
+        else:
+            if shutil.which("ollama"):
+                try:
+                    Downloader.downloadOllamaModel(model, True)
+                    if feature == "default":
+                        config.ollamaDefaultModel = model
+                    elif feature == "code":
+                        config.ollamaCodeModel = model
+                except:
+                    print2(f"Failed to download '{model}'! Please make sure you enter a valid model name or tag.")
+            else:
+                print("Ollama not found! Install Ollama first to use Ollama model library!")
+                print("To install Ollama, visit https://ollama.com")
+
+    def setLlmModel_llamacpp(self, feature="default"):
+        library = self.dialogs.getValidOptions(
+            options=("Ollama Library", "Huggingface Hub", "Custom GGUF"),
+            title="Model Library",
+            default="Ollama Library" if shutil.which("ollama") else "Huggingface Hub",
+            text="Select a model library:",
+        )
+        if library:
+            if library == "Ollama Library":
+                model = self.selectOllamaModel(feature=feature)
+                downloadedOllamaModels = getDownloadedOllamaModels()
+                if model in downloadedOllamaModels:
+                    if feature == "default":
+                        config.llamacppDefaultModel_model_path = downloadedOllamaModels[model]
+                    elif feature == "code":
+                        config.llamacppCodeModel_model_path = downloadedOllamaModels[model]
+                else:
+                    if shutil.which("ollama"):
+                        try:
+                            Downloader.downloadOllamaModel(model, True)
+                            # refresh download list
+                            downloadedOllamaModels = getDownloadedOllamaModels()
+                            if feature == "default":
+                                config.llamacppDefaultModel_model_path = downloadedOllamaModels[model]
+                            elif feature == "code":
+                                config.llamacppCodeModel_model_path = downloadedOllamaModels[model]
+                        except:
+                            print2(f"Failed to download '{model}'! Please make sure you enter a valid model name or tag.")
+                    else:
+                        print("Ollama not found! Install Ollama first to use Ollama model library!")
+                        print("To install Ollama, visit https://ollama.com")
+            elif library == "Huggingface Hub":
+                downloadedGgufModels = getDownloadedGgufModels()
+                if not downloadedGgufModels:
+                    self.setCustomHuggingfaceModel(feature=feature)
+                else:
+                    model = self.dialogs.getValidOptions(
+                        options=list(downloadedGgufModels.keys()) + ["Others ..."],
+                        title="Huggingface Hub Model",
+                        default="" if ... else "",
+                        text="Select a huggingface model:",
+                    )
+                    if model:
+                        if model == "Others ...":
+                            self.setCustomHuggingfaceModel(feature=feature)
+                        elif feature == "default":
+                            config.llamacppDefaultModel_model_path = downloadedGgufModels[model]
+                        elif feature == "code":
+                            config.llamacppCodeModel_model_path = downloadedGgufModels[model]
+            elif library == "Custom GGUF":
+                self.setCustomModelPath(feature=feature)
+
+    def setCustomModelPath(self, feature="default"):
+        #historyFolder = os.path.join(getLocalStorage(), "history")
+        #Path(historyFolder).mkdir(parents=True, exist_ok=True)
+        #model_path_history = os.path.join(historyFolder, "llamacpp_code_model_path" if feature == "code" else "llamacpp_default_model_path")
+        #model_path_session = PromptSession(history=FileHistory(model_path_history))
+        #bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
+        #print1("Enter a custom model path:")
+        #model_path = self.prompts.simplePrompt(style=self.prompts.promptStyle2, promptSession=model_path_session, bottom_toolbar=bottom_toolbar, default=config.llamacppCodeModel_model_path if feature == "code" else config.llamacppDefaultModel_model_path)
+        model_path = self.getPath.getFilePath(
+            check_isfile=True,
+            empty_to_cancel=True,
+            list_content_on_directory_change=True,
+            keep_startup_directory=True,
+            message="Enter a custom model path:",
+            default=config.llamacppCodeModel_model_path if feature == "code" else config.llamacppDefaultModel_model_path,
+        )
+        if model_path and os.path.isfile(model_path):
+            if feature == "default":
+                config.llamacppDefaultModel_model_path = model_path
+            elif feature == "code":
+                config.llamacppCodeModel_model_path = model_path
+
+    def setCustomHuggingfaceModel(self, feature="default"):
+        historyFolder = os.path.join(getLocalStorage(), "history")
+        Path(historyFolder).mkdir(parents=True, exist_ok=True)
+        repo_id_history = os.path.join(historyFolder, "llamacpp_code_repo_id" if feature == "code" else "llamacpp_default_repo_id")
+        repo_id_session = PromptSession(history=FileHistory(repo_id_history))
+        filename_history = os.path.join(historyFolder, "llamacpp_code_filename" if feature == "code" else "llamacpp_default_filename")
+        filename_session = PromptSession(history=FileHistory(filename_history))
+        bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
+        print1("Please specify the huggingface repo id of a *.gguf model:")
+        repo_id = self.prompts.simplePrompt(style=self.prompts.promptStyle2, promptSession=repo_id_session, bottom_toolbar=bottom_toolbar, default=config.llamacppCodeModel_repo_id if feature == "code" else config.llamacppDefaultModel_repo_id)
+        print2("Please specify a filename or glob pattern to match the model file in the repo:")
+        filename = self.prompts.simplePrompt(style=self.prompts.promptStyle2, promptSession=filename_session, bottom_toolbar=bottom_toolbar, default=config.llamacppCodeModel_filename if feature == "code" else config.llamacppDefaultModel_filename)
+        if (repo_id and not repo_id.lower() == config.exit_entry) and (filename and not filename.lower() == config.exit_entry):
+            if feature == "default":
+                config.llamacppDefaultModel_repo_id = repo_id
+                config.llamacppDefaultModel_filename = filename
+            elif feature == "code":
+                config.llamacppCodeModel_repo_id = repo_id
+                config.llamacppCodeModel_filename = filename
+            CallLLM.checkCompletion()
+        else:
+            print2("Action cancelled due to insufficient information!")
+
+    def setLlmModel_chatgpt(self):
         model = self.dialogs.getValidOptions(
             options=self.models,
             title="Function Calling Model",
@@ -805,7 +974,6 @@ class FreeGenius:
             print3(f"ChatGPT model: {model}")
             # set max tokens
             config.chatGPTApiMaxTokens = self.getMaxTokens()[-1]
-            config.saveConfig()
             print3(f"Maximum response tokens: {config.chatGPTApiMaxTokens}")
 
     def setChatbot(self):

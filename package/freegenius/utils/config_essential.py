@@ -26,7 +26,7 @@ if config.isTermux:
 
 defaultSettings = (
     # unique configs in FreeGenius AI
-    ('llmBackend', "llamacpp"), # "ollama", "llamacpp", "gemini", "chatgpt", "letmedoit"
+    ('llmBackend', "llamacpp"), # "llamacpp", "ollama", "gemini", "chatgpt", "letmedoit"
     ('intent_screening', False), # set True to increase both reliability and waiting time
     ('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools
     ('tool_auto_selection_threshold', 0.5), # range: 0.0 - 1.0; tool auto selection is implemented when the closest tool match has a semantic distance lower than its value; manual selection from top matched tools is implemented when the closest distance fall between its value and tool_dependence

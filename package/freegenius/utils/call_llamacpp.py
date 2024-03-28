@@ -12,27 +12,54 @@ class CallLlamaCpp:
     @staticmethod
     def checkCompletion():
         # llm directory
-        llm_directory = os.path.join(getLocalStorage(), "LLMs", "huggingface")
+        llm_directory = os.path.join(getLocalStorage(), "LLMs", "gguf")
         Path(llm_directory).mkdir(parents=True, exist_ok=True)
+
+        # check if model paths are valid
+        if config.llamacppDefaultModel_model_path and not os.path.isfile(config.llamacppDefaultModel_model_path):
+            config.llamacppDefaultModel_model_path = ""
+            config.saveConfig()
+        if config.llamacppCodeModel_model_path and not os.path.isfile(config.llamacppCodeModel_model_path):
+            config.llamacppCodeModel_model_path = ""
+            config.saveConfig()
 
         # check available model files in FreeGenius directory
         llamacppDefaultModel_model_path = os.path.join(llm_directory, config.llamacppDefaultModel_filename)
         if (not config.llamacppDefaultModel_model_path or not os.path.isfile(config.llamacppDefaultModel_model_path)) and os.path.isfile(llamacppDefaultModel_model_path):
             config.llamacppDefaultModel_model_path = llamacppDefaultModel_model_path
+            config.saveConfig()
         llamacppCodeModel_model_path = os.path.join(llm_directory, config.llamacppCodeModel_filename)
         if (not config.llamacppCodeModel_model_path or not os.path.isfile(config.llamacppCodeModel_model_path)) and os.path.isfile(llamacppCodeModel_model_path):
             config.llamacppCodeModel_model_path = llamacppCodeModel_model_path
-        
-        # llamacppDefaultModel
-        if config.llamacppDefaultModel_model_path and os.path.isfile(config.llamacppDefaultModel_model_path):
-            config.llamacppDefaultModel = Llama(
-                model_path=config.llamacppDefaultModel_model_path,
-                chat_format="chatml",
-                n_ctx=config.llamacppDefaultModel_n_ctx,
-                verbose=False,
-                n_gpu_layers=config.llamacppDefaultModel_n_gpu_layers,
-            )
-        else:
+            config.saveConfig()
+
+        try:
+            # llamacppDefaultModel
+            if config.llamacppDefaultModel_model_path and os.path.isfile(config.llamacppDefaultModel_model_path):
+                config.llamacppDefaultModel = Llama(
+                    model_path=config.llamacppDefaultModel_model_path,
+                    chat_format="chatml",
+                    n_ctx=config.llamacppDefaultModel_n_ctx,
+                    verbose=False,
+                    n_gpu_layers=config.llamacppDefaultModel_n_gpu_layers,
+                )
+            else:
+                config.llamacppDefaultModel = Llama.from_pretrained(
+                    repo_id=config.llamacppDefaultModel_repo_id,
+                    filename=config.llamacppDefaultModel_filename,
+                    local_dir=llm_directory,
+                    local_dir_use_symlinks=False if config.store_llm_in_user_dir else True,
+                    chat_format="chatml",
+                    n_ctx=config.llamacppDefaultModel_n_ctx,
+                    verbose=False,
+                    n_gpu_layers=config.llamacppDefaultModel_n_gpu_layers,
+                )
+        except:
+            # restore default config
+            print2("Errors! Restoring default model!")
+            config.llamacppDefaultModel_model_path = ""
+            config.llamacppDefaultModel_repo_id = "TheBloke/phi-2-GGUF"
+            config.llamacppDefaultModel_filename = "phi-2.Q4_K_M.gguf"
             config.llamacppDefaultModel = Llama.from_pretrained(
                 repo_id=config.llamacppDefaultModel_repo_id,
                 filename=config.llamacppDefaultModel_filename,
@@ -44,16 +71,33 @@ class CallLlamaCpp:
                 n_gpu_layers=config.llamacppDefaultModel_n_gpu_layers,
             )
 
-        # llamacppCodeModel_model_path
-        if config.llamacppCodeModel_model_path and os.path.isfile(config.llamacppCodeModel_model_path):
-            config.llamacppCodeModel = Llama(
-                model_path=config.llamacppCodeModel_model_path,
-                chat_format="chatml",
-                n_ctx=config.llamacppCodeModel_n_ctx,
-                verbose=False,
-                n_gpu_layers=config.llamacppCodeModel_n_gpu_layers,
-            )
-        else:
+        try:
+            # llamacppCodeModel_model_path
+            if config.llamacppCodeModel_model_path and os.path.isfile(config.llamacppCodeModel_model_path):
+                config.llamacppCodeModel = Llama(
+                    model_path=config.llamacppCodeModel_model_path,
+                    chat_format="chatml",
+                    n_ctx=config.llamacppCodeModel_n_ctx,
+                    verbose=False,
+                    n_gpu_layers=config.llamacppCodeModel_n_gpu_layers,
+                )
+            else:
+                config.llamacppCodeModel = Llama.from_pretrained(
+                    repo_id=config.llamacppCodeModel_repo_id,
+                    filename=config.llamacppCodeModel_filename,
+                    local_dir=llm_directory,
+                    local_dir_use_symlinks=False if config.store_llm_in_user_dir else True,
+                    chat_format="chatml",
+                    n_ctx=config.llamacppCodeModel_n_ctx,
+                    verbose=False,
+                    n_gpu_layers=config.llamacppCodeModel_n_gpu_layers,
+                )
+        except:
+            # restore default config
+            print2("Errors! Restoring default model!")
+            config.llamacppCodeModel_model_path = ""
+            config.llamacppCodeModel_repo_id = "TheBloke/phi-2-GGUF"
+            config.llamacppCodeModel_filename = "phi-2.Q4_K_M.gguf"
             config.llamacppCodeModel = Llama.from_pretrained(
                 repo_id=config.llamacppCodeModel_repo_id,
                 filename=config.llamacppCodeModel_filename,

@@ -52,7 +52,9 @@ Default: 'llamacpp'
 
 Testing:
 
-* [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/)
+* [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library)
+
+Remarks: From version 0.0.44, FreeGenius AI supports loading Ollama hosted models with "llamacpp" set as the backend.  It is recommended to use Ollama hosted models with Llama.cpp for two reasons.  First, Llama.cpp-compatible models are easily to be downloaded via Ollama. We added a prompt for user to easily choose models from numeral choices. Second, Llama.cpp loads and responses faster for the same model, compared against Ollama.  The speed advantage of Llama.cpp is more obvious with average hardware.
 
 * [Ollama](https://ollama.com/) / [Ollama Hosted models](https://ollama.com/library)
 
@@ -61,6 +63,8 @@ Testing:
 * [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
 
 * [LetMeDoIt mode](https://github.com/eliranwong/freegenius/wiki/LetMeDoIt-Mode) / [ChatGPT models](https://platform.openai.com/docs/models)
+
+Remarks: To use Ollama hosted models, installation [Ollama](https://ollama.com/) is required.
 
 # How to Change LLM Backend?
 

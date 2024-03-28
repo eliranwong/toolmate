@@ -1,4 +1,4 @@
-from freegenius import config, getLocalStorage, get_or_create_collection, add_vector, fileNamesWithoutExtension
+from freegenius import config, getLocalStorage, get_or_create_collection, add_vector, getFilenamesWithoutExtension
 from freegenius import print2
 from pathlib import Path
 from chromadb.config import Settings
@@ -49,7 +49,7 @@ class Plugins:
                 config.pluginExcludeList.remove(i)
         # execute enabled plugins
         for folder in pluginFolders:
-            for plugin in fileNamesWithoutExtension(folder, "py"):
+            for plugin in getFilenamesWithoutExtension(folder, "py"):
                 if not plugin in config.pluginExcludeList:
                     script = os.path.join(folder, "{0}.py".format(plugin))
                     run = execPythonFile(script)

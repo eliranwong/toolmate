@@ -1,13 +1,13 @@
 import ollama
 from ollama import pull
 from tqdm import tqdm
-
+from freegenius import getDownloadedOllamaModels
 
 class Downloader:
 
     @staticmethod
-    def downloadOllamaModel(model, force=False):
-        if force or not f"'model': '{model}'" in str(ollama.list()).replace(":latest", ""):
+    def downloadOllamaModel(model, force=False) -> bool:
+        if force or not model in getDownloadedOllamaModels():
 
             print(f"Downloading '{model}' ...")
             
@@ -32,3 +32,5 @@ class Downloader:
                     current_digest = digest
             except ollama.ResponseError as e:
                 print('Error:', e.error)
+                return False
+        return True

@@ -4,6 +4,10 @@ FreeGenius AI is an ambitious project sparked by the pioneering work of [LetMeDo
 
 As with [LetMeDoIt AI](https://github.com/eliranwong/letmedoit), FreeGenius AI is designed to be capable of engaging in intuitive conversations, executing codes, providing up-to-date information, and performing a wide range of tasks. It's designed to learn, adapt, and grow with the user, offering personalized experiences and interactions.
 
+# Status
+
+This project is still in early development and testing, not for production yet.
+
 # Beyond LetMeDoIt AI
 
 The genesis of this project stems from our aspiration to augment the capabilities of [LetMeDoIt AI](https://github.com/eliranwong/letmedoit) significantly.
@@ -30,10 +34,6 @@ The author aims to equip FreeGenius AI, as an AI suite that is able to:
 - devlops strategies plugin framework to execute multi-step generation or task execution
 - run with common computer hardwares with reasonable and affordable cost
 
-# In Testing Stage; Not for Production Yet
-
-Please kindly note that the project is still in testing phrase. It is not for production yet.
-
 ## For Testing and Contributions
 
 Install FreeGenius AI, by running:
@@ -52,7 +52,9 @@ Default: 'llamacpp'
 
 Testing:
 
-* [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/)
+* [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library)
+
+Remarks: From version 0.0.44, FreeGenius AI supports loading Ollama hosted models with "llamacpp" set as the backend.  It is recommended to use Ollama hosted models with Llama.cpp for two reasons.  First, Llama.cpp-compatible models are easily to be downloaded via Ollama. We added a prompt for user to easily choose models from numeral choices. Second, Llama.cpp loads and responses faster for the same model, compared against Ollama.  The speed advantage of Llama.cpp is more obvious with average hardware.
 
 * [Ollama](https://ollama.com/) / [Ollama Hosted models](https://ollama.com/library)
 
@@ -61,6 +63,8 @@ Testing:
 * [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
 
 * [LetMeDoIt mode](https://github.com/eliranwong/freegenius/wiki/LetMeDoIt-Mode) / [ChatGPT models](https://platform.openai.com/docs/models)
+
+Remarks: To use Ollama hosted models, installation [Ollama](https://ollama.com/) is required.
 
 # How to Change LLM Backend?
 

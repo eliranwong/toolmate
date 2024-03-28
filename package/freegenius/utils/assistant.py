@@ -800,7 +800,7 @@ class FreeGenius:
         }
         llmBackend = self.dialogs.getValidOptions(
             options=options.keys(),
-            descriptions=options.values(),
+            descriptions=list(options.values()),
             title="LLM Backend",
             default=config.llmBackend,
             text="Select a backend:",

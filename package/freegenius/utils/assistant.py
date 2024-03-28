@@ -38,7 +38,7 @@ if not config.isTermux:
     from freegenius.geminipro import GeminiPro
     from freegenius.palm2 import Palm2
     from freegenius.codey import Codey
-from elevenlabs import generate, voices
+from elevenlabs.client import ElevenLabs
 
 
 class FreeGenius:
@@ -215,15 +215,19 @@ class FreeGenius:
         elevenlabsVoice_history = os.path.join(self.storageDir, "history", "elevenlabsVoice")
         elevenlabsVoice_session = PromptSession(history=FileHistory(elevenlabsVoice_history))
         # input suggestion for options
-        options = [voice.name for voice in voices()]
+        options = {}
+        ids = {}
+        for voice in list(ElevenLabs(api_key=config.elevenlabsApi).voices.get_all())[0][-1]:
+            options[voice.name] = voice.voice_id
+            ids[voice.voice_id] = voice.name
         # default
-        default = config.elevenlabsVoice if config.elevenlabsVoice in options else "Rachel"
+        default = ids[config.elevenlabsVoice] if config.elevenlabsVoice in ids else "Rachel"
         # completer
-        completer = FuzzyCompleter(WordCompleter(options, ignore_case=True))
+        completer = FuzzyCompleter(WordCompleter(options.keys(), ignore_case=True))
         print1("Please specify ElevenLabs Text-to-Speech Voice:")
         option = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=default, promptSession=elevenlabsVoice_session, completer=completer)
         if option and not option in (config.exit_entry, config.cancel_entry):
-            config.elevenlabsVoice = option if option in options else "Rachel"
+            config.elevenlabsVoice = options[option] if option in options else "21m00Tcm4TlvDq8ikWAM" # Rachel's voice id
 
     # Google Text-to-Speech (Generic)
     def setGttsLanguage(self):
@@ -417,10 +421,10 @@ class FreeGenius:
                 config.elevenlabsApi = apikey
             try:
                 # testing
-                generate(
-                    api_key=config.elevenlabsApi, # Defaults to os.getenv(ELEVEN_API_KEY)
+                ElevenLabs(api_key=config.elevenlabsApi).generate(
+                    #api_key=config.elevenlabsApi, # Defaults to os.getenv(ELEVEN_API_KEY)
                     text="test",
-                    voice="Rachel",
+                    voice=config.elevenlabsVoice,
                     model="eleven_multilingual_v2"
                 )
                 config.saveConfig()

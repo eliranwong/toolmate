@@ -1,7 +1,8 @@
 from freegenius import config
 import os, traceback, subprocess, re, sounddevice, soundfile
 from gtts import gTTS
-from elevenlabs import generate, play
+from elevenlabs.client import ElevenLabs
+from elevenlabs import play
 from freegenius.utils.vlc_utils import VlcUtil
 try:
     from google.cloud import texttospeech
@@ -60,10 +61,10 @@ class TTSUtil:
                             command = f'''{config.ttsCommand} "{content}"{config.ttsCommandSuffix}'''
                     subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
                 elif config.ttsPlatform == "elevenlabs" and config.elevenlabsApi:
-                    audio = generate(
-                        api_key=config.elevenlabsApi, # Defaults to os.getenv(ELEVEN_API_KEY)
+                    audio = ElevenLabs(api_key=config.elevenlabsApi).generate(
+                        #api_key=config.elevenlabsApi, # Defaults to os.getenv(ELEVEN_API_KEY)
                         text=content,
-                        voice="Rachel",
+                        voice=config.elevenlabsVoice,
                         model="eleven_multilingual_v2"
                     )
                     play(audio)

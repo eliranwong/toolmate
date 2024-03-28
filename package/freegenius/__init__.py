@@ -49,6 +49,9 @@ import sounddevice
 
 # local llm
 
+def startLlamacppServer():
+    ""
+
 def getOllamaModelDir():
     # read https://github.com/ollama/ollama/blob/main/docs/faq.md#where-are-models-stored
     OLLAMA_MODELS = os.getenv("OLLAMA_MODELS")

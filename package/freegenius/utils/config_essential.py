@@ -135,7 +135,7 @@ defaultSettings = (
     ("ttsLanguagesCommandMap", {"en": "", "en-gb": "", "en-us": "", "zh": "", "yue": "", "el": "",}), # advanced users need to edit this item manually to support different voices with customised tts command, e.g. ttsCommand set to "say -r 200 -v Daniel" and ttsLanguagesCommandMap set to {"en": "Daniel", "en-gb": "Daniel", "en-us": "", "zh": "", "yue": "", "el": "",}
     ("openweathermapApi", ""),
     ("elevenlabsApi", ""),
-    ("elevenlabsVoice", "Rachel"),
+    ("elevenlabsVoice", "21m00Tcm4TlvDq8ikWAM"),
     ("pyaudioInstalled", False),
     ("voiceTypingPlatform", "google"), # "google", "googlecloud", "whisper"
     ("voiceTypingLanguage", "en-US"), # https://cloud.google.com/speech-to-text/docs/speech-to-text-supported-languages

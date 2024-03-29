@@ -40,6 +40,7 @@ class CallLlamaCpp:
                     model_path=config.llamacppDefaultModel_model_path,
                     chat_format="chatml",
                     n_ctx=config.llamacppDefaultModel_n_ctx,
+                    n_batch=config.llamacppDefaultModel_n_batch,
                     verbose=False,
                     n_gpu_layers=config.llamacppDefaultModel_n_gpu_layers,
                 )
@@ -51,6 +52,7 @@ class CallLlamaCpp:
                     local_dir_use_symlinks=False if config.store_llm_in_user_dir else True,
                     chat_format="chatml",
                     n_ctx=config.llamacppDefaultModel_n_ctx,
+                    n_batch=config.llamacppDefaultModel_n_batch,
                     verbose=False,
                     n_gpu_layers=config.llamacppDefaultModel_n_gpu_layers,
                 )
@@ -67,6 +69,7 @@ class CallLlamaCpp:
                 local_dir_use_symlinks=False if config.store_llm_in_user_dir else True,
                 chat_format="chatml",
                 n_ctx=config.llamacppDefaultModel_n_ctx,
+                n_batch=config.llamacppDefaultModel_n_batch,
                 verbose=False,
                 n_gpu_layers=config.llamacppDefaultModel_n_gpu_layers,
             )
@@ -78,6 +81,7 @@ class CallLlamaCpp:
                     model_path=config.llamacppCodeModel_model_path,
                     chat_format="chatml",
                     n_ctx=config.llamacppCodeModel_n_ctx,
+                    n_batch=config.llamacppCodeModel_n_batch,
                     verbose=False,
                     n_gpu_layers=config.llamacppCodeModel_n_gpu_layers,
                 )
@@ -89,6 +93,7 @@ class CallLlamaCpp:
                     local_dir_use_symlinks=False if config.store_llm_in_user_dir else True,
                     chat_format="chatml",
                     n_ctx=config.llamacppCodeModel_n_ctx,
+                    n_batch=config.llamacppCodeModel_n_batch,
                     verbose=False,
                     n_gpu_layers=config.llamacppCodeModel_n_gpu_layers,
                 )
@@ -105,6 +110,7 @@ class CallLlamaCpp:
                 local_dir_use_symlinks=False if config.store_llm_in_user_dir else True,
                 chat_format="chatml",
                 n_ctx=config.llamacppCodeModel_n_ctx,
+                n_batch=config.llamacppCodeModel_n_batch,
                 verbose=False,
                 n_gpu_layers=config.llamacppCodeModel_n_gpu_layers,
             )

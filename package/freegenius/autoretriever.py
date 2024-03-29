@@ -13,7 +13,7 @@ if not hasattr(config, "max_consecutive_auto_reply"):
 
 from freegenius import print2, print3, tokenLimits
 
-from freegenius import getEmbeddingFunction
+from freegenius import getEmbeddingFunction, startLlamacppServer, stopLlamacppServer
 import autogen, os, json, traceback, chromadb, re, zipfile, datetime, traceback
 from chromadb.config import Settings
 from pathlib import Path
@@ -48,6 +48,13 @@ class AutoGenRetriever:
         """
         os.environ["AUTOGEN_USE_DOCKER"] = "False"
 
+        if config.llmBackend == "llamacpp":
+            startLlamacppServer()
+
+    def __del__(self):
+        if config.llmBackend == "llamacpp":
+            stopLlamacppServer()
+
     def getResponse(self, docs_path, message, auto=False):
         if not os.path.exists(docs_path):
             print2("Invalid path!")
@@ -81,22 +88,33 @@ class AutoGenRetriever:
                 print2("File format not supported!")
                 return None
 
-        oai_config_list = autogen.config_list_from_json(
-            env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
-            filter_dict={
-                "model": {
-                    config.chatGPTApiModel,
+        if config.llmBackend == "chatgpt":
+            config_list = autogen.config_list_from_json(
+                env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
+                filter_dict={
+                    "model": {
+                        config.chatGPTApiModel,
+                    }
                 }
-            }
-        )
-
-        ollama_config_list = [
-            {
-                "model": config.ollamaDefaultModel,
-                "base_url": "http://localhost:11434/v1",
-                "api_key": "ollama",
-            }
-        ]
+            )
+        elif config.llmBackend == "ollama":
+            config_list = [
+                {
+                    "model": config.ollamaDefaultModel,
+                    "base_url": "http://localhost:11434/v1",
+                    "api_type": "open_ai",
+                    "api_key": "freegenius",
+                }
+            ]
+        elif config.llmBackend == "llamacpp":
+            config_list = [
+                {
+                    "model": config.llamacppDefaultModel_model_path,
+                    "base_url": "http://localhost:8000/v1",
+                    "api_type": "open_ai",
+                    "api_key": "freegenius",
+                }
+            ]
 
         # https://microsoft.github.io/autogen/docs/reference/agentchat/contrib/retrieve_assistant_agent
         assistant = RetrieveAssistantAgent(
@@ -104,7 +122,7 @@ class AutoGenRetriever:
             system_message="You are a helpful assistant.",
             llm_config={
                 #"cache_seed": 42,  # seed for caching and reproducibility
-                "config_list": oai_config_list if config.llmBackend == "chatgpt" else ollama_config_list,
+                "config_list": config_list,
                 "temperature": config.llmTemperature,  # temperature for sampling
                 "timeout": 600,
             },  # configuration for autogen's enhanced inference API which is compatible with OpenAI API

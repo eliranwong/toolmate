@@ -12,7 +12,7 @@ if not hasattr(config, "max_consecutive_auto_reply"):
     config.max_consecutive_auto_reply = 10
 
 import autogen, os, json, traceback
-from freegenius import getDeviceInfo, tokenLimits
+from freegenius import getDeviceInfo, startLlamacppServer, stopLlamacppServer, tokenLimits
 from freegenius.utils.prompts import Prompts
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.styles import Style
@@ -43,6 +43,13 @@ class AutoGenAssistant:
         """
         os.environ["AUTOGEN_USE_DOCKER"] = "False"
 
+        if config.llmBackend == "llamacpp":
+            startLlamacppServer()
+
+    def __del__(self):
+        if config.llmBackend == "llamacpp":
+            stopLlamacppServer()
+
     def getResponse(self, message, auto=False):
 
         message = f"""Current device information is given below:
@@ -51,28 +58,39 @@ class AutoGenAssistant:
 Below is my message:
 {message}"""
 
-        oai_config_list = autogen.config_list_from_json(
-            env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
-            filter_dict={
-                "model": {
-                    config.chatGPTApiModel,
+        if config.llmBackend == "chatgpt":
+            config_list = autogen.config_list_from_json(
+                env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
+                filter_dict={
+                    "model": {
+                        config.chatGPTApiModel,
+                    }
                 }
-            }
-        )
-
-        ollama_config_list = [
-            {
-                "model": config.ollamaDefaultModel,
-                "base_url": "http://localhost:11434/v1",
-                "api_key": "ollama",
-            }
-        ]
+            )
+        elif config.llmBackend == "ollama":
+            config_list = [
+                {
+                    "model": config.ollamaDefaultModel,
+                    "base_url": "http://localhost:11434/v1",
+                    "api_type": "open_ai",
+                    "api_key": "freegenius",
+                }
+            ]
+        elif config.llmBackend == "llamacpp":
+            config_list = [
+                {
+                    "model": config.llamacppDefaultModel_model_path,
+                    "base_url": "http://localhost:8000/v1",
+                    "api_type": "open_ai",
+                    "api_key": "freegenius",
+                }
+            ]
 
         assistant = autogen.AssistantAgent(
             name="assistant",
             llm_config={
                 #"cache_seed": 42,  # seed for caching and reproducibility
-                "config_list": oai_config_list if config.llmBackend == "chatgpt" else ollama_config_list,
+                "config_list": config_list,
                 "temperature": config.llmTemperature,  # temperature for sampling
                 "timeout": 300,
             },  # configuration for autogen's enhanced inference API which is compatible with OpenAI API

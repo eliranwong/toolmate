@@ -30,7 +30,7 @@ from freegenius import config
 # import other libraries
 
 import os, geocoder, platform, socket, geocoder, datetime, requests, netifaces, getpass, pendulum, pkg_resources
-import traceback, uuid, re, textwrap, glob, wcwidth, shutil, threading, time, tiktoken, subprocess, json
+import traceback, uuid, re, textwrap, signal, wcwidth, shutil, threading, time, tiktoken, subprocess, json
 from packaging import version
 from chromadb.utils import embedding_functions
 from pygments.styles import get_style_by_name
@@ -50,7 +50,14 @@ import sounddevice
 # local llm
 
 def startLlamacppServer():
-    ""
+    if not hasattr(config, "llamacppServer") or config.llamacppServer is None:
+        cmd = f"""{sys.executable} -m llama_cpp.server --model {config.llamacppDefaultModel_model_path} --verbose False --chat_format chatml --n_ctx {config.llamacppDefaultModel_n_ctx} --n_gpu_layers {config.llamacppDefaultModel_n_gpu_layers} --n_batch {config.llamacppDefaultModel_n_batch}"""
+        config.llamacppServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+
+def stopLlamacppServer():
+    if hasattr(config, "llamacppServer"):
+        os.killpg(os.getpgid(config.llamacppServer.pid), signal.SIGTERM)
+        config.llamacppServer = None
 
 def getOllamaModelDir():
     # read https://github.com/ollama/ollama/blob/main/docs/faq.md#where-are-models-stored

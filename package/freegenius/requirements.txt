@@ -51,3 +51,4 @@ elevenlabs==1.0.3
 ollama
 llama-cpp-python[server]==0.2.57
 huggingface-hub
+langchain==0.1.13

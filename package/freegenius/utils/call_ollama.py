@@ -1,10 +1,11 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
-from freegenius import print1, print2, print3, selectTool, restartApp
+from freegenius import print1, print2, print3, selectTool, restartApp, getPythonFunctionResponse, extractPythonCode, isValidPythodCode
 from freegenius import config
 import shutil, re, traceback, json, ollama
 from typing import Optional
 from freegenius.utils.download import Downloader
 from ollama import Options
+from prompt_toolkit import prompt
 
 
 def check_ollama_errors(func):
@@ -41,13 +42,80 @@ class CallOllama:
             restartApp()
 
     @staticmethod
-    @check_ollama_errors
     def autoHealPythonCode(code, trace):
-        ...
+        # swap to code model
+        CallOllama.swapModels()
+
+        for i in range(config.max_consecutive_auto_heal):
+            userInput = f"""I encountered these errors:
+```
+{trace}
+```
+
+When I run the following python code:
+```
+{code}
+```
+
+Please rewrite the code to make it work.
+
+Remember, give me the python code ONLY, without additional notes or explanation.
+"""
+            messages = [{"role": "user", "content" : userInput}]
+            print3(f"Auto-correction attempt: {(i + 1)}")
+
+            function_call_message, function_call_response = CallOllama.getSingleFunctionCallResponse(messages, "heal_python")
+            arguments = function_call_message["function_call"]["arguments"]
+            if not arguments:
+                print2("Generating code ...")
+                response = CallOllama.getSingleChatResponse(userInput)
+                code = extractPythonCode(response)
+                if isValidPythodCode(code):
+                    arguments = {
+                        "code": code,
+                        "missing": [],
+                        "issue": "",
+                    }
+                    function_call_response = executeToolFunction(arguments, "heal_python")
+                else:
+                    continue
+
+            # display response
+            print1(config.divider)
+            if config.developer:
+                print(function_call_response)
+            else:
+                print1("Executed!" if function_call_response == "EXECUTED" else "Failed!")
+            if function_call_response == "EXECUTED":
+                break
+            else:
+                code = arguments.get("code")
+                trace = function_call_response
+            print1(config.divider)
+        
+        # swap back to default model
+        CallOllama.swapModels()
+
+        # return information if any
+        if function_call_response == "EXECUTED":
+            pythonFunctionResponse = getPythonFunctionResponse(code)
+            if pythonFunctionResponse:
+                return json.dumps({"information": pythonFunctionResponse})
+            else:
+                return ""
+        # ask if user want to manually edit the code
+        print1(f"Failed to execute the code {(config.max_consecutive_auto_heal + 1)} times in a row!")
+        print1("Do you want to manually edit it? [y]es / [N]o")
+        confirmation = prompt(style=config.promptStyle2, default="N")
+        if confirmation.lower() in ("y", "yes"):
+            config.defaultEntry = f"```python\n{code}\n```"
+            return ""
+        else:
+            return "[INVALID]"
 
     @staticmethod
     @check_ollama_errors
-    def regularCall(messages: dict, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
+    def regularCall(messages: dict, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
         return ollama.chat(
             keep_alive=config.ollamaDefaultModel_keep_alive,
             model=config.ollamaDefaultModel,
@@ -56,6 +124,7 @@ class CallOllama:
             options=Options(
                 temperature=temperature if temperature is not None else config.llmTemperature,
                 num_ctx=num_ctx if num_ctx is not None else config.ollamaDefaultModel_num_ctx,
+                num_batch=num_batch if num_batch is not None else config.ollamaDefaultModel_num_batch,
                 num_predict=num_predict if num_predict is not None else config.ollamaDefaultModel_num_predict,
             ),
             **kwargs,
@@ -63,7 +132,7 @@ class CallOllama:
 
     @staticmethod
     @check_ollama_errors
-    def getResponseDict(messages: list, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
+    def getResponseDict(messages: list, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
         #pprint.pprint(messages)
         try:
             completion = ollama.chat(
@@ -75,6 +144,7 @@ class CallOllama:
                 options=Options(
                     temperature=temperature if temperature is not None else config.llmTemperature,
                     num_ctx=num_ctx if num_ctx is not None else config.ollamaDefaultModel_num_ctx,
+                    num_batch=num_batch if num_batch is not None else config.ollamaDefaultModel_num_batch,
                     num_predict=num_predict if num_predict is not None else config.ollamaDefaultModel_num_predict,
                 ),
                 **kwargs,
@@ -91,7 +161,7 @@ class CallOllama:
 
     @staticmethod
     @check_ollama_errors
-    def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
+    def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
         # non-streaming single call
         messages.append({"role": "user", "content" : userInput})
         try:
@@ -102,6 +172,7 @@ class CallOllama:
                 options=Options(
                     temperature=temperature if temperature is not None else config.llmTemperature,
                     num_ctx=num_ctx if num_ctx is not None else config.ollamaDefaultModel_num_ctx,
+                    num_batch=num_batch if num_batch is not None else config.ollamaDefaultModel_num_batch,
                     num_predict=num_predict if num_predict is not None else config.ollamaDefaultModel_num_predict,
                 ),
                 **kwargs,
@@ -127,10 +198,10 @@ class CallOllama:
 
     @staticmethod
     @check_ollama_errors
-    def getSingleFunctionCallResponse(messages: list, function_name: str, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
+    def getSingleFunctionCallResponse(messages: list, function_name: str, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
         tool_schema = config.toolFunctionSchemas[function_name]["parameters"]
         user_request = messages[-1]["content"]
-        func_arguments = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages, temperature=temperature, num_ctx=num_ctx, num_predict=num_predict, **kwargs)
+        func_arguments = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages, temperature=temperature, num_ctx=num_ctx, num_batch=num_batch, num_predict=num_predict, **kwargs)
         function_call_response = executeToolFunction(func_arguments=func_arguments, function_name=function_name)
         function_call_message_mini = {
             "role": "assistant",
@@ -259,7 +330,15 @@ Remember, response in JSON with the filled template ONLY.""",
         return True if "yes" in str(output).lower() else False
 
     @staticmethod
-    def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_predict: Optional[int]=None, **kwargs) -> dict:
+    def swapModels():
+        config.ollamaDefaultModel, config.ollamaCodeModel = config.ollamaCodeModel, config.ollamaDefaultModel
+        config.ollamaDefaultModel_num_ctx, config.ollamaCodeModel_num_ctx = config.ollamaCodeModel_num_ctx, config.ollamaDefaultModel_num_ctx
+        config.ollamaDefaultModel_num_predict, config.ollamaCodeModel_num_predict = config.ollamaCodeModel_num_predict, config.ollamaDefaultModel_num_predict
+        config.ollamaDefaultModel_num_batch, config.ollamaCodeModel_num_batch = config.ollamaCodeModel_num_batch, config.ollamaDefaultModel_num_batch
+        config.ollamaDefaultModel_keep_alive, config.ollamaCodeModel_keep_alive = config.ollamaCodeModel_keep_alive, config.ollamaDefaultModel_keep_alive
+
+    @staticmethod
+    def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, **kwargs) -> dict:
         """
         Extract action parameters
         """
@@ -301,7 +380,7 @@ Remember, response in JSON with the filled template ONLY.""",
             },
         ]
 
-        parameters = CallOllama.getResponseDict(messages, temperature=temperature, num_ctx=num_ctx, num_predict=num_predict, **kwargs)
+        parameters = CallOllama.getResponseDict(messages, temperature=temperature, num_ctx=num_ctx, num_batch=num_batch, num_predict=num_predict, **kwargs)
 
         # enforce code generation
         if (len(properties) == 1 or "code" in schema["required"]) and "code" in parameters and (not isinstance(parameters.get("code"), str) or not parameters.get("code").strip() or not isValidPythodCode(parameters.get("code").strip())):
@@ -333,20 +412,13 @@ Remember, answer in JSON with the filled template ONLY.""",
                 },
             ]
 
-            # switch to a dedicated model for code generation
-            ollamaDefaultModel = config.ollamaDefaultModel
-            ollamaDefaultModel_num_ctx = config.ollamaDefaultModel_num_ctx
-            ollamaDefaultModel_num_predict = config.ollamaDefaultModel_num_predict
+            # swap to code model
+            CallOllama.swapModels()
 
-            config.ollamaDefaultModel = config.ollamaCodeModel
-            config.ollamaDefaultModel_num_ctx = config.ollamaCodeModel_num_ctx
-            config.ollamaDefaultModel_num_predict = config.ollamaCodeModel_num_predict
-
-            code = CallOllama.getResponseDict(messages, temperature=temperature, num_ctx=num_ctx, num_predict=num_predict, **kwargs)
+            code = CallOllama.getResponseDict(messages, temperature=temperature, num_ctx=num_ctx, num_batch=num_batch, num_predict=num_predict, **kwargs)
             parameters["code"] = code["code"]
 
-            config.ollamaDefaultModel = ollamaDefaultModel
-            config.ollamaDefaultModel_num_ctx = ollamaDefaultModel_num_ctx
-            config.ollamaDefaultModel_num_predict = ollamaDefaultModel_num_predict
+            # swap back to default model
+            CallOllama.swapModels()
 
         return parameters

@@ -24,11 +24,14 @@ def heal_python(function_args):
 
     fix = function_args.get("code") # required
     missing = function_args.get("missing") # required
-    if isinstance(missing, str):
-        missing = eval(missing)
 
     try:
         if missing:
+            try:
+                if isinstance(missing, str):
+                    missing = eval(missing)
+            except:
+                missing = [missing]
             print2("Installing missing packages ...")
             for i in missing:
                 installPipPackage(f"--upgrade {i}")

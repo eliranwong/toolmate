@@ -117,8 +117,22 @@ class CallLlamaCpp:
 
     @staticmethod
     def autoHealPythonCode(code, trace):
+        # swap to code model
+        CallLlamaCpp.swapModels()
+
         for i in range(config.max_consecutive_auto_heal):
-            userInput = f"Original python code:\n```\n{code}\n```\n\nTraceback:\n```\n{trace}\n```"
+            userInput = f"""I encountered these errors:
+```
+{trace}
+```
+
+When I run the following python code:
+```
+{code}
+```
+
+Please rewrite the code to make it work.
+""" # alternative: Please generate another copy of code that fix the errors.
             messages = [{"role": "user", "content" : userInput}]
             print3(f"Auto-correction attempt: {(i + 1)}")
             function_call_message, function_call_response = CallLlamaCpp.getSingleFunctionCallResponse(messages, "heal_python")
@@ -131,9 +145,16 @@ class CallLlamaCpp:
             if function_call_response == "EXECUTED":
                 break
             else:
-                code = json.loads(function_call_message["function_call"]["arguments"]).get("fix")
+                arguments = function_call_message["function_call"]["arguments"]
+                if not arguments:
+                    continue
+                code = arguments.get("code")
                 trace = function_call_response
             print1(config.divider)
+        
+        # swap back to default model
+        CallLlamaCpp.swapModels()
+        
         # return information if any
         if function_call_response == "EXECUTED":
             pythonFunctionResponse = getPythonFunctionResponse(code)
@@ -150,10 +171,6 @@ class CallLlamaCpp:
             return ""
         else:
             return "[INVALID]"
-
-
-    def autoHealPythonCode2(code, trace):
-        ...
 
     @staticmethod
     def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs):
@@ -374,6 +391,10 @@ Remember, response in JSON with the filled template ONLY.""",
         return True if (not output) or str(output).lower() == "yes" else False
 
     @staticmethod
+    def swapModels():
+        config.llamacppDefaultModel, config.llamacppCodeModel = config.llamacppCodeModel, config.llamacppDefaultModel
+
+    @staticmethod
     def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs) -> dict:
         """
         Extract action parameters
@@ -381,7 +402,7 @@ Remember, response in JSON with the filled template ONLY.""",
         schema = toParameterSchema(schema)
         deviceInfo = f"""\n\nMy device information:\n{getDeviceInfo()}""" if config.includeDeviceInfoInContext else ""
         if "code" in schema["properties"]:
-            enforceCodeOutput = """The python script is run as main program, so do NOT use `if __name__ == "__main__"` block. Remember, you should format the requested information, if any, into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."""
+            enforceCodeOutput = """Remember, you should format the requested information, if any, into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."""
             schema["properties"]["code"]["description"] += enforceCodeOutput
             code_instruction = f"""\n\nParticularly, generate python code as the value of the JSON key "code" based on the following instruction:\n{schema["properties"]["code"]["description"]}"""
         else:
@@ -434,16 +455,8 @@ Remember, output in JSON.""",
                 },
             ]
 
-            # switch to a dedicated model for code generation
-            llamacppDefaultModel_repo_id = config.llamacppDefaultModel_repo_id
-            llamacppDefaultModel_filename = config.llamacppDefaultModel_filename
-            llamacppDefaultModel_n_ctx = config.llamacppDefaultModel_n_ctx
-            llamacppDefaultModel_max_tokens = config.llamacppDefaultModel_max_tokens
-
-            config.llamacppDefaultModel_repo_id = config.llamacppCodeModel_repo_id
-            config.llamacppDefaultModel_filename = config.llamacppCodeModel_filename
-            config.llamacppDefaultModel_n_ctx = config.llamacppCodeModel_n_ctx
-            config.llamacppDefaultModel_max_tokens = config.llamacppCodeModel_max_tokens            
+            # swap to code model
+            CallLlamaCpp.swapModels()
 
             this_schema = {
                 "type": "object",
@@ -458,9 +471,7 @@ Remember, output in JSON.""",
             code = CallLlamaCpp.getResponseDict(messages, this_schema, temperature=temperature, max_tokens=max_tokens, **kwargs)
             parameters["code"] = code["code"]
 
-            config.llamacppDefaultModel_repo_id = llamacppDefaultModel_repo_id
-            config.llamacppDefaultModel_filename = llamacppDefaultModel_filename
-            config.llamacppDefaultModel_n_ctx = llamacppDefaultModel_n_ctx
-            config.llamacppDefaultModel_max_tokens = llamacppDefaultModel_max_tokens
+            # swap back to default model
+            CallLlamaCpp.swapModels()
 
         return parameters

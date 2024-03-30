@@ -51,7 +51,7 @@ import sounddevice
 
 def startLlamacppServer():
     if not hasattr(config, "llamacppServer") or config.llamacppServer is None:
-        cmd = f"""{sys.executable} -m llama_cpp.server --model {config.llamacppDefaultModel_model_path} --verbose False --chat_format chatml --n_ctx {config.llamacppDefaultModel_n_ctx} --n_gpu_layers {config.llamacppDefaultModel_n_gpu_layers} --n_batch {config.llamacppDefaultModel_n_batch}"""
+        cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppServer_port} --model "{config.llamacppDefaultModel_model_path}" --verbose False --chat_format chatml --n_ctx {config.llamacppDefaultModel_n_ctx} --n_gpu_layers {config.llamacppDefaultModel_n_gpu_layers} --n_batch {config.llamacppDefaultModel_n_batch}"""
         config.llamacppServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
 
 def stopLlamacppServer():
@@ -286,6 +286,13 @@ def extractPythonCode(content):
 def fineTunePythonCode(code):
     # dedent
     code = textwrap.dedent(code).rstrip()
+    # extract from code block, if any
+    if code_only := re.search('```python\n(.+?)```', code, re.DOTALL):
+        code = code_only.group(1)
+    # make sure it is run as main program
+    if "if __name__ == '__main__':\n" in code:
+        half1, half2 = code.split("if __name__ == '__main__':\n", 1)
+        code = half1 + textwrap.dedent(half2)
     # capture print output
     config.pythonFunctionResponse = ""
     insert_string = "from freegenius import config\nconfig.pythonFunctionResponse = "

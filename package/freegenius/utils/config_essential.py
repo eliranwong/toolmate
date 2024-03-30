@@ -36,11 +36,15 @@ defaultSettings = (
     ('includeIpInDeviceInfo', False),
     ('ollamaDefaultModel', 'phi'), # ollama model used for general purposes
     ('ollamaDefaultModel_num_ctx', 100000), # ollama default model context window
+    ('ollamaDefaultModel_num_batch', 512), # ollama code model batch size
     ('ollamaDefaultModel_num_predict', -1), # ollama default model maximum tokens
     ('ollamaDefaultModel_keep_alive', "5m"), # ollama default model keep alive time
     ('ollamaCodeModel', 'phi'), # ollama model used for code generation
     ('ollamaCodeModel_num_ctx', 100000), # ollama code model context window
+    ('ollamaCodeModel_num_batch', 512), # ollama code model batch size
     ('ollamaCodeModel_num_predict', -1), # ollama code model maximum tokens
+    ('ollamaCodeModel_keep_alive', "5m"), # ollama code model keep alive time
+    ('llamacppServer_port', 8000),
     ('llamacppDefaultModel_model_path', ''), # specify file path of llama.cpp model for general purpose
     ('llamacppDefaultModel_repo_id', 'TheBloke/phi-2-GGUF'), # llama.cpp model used for general purposes, e.g. 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
     ('llamacppDefaultModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for general purposes, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'

@@ -123,7 +123,7 @@ def autoHealPythonCode(code, trace):
         if function_call_response == "EXECUTED":
             break
         else:
-            code = json.loads(function_call_message["function_call"]["arguments"]).get("fix")
+            code = json.loads(function_call_message["function_call"]["arguments"]).get("code")
             trace = function_call_response
         print1(config.divider)
     # return information if any

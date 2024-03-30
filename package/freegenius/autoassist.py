@@ -80,7 +80,7 @@ Below is my message:
             config_list = [
                 {
                     "model": config.llamacppDefaultModel_model_path,
-                    "base_url": "http://localhost:8000/v1",
+                    "base_url": f"http://localhost:{config.config.llamacppServer_port}/v1",
                     "api_type": "open_ai",
                     "api_key": "freegenius",
                 }

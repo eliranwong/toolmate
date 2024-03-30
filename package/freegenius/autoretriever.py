@@ -89,6 +89,7 @@ class AutoGenRetriever:
                 return None
 
         if config.llmBackend == "chatgpt":
+            llm = config.chatGPTApiModel
             config_list = autogen.config_list_from_json(
                 env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
                 filter_dict={
@@ -98,6 +99,7 @@ class AutoGenRetriever:
                 }
             )
         elif config.llmBackend == "ollama":
+            llm = config.ollamaDefaultModel
             config_list = [
                 {
                     "model": config.ollamaDefaultModel,
@@ -107,10 +109,11 @@ class AutoGenRetriever:
                 }
             ]
         elif config.llmBackend == "llamacpp":
+            llm = config.llamacppDefaultModel_model_path
             config_list = [
                 {
                     "model": config.llamacppDefaultModel_model_path,
-                    "base_url": "http://localhost:8000/v1",
+                    "base_url": f"http://localhost:{config.config.llamacppServer_port}/v1",
                     "api_type": "open_ai",
                     "api_key": "freegenius",
                 }
@@ -143,7 +146,7 @@ class AutoGenRetriever:
                     #"task": "qa", # the task of the retrieve chat. Possible values are "code", "qa" and "default". System prompt will be different for different tasks. The default value is default, which supports both code and qa.
                     "docs_path": docs_path,
                     "chunk_token_size": 2000, # the chunk token size for the retrieve chat. If key not provided, a default size max_tokens * 0.4 will be used.
-                    "model": oai_config_list[0]["model"] if config.llmBackend == "chatgpt" else config.ollamaDefaultModel,
+                    "model": llm,
                     "client": client,
                     "embedding_function": getEmbeddingFunction(),
                     #"embedding_model": "all-mpnet-base-v2", # the embedding model to use for the retrieve chat. If key not provided, a default model all-MiniLM-L6-v2 will be used. All available models can be found at https://www.sbert.net/docs/pretrained_models.html. The default model is a fast model. If you want to use a high performance model, all-mpnet-base-v2 is recommended.

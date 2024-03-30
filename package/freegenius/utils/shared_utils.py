@@ -138,7 +138,7 @@ class SharedUtil:
             trace = showErrors()
             print1(config.divider)
             if config.max_consecutive_auto_heal > 0:
-                return CallLLM.autoHealPythonCode(code, trace)
+                return CallLLM.autoCorrectPythonCode(code, trace)
             else:
                 return "[INVALID]"
         if not pythonFunctionResponse:

@@ -40,7 +40,7 @@ class Plugins:
         execPythonFile(script)
         # always include the following plugins
         requiredPlugins = (
-            "auto heal python code",
+            "auto correct python code",
             "execute python code",
             "execute termux command",
         )

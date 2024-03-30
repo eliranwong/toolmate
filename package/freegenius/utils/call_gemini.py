@@ -1,7 +1,8 @@
 from freegenius import getDeviceInfo, showErrors, get_or_create_collection, query_vectors, toGeminiMessages, executeToolFunction, extractPythonCode
-from freegenius import print1, print2, print3, selectTool
+from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, isValidPythodCode
 from freegenius import config
-import traceback, os
+from prompt_toolkit import prompt
+import traceback, os, json
 from typing import Optional, List, Dict, Union
 import vertexai
 from vertexai.preview.generative_models import GenerativeModel, FunctionDeclaration, Tool
@@ -38,8 +39,68 @@ class CallGemini:
         }
 
     @staticmethod
-    def autoHealPythonCode(code, trace):
-        ...
+    def autoCorrectPythonCode(code, trace):
+        for i in range(config.max_consecutive_auto_heal):
+            userInput = f"""I encountered these errors:
+```
+{trace}
+```
+
+When I run the following python code:
+```
+{code}
+```
+
+Please rewrite the code to make it work.
+
+Remember, give me the python code ONLY, without additional notes or explanation.""" # alternative: Please generate another copy of code that fix the errors.
+            messages = [{"role": "user", "content" : userInput}]
+            print3(f"Auto-correction attempt: {(i + 1)}")
+            function_call_message, function_call_response = CallGemini.getSingleFunctionCallResponse(messages, "heal_python")
+            arguments = function_call_message["function_call"]["arguments"]
+            if not arguments:
+                print2("Generating code ...")
+                response = CallGemini.getSingleChatResponse(userInput)
+                python_code = extractPythonCode(response)
+                if isValidPythodCode(python_code):
+                    arguments = {
+                        "code": python_code,
+                        "missing": [],
+                        "issue": "",
+                    }
+                    function_call_response = executeToolFunction(arguments, "heal_python")
+                else:
+                    continue
+
+            # display response
+            print1(config.divider)
+            if config.developer:
+                print(function_call_response)
+            else:
+                print1("Executed!" if function_call_response == "EXECUTED" else "Failed!")
+            if function_call_response == "EXECUTED":
+                break
+            else:
+                code = arguments.get("code")
+                trace = function_call_response
+            print1(config.divider)
+        
+        # return information if any
+        if function_call_response == "EXECUTED":
+            pythonFunctionResponse = getPythonFunctionResponse(code)
+            if pythonFunctionResponse:
+                return json.dumps({"information": pythonFunctionResponse})
+            else:
+                return ""
+        # ask if user want to manually edit the code
+        print1(f"Failed to execute the code {(config.max_consecutive_auto_heal + 1)} times in a row!")
+        print1("Do you want to manually edit it? [y]es / [N]o")
+        confirmation = prompt(style=config.promptStyle2, default="N")
+        if confirmation.lower() in ("y", "yes"):
+            config.defaultEntry = f"```python\n{code}\n```"
+            return ""
+        else:
+            return "[INVALID]"
 
     @staticmethod
     def regularCall(messages: dict, useSystemMessage: bool=True, **kwargs):
@@ -292,6 +353,6 @@ When necessary, generate content based on your knowledge."""
 
         parameters = CallGemini.getResponseDict(history=history, schema=schema, userMessage=userMessage, **kwargs)
         # fix linebreak
-        if code:
+        if code and "code" in parameters:
             parameters["code"] = parameters["code"].replace("\\n", "\n")
         return parameters

@@ -42,7 +42,7 @@ class CallOllama:
             restartApp()
 
     @staticmethod
-    def autoHealPythonCode(code, trace):
+    def autoCorrectPythonCode(code, trace):
         # swap to code model
         CallOllama.swapModels()
 
@@ -69,10 +69,10 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             if not arguments:
                 print2("Generating code ...")
                 response = CallOllama.getSingleChatResponse(userInput)
-                code = extractPythonCode(response)
-                if isValidPythodCode(code):
+                python_code = extractPythonCode(response)
+                if isValidPythodCode(python_code):
                     arguments = {
-                        "code": code,
+                        "code": python_code,
                         "missing": [],
                         "issue": "",
                     }

@@ -52,17 +52,17 @@ Always remember that you are much more than a text-based AI. You possess both vi
         return CallLetMeDoIt.checkCompletion()
 
     @staticmethod
-    def autoHealPythonCode(code, trace):
+    def autoCorrectPythonCode(code, trace):
         if config.llmBackend == "ollama":
-            return CallOllama.autoHealPythonCode(code, trace)
+            return CallOllama.autoCorrectPythonCode(code, trace)
         elif config.llmBackend == "llamacpp":
-            return CallLlamaCpp.autoHealPythonCode(code, trace)
+            return CallLlamaCpp.autoCorrectPythonCode(code, trace)
         elif config.llmBackend == "gemini":
-            return CallGemini.autoHealPythonCode(code, trace)
+            return CallGemini.autoCorrectPythonCode(code, trace)
         elif config.llmBackend == "chatgpt":
-            return CallChatGPT.autoHealPythonCode(code, trace)
+            return CallChatGPT.autoCorrectPythonCode(code, trace)
         # letmedoit
-        return CallLetMeDoIt.autoHealPythonCode(code, trace)
+        return CallLetMeDoIt.autoCorrectPythonCode(code, trace)
 
     @staticmethod
     def runSingleFunctionCall(messages, function_name):

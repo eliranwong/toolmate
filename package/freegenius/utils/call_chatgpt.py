@@ -108,7 +108,7 @@ Acess the risk level of this Python code:
         return "high"
 
 @check_openai_errors
-def autoHealPythonCode(code, trace):
+def autoCorrectPythonCode(code, trace):
     for i in range(config.max_consecutive_auto_heal):
         userInput = f"Original python code:\n```\n{code}\n```\n\nTraceback:\n```\n{trace}\n```"
         messages = [{"role": "user", "content" : userInput}]
@@ -268,7 +268,7 @@ def finetuneSingleFunctionCallResponse(func_arguments, function_name):
             trace = showErrors()
             print1(config.divider)
             if config.max_consecutive_auto_heal > 0:
-                return autoHealPythonCode(refinedCode, trace)
+                return autoCorrectPythonCode(refinedCode, trace)
             else:
                 return "[INVALID]"
         if function_response:
@@ -305,8 +305,8 @@ class CallChatGPT:
 
     @staticmethod
     @check_openai_errors
-    def autoHealPythonCode(code, trace):
-        return autoHealPythonCode(code, trace)
+    def autoCorrectPythonCode(code, trace):
+        return autoCorrectPythonCode(code, trace)
 
     @staticmethod
     @check_openai_errors
@@ -490,8 +490,8 @@ class CallLetMeDoIt:
 
     @staticmethod
     @check_openai_errors
-    def autoHealPythonCode(code, trace):
-        return autoHealPythonCode(code, trace)
+    def autoCorrectPythonCode(code, trace):
+        return autoCorrectPythonCode(code, trace)
 
     @staticmethod
     @check_openai_errors

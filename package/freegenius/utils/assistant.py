@@ -136,7 +136,7 @@ class FreeGenius:
             ".maxtokens": ("change maximum response tokens", self.setMaxTokens),
             ".mintokens": ("change minimum response tokens", self.setMinTokens),
             ".dynamictokencount": ("change dynamic token count", self.setDynamicTokenCount),
-            ".maxautoheal": ("change maximum consecutive auto-heal", self.setMaxAutoHeal),
+            ".maxautocorrect": ("change maximum consecutive auto-heal", self.setMaxAutoCorrect),
             ".maxmemorymatches": ("change maximum memory matches", self.setMemoryClosestMatches),
             ".maxchatrecordmatches": ("change maximum chat record matches", self.setChatRecordClosestMatches),
             ".plugins": ("change plugins", self.selectPlugins),
@@ -1082,13 +1082,13 @@ class FreeGenius:
             config.saveConfig()
             print3(f"Number of memory closest matches: {config.memoryClosestMatches}")
 
-    def setMaxAutoHeal(self):
+    def setMaxAutoCorrect(self):
         print1(f"The auto-heal feature enables {config.freeGeniusAIName} to automatically fix broken Python code if it was not executed properly.")
         print1("Please specify maximum number of auto-heal attempts below:")
         print1("(Remarks: Enter '0' if you want to disable auto-heal feature)")
-        maxAutoHeal = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.max_consecutive_auto_heal))
-        if maxAutoHeal and not maxAutoHeal.strip().lower() == config.exit_entry and int(maxAutoHeal) >= 0:
-            config.max_consecutive_auto_heal = int(maxAutoHeal)
+        maxAutoCorrect = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.max_consecutive_auto_heal))
+        if maxAutoCorrect and not maxAutoCorrect.strip().lower() == config.exit_entry and int(maxAutoCorrect) >= 0:
+            config.max_consecutive_auto_heal = int(maxAutoCorrect)
             config.saveConfig()
             print3(f"Maximum consecutive auto-heal: {config.max_consecutive_auto_heal}")
 
@@ -1463,7 +1463,7 @@ class FreeGenius:
             print(trace if config.developer else "Error encountered!")
             print1(config.divider)
             if config.max_consecutive_auto_heal > 0:
-                CallLLM.autoHealPythonCode(script, trace)
+                CallLLM.autoCorrectPythonCode(script, trace)
 
     def startChats(self):
         tokenValidator = TokenValidator()

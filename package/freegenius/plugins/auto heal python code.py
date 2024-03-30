@@ -5,7 +5,7 @@ from freegenius import installPipPackage
 from freegenius.utils.shared_utils import SharedUtil
 
 """
-LetMeDoIt AI Plugin - auto heal python code
+LetMeDoIt AI Plugin - auto correct python code
 
 functionalities:
 * install missing packages

@@ -163,4 +163,6 @@ ollama_models = (
     "starcoder2:7b",
     "starcoder2:15b",
     "dolphincoder",
+    "mxbai-embed-large",
+    "command-r",
 )

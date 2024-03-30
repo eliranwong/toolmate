@@ -1,5 +1,5 @@
 from freegenius import config, showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
-from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, getLocalStorage
+from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, getLocalStorage, extractPythonCode
 import traceback, json, re, os
 from typing import Optional
 from llama_cpp import Llama
@@ -116,7 +116,7 @@ class CallLlamaCpp:
             )
 
     @staticmethod
-    def autoHealPythonCode(code, trace):
+    def autoCorrectPythonCode(code, trace):
         # swap to code model
         CallLlamaCpp.swapModels()
 
@@ -132,10 +132,26 @@ When I run the following python code:
 ```
 
 Please rewrite the code to make it work.
-""" # alternative: Please generate another copy of code that fix the errors.
+
+Remember, give me the python code ONLY, without additional notes or explanation.""" # alternative: Please generate another copy of code that fix the errors.
             messages = [{"role": "user", "content" : userInput}]
             print3(f"Auto-correction attempt: {(i + 1)}")
             function_call_message, function_call_response = CallLlamaCpp.getSingleFunctionCallResponse(messages, "heal_python")
+            arguments = function_call_message["function_call"]["arguments"]
+            if not arguments:
+                print2("Generating code ...")
+                response = CallLlamaCpp.getSingleChatResponse(userInput)
+                python_code = extractPythonCode(response)
+                if isValidPythodCode(python_code):
+                    arguments = {
+                        "code": python_code,
+                        "missing": [],
+                        "issue": "",
+                    }
+                    function_call_response = executeToolFunction(arguments, "heal_python")
+                else:
+                    continue
+
             # display response
             print1(config.divider)
             if config.developer:
@@ -145,9 +161,6 @@ Please rewrite the code to make it work.
             if function_call_response == "EXECUTED":
                 break
             else:
-                arguments = function_call_message["function_call"]["arguments"]
-                if not arguments:
-                    continue
                 code = arguments.get("code")
                 trace = function_call_response
             print1(config.divider)

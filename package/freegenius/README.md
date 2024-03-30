@@ -154,7 +154,7 @@ So far, we tested the following function call plugins:
 * ask mistral
 * ask ollama
 * analyze web content
-* auto heal python code
+* auto correct python code
 * create ai assistants
 * create maps
 * execute python code

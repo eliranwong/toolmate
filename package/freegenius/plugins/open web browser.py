@@ -18,9 +18,6 @@ def open_browser(function_args):
 
 # Function Signature
 functionSignature = {
-    "intent": [
-        "access to internet real-time information",
-    ],
     "examples": [
         "Open web browser",
         "Open website",

@@ -18,10 +18,6 @@ def send_tweet(function_args):
     return ""
 
 functionSignature = {
-    "intent": [
-        "social media",
-        "access to internet real-time information",
-    ],
     "examples": [
         "Send a tweet",
         "write twitter",

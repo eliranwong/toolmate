@@ -17,9 +17,6 @@ def ask_palm2(function_args):
     return ""
 
 functionSignature = {
-    "intent": [
-        "ask a chatbot",
-    ],
     "examples": [
         "Ask PaLM about",
     ],

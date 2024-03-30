@@ -18,9 +18,6 @@ def ask_chatgpt(function_args):
     return ""
 
 functionSignature = {
-    "intent": [
-        "ask a chatbot",
-    ],
     "examples": [
         "Ask ChatGPT about",
     ],

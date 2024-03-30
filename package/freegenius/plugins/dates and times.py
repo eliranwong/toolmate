@@ -15,9 +15,6 @@ def datetimes(function_args):
     return information
 
 functionSignature = {
-    "intent": [
-        "access to internet real-time information",
-    ],
     "examples": [
         "What time is it now?",
         "What is the current time",

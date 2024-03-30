@@ -74,11 +74,6 @@ if config.terminalEnableTermuxAPI:
         return json.dumps(info)
 
     functionSignature = {
-        "intent": [
-            "access to device information",
-            "execute a computing task or run a command",
-            "generate code",
-        ],
         "examples": [
             "Run Termux command",
         ],

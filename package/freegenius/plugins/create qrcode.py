@@ -29,9 +29,6 @@ def create_qrcode(function_args):
     return ""
 
 functionSignature = {
-    "intent": [
-        "create content",
-    ],
     "examples": [
         "Create a QR code",
     ],

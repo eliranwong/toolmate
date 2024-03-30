@@ -67,10 +67,6 @@ Please consider individual table information below for code generation:
         return "[INVALID]"
 
 functionSignature = {
-    "intent": [
-        "database access",
-        "analyze files",
-    ],
     "examples": [
         "Connect to SQLite file",
         "Search SQLite file",

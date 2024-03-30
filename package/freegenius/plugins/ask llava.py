@@ -17,9 +17,6 @@ def ask_llava(function_args):
     return ""
 
 functionSignature = {
-    "intent": [
-        "ask a chatbot",
-    ],
     "examples": [
         "Ask Llava about",
     ],

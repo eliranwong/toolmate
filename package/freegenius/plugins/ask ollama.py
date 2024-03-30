@@ -50,9 +50,6 @@ def ask_ollama(function_args):
     return ""
 
 functionSignature = {
-    "intent": [
-        "ask a chatbot",
-    ],
     "examples": [
         "Ask Ollama about",
     ],

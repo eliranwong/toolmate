@@ -38,7 +38,23 @@ The author aims to equip FreeGenius AI, as an AI suite that is able to:
 
 Install FreeGenius AI, by running:
 
+To set up virtual environment (recommended):
+
+> mkdir -p ~/apps/freegenius
+
+> cd ~/apps/freegenius
+
+> python3 -m venv freegenius
+
+> source freegenius/bin/activate
+
+To install:
+
 > pip install freegenius
+
+To run:
+
+> freegenius
 
 We appreciate anyone who help testing / codeing.
 

@@ -10,7 +10,7 @@ from freegenius import config, get_or_create_collection, add_vector, query_vecto
 from freegenius import print1, print2, print3
 from pathlib import Path
 from chromadb.config import Settings
-import uuid, os, chromadb, re
+import os, chromadb, re
 from freegenius.utils.shared_utils import SharedUtil
 from prompt_toolkit import print_formatted_text, HTML
 
@@ -25,6 +25,7 @@ def save_chat_record(timestamp, order, record):
     if role and role in ("user", "assistant") and content:
         collection = get_or_create_collection("chats")
         metadata = {
+            "backend": config.llmBackend,
             "timestamp": timestamp,
             "order": order,
             "role": role,

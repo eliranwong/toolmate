@@ -62,9 +62,6 @@ def analyze_images(function_args):
         return ""
 
 functionSignature = {
-    "intent": [
-        "analyze files",
-    ],
     "examples": [
         "analyze image",
     ],

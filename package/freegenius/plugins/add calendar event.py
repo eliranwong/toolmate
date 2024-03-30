@@ -123,10 +123,6 @@ def add_calendar_event(function_args):
     return "Done!"
 
 functionSignature = {
-    "intent": [
-        "arrange activities",
-        "access to internet real-time information",
-    ],
     "examples": [
         "add to my google calendar",
         "add to my outlook calendar",

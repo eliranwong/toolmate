@@ -38,8 +38,8 @@ class CallOllama:
             config.llmBackend = "llamacpp"
             config.saveConfig()
             print("LLM backend changed back to 'llamacpp'")
-            print("Restarting 'FreeGenius AI' ...")
-            restartApp()
+            #print("Restarting 'FreeGenius AI' ...")
+            #restartApp()
 
     @staticmethod
     def autoCorrectPythonCode(code, trace):

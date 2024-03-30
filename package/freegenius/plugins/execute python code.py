@@ -55,11 +55,6 @@ def execute_python_code(function_args):
     return SharedUtil.executePythonCode(refinedCode)
 
 functionSignature = {
-    "intent": [
-        "access to device information",
-        "execute a computing task or run a command",
-        "generate code",
-    ],
     "examples": [
         "Run python code",
         "Run system command",
@@ -96,9 +91,6 @@ config.addFunctionCall(signature=functionSignature, method=execute_python_code)
 def python_qa(_):
     return "[INVALID]"
 functionSignature = {
-    "intent": [
-        "answer a question that you have sufficient knowledge",
-    ],
     "examples": [
         "How to use decorators in python",
     ],

@@ -93,10 +93,6 @@ def send_email(function_args):
     return "Done!"
 
 functionSignature = {
-    "intent": [
-        "arrange activities",
-        "access to internet real-time information",
-    ],
     "examples": [
         "Draft email",
         "Write email",

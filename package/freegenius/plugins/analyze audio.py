@@ -52,9 +52,6 @@ def analyze_audio(function_args):
 
 # Function Signature
 functionSignature = {
-    "intent": [
-        "analyze files",
-    ],
     "examples": [
         "analyze audio",
     ],

@@ -24,9 +24,6 @@ def create_map(function_args):
     return ""
 
 functionSignature = {
-    "intent": [
-        "create content",
-    ],
     "examples": [
         "Create a map",
     ],

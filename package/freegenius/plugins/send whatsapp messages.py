@@ -20,10 +20,6 @@ def send_whatsapp(function_args):
     return "Done!"
 
 functionSignature = {
-    "intent": [
-        "arrange activities",
-        "access to internet real-time information",
-    ],
     "examples": [
         "Send WhatsApp",
     ],

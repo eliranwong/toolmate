@@ -34,9 +34,6 @@ def search_latest_news(function_args: dict) -> str:
 
 # Function signature to work with ChatGPT function calling
 functionSignature = {
-    "intent": [
-        "access to internet real-time information",
-    ],
     "examples": [
         "latest news about",
         "what happened today",

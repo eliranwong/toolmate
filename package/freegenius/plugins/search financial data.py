@@ -21,9 +21,6 @@ def search_finance(function_args):
     return ""
 
 functionSignature = {
-    "intent": [
-        "access to internet real-time information",
-    ],
     "examples": [
         "Check stock price",
     ],

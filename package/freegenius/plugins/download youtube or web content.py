@@ -73,9 +73,6 @@ def download_web_content(function_args):
         return "[INVALID]"
 
 functionSignature = {
-    "intent": [
-        "access to internet real-time information",
-    ],
     "examples": [
         "Download Youtube video",
         "Download Youtube audio into mp3 format",

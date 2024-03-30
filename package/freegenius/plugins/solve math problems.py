@@ -21,9 +21,6 @@ def solve_math(function_args):
     return ""
 
 functionSignature = {
-    "intent": [
-        "resolve a math question",
-    ],
     "examples": [
         "Calculate",
     ],

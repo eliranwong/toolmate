@@ -17,9 +17,6 @@ def ask_llama2(function_args):
     return ""
 
 functionSignature = {
-    "intent": [
-        "ask a chatbot",
-    ],
     "examples": [
         "Ask Llama2 Pro about",
     ],

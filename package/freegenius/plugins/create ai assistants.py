@@ -28,10 +28,6 @@ def build_agents(function_args):
     return ""
 
 functionSignature = {
-    "intent": [
-        "ask an auto assistant",
-        "create content",
-    ],
     "examples": [
         "Ask autobuilder to",
         "Create a team of agents / assistants to",

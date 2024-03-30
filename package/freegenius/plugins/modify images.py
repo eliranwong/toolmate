@@ -142,9 +142,6 @@ def create_image(description, original_filename):
     return ""
 
 functionSignature = {
-    "intent": [
-        "change files",
-    ],
     "examples": [
         "Modify image",
     ],

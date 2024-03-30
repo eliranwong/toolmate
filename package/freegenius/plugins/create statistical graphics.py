@@ -27,9 +27,6 @@ def create_statistical_graphics(function_args):
     return ""
 
 functionSignature = {
-    "intent": [
-        "create content",
-    ],
     "examples": [
         "Create a plot / graph / bar chart / par chart",
         "Visualize data",

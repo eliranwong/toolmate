@@ -56,9 +56,6 @@ def remove_image_background2(function_args):
     return ""
 
 functionSignature = {
-    "intent": [
-        "change files",
-    ],
     "examples": [
         "Remove image background",
     ],

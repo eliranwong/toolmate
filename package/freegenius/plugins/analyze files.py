@@ -37,9 +37,6 @@ def analyze_files(function_args):
     return "[INVALID]"
 
 functionSignature = {
-    "intent": [
-        "analyze files",
-    ],
     "examples": [
         "analyze files",
     ],

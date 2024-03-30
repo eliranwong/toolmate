@@ -23,9 +23,6 @@ if config.openweathermapApi:
         return "Not found!"
 
     functionSignature = {
-        "intent": [
-            "access to internet real-time information",
-        ],
         "examples": [
             "What's the current weather",
         ],

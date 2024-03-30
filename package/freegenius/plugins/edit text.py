@@ -36,9 +36,6 @@ def edit_text(function_args):
         return "Finished! Text editor closed!"
 
 functionSignature = {
-    "intent": [
-        "change files",
-    ],
     "examples": [
         "Edit test.txt",
     ],

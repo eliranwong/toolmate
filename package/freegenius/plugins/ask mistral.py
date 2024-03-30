@@ -17,9 +17,6 @@ def ask_mistral(function_args):
     return ""
 
 functionSignature = {
-    "intent": [
-        "ask a chatbot",
-    ],
     "examples": [
         "Ask Mistral about",
     ],

@@ -18,9 +18,6 @@ def analyze_images_with_gemini(function_args):
     return "[INVALID]" if not answer else ""
 
 functionSignature = {
-    "intent": [
-        "analyze files",
-    ],
     "examples": [
         "analyze image with Gemini",
     ],

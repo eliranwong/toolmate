@@ -40,10 +40,6 @@ def analyze_web_content(function_args):
     return ""
 
 functionSignature = {
-    "intent": [
-        "analyze files",
-        "access to internet real-time information",
-    ],
     "examples": [
         "analyze this url",
         "summarize this website",

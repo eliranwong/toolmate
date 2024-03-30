@@ -33,9 +33,6 @@ def integrate_google_searches(function_args):
     return json.dumps(info)
 
 functionSignature = {
-    "intent": [
-        "access to internet real-time information",
-    ],
     "examples": [
         "Search online",
         "Google search",

@@ -44,9 +44,6 @@ def heal_python(function_args):
         return traceback.format_exc()
 
 functionSignature = {
-    "intent": [
-        "generate code",
-    ],
     "examples": [
         "Fix python code",
     ],

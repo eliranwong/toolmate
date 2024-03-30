@@ -17,9 +17,6 @@ def ask_codey(function_args):
     return ""
 
 functionSignature = {
-    "intent": [
-        "ask a chatbot",
-    ],
     "examples": [
         "Ask Codey about",
     ],

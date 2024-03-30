@@ -21,6 +21,9 @@ class CallGemini:
         else:
             print("Vertex AI is disabled!")
             print("Read https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup for setting up Google API.")
+            config.llmBackend = "llamacpp"
+            config.saveConfig()
+            print("LLM backend changed back to 'llamacpp'")
         # initiation
         vertexai.init()
         

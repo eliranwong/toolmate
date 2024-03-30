@@ -72,9 +72,6 @@ def create_image(function_args):
     return f"Saved as '{imageFile}'"
 
 functionSignature = {
-    "intent": [
-        "create content",
-    ],
     "examples": [
         "Create image",
     ],

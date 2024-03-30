@@ -26,9 +26,6 @@ def pronunce_words(function_args):
     return "Finished! Speech engine closed!"
 
 functionSignature = {
-    "intent": [
-        "interact with user",
-    ],
     "examples": [
         "pronounce words",
         "speak in",

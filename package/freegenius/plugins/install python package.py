@@ -20,9 +20,6 @@ def install_package(function_args):
 
 # Function Signature
 functionSignature = {
-    "intent": [
-        "installation",
-    ],
     "examples": [
         "Install package",
     ],

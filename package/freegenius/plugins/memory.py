@@ -31,7 +31,7 @@ def save_memory(function_args):
     memory_tags = function_args.get("tags") # required
     if not isinstance(memory_tags, str):
         memory_tags = str(memory_tags)
-    collection = get_or_create_collection("memories")
+    collection = get_or_create_collection(chroma_client, "memories")
     g = geocoder.ip('me')
     metadata = {
         "timestamp": str(datetime.datetime.now()),
@@ -53,7 +53,7 @@ def save_memory(function_args):
 
 def retrieve_memory(function_args):
     query = function_args.get("query") # required
-    collection = get_or_create_collection("memories")
+    collection = get_or_create_collection(chroma_client, "memories")
     res = query_vectors(collection, query, config.memoryClosestMatches)
     if config.developer:
         print1(config.divider)

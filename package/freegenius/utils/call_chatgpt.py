@@ -374,7 +374,7 @@ class CallChatGPT:
             # 2. Tool Selection
             if config.developer:
                 print1("selecting tool ...")
-            tool_collection = get_or_create_collection("tools")
+            tool_collection = get_or_create_collection(config.tool_store_client, "tools")
             search_result = query_vectors(tool_collection, user_request, config.tool_selection_max_choices)
             
             # no tool is available; return a regular call instead
@@ -442,7 +442,7 @@ class CallChatGPT:
                 config.tempContent = ""
 
                 return CallChatGPT.regularCall(messages)
-            else:
+            elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
                 # tool function executed without chat extension
                 config.currentMessages.append({"role": "assistant", "content": "Done!"})
                 return None

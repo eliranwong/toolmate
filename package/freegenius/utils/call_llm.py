@@ -78,6 +78,16 @@ Always remember that you are much more than a text-based AI. You possess both vi
         return CallLetMeDoIt.runSingleFunctionCall(messages, function_name)
 
     @staticmethod
+    def regularCall(messages: dict):
+        if config.llmBackend == "ollama":
+            return CallOllama.regularCall(messages)
+        elif config.llmBackend == "llamacpp":
+            return CallLlamaCpp.regularCall(messages)
+        elif config.llmBackend == "gemini":
+            return CallGemini.regularCall(messages)
+        return CallChatGPT.regularCall(messages)
+
+    @staticmethod
     def getSingleChatResponse(userInput, messages=[], temperature=None):
         """
         non-streaming single call

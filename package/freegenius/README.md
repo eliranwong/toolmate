@@ -121,7 +121,7 @@ This novel strategy involves breaking down the function calling process into sev
 
 This methodology has been found to work effectively with freely available open-source models, even on devices lacking a GPU.
 
-[In case you are interested, you may check the class "CallOllama" [in this file](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/utils/shared_utils.py)]
+In case you are interested, you may check, for example, [how we implement this approach with Llama.cpp](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/utils/call_llamacpp.py)
 
 We invite [further discussion and contributions](https://github.com/eliranwong/freegenius/issues) to refine and enhance this strategy.
 

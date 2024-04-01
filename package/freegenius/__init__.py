@@ -43,6 +43,7 @@ from pathlib import Path
 from PIL import Image
 from openai import OpenAI
 from freegenius.utils.terminal_mode_dialogs import TerminalModeDialogs
+from autogen.retrieve_utils import TEXT_FORMATS
 
 # a dummy import line to resolve ALSA error display on Linux
 import sounddevice
@@ -149,6 +150,16 @@ def isUrlAlive(url):
 
 # files
 
+def getUnstructuredFiles(dir_path: str) -> list:
+    full_paths = []
+    for dirpath, _, files in os.walk(dir_path):
+        for filename in files:
+            _, file_extension = os.path.splitext(filename)
+            if file_extension[1:] in TEXT_FORMATS:
+                filepath = os.path.join(dirpath, filename)
+                full_paths.append(filepath)
+    return full_paths
+
 def getFilenamesWithoutExtension(dir, ext):
     # Note: pathlib.Path(file).stem does not work with file name containg more than one dot, e.g. "*.db.sqlite"
     #files = glob.glob(os.path.join(dir, "*.{0}".format(ext)))
@@ -233,7 +244,7 @@ def toGeminiMessages(messages: dict=[]) -> Optional[list]:
     lastUserMessage = ""
     if messages:
         history = []
-        for i in config.currentMessages:
+        for i in messages:
             role = i.get("role", "")
             content = i.get("content", "")
             if role in ("user", "assistant"):
@@ -336,8 +347,8 @@ def getEmbeddingFunction(embeddingModel=None):
 
 # chromadb
 
-def get_or_create_collection(collection_name):
-    collection = config.tool_store_client.get_or_create_collection(
+def get_or_create_collection(client, collection_name):
+    collection = client.get_or_create_collection(
         name=collection_name,
         metadata={"hnsw:space": "cosine"},
         embedding_function=getEmbeddingFunction(),

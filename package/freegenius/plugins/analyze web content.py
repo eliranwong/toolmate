@@ -11,6 +11,7 @@ from freegenius import config
 from freegenius import print1, print2, print3
 from freegenius.utils.shared_utils import SharedUtil
 from freegenius.autoretriever import AutoGenRetriever
+from freegenius.rag import RAG
 
 def analyze_web_content(function_args):
     query = function_args.get("query") # required
@@ -31,12 +32,16 @@ def analyze_web_content(function_args):
         print3("Running function: 'analyze_images'")
         return config.toolFunctionMethods["analyze_images"](function_args)
 
-    # process with AutoGen Retriever
-    print2("AutoGen Retriever launched!")
-    last_message = AutoGenRetriever().getResponse(filename, query, True)
-    config.currentMessages += last_message
-    print2("AutoGen Retriever closed!")
-
+    if config.rag_useAutoRetriever and not config.llmBackend == "gemini":
+        # process with AutoGen Retriever
+        print2("AutoGen Retriever launched!")
+        last_message = AutoGenRetriever().getResponse(filename, query, True)
+        config.currentMessages += last_message
+        print2("AutoGen Retriever closed!")
+    else:
+        print2("Retriever utility launched!")
+        RAG().getResponse(filename, query)
+        print2("Retriever utility closed!")
     return ""
 
 functionSignature = {

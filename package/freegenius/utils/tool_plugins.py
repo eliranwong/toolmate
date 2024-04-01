@@ -92,7 +92,7 @@ class ToolStore:
         print(f"Adding tool: {name}")
         if "examples" in signature:
             description = description + "\n" + "\n".join(signature["examples"])
-        collection = get_or_create_collection("tools")
+        collection = get_or_create_collection(config.tool_store_client, "tools")
         metadata = {
             "name": name,
             "parameters": json.dumps(parameters),

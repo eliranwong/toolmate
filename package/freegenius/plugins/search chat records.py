@@ -23,7 +23,7 @@ def save_chat_record(timestamp, order, record):
     role = record.get("role", "")
     content = record.get("content", "")
     if role and role in ("user", "assistant") and content:
-        collection = get_or_create_collection("chats")
+        collection = get_or_create_collection(chroma_client, "chats")
         metadata = {
             "backend": config.llmBackend,
             "timestamp": timestamp,
@@ -36,7 +36,7 @@ config.save_chat_record = save_chat_record
 def search_chats(function_args):
     query = function_args.get("query") # required
     print3(f"""Query: {query}""")
-    collection = get_or_create_collection("chats")
+    collection = get_or_create_collection(chroma_client, "chats")
     res = query_vectors(collection, query, config.chatRecordClosestMatches)
     config.stopSpinning()
     if res:

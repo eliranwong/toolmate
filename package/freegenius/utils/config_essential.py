@@ -91,6 +91,9 @@ defaultSettings = (
     ('llmTemperature', 0.3),
     ('max_consecutive_auto_reply', 10), # work with pyautogen
     ('memoryClosestMatches', 5),
+    ('rag_useAutoRetriever', False),
+    ('rag_closestMatches', 5),
+    ('rag_retrieverSettings', {'search_kwargs': {'k': 5}}),
     ('chatRecordClosestMatches', 5),
     ('runPythonScriptGlobally', False),
     ('openaiApiKey', ''),

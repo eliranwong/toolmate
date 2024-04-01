@@ -11,11 +11,11 @@ from freegenius import config, is_valid_image_file
 from freegenius import print2, print3
 import os
 from freegenius.autoretriever import AutoGenRetriever
-from PIL import Image
+from freegenius.rag import RAG
+#from PIL import Image
 
 
 def analyze_files(function_args):
-
     query = function_args.get("query") # required
     files = function_args.get("files") # required
     if os.path.exists(files):
@@ -28,10 +28,15 @@ def analyze_files(function_args):
             print3("Running function: 'analyze_images'")
             return config.toolFunctionMethods["analyze_images"](function_args)
         config.stopSpinning()
-        print2("AutoGen Retriever launched!")
-        last_message = AutoGenRetriever().getResponse(files, query, True)
-        config.currentMessages += last_message
-        print2("AutoGen Retriever closed!")
+        if config.rag_useAutoRetriever and not config.llmBackend == "gemini":
+            print2("AutoGen Retriever launched!")
+            last_message = AutoGenRetriever().getResponse(files, query, True)
+            config.currentMessages += last_message
+            print2("AutoGen Retriever closed!")
+        else:
+            print2("Retriever utility launched!")
+            RAG().getResponse(files, query)
+            print2("Retriever utility closed!")
         return ""
 
     return "[INVALID]"

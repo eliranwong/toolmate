@@ -795,6 +795,8 @@ class FreeGenius:
             print3(f"LLM Temperature: {temperature}")
 
     def selectLlmBackend(self):
+        instruction = "Select a backend:"
+        print1(instruction)
         options = {
             "llamacpp": "Llama.cpp",
             "ollama": "Ollama LLM",
@@ -807,24 +809,42 @@ class FreeGenius:
             descriptions=list(options.values()),
             title="LLM Backend",
             default=config.llmBackend,
-            text="Select a backend:",
+            text=instruction,
         )
         if llmBackend:
             config.llmBackend = llmBackend
             CallLLM.checkCompletion()
 
     def setLlmModel(self):
+        def askAdditionalCodeModel() -> bool:
+            options = ("yes", "no")
+            question = "Do you want an additional model for generating code?"
+            print1(question)
+            useAdditionalCodeModel = self.dialogs.getValidOptions(
+                options=options,
+                title="Additional Code Model",
+                default="yes" if config.useAdditionalCodeModel else "no",
+                text=question,
+            )
+            if useAdditionalCodeModel and useAdditionalCodeModel == "yes":
+                config.useAdditionalCodeModel = True
+                return True
+            return False
+
         self.selectLlmBackend()
+        print1("Select models ...")
         if config.llmBackend == "ollama":
             print2("# For general purpose")
             self.setLlmModel_ollama()
-            print2("# For code generation")
-            self.setLlmModel_ollama("code")
+            if askAdditionalCodeModel():
+                print2("# For code generation")
+                self.setLlmModel_ollama("code")
         elif config.llmBackend == "llamacpp":
             print2("# For general purpose")
             self.setLlmModel_llamacpp()
-            print2("# For code generation")
-            self.setLlmModel_llamacpp("code")
+            if askAdditionalCodeModel():
+                print2("# For code generation")
+                self.setLlmModel_llamacpp("code")
         elif config.llmBackend == "gemini":
             print3("Model selected: Google Gemini Pro")
         else:

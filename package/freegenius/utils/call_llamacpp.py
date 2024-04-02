@@ -405,7 +405,8 @@ Remember, response in JSON with the filled template ONLY.""",
 
     @staticmethod
     def swapModels():
-        config.llamacppDefaultModel, config.llamacppCodeModel = config.llamacppCodeModel, config.llamacppDefaultModel
+        if config.useAdditionalCodeModel:
+            config.llamacppDefaultModel, config.llamacppCodeModel = config.llamacppCodeModel, config.llamacppDefaultModel
 
     @staticmethod
     def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs) -> dict:

@@ -96,6 +96,8 @@ def getDownloadedOllamaModels() -> dict:
                                 model_file = re.search('''vnd.ollama.image.model","digest":"(.*?)"''', content)
                                 if model_file:
                                     model_file = os.path.join(modelDir, "blobs", model_file.group(1))
+                                    if not os.path.isfile(model_file):
+                                        model_file = model_file.replace(":", "-")
                                     if os.path.isfile(model_file):
                                         model_tag = f"{d}:{f}"
                                         models[model_tag] = model_file

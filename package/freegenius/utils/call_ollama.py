@@ -331,11 +331,12 @@ Remember, response in JSON with the filled template ONLY.""",
 
     @staticmethod
     def swapModels():
-        config.ollamaDefaultModel, config.ollamaCodeModel = config.ollamaCodeModel, config.ollamaDefaultModel
-        config.ollamaDefaultModel_num_ctx, config.ollamaCodeModel_num_ctx = config.ollamaCodeModel_num_ctx, config.ollamaDefaultModel_num_ctx
-        config.ollamaDefaultModel_num_predict, config.ollamaCodeModel_num_predict = config.ollamaCodeModel_num_predict, config.ollamaDefaultModel_num_predict
-        config.ollamaDefaultModel_num_batch, config.ollamaCodeModel_num_batch = config.ollamaCodeModel_num_batch, config.ollamaDefaultModel_num_batch
-        config.ollamaDefaultModel_keep_alive, config.ollamaCodeModel_keep_alive = config.ollamaCodeModel_keep_alive, config.ollamaDefaultModel_keep_alive
+        if config.useAdditionalCodeModel:
+            config.ollamaDefaultModel, config.ollamaCodeModel = config.ollamaCodeModel, config.ollamaDefaultModel
+            config.ollamaDefaultModel_num_ctx, config.ollamaCodeModel_num_ctx = config.ollamaCodeModel_num_ctx, config.ollamaDefaultModel_num_ctx
+            config.ollamaDefaultModel_num_predict, config.ollamaCodeModel_num_predict = config.ollamaCodeModel_num_predict, config.ollamaDefaultModel_num_predict
+            config.ollamaDefaultModel_num_batch, config.ollamaCodeModel_num_batch = config.ollamaCodeModel_num_batch, config.ollamaDefaultModel_num_batch
+            config.ollamaDefaultModel_keep_alive, config.ollamaCodeModel_keep_alive = config.ollamaCodeModel_keep_alive, config.ollamaDefaultModel_keep_alive
 
     @staticmethod
     def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, **kwargs) -> dict:

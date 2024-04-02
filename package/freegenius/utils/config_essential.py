@@ -34,6 +34,7 @@ defaultSettings = (
     ('tokenizers_parallelism', 'true'), # 'true' / 'false'
     ('includeDeviceInfoInContext', False),
     ('includeIpInDeviceInfo', False),
+    ('useAdditionalCodeModel', False),
     ('ollamaDefaultModel', 'phi'), # ollama model used for general purposes
     ('ollamaDefaultModel_num_ctx', 100000), # ollama default model context window
     ('ollamaDefaultModel_num_batch', 512), # ollama code model batch size

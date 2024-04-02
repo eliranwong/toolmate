@@ -1,12 +1,14 @@
 from setuptools import setup
 from setuptools.command.install import install
-import os, shutil
+import os, shutil, platform
 
 class PreInstallCommand(install):
     """Pre-installation for installation mode."""
     # setting 'CMAKE_ARGS' for installation of 'llama-cpp-python'
     # read https://github.com/abetlen/llama-cpp-python
     def run(self):
+        # https://github.com/abetlen/llama-cpp-python#installation-configuration
+        os.system('''$env:CMAKE_ARGS = "-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS"''' if platform.system() == "Windows" else '''CMAKE_ARGS="-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS"''')
         os.environ['CMAKE_ARGS'] = "-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS"
         install.run(self)
 
@@ -49,7 +51,7 @@ open(os.path.join(package, "config.py"), "w").close()
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name=package,
-    version="0.0.56",
+    version="0.0.58",
     python_requires=">=3.8, <3.12",
     description=f"{appFullName}, an advanced AI assistant, leveraging the capabilities of ChatGPT API, Gemini Pro and AutoGen, capable of engaging in conversations, executing codes with auto-healing, and assisting you with a wide range of tasks on your local devices.",
     long_description=long_description,

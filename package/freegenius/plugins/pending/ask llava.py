@@ -18,7 +18,7 @@ def ask_llava(function_args):
 
 functionSignature = {
     "examples": [
-        "Ask Llava about",
+        "Ask Llava",
     ],
     "name": "ask_llava",
     "description": "Ask LLava to chat or provide information",

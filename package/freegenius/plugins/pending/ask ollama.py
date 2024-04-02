@@ -51,7 +51,7 @@ def ask_ollama(function_args):
 
 functionSignature = {
     "examples": [
-        "Ask Ollama about",
+        "Ask Ollama",
     ],
     "name": "ask_ollama",
     "description": "Ask Ollama to chat or provide information",

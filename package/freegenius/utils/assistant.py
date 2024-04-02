@@ -799,7 +799,7 @@ class FreeGenius:
         print1(instruction)
         options = {
             "llamacpp": "Llama.cpp",
-            "ollama": "Ollama LLM",
+            "ollama": "Ollama",
             "gemini": "Google Gemini",
             "chatgpt": "OpenAI ChatGPT",
             "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",

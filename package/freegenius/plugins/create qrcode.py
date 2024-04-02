@@ -11,7 +11,9 @@ from freegenius import print1, print2, print3
 import os, qrcode
 
 def create_qrcode(function_args):
-    url = function_args.get("content") # required
+    url = function_args.get("url", "") # required
+    if not url:
+        url = function_args.get("text", "") # required
     qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=4)
     qr.add_data(url)
     qr.make(fit=True)
@@ -37,12 +39,16 @@ functionSignature = {
     "parameters": {
         "type": "object",
         "properties": {
-            "content": {
+            "url": {
                 "type": "string",
-                "description": "The url or text content that is to be converted into qr code.",
+                "description": "The url that is to be converted into qr code. Return '' if not given.",
+            },
+            "text": {
+                "type": "string",
+                "description": "The text content that is to be converted into qr code. Return '' if not given.",
             },
         },
-        "required": ["content"],
+        "required": ["url", "text"],
     },
 }
 

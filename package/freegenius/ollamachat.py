@@ -1,5 +1,6 @@
-import ollama, os, argparse, threading, shutil, json, re
+import ollama, os, argparse, threading, shutil, json
 from ollama import Options, pull
+from freegenius.utils.download import Downloader
 from freegenius import config, getLocalStorage, is_valid_image_file
 from freegenius import print1, print2, print3
 from freegenius.utils.ollama_models import ollama_models
@@ -29,7 +30,7 @@ class OllamaChat:
             self.runnable = True
         else:
             print("Local LLM Server 'Ollama' not found! Install Ollama first!")
-            print("Read https://ollama.com/.")
+            print("Visit https://ollama.com/")
             self.runnable = False
 
     def installModel(self, model):
@@ -54,17 +55,7 @@ class OllamaChat:
 
             current_digest = digest
 
-    def run(self, prompt="", model="mistral") -> None:
-        def checkModel(thisModel) -> bool:
-            # check model
-            if not f"'model': '{thisModel}'" in str(ollama.list()).replace(":latest", ""):
-                try:
-                    self.installModel(thisModel)
-                except ollama.ResponseError as e:
-                    print('Error:', e.error)
-                    return False
-            return True
-        
+    def run(self, prompt="", model="mistral") -> None:        
         def extractImages(content) -> list:
             template = {
                 "imageList": [],
@@ -104,10 +95,10 @@ Here is my request:
             return None
 
         # check model
-        if not checkModel(model):
+        if not Downloader.downloadOllamaModel(model):
             return None
         if model.startswith("llava"):
-            checkModel("gemma:2b")
+            Downloader.downloadOllamaModel("gemma:2b")
         
         previoiusModel = config.ollamaDefaultModel
         config.ollamaDefaultModel = model

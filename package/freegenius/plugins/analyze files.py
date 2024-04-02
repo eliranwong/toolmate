@@ -17,7 +17,7 @@ from freegenius.rag import RAG
 
 def analyze_files(function_args):
     query = function_args.get("query") # required
-    files = function_args.get("files") # required
+    files = function_args.get("filepath") # required
     if os.path.exists(files):
         if os.path.isfile(files) and is_valid_image_file(files):
             # call function "analyze image" instead if it is an image
@@ -54,12 +54,12 @@ functionSignature = {
                 "type": "string",
                 "description": "Detailed queries about the given files",
             },
-            "files": {
+            "filepath": {
                 "type": "string",
                 "description": """Return a directory or non-image file path. Return an empty string '' if it is not given.""",
             },
         },
-        "required": ["query", "files"],
+        "required": ["query", "filepath"],
     },
 }
 

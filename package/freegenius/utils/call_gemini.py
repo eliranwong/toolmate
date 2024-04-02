@@ -2,7 +2,7 @@ from freegenius import getDeviceInfo, showErrors, get_or_create_collection, quer
 from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, isValidPythodCode
 from freegenius import config
 from prompt_toolkit import prompt
-import traceback, os, json
+import traceback, os, json, pprint
 from typing import Optional, List, Dict, Union
 import vertexai
 from vertexai.preview.generative_models import GenerativeModel, FunctionDeclaration, Tool
@@ -358,4 +358,9 @@ When necessary, generate content based on your knowledge."""
         # fix linebreak
         if code and "code" in parameters:
             parameters["code"] = parameters["code"].replace("\\n", "\n")
+
+        if config.developer:
+            print2("```parameters")
+            pprint.pprint(parameters)
+            print2("```")
         return parameters

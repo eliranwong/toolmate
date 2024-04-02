@@ -1,27 +1,27 @@
 """
-LetMeDoIt AI Plugin - ask Gemma
+LetMeDoIt AI Plugin - ask Codey
 
-Ask Google Gemma for information
+Ask Google Codey for information about coding
 
 [FUNCTION_CALL]
 """
 
 
 from freegenius import config
-from freegenius.ollamachat import OllamaChat
+from freegenius.codey import Codey
 
-def ask_gemma(function_args):
+def ask_codey(function_args):
     query = function_args.get("query") # required
     config.stopSpinning()
-    OllamaChat().run(query, model="gemma:7b")
+    Codey().run(query, temperature=config.llmTemperature)
     return ""
 
 functionSignature = {
     "examples": [
-        "Ask Gemma about",
+        "Ask Codey",
     ],
-    "name": "ask_gemma",
-    "description": "Ask Gemma to chat or provide information",
+    "name": "ask_codey",
+    "description": "Ask Codey for information about coding",
     "parameters": {
         "type": "object",
         "properties": {
@@ -34,5 +34,5 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=ask_gemma)
-config.inputSuggestions.append("Ask Gemma: ")
+config.addFunctionCall(signature=functionSignature, method=ask_codey)
+config.inputSuggestions.append("Ask Codey: ")

@@ -13,7 +13,7 @@ import os, json, rembg
 
 
 def remove_image_background(function_args):
-    files = function_args.get("files") # required
+    files = function_args.get("filepath") # required
     if isinstance(files, str):
         if not files.startswith("["):
             files = f'["{files}"]'
@@ -64,12 +64,12 @@ functionSignature = {
     "parameters": {
         "type": "object",
         "properties": {
-            "files": {
+            "filepath": {
                 "type": "string",
                 "description": """Return a list of image paths, e.g. '["image1.png", "/tmp/image2.png"]'. Return '[]' if image path is not provided.""",
             },
         },
-        "required": ["files"],
+        "required": ["filepath"],
     },
 }
 

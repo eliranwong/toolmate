@@ -221,7 +221,7 @@ class ChatGui(QMainWindow):
         # set title
         self.setWindowTitle(config.freeGeniusAIName)
         # set variables
-        self.setupVariables()
+        #self.setupVariables()
         # run plugins
         Plugins.runPlugins()
         # gui

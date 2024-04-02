@@ -1,7 +1,7 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
 from freegenius import print1, print2, print3, selectTool, restartApp, getPythonFunctionResponse, extractPythonCode, isValidPythodCode
 from freegenius import config
-import shutil, re, traceback, json, ollama
+import shutil, re, traceback, json, ollama, pprint
 from typing import Optional
 from freegenius.utils.download import Downloader
 from ollama import Options
@@ -422,4 +422,8 @@ Remember, answer in JSON with the filled template ONLY.""",
             # swap back to default model
             CallOllama.swapModels()
 
+        if config.developer:
+            print2("```parameters")
+            pprint.pprint(parameters)
+            print2("```")
         return parameters

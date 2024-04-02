@@ -60,6 +60,7 @@ functionSignature = {
         "Run system command",
         "Execute python code",
         "Execute system command",
+        "Execute computing task",
     ],
     "name": "execute_python_code",
     "description": "Execute python code to resolve a computing task",

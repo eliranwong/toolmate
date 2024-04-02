@@ -9,7 +9,7 @@ pronunce words
 try:
     from gtts import gTTS
 except:
-    from freegenius import installPipPackage
+    from freegenius import installPipPackage, print1
     installPipPackage(f"--upgrade gTTS")
 
 from freegenius import config

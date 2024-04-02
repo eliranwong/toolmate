@@ -630,12 +630,12 @@ def setChatGPTAPIkey():
     os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
 
 def setGoogleCredentials():
-    config.google_cloud_credentials_file = os.path.join(storageDir, "credentials_google_cloud.json")
+    config.google_cloud_credentials_file = os.path.join(config.localStorage, "credentials_google_cloud.json")
     if config.google_cloud_credentials and os.path.isfile(config.google_cloud_credentials):
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = config.google_cloud_credentials
     else:
-        gccfile2 = os.path.join(storageDir, "credentials_googleaistudio.json")
-        gccfile3 = os.path.join(storageDir, "credentials_googletts.json")
+        gccfile2 = os.path.join(config.localStorage, "credentials_googleaistudio.json")
+        gccfile3 = os.path.join(config.localStorage, "credentials_googletts.json")
 
         if os.path.isfile(config.google_cloud_credentials_file):
             config.google_cloud_credentials = config.google_cloud_credentials_file
@@ -770,6 +770,9 @@ def setToolDependence(entry: Any) -> bool:
                 if 0 <= tool_auto_selection_threshold <=1.0:
                     config.tool_auto_selection_threshold = tool_auto_selection_threshold
                     print3(f"Tool auto selection threshold changed to: {tool_auto_selection_threshold}")
+            else:
+                # 3/4 of config.tool_dependence
+                config.tool_auto_selection_threshold = round(config.tool_dependence * 3/4, 5)
 
             config.saveConfig()
 

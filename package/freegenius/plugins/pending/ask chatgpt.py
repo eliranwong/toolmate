@@ -1,27 +1,28 @@
 """
-LetMeDoIt AI Plugin - ask gemini pro
+LetMeDoIt AI Plugin - ask chatgpt
 
-Ask Google Gemini Pro for information
+Ask ChatGPT for conversation only; no function calling
 
 [FUNCTION_CALL]
 """
 
 
 from freegenius import config
-from freegenius.geminipro import GeminiPro
+from freegenius.chatgpt import ChatGPT
 
-def ask_gemini_pro(function_args):
+def ask_chatgpt(function_args):
     config.stopSpinning()
     query = function_args.get("query") # required
-    GeminiPro(temperature=config.llmTemperature).run(query)
+    config.currentMessages = config.currentMessages[:-1]
+    ChatGPT().run(query)
     return ""
 
 functionSignature = {
     "examples": [
-        "Ask Gemini about",
+        "Ask ChatGPT",
     ],
-    "name": "ask_gemini_pro",
-    "description": "Ask Gemini Pro to chat or provide information",
+    "name": "ask_chatgpt",
+    "description": "Ask ChatGPT to chat or provide information",
     "parameters": {
         "type": "object",
         "properties": {
@@ -34,5 +35,5 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=ask_gemini_pro)
-config.inputSuggestions.append("Ask Gemini Pro: ")
+config.addFunctionCall(signature=functionSignature, method=ask_chatgpt)
+config.inputSuggestions.append("Ask ChatGPT: ")

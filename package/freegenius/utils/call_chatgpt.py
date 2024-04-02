@@ -1,7 +1,7 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution
 from freegenius import config
 from freegenius import print1, print2, print3, getDynamicTokens, selectTool
-import re, traceback, openai
+import re, traceback, openai, pprint
 import textwrap, json, pygments
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit import print_formatted_text, HTML
@@ -354,8 +354,6 @@ class CallChatGPT:
             **kwargs,
         )
         responseDict = json.loads(completion.choices[0].message.tool_calls[0].function.arguments)
-        #if config.developer:
-        #    pprint.pprint(responseDict)
         return responseDict
 
     # Auto Function Call equivalence
@@ -478,6 +476,10 @@ class CallChatGPT:
         Extract action parameters
         """
         parameters = CallChatGPT.getResponseDict(messages=ongoingMessages, schema=schema, **kwargs)
+        if config.developer:
+            print2("```parameters")
+            pprint.pprint(parameters)
+            print2("```")
         return parameters
 
 
@@ -568,6 +570,11 @@ class CallLetMeDoIt:
                     func_id = func.id
                     func_name = func.function.name
                     func_arguments = toolArguments[func_index]
+
+                    if config.developer:
+                        print2(f"```{func_name}")
+                        pprint.pprint(func_arguments)
+                        print2("```")
 
                     # get function response
                     func_response = CallLetMeDoIt.finetuneSingleFunctionCallResponse(func_arguments, func_name)

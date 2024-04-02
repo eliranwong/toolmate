@@ -1,27 +1,27 @@
 """
-LetMeDoIt AI Plugin - ask PaLM 2
+LetMeDoIt AI Plugin - ask Llama2
 
-Ask Google PaLM 2 for information
+Ask Llama2 for information
 
 [FUNCTION_CALL]
 """
 
 
 from freegenius import config
-from freegenius.palm2 import Palm2
+from freegenius.ollamachat import OllamaChat
 
-def ask_palm2(function_args):
+def ask_llama2(function_args):
     query = function_args.get("query") # required
     config.stopSpinning()
-    Palm2().run(query, temperature=config.llmTemperature)
+    OllamaChat().run(query, model="llama2")
     return ""
 
 functionSignature = {
     "examples": [
-        "Ask PaLM about",
+        "Ask Llama2",
     ],
-    "name": "ask_palm2",
-    "description": "Ask PaLM 2 to chat or provide information",
+    "name": "ask_llama2",
+    "description": "Ask Llama2 to chat or provide information",
     "parameters": {
         "type": "object",
         "properties": {
@@ -34,5 +34,5 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=ask_palm2)
-config.inputSuggestions.append("Ask PaLM 2: ")
+config.addFunctionCall(signature=functionSignature, method=ask_llama2)
+config.inputSuggestions.append("Ask Llama2: ")

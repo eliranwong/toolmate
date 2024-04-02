@@ -40,19 +40,20 @@ class SystemTrayIcon(QSystemTrayIcon):
         super().__init__(icon, parent)
 
         # pre-load the main gui
-        self.chatGui = ChatGui()
+        #self.chatGui = ChatGui()
 
         self.menu = QMenu(parent)
 
-        if config.developer:
-            chatgui = QAction("Desktop Assistant [experimental]", self)
-            chatgui.triggered.connect(self.showGui)
-            self.menu.addAction(chatgui)
+        #if config.developer:
+        #    chatgui = QAction("Desktop Assistant [experimental]", self)
+        #    chatgui.triggered.connect(self.showGui)
+        #    self.menu.addAction(chatgui)
 
-            self.menu.addSeparator()
+        #    self.menu.addSeparator()
 
         commandPrefix = [
             package,
+            "ollamachat",
             "chatgpt",
             "geminipro",
             "geminiprovision",
@@ -60,9 +61,8 @@ class SystemTrayIcon(QSystemTrayIcon):
             "codey",
             "autoassist",
             "autoretriever",
-            "automath",
             "autobuilder",
-            "ollamachat",
+            "rag",
         ]
         commandSuffix = [
             "etextedit",

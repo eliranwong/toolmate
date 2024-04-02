@@ -1,7 +1,7 @@
 """
-LetMeDoIt AI Plugin - ask Mistral
+LetMeDoIt AI Plugin - ask Gemma
 
-Ask Mistral for information
+Ask Google Gemma for information
 
 [FUNCTION_CALL]
 """
@@ -10,18 +10,18 @@ Ask Mistral for information
 from freegenius import config
 from freegenius.ollamachat import OllamaChat
 
-def ask_mistral(function_args):
+def ask_gemma(function_args):
     query = function_args.get("query") # required
     config.stopSpinning()
-    OllamaChat().run(query, model="mistral")
+    OllamaChat().run(query, model="gemma:7b")
     return ""
 
 functionSignature = {
     "examples": [
-        "Ask Mistral about",
+        "Ask Gemma",
     ],
-    "name": "ask_mistral",
-    "description": "Ask Mistral to chat or provide information",
+    "name": "ask_gemma",
+    "description": "Ask Gemma to chat or provide information",
     "parameters": {
         "type": "object",
         "properties": {
@@ -34,5 +34,5 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=ask_mistral)
-config.inputSuggestions.append("Ask Mistral: ")
+config.addFunctionCall(signature=functionSignature, method=ask_gemma)
+config.inputSuggestions.append("Ask Gemma: ")

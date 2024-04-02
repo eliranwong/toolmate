@@ -1,6 +1,6 @@
 from freegenius import config, showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
 from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, getLocalStorage, extractPythonCode
-import traceback, json, re, os
+import traceback, json, re, os, pprint
 from typing import Optional
 from llama_cpp import Llama
 from prompt_toolkit import prompt
@@ -210,9 +210,6 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             jsonOutput = completion["choices"][0]["message"].get("content", "{}")
             jsonOutput = re.sub("^[^{]*?({.*?})[^}]*?$", r"\1", jsonOutput)
             responseDict = json.loads(jsonOutput)
-            #if config.developer:
-            #    import pprint
-            #    pprint.pprint(responseDict)
             return responseDict
         except:
             showErrors()
@@ -488,4 +485,8 @@ Remember, output in JSON.""",
             # swap back to default model
             CallLlamaCpp.swapModels()
 
+        if config.developer:
+            print2("```parameters")
+            pprint.pprint(parameters)
+            print2("```")
         return parameters

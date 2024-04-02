@@ -158,6 +158,7 @@ So far, we tested the following function call plugins:
 * dates and times
 * search weather info
 * create qr code
+* analyze audio
 * analyze files
 * solve math problems
 * ask chatgpt
@@ -186,6 +187,7 @@ So far, we tested the following function call plugins:
 
 pending:
 
+* analyze images
 * create images
 * ask llava
 * ask sqlite

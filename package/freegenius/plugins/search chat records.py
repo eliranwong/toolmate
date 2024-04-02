@@ -116,7 +116,8 @@ functionSignature1 = {
         "memory / record access",
     ],
     "examples": [
-        "Save chat record",
+        "Search chat record",
+        "Find in chat history",
     ],
     "name": "search_chats",
     "description": """Search chat records""",
@@ -138,6 +139,7 @@ functionSignature2 = {
     ],
     "examples": [
         "Load chat record",
+        "Open chat history",
     ],
     "name": "load_chats",
     "description": """Load or open old saved chat records if chat ID / timestamp / file path is given""",

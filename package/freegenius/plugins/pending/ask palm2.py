@@ -1,27 +1,27 @@
 """
-LetMeDoIt AI Plugin - ask Codey
+LetMeDoIt AI Plugin - ask PaLM 2
 
-Ask Google Codey for information about coding
+Ask Google PaLM 2 for information
 
 [FUNCTION_CALL]
 """
 
 
 from freegenius import config
-from freegenius.codey import Codey
+from freegenius.palm2 import Palm2
 
-def ask_codey(function_args):
+def ask_palm2(function_args):
     query = function_args.get("query") # required
     config.stopSpinning()
-    Codey().run(query, temperature=config.llmTemperature)
+    Palm2().run(query, temperature=config.llmTemperature)
     return ""
 
 functionSignature = {
     "examples": [
-        "Ask Codey about",
+        "Ask PaLM",
     ],
-    "name": "ask_codey",
-    "description": "Ask Codey for information about coding",
+    "name": "ask_palm2",
+    "description": "Ask PaLM 2 to chat or provide information",
     "parameters": {
         "type": "object",
         "properties": {
@@ -34,5 +34,5 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=ask_codey)
-config.inputSuggestions.append("Ask Codey: ")
+config.addFunctionCall(signature=functionSignature, method=ask_palm2)
+config.inputSuggestions.append("Ask PaLM 2: ")

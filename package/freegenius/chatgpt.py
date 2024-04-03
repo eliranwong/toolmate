@@ -1,4 +1,4 @@
-from freegenius import config, getLocalStorage, count_tokens_from_messages
+from freegenius import config, count_tokens_from_messages
 from freegenius import print2, tokenLimits
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
@@ -42,7 +42,7 @@ class ChatGPT:
     def run(self, prompt=""):
         if self.defaultPrompt:
             prompt, self.defaultPrompt = self.defaultPrompt, ""
-        historyFolder = os.path.join(getLocalStorage(), "history")
+        historyFolder = os.path.join(config.localStorage, "history")
         Path(historyFolder).mkdir(parents=True, exist_ok=True)
         chat_history = os.path.join(historyFolder, "chatgpt")
         chat_session = PromptSession(history=FileHistory(chat_history))

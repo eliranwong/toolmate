@@ -1,7 +1,7 @@
 import vertexai, os, traceback, argparse
 from vertexai.language_models import CodeChatModel, ChatMessage
-from freegenius import config, getPygmentsStyle, getLocalStorage, startSpinning, stopSpinning
-from freegenius import print1, print2, print3
+from freegenius import config, getPygmentsStyle, startSpinning, stopSpinning
+from freegenius import print2
 from freegenius.utils.single_prompt import SinglePrompt
 import pygments
 from pygments.lexers.markup import MarkdownLexer
@@ -33,7 +33,7 @@ class Codey:
         self.name = name
 
     def run(self, prompt="", model="codechat-bison-32k", temperature=0.2, max_output_tokens=2048):
-        historyFolder = os.path.join(getLocalStorage(), "history")
+        historyFolder = os.path.join(config.localStorage, "history")
         Path(historyFolder).mkdir(parents=True, exist_ok=True)
         chat_history = os.path.join(historyFolder, self.name.replace(" ", "_"))
         chat_session = PromptSession(history=FileHistory(chat_history))

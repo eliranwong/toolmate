@@ -1,12 +1,12 @@
 """
-LetMeDoIt AI Plugin - create images
+FreeGenius AI Plugin - create images
 
 generate images with model "dall-e-3"
 
 [FUNCTION_CALL]
 """
 
-from freegenius import config, getLocalStorage
+from freegenius import config
 import os
 from base64 import b64decode
 from freegenius.utils.shared_utils import SharedUtil
@@ -57,8 +57,7 @@ def create_image(function_args):
     #jsonFile = os.path.join(config.freeGeniusAIFolder, "temp", "openai_image.json")
     #with open(jsonFile, mode="w", encoding="utf-8") as fileObj:
     #    json.dump(response.data[0].b64_json, fileObj)
-    folder = getLocalStorage()
-    folder = os.path.join(folder, "images")
+    folder = os.path.join(config.localStorage, "images")
     Path(folder).mkdir(parents=True, exist_ok=True)
     imageFile = os.path.join(folder, f"{SharedUtil.getCurrentDateTime()}.png")
     image_data = b64decode(response.data[0].b64_json)
@@ -73,7 +72,7 @@ def create_image(function_args):
 
 functionSignature = {
     "examples": [
-        "Create image",
+        "generate image",
     ],
     "name": "create_image",
     "description": "create an image",

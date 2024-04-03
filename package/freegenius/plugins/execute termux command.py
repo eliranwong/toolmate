@@ -1,6 +1,6 @@
 
 """
-LetMeDoIt AI Plugin - execute termux command
+FreeGenius AI Plugin - execute termux command
 
 execute termux command
 

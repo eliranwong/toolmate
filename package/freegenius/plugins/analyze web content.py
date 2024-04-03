@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - analyze web content
+FreeGenius AI Plugin - analyze web content
 
 analyze web content with "AutoGen Retriever"
 

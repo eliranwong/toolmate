@@ -5,8 +5,8 @@ from vertexai.generative_models._generative_models import (
     HarmCategory,
     HarmBlockThreshold,
 )
-from freegenius import config, getLocalStorage
-from freegenius import print1, print2, print3
+from freegenius import config
+from freegenius import print2
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
 from prompt_toolkit.styles import Style
@@ -64,7 +64,7 @@ class GeminiPro:
     def run(self, prompt=""):
         if self.defaultPrompt:
             prompt, self.defaultPrompt = self.defaultPrompt, ""
-        historyFolder = os.path.join(getLocalStorage(), "history")
+        historyFolder = os.path.join(config.localStorage, "history")
         Path(historyFolder).mkdir(parents=True, exist_ok=True)
         chat_history = os.path.join(historyFolder, "geminipro")
         chat_session = PromptSession(history=FileHistory(chat_history))

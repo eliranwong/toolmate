@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - execute python code
+FreeGenius AI Plugin - execute python code
 
 execute python code
 

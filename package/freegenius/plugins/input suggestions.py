@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - input suggestions
+FreeGenius AI Plugin - input suggestions
 
 add input suggestions
 """

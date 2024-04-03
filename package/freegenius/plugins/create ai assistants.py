@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - build agents
+FreeGenius AI Plugin - build agents
 
 build a group of agents to execute a task with integrated "AutoGen Agent Builder"
 

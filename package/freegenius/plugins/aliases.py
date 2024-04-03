@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - aliases
+FreeGenius AI Plugin - aliases
 
 add aliases
 """

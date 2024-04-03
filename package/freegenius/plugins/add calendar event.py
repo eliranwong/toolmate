@@ -4,7 +4,7 @@ from freegenius.utils.shared_utils import SharedUtil
 import urllib.parse
 
 """
-LetMeDoIt AI Plugin - add calender event
+FreeGenius AI Plugin - add calender event
 
 supported calendars:
 * google calendar

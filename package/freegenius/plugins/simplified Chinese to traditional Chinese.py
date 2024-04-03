@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - convert simplified Chinese into traditional Chinese
+FreeGenius AI Plugin - convert simplified Chinese into traditional Chinese
 
 Convert simplified Chinese into traditional Chinese in text output
 """

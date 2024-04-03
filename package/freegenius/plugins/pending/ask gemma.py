@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - ask Gemma
+FreeGenius AI Plugin - ask Gemma
 
 Ask Google Gemma for information
 

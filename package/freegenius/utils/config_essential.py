@@ -30,11 +30,12 @@ defaultSettings = (
     ('intent_screening', False), # set True to increase both reliability and waiting time
     ('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools
     ('tool_auto_selection_threshold', 0.5), # range: 0.0 - 1.0; tool auto selection is implemented when the closest tool match has a semantic distance lower than its value; manual selection from top matched tools is implemented when the closest distance fall between its value and tool_dependence
-    ('tool_selection_max_choices', 3), # when tool search distance is higher than tool_auto_selection_threshold but lower than or equal to tool_dependence, manual selection implemented among the top matched tools.  This value specifies the maximum number of choices for manual tool selection in such cases.
+    ('tool_selection_max_choices', 4), # when tool search distance is higher than tool_auto_selection_threshold but lower than or equal to tool_dependence, manual selection implemented among the top matched tools.  This value specifies the maximum number of choices for manual tool selection in such cases.
     ('tokenizers_parallelism', 'true'), # 'true' / 'false'
     ('includeDeviceInfoInContext', False),
     ('includeIpInDeviceInfo', False),
     ('useAdditionalCodeModel', False),
+    ('ollamaVisionModel', 'llava'), # ollama model used for vision
     ('ollamaDefaultModel', 'phi'), # ollama model used for general purposes
     ('ollamaDefaultModel_num_ctx', 100000), # ollama default model context window
     ('ollamaDefaultModel_num_batch', 512), # ollama code model batch size
@@ -46,6 +47,9 @@ defaultSettings = (
     ('ollamaCodeModel_num_predict', -1), # ollama code model maximum tokens
     ('ollamaCodeModel_keep_alive', "5m"), # ollama code model keep alive time
     ('llamacppServer_port', 8000),
+    ('llamacppVisionModel_model_path', ''), # specify file path of llama.cpp model for vision
+    ('llamacppVisionModel_clip_model_path', ''), # specify file path of llama.cpp clip model for vision
+    ('llamacppDefaultModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
     ('llamacppDefaultModel_model_path', ''), # specify file path of llama.cpp model for general purpose
     ('llamacppDefaultModel_repo_id', 'TheBloke/phi-2-GGUF'), # llama.cpp model used for general purposes, e.g. 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
     ('llamacppDefaultModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for general purposes, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
@@ -53,6 +57,7 @@ defaultSettings = (
     ('llamacppDefaultModel_max_tokens', 10000), # llama.cpp default model maximum tokens
     ('llamacppDefaultModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
     ('llamacppDefaultModel_n_batch', 512), # The batch size to use per eval
+    ('llamacppCodeModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
     ('llamacppCodeModel_model_path', ''), # specify file path of llama.cpp model for code generation
     ('llamacppCodeModel_repo_id', 'TheBloke/phi-2-GGUF'), # llama.cpp model used for code generation, e.g. 'TheBloke/CodeLlama-7B-Python-GGUF'
     ('llamacppCodeModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for code generation, e.g. 'codellama-7b-python.Q4_K_M.gguf'
@@ -188,6 +193,8 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "llamacppServer",
+    "llamacppVisionServer",
     "geminipro_model",
     "geminipro_generation_config",
     "geminipro_safety_settings",
@@ -253,6 +260,7 @@ temporaryConfigs = [
     "pythonFunctionResponse", # used with plugins; function call when function name is 'python'
     # FreeGenius methods shared from Class FreeGenius
     "getLocalStorage",
+    "localStorage",
     "stopSpinning",
     "toggleMultiline",
     "getWrappedHTMLText",

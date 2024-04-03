@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - ask sqlite
+FreeGenius AI Plugin - ask sqlite
 
 Ask SQLite file. To retrieve information from or make changes in a sqlite file, e.g. fetch data, update records, etc.
 

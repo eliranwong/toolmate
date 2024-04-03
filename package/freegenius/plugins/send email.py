@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - send emails
+FreeGenius AI Plugin - send emails
 
 send google or outlook emails
 

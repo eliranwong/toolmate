@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - ask Llama2
+FreeGenius AI Plugin - ask Llama2
 
 Ask Llama2 for information
 

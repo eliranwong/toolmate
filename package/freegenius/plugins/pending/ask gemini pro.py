@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - ask gemini pro
+FreeGenius AI Plugin - ask gemini pro
 
 Ask Google Gemini Pro for information
 

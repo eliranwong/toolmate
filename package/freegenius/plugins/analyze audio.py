@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - analyze audio file
+FreeGenius AI Plugin - analyze audio file
 
 analyze audio file
 
@@ -38,9 +38,9 @@ def analyze_audio(function_args):
             try:
                 with open(audio_file, "rb") as audio_file:
                     transcript = config.oai_client.audio.transcriptions.create(
-                    model="whisper-1", 
-                    file=audio_file, 
-                    response_format="text"
+                        model="whisper-1", 
+                        file=audio_file, 
+                        response_format="text"
                     )
                 transcript = f"The transcript of the audio is: {transcript}"
                 if config.llmBackend == "letmedoit" and config.developer:

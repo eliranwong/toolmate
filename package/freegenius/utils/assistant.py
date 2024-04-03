@@ -1,4 +1,4 @@
-from freegenius import config, showErrors, getDayOfWeek, getLocalStorage, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation
+from freegenius import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage
 from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits
 from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels
 from freegenius.utils.call_llm import CallLLM
@@ -69,7 +69,6 @@ class FreeGenius:
         config.pagerContent = ""
         #self.addPagerContent = False
         # share the following methods in config so that they are accessible via plugins
-        #getLocalStorage = getLocalStorage
         config.toggleMultiline = self.toggleMultiline
         config.getWrappedHTMLText = self.getWrappedHTMLText
         config.fineTuneUserInput = self.fineTuneUserInput
@@ -90,11 +89,9 @@ class FreeGenius:
             itemColor=config.terminalColors[config.terminalCommandEntryColor2],
         )
 
-        # local storage directory
-        self.storageDir = getLocalStorage()
         # hisotry directory
         try:
-            historyParentFolder = os.path.join(self.storageDir, "history")
+            historyParentFolder = os.path.join(config.localStorage, "history")
             Path(historyParentFolder).mkdir(parents=True, exist_ok=True)
             for i in ("chats", "paths", "commands"):
                 historyFile = os.path.join(historyParentFolder, i)
@@ -116,7 +113,7 @@ class FreeGenius:
         if config.initialCompletionCheck:
             CallLLM.checkCompletion()
 
-        chat_history = os.path.join(self.storageDir, "history", "chats")
+        chat_history = os.path.join(config.localStorage, "history", "chats")
         self.terminal_chat_session = PromptSession(history=FileHistory(chat_history))
 
         # check if tts is ready
@@ -185,7 +182,7 @@ class FreeGenius:
     # Voice Typing Language
     def setSpeechToTextLanguage(self):
         # record in history for easy retrieval by moving arrows upwards / downwards
-        voice_typing_language_history = os.path.join(self.storageDir, "history", "voice_typing_language")
+        voice_typing_language_history = os.path.join(config.localStorage, "history", "voice_typing_language")
         voice_typing_language_session = PromptSession(history=FileHistory(voice_typing_language_history))
         # input suggestion for languages
         languages = tuple(googleSpeeckToTextLanguages.keys()) if config.voiceTypingPlatform in ("google", "googlecloud") else whisperSpeeckToTextLanguages
@@ -212,7 +209,7 @@ class FreeGenius:
     # ElevenLabs Text-to-Speech Voice
     def setElevenlabsVoice(self):
         # record in history for easy retrieval by moving arrows upwards / downwards
-        elevenlabsVoice_history = os.path.join(self.storageDir, "history", "elevenlabsVoice")
+        elevenlabsVoice_history = os.path.join(config.localStorage, "history", "elevenlabsVoice")
         elevenlabsVoice_session = PromptSession(history=FileHistory(elevenlabsVoice_history))
         # input suggestion for options
         options = {}
@@ -232,7 +229,7 @@ class FreeGenius:
     # Google Text-to-Speech (Generic)
     def setGttsLanguage(self):
         # record in history for easy retrieval by moving arrows upwards / downwards
-        gtts_language_history = os.path.join(self.storageDir, "history", "gtts_language")
+        gtts_language_history = os.path.join(config.localStorage, "history", "gtts_language")
         gtts_language_session = PromptSession(history=FileHistory(gtts_language_history))
         # input suggestion for languages
         languages = tuple(TtsLanguages.gtts.keys())
@@ -257,7 +254,7 @@ class FreeGenius:
     # Google Cloud Text-to-Speech (API)
     def setGcttsLanguage(self):
         # record in history for easy retrieval by moving arrows upwards / downwards
-        gctts_language_history = os.path.join(self.storageDir, "history", "gctts_language")
+        gctts_language_history = os.path.join(config.localStorage, "history", "gctts_language")
         gctts_language_session = PromptSession(history=FileHistory(gctts_language_history))
         # input suggestion for languages
         languages = tuple(TtsLanguages.gctts.keys())
@@ -337,8 +334,8 @@ class FreeGenius:
         plugins = []
         enabledPlugins = []
         pluginFolder = os.path.join(config.freeGeniusAIFolder, "plugins")
-        if self.storageDir:
-            customPluginFoler = os.path.join(self.storageDir, "plugins")
+        if config.localStorage:
+            customPluginFoler = os.path.join(config.localStorage, "plugins")
             Path(customPluginFoler).mkdir(parents=True, exist_ok=True)
             pluginFolders = (pluginFolder, customPluginFoler)
         else:
@@ -610,6 +607,7 @@ class FreeGenius:
             folder = ""
         if folder and os.path.isdir(folder):
             config.storagedirectory = folder
+            config.localStorage = getLocalStorage()
             config.saveConfig()
             print3(f"Startup directory:\n{folder}")
 
@@ -750,7 +748,7 @@ class FreeGenius:
     def editConfigs(self):
         # file paths
         configFile = os.path.join(config.freeGeniusAIFolder, "config.py")
-        backupFile = os.path.join(getLocalStorage(), "config_backup.py")
+        backupFile = os.path.join(config.localStorage, "config_backup.py")
         # backup configs
         config.saveConfig()
         shutil.copy(configFile, backupFile)
@@ -853,41 +851,48 @@ class FreeGenius:
 
     def selectOllamaModel(self, message="Select a model from Ollama Library:", feature="default") -> str:
         # history session
-        historyFolder = os.path.join(getLocalStorage(), "history")
+        historyFolder = os.path.join(config.localStorage, "history")
         Path(historyFolder).mkdir(parents=True, exist_ok=True)
         model_history = os.path.join(historyFolder, "ollama_code" if feature == "code" else "ollama_default")
         model_session = PromptSession(history=FileHistory(model_history))
         completer = FuzzyCompleter(WordCompleter(sorted(ollama_models), ignore_case=True))
         bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
+        default = config.ollamaCodeModel if feature == "code" else config.ollamaDefaultModel
+        if config.llmBackend == "llamacpp":
+            if feature == "default" and config.llamacppDefaultModel_ollama_tag:
+                default = config.llamacppDefaultModel_ollama_tag
+            elif feature == "code" and config.llamacppCodeModel_ollama_tag:
+                default = config.llamacppCodeModel_ollama_tag
         # prompt
         print1(message)
         print1("(For details, visit https://ollama.com/library)")
-        model = self.prompts.simplePrompt(style=self.prompts.promptStyle2, promptSession=model_session, bottom_toolbar=bottom_toolbar, default=config.ollamaCodeModel if feature == "code" else config.ollamaDefaultModel, completer=completer)
+        model = self.prompts.simplePrompt(style=self.prompts.promptStyle2, promptSession=model_session, bottom_toolbar=bottom_toolbar, default=default, completer=completer)
         if model and not model.lower() == config.exit_entry:
             return model
         return ""
 
     def setLlmModel_ollama(self, feature="default"):
         model = self.selectOllamaModel(feature=feature)
-        downloadedOllamaModels = getDownloadedOllamaModels()
-        if model in downloadedOllamaModels:
-            if feature == "default":
-                config.ollamaDefaultModel = model
-            elif feature == "code":
-                config.ollamaCodeModel = model
-        else:
-            if shutil.which("ollama"):
-                try:
-                    Downloader.downloadOllamaModel(model, True)
-                    if feature == "default":
-                        config.ollamaDefaultModel = model
-                    elif feature == "code":
-                        config.ollamaCodeModel = model
-                except:
-                    print2(f"Failed to download '{model}'! Please make sure you enter a valid model name or tag.")
+        if model:
+            downloadedOllamaModels = getDownloadedOllamaModels()
+            if model in downloadedOllamaModels:
+                if feature == "default":
+                    config.ollamaDefaultModel = model
+                elif feature == "code":
+                    config.ollamaCodeModel = model
             else:
-                print("Ollama not found! Install Ollama first to use Ollama model library!")
-                print("To install Ollama, visit https://ollama.com")
+                if shutil.which("ollama"):
+                    try:
+                        Downloader.downloadOllamaModel(model, True)
+                        if feature == "default":
+                            config.ollamaDefaultModel = model
+                        elif feature == "code":
+                            config.ollamaCodeModel = model
+                    except:
+                        print2(f"Failed to download '{model}'! Please make sure you enter a valid model name or tag.")
+                else:
+                    print("Ollama not found! Install Ollama first to use Ollama model library!")
+                    print("To install Ollama, visit https://ollama.com")
 
     def setLlmModel_llamacpp(self, feature="default"):
         library = self.dialogs.getValidOptions(
@@ -899,27 +904,32 @@ class FreeGenius:
         if library:
             if library == "Ollama Library":
                 model = self.selectOllamaModel(feature=feature)
-                downloadedOllamaModels = getDownloadedOllamaModels()
-                if model in downloadedOllamaModels:
-                    if feature == "default":
-                        config.llamacppDefaultModel_model_path = downloadedOllamaModels[model]
-                    elif feature == "code":
-                        config.llamacppCodeModel_model_path = downloadedOllamaModels[model]
-                else:
-                    if shutil.which("ollama"):
-                        try:
-                            Downloader.downloadOllamaModel(model, True)
-                            # refresh download list
-                            downloadedOllamaModels = getDownloadedOllamaModels()
-                            if feature == "default":
-                                config.llamacppDefaultModel_model_path = downloadedOllamaModels[model]
-                            elif feature == "code":
-                                config.llamacppCodeModel_model_path = downloadedOllamaModels[model]
-                        except:
-                            print2(f"Failed to download '{model}'! Please make sure you enter a valid model name or tag.")
+                if model:
+                    downloadedOllamaModels = getDownloadedOllamaModels()
+                    if model in downloadedOllamaModels:
+                        if feature == "default":
+                            config.llamacppDefaultModel_model_path = downloadedOllamaModels[model]
+                        elif feature == "code":
+                            config.llamacppCodeModel_model_path = downloadedOllamaModels[model]
                     else:
-                        print("Ollama not found! Install Ollama first to use Ollama model library!")
-                        print("To install Ollama, visit https://ollama.com")
+                        if shutil.which("ollama"):
+                            try:
+                                Downloader.downloadOllamaModel(model, True)
+                                # refresh download list
+                                downloadedOllamaModels = getDownloadedOllamaModels()
+                                if feature == "default":
+                                    config.llamacppDefaultModel_model_path = downloadedOllamaModels[model]
+                                elif feature == "code":
+                                    config.llamacppCodeModel_model_path = downloadedOllamaModels[model]
+                            except:
+                                print2(f"Failed to download '{model}'! Please make sure you enter a valid model name or tag.")
+                        else:
+                            print("Ollama not found! Install Ollama first to use Ollama model library!")
+                            print("To install Ollama, visit https://ollama.com")
+                    if feature == "default":
+                        config.llamacppDefaultModel_ollama_tag = model
+                    elif feature == "code":
+                        config.llamacppCodeModel_ollama_tag = model
             elif library == "Huggingface Hub":
                 downloadedGgufModels = getDownloadedGgufModels()
                 if not downloadedGgufModels:
@@ -942,7 +952,7 @@ class FreeGenius:
                 self.setCustomModelPath(feature=feature)
 
     def setCustomModelPath(self, feature="default"):
-        #historyFolder = os.path.join(getLocalStorage(), "history")
+        #historyFolder = os.path.join(config.localStorage, "history")
         #Path(historyFolder).mkdir(parents=True, exist_ok=True)
         #model_path_history = os.path.join(historyFolder, "llamacpp_code_model_path" if feature == "code" else "llamacpp_default_model_path")
         #model_path_session = PromptSession(history=FileHistory(model_path_history))
@@ -964,7 +974,7 @@ class FreeGenius:
                 config.llamacppCodeModel_model_path = model_path
 
     def setCustomHuggingfaceModel(self, feature="default"):
-        historyFolder = os.path.join(getLocalStorage(), "history")
+        historyFolder = os.path.join(config.localStorage, "history")
         Path(historyFolder).mkdir(parents=True, exist_ok=True)
         repo_id_history = os.path.join(historyFolder, "llamacpp_code_repo_id" if feature == "code" else "llamacpp_default_repo_id")
         repo_id_session = PromptSession(history=FileHistory(repo_id_history))
@@ -1035,8 +1045,8 @@ class FreeGenius:
             print1("Do you want to delete them now? [y]es / [N]o")
             confirmation = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default="yes")
             if confirmation.lower() in ("y", "yes"):
-                memory_store = os.path.join(getLocalStorage(), "memory")
-                retrieved_collections = os.path.join(getLocalStorage(), "autogen", "retriever")
+                memory_store = os.path.join(config.localStorage, "memory")
+                retrieved_collections = os.path.join(config.localStorage, "autogen", "retriever")
                 for folder in (memory_store, retrieved_collections):
                     shutil.rmtree(folder, ignore_errors=True)
             else:
@@ -1057,7 +1067,7 @@ class FreeGenius:
         freeGeniusAIName = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.freeGeniusAIName)
         if freeGeniusAIName and not freeGeniusAIName.strip().lower() == config.exit_entry:
             config.freeGeniusAIName = freeGeniusAIName
-            self.storageDir = getLocalStorage()
+            config.localStorage = getLocalStorage()
             config.saveConfig()
             print3(f"You have changed my name to: {config.freeGeniusAIName}")
 
@@ -1367,7 +1377,7 @@ class FreeGenius:
                     config.save_chat_record(timestamp, order, i)
 
             try:
-                folderPath = os.path.join(getLocalStorage(), "chats", re.sub("^([0-9]+?\-[0-9]+?)\-.*?$", r"\1", timestamp))
+                folderPath = os.path.join(config.localStorage, "chats", re.sub("^([0-9]+?\-[0-9]+?)\-.*?$", r"\1", timestamp))
                 Path(folderPath).mkdir(parents=True, exist_ok=True)
                 if os.path.isdir(folderPath):
                     chatFile = os.path.join(folderPath, f"{timestamp}.txt")
@@ -1404,7 +1414,7 @@ class FreeGenius:
                 pydoc.pipepager(plainText, cmd="termux-share -a send")
             else:
                 try:
-                    folderPath = os.path.join(getLocalStorage(), "chats", "export")
+                    folderPath = os.path.join(config.localStorage, "chats", "export")
                     Path(folderPath).mkdir(parents=True, exist_ok=True)
                     if os.path.isdir(folderPath):
                         chatFile = os.path.join(folderPath, f"{timestamp}.txt")
@@ -1495,7 +1505,7 @@ class FreeGenius:
             self.showLogo()
             self.showCurrentContext()
             # go to startup directory
-            storagedirectory = getLocalStorage()
+            storagedirectory = config.localStorage
             os.chdir(storagedirectory)
             messages = CallLLM.resetMessages()
             #print1(f"startup directory:\n{storagedirectory}")

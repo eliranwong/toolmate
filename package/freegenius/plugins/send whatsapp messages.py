@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - send whatsapp messages
+FreeGenius AI Plugin - send whatsapp messages
 
 send whatsapp messages
 

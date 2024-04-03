@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - search weather info
+FreeGenius AI Plugin - search weather info
 
 search for weather information
 

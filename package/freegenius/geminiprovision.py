@@ -8,9 +8,6 @@ from vertexai.generative_models._generative_models import (
 from freegenius import config, showErrors, is_valid_image_file, is_valid_image_url, wrapText, print1, print2, print3
 from freegenius.utils.single_prompt import SinglePrompt
 
-import shutil, textwrap
-from PIL import Image as im
-import requests
 import http.client
 import typing
 import urllib.request
@@ -82,7 +79,7 @@ class GeminiProVision:
                 try:
                     function_args = {
                         "query": query,
-                        "files": files,
+                        "image_filepath": files,
                     }
                     self.analyze_images(function_args)
                 except:
@@ -113,7 +110,7 @@ class GeminiProVision:
             return Image.from_bytes(image_bytes)
 
         query = function_args.get("query") # required
-        files = function_args.get("files") # required
+        files = function_args.get("image_filepath") # required
         if not files:
             self.defaultPrompt = f"{query}\n[NO_FUNCTION_CALL]"
             return None
@@ -158,7 +155,9 @@ class GeminiProVision:
                 try:
                     chat_response = response.text.strip()
                     if chat_response:
+                        print2("```assistant")
                         print(wrapText(chat_response))
+                        print2("```")
                         return chat_response
                 except:
                     showErrors()

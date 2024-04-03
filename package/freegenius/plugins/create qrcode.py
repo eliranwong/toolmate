@@ -1,13 +1,13 @@
 """
-LetMeDoIt AI Plugin - create qr code
+FreeGenius AI Plugin - create qr code
 
 Create qr code image
 
 [FUNCTION_CALL]
 """
 
-from freegenius import config, getLocalStorage
-from freegenius import print1, print2, print3
+from freegenius import config
+from freegenius import print3
 import os, qrcode
 
 def create_qrcode(function_args):
@@ -18,7 +18,7 @@ def create_qrcode(function_args):
     qr.add_data(url)
     qr.make(fit=True)
 
-    filepath = os.path.join(getLocalStorage(), "qrcode.png")
+    filepath = os.path.join(config.localStorage, "qrcode.png")
     img = qr.make_image(fill='black', back_color='white')
     img.save(filepath)
     

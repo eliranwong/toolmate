@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - remove image background
+FreeGenius AI Plugin - remove image background
 
 Remove image background
 

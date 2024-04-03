@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - pronunce words
+FreeGenius AI Plugin - pronunce words
 
 pronunce words
 

@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - memory
+FreeGenius AI Plugin - memory
 
 Save and retrieve memory
 
@@ -8,13 +8,13 @@ modified from source: https://medium.com/@simon_attard/building-a-memory-layer-f
 [FUNCTION_CALL]
 """
 
-from freegenius import config, get_or_create_collection, add_vector, query_vectors, getLocalStorage
+from freegenius import config, get_or_create_collection, add_vector, query_vectors
 from freegenius import print1
 from pathlib import Path
 from chromadb.config import Settings
 import os, chromadb, getpass, geocoder, datetime, json
 
-memory_store = os.path.join(getLocalStorage(), "memory")
+memory_store = os.path.join(config.localStorage, "memory")
 Path(memory_store).mkdir(parents=True, exist_ok=True)
 chroma_client = chromadb.PersistentClient(memory_store, Settings(anonymized_telemetry=False))
 

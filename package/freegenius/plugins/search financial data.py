@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - search financial data
+FreeGenius AI Plugin - search financial data
 
 search financial data with yfinance
 

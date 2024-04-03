@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - analyze files
+FreeGenius AI Plugin - analyze files
 
 analyze files with integrated "AutoGen Retriever"
 

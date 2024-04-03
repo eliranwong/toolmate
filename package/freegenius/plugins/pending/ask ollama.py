@@ -1,13 +1,13 @@
 """
-LetMeDoIt AI Plugin - ask Ollama Chat
+FreeGenius AI Plugin - ask Ollama Chat
 
 Ask Ollama Chat for information
 
 [FUNCTION_CALL]
 """
 
-from freegenius import config, getLocalStorage
-from freegenius import print1, print2, print3
+from freegenius import config
+from freegenius import print2
 from freegenius.ollamachat import OllamaChat
 from freegenius.utils.ollama_models import ollama_models
 from prompt_toolkit import PromptSession
@@ -30,7 +30,7 @@ def ask_ollama(function_args):
         # Prompt.
         "indicator": config.terminalPromptIndicatorColor2,
     })
-    historyFolder = os.path.join(getLocalStorage(), "history")
+    historyFolder = os.path.join(config.localStorage, "history")
     Path(historyFolder).mkdir(parents=True, exist_ok=True)
     model_history = os.path.join(historyFolder, "ollama_default")
     model_session = PromptSession(history=FileHistory(model_history))

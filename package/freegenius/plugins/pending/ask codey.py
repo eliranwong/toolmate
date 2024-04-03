@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - ask Codey
+FreeGenius AI Plugin - ask Codey
 
 Ask Google Codey for information about coding
 

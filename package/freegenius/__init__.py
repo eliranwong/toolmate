@@ -51,14 +51,39 @@ import sounddevice
 # local llm
 
 def startLlamacppServer():
-    if not hasattr(config, "llamacppServer") or config.llamacppServer is None:
-        cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppServer_port} --model "{config.llamacppDefaultModel_model_path}" --verbose False --chat_format chatml --n_ctx {config.llamacppDefaultModel_n_ctx} --n_gpu_layers {config.llamacppDefaultModel_n_gpu_layers} --n_batch {config.llamacppDefaultModel_n_batch}"""
-        config.llamacppServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+    try:
+        if not hasattr(config, "llamacppServer") or config.llamacppServer is None:
+            print2("Running llama.cpp server ...")
+            cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppServer_port} --model "{config.llamacppDefaultModel_model_path}" --verbose False --chat_format chatml --n_ctx {config.llamacppDefaultModel_n_ctx} --n_gpu_layers {config.llamacppDefaultModel_n_gpu_layers} --n_batch {config.llamacppDefaultModel_n_batch}"""
+            config.llamacppServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+    except:
+        print2(f'''Failed to run llama.cpp server at "localhost:{config.llamacppServer_port}"!''')
+        config.llamacppServer = None
 
 def stopLlamacppServer():
-    if hasattr(config, "llamacppServer"):
+    if hasattr(config, "llamacppServer") and config.llamacppServer is not None:
+        print2("Stopping llama.cpp server ...")
         os.killpg(os.getpgid(config.llamacppServer.pid), signal.SIGTERM)
         config.llamacppServer = None
+
+def startLlamacppVisionServer():
+    try:
+        if not hasattr(config, "llamacppVisionServer") or config.llamacppVisionServer is None:
+            if os.path.isfile(config.llamacppVisionModel_model_path) and os.path.isfile(config.llamacppVisionModel_clip_model_path):
+                print2("Running llama.cpp vision server ...")
+                cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppServer_port} --model "{config.llamacppVisionModel_model_path}" --clip_model_path {config.llamacppVisionModel_clip_model_path} --verbose False --chat_format llava-1-5 --n_ctx {config.llamacppDefaultModel_n_ctx} --n_gpu_layers {config.llamacppDefaultModel_n_gpu_layers} --n_batch {config.llamacppDefaultModel_n_batch}"""
+                config.llamacppVisionServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+            else:
+                print1("Error! Clip model or vision model is missing!")
+    except:
+        print2(f'''Failed to run llama.cpp server at "localhost:{config.llamacppServer_port}"!''')
+        config.llamacppVisionServer = None
+
+def stopLlamacppVisionServer():
+    if hasattr(config, "llamacppVisionServer") and config.llamacppVisionServer is not None:
+        print2("Stopping llama.cpp vision server ...")
+        os.killpg(os.getpgid(config.llamacppVisionServer.pid), signal.SIGTERM)
+        config.llamacppVisionServer = None
 
 def getOllamaModelDir():
     # read https://github.com/ollama/ollama/blob/main/docs/faq.md#where-are-models-stored
@@ -109,7 +134,7 @@ def getDownloadedOllamaModels() -> dict:
 
 def getDownloadedGgufModels() -> dict:
     # support when config.store_llm_in_user_dir is set to True
-    llm_directory = os.path.join(getLocalStorage(), "LLMs", "gguf")
+    llm_directory = os.path.join(config.localStorage, "LLMs", "gguf")
     models = {}
     for f in getFilenamesWithoutExtension(llm_directory, "gguf"):
         models[f] = os.path.join(llm_directory, f"{f}.gguf")
@@ -772,7 +797,7 @@ def setToolDependence(entry: Any) -> bool:
                     print3(f"Tool auto selection threshold changed to: {tool_auto_selection_threshold}")
             else:
                 # 3/4 of config.tool_dependence
-                config.tool_auto_selection_threshold = round(config.tool_dependence * 3/4, 5)
+                config.tool_auto_selection_threshold = round(config.tool_dependence * 5/8, 5)
 
             config.saveConfig()
 

@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - conselling
+FreeGenius AI Plugin - conselling
 
 add contexts for conselling
 

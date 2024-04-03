@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - send tweet
+FreeGenius AI Plugin - send tweet
 
 send a tweet to twitter
 

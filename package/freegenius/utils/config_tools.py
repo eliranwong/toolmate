@@ -1,4 +1,4 @@
-from freegenius import config, getLocalStorage
+from freegenius import config
 import pprint, re, os, shutil
 from freegenius.utils.config_essential import defaultSettings
 from prompt_toolkit.shortcuts import yes_no_dialog
@@ -21,7 +21,7 @@ def setConfig(defaultSettings, thisTranslation={}, temporary=False):
             if not i in config.thisTranslation:
                 config.thisTranslation[i] = thisTranslation[i]
 
-storageDir = getLocalStorage()
+storageDir = config.localStorage
 
 # restore configs from backup
 if os.path.isdir(storageDir):

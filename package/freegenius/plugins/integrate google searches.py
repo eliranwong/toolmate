@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - integrate google searches
+FreeGenius AI Plugin - integrate google searches
 
 Search internet for keywords when ChatGPT lacks information or when user ask about news or latest updates
 

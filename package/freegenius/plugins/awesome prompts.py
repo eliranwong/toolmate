@@ -1,7 +1,7 @@
 from freegenius import config
 
 """
-LetMeDoIt AI Plugin - awesome prompts
+FreeGenius AI Plugin - awesome prompts
 
 add selected awesome prompts https://github.com/f/awesome-chatgpt-prompts as predefined contexts
 

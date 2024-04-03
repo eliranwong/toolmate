@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - search latest news
+FreeGenius AI Plugin - search latest news
 
 search latest news
 

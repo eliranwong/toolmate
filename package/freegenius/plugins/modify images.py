@@ -1,18 +1,17 @@
 """
-LetMeDoIt AI Plugin - modify images
+FreeGenius AI Plugin - modify images
 
 modify the given images according to changes specified by users
 
 [FUNCTION_CALL]
 """
 
-from freegenius import config, is_valid_image_file, is_valid_image_url
+from freegenius import config, is_valid_image_file, is_valid_image_url, print1
 import os
 from openai import OpenAI
 from freegenius.utils.shared_utils import SharedUtil
 from freegenius.utils.call_chatgpt import check_openai_errors
 from freegenius.utils.terminal_mode_dialogs import TerminalModeDialogs
-from pathlib import Path
 from base64 import b64decode
 from urllib.parse import quote
 
@@ -143,10 +142,10 @@ def create_image(description, original_filename):
 
 functionSignature = {
     "examples": [
-        "Modify image",
+        "change image",
     ],
     "name": "modify_images",
-    "description": "modify the images that I provide",
+    "description": "modify images",
     "parameters": {
         "type": "object",
         "properties": {

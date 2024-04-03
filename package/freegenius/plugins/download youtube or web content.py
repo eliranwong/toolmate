@@ -1,7 +1,7 @@
 # install binary ffmpeg and python package yt-dlp to work with this plugin
 
 """
-LetMeDoIt AI Plugin - download youtube or web content
+FreeGenius AI Plugin - download youtube or web content
 
 * download Youtube video
 * download Youtube audio and convert it into mp3
@@ -10,7 +10,7 @@ LetMeDoIt AI Plugin - download youtube or web content
 [FUNCTION_CALL]
 """
 
-from freegenius import config, showErrors, getLocalStorage, isCommandInstalled, print1, print3
+from freegenius import config, showErrors, isCommandInstalled, print1, print3
 import re, subprocess, os
 from freegenius.utils.shared_utils import SharedUtil
 from pathlib import Path
@@ -53,14 +53,14 @@ def download_web_content(function_args):
         format = function_args.get("format") # required
         location = function_args.get("location", "") # optional
         if not (location and os.path.isdir(location)):
-            location = os.path.join(getLocalStorage(), "audio" if format == "audio" else "video")
+            location = os.path.join(config.localStorage, "audio" if format == "audio" else "video")
             Path(location).mkdir(parents=True, exist_ok=True)
         downloadCommand = "yt-dlp -x --audio-format mp3" if format == "audio" else "yt-dlp -f bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4"
         terminalDownloadYoutubeFile(downloadCommand, url, location)
         return "Finished! Youtube downloader closed!"
     elif SharedUtil.is_valid_url(url):
         try:
-            folder = getLocalStorage()
+            folder = config.localStorage
             folder = os.path.join(folder, "Downloads")
             Path(folder).mkdir(parents=True, exist_ok=True)
             SharedUtil.downloadWebContent(url, folder=folder, ignoreKind=True)

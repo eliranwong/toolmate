@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - dates and times
+FreeGenius AI Plugin - dates and times
 
 Retrieve information about dates and times
 

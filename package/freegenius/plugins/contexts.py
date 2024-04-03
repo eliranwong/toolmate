@@ -1,7 +1,7 @@
 from freegenius import config
 
 """
-LetMeDoIt AI Plugin - contexts
+FreeGenius AI Plugin - contexts
 
 add pre-defined contexts
 """

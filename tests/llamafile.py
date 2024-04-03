@@ -59,7 +59,8 @@ Response:
                 return CallOllama.regularCall(messages)
             else:
                 # tool function executed without chat extension
-                config.currentMessages.append({"role": "assistant", "content": "Done!"})
+                config.currentMessages.append({"role": "assistant", "content": config.tempContent if config.tempContent else "Done!"})
+                config.tempContent = ""
                 return None
 
     @staticmethod

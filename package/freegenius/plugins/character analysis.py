@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - character analysis
+FreeGenius AI Plugin - character analysis
 
 add contexts for character analysis
 

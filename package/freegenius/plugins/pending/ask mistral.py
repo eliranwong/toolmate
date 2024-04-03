@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - ask Mistral
+FreeGenius AI Plugin - ask Mistral
 
 Ask Mistral for information
 

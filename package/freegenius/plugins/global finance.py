@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - global finance
+FreeGenius AI Plugin - global finance
 
 add input suggestions and contexts about global finance
 

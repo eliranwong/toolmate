@@ -161,12 +161,13 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     @check_ollama_errors
-    def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
+    def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, model: Optional[str]=None, **kwargs):
         # non-streaming single call
-        messages.append({"role": "user", "content" : userInput})
+        if userInput:
+            messages.append({"role": "user", "content" : userInput})
         try:
             completion = ollama.chat(
-                model=config.ollamaDefaultModel,
+                model=model if model is not None else config.ollamaDefaultModel,
                 messages=messages,
                 stream=False,
                 options=Options(
@@ -284,7 +285,8 @@ Your response:
                 return CallOllama.regularCall(messages)
             elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
                 # tool function executed without chat extension
-                config.currentMessages.append({"role": "assistant", "content": "Done!"})
+                config.currentMessages.append({"role": "assistant", "content": config.tempContent if config.tempContent else "Done!"})
+                config.tempContent = ""
                 return None
 
     @staticmethod

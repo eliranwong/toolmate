@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - open web browser
+FreeGenius AI Plugin - open web browser
 
 open a url with default web browser
 

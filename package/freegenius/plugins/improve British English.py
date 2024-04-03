@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - improve British English
+FreeGenius AI Plugin - improve British English
 
 add context to help users to improve British English
 """

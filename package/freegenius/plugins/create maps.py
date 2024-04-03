@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - create maps
+FreeGenius AI Plugin - create maps
 
 Create maps
 

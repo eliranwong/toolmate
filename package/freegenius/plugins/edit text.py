@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - edit text
+FreeGenius AI Plugin - edit text
 
 edit text files
 

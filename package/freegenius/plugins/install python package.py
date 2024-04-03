@@ -1,5 +1,5 @@
 """
-LetMeDoIt AI Plugin - install python package
+FreeGenius AI Plugin - install python package
 
 install python package into the environment that runs LetMeDoIt AI
 

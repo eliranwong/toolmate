@@ -268,7 +268,8 @@ Your response:
                 return CallGemini.regularCall(messages)
             elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
                 # tool function executed without chat extension
-                config.currentMessages.append({"role": "assistant", "content": "Done!"})
+                config.currentMessages.append({"role": "assistant", "content": config.tempContent if config.tempContent else "Done!"})
+                config.tempContent = ""
                 return None
 
     @staticmethod

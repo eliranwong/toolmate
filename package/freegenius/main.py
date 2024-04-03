@@ -3,7 +3,7 @@ from freegenius import config
 import os, shutil, argparse
 from pathlib import Path
 
-from freegenius import getLocalStorage, updateApp, configFile
+from freegenius import updateApp, configFile
 from freegenius.utils.assistant import FreeGenius
 from prompt_toolkit.shortcuts import set_title, clear_title
 
@@ -112,17 +112,16 @@ def main():
     set_title(config.freeGeniusAIName)
 
     # local storage
-    storageDir = getLocalStorage()
     # check log files; remove old lines if more than 3000 lines is found in a log file
     for i in ("chats", "paths", "commands"):
-        filepath = os.path.join(storageDir, "history", i)
+        filepath = os.path.join(config.localStorage, "history", i)
         set_log_file_max_lines(filepath, 3000)
     FreeGenius().startChats()
     # Do the following tasks before exit
     # backup configurations
     config.saveConfig()
-    if os.path.isdir(storageDir):
-        shutil.copy(configFile, os.path.join(storageDir, "config_backup.py"))
+    if os.path.isdir(config.localStorage):
+        shutil.copy(configFile, os.path.join(config.localStorage, "config_backup.py"))
     # delete temporary content
     try:
         tempFolder = os.path.join(config.freeGeniusAIFolder, "temp")

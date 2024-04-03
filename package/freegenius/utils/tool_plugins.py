@@ -1,4 +1,4 @@
-from freegenius import config, getLocalStorage, get_or_create_collection, add_vector, getFilenamesWithoutExtension
+from freegenius import config, get_or_create_collection, add_vector, getFilenamesWithoutExtension, execPythonFile
 from freegenius import print2
 from pathlib import Path
 from chromadb.config import Settings
@@ -6,14 +6,10 @@ import os, shutil, chromadb, json
 from typing import Callable
 
 
-from freegenius import config, getLocalStorage, execPythonFile
-import os
-
 class Plugins:
 
     @staticmethod
-    def runPlugins():        
-        storageDir = getLocalStorage()
+    def runPlugins():
         # The following config values can be modified with plugins, to extend functionalities
         #config.pluginsWithFunctionCall = []
         config.aliases = {}
@@ -28,8 +24,8 @@ class Plugins:
         config.toolFunctionMethods = {}
 
         pluginFolder = os.path.join(config.freeGeniusAIFolder, "plugins")
-        if storageDir:
-            customPluginFoler = os.path.join(storageDir, "plugins")
+        if config.localStorage:
+            customPluginFoler = os.path.join(config.localStorage, "plugins")
             Path(customPluginFoler).mkdir(parents=True, exist_ok=True)
             pluginFolders = (pluginFolder, customPluginFoler)
         else:
@@ -77,7 +73,7 @@ class ToolStore:
 
     @staticmethod
     def setupToolStoreClient():
-        tool_store = os.path.join(getLocalStorage(), "tool_store")
+        tool_store = os.path.join(config.localStorage, "tool_store")
         try:
             shutil.rmtree(tool_store, ignore_errors=True)
             print2("Old tool store removed!")

@@ -1,12 +1,12 @@
 """
-LetMeDoIt AI Plugin - search chat records
+FreeGenius AI Plugin - search chat records
 
 search and open old chat records
 
 [FUNCTION_CALL]
 """
 
-from freegenius import config, get_or_create_collection, add_vector, query_vectors, showErrors, getLocalStorage
+from freegenius import config, get_or_create_collection, add_vector, query_vectors, showErrors
 from freegenius import print1, print2, print3
 from pathlib import Path
 from chromadb.config import Settings
@@ -14,7 +14,7 @@ import os, chromadb, re
 from freegenius.utils.shared_utils import SharedUtil
 from prompt_toolkit import print_formatted_text, HTML
 
-chat_store = os.path.join(getLocalStorage(), "chats")
+chat_store = os.path.join(config.localStorage, "chats")
 Path(chat_store).mkdir(parents=True, exist_ok=True)
 chroma_client = chromadb.PersistentClient(chat_store, Settings(anonymized_telemetry=False))
 
@@ -66,7 +66,7 @@ def load_chats(function_args):
             isfile = True
         elif re.search("^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9]_[0-9][0-9]_[0-9][0-9]$", chatFile):
             # match chat id format
-            folderPath = os.path.join(getLocalStorage(), "chats", re.sub("^([0-9]+?\-[0-9]+?)\-.*?$", r"\1", chatFile))
+            folderPath = os.path.join(config.localStorage, "chats", re.sub("^([0-9]+?\-[0-9]+?)\-.*?$", r"\1", chatFile))
             chatFile = os.path.join(folderPath, f"{chatFile}.txt")
             if os.path.isfile(chatFile):
                 isfile = True

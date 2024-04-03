@@ -1,8 +1,8 @@
 import ollama, os, argparse, threading, shutil, json
 from ollama import Options, pull
 from freegenius.utils.download import Downloader
-from freegenius import config, getLocalStorage, is_valid_image_file
-from freegenius import print1, print2, print3
+from freegenius import config, is_valid_image_file
+from freegenius import print2, print3
 from freegenius.utils.ollama_models import ollama_models
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
@@ -107,7 +107,7 @@ Here is my request:
         if not config.ollamaDefaultModel == previoiusModel:
             config.saveConfig()
 
-        historyFolder = os.path.join(getLocalStorage(), "history")
+        historyFolder = os.path.join(config.localStorage, "history")
         Path(historyFolder).mkdir(parents=True, exist_ok=True)
         chat_history = os.path.join(historyFolder, f"ollama_{model}")
         chat_session = PromptSession(history=FileHistory(chat_history))
@@ -246,7 +246,7 @@ def main(thisModel=""):
         if args.model and args.model.strip():
             model = args.model.strip()
         else:
-            historyFolder = os.path.join(getLocalStorage(), "history")
+            historyFolder = os.path.join(config.localStorage, "history")
             Path(historyFolder).mkdir(parents=True, exist_ok=True)
             model_history = os.path.join(historyFolder, "ollama_default")
             model_session = PromptSession(history=FileHistory(model_history))

@@ -55,7 +55,7 @@ def startLlamacppServer():
         if not hasattr(config, "llamacppServer") or config.llamacppServer is None:
             print2("Running llama.cpp server ...")
             cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppServer_port} --model "{config.llamacppDefaultModel_model_path}" --verbose False --chat_format chatml --n_ctx {config.llamacppDefaultModel_n_ctx} --n_gpu_layers {config.llamacppDefaultModel_n_gpu_layers} --n_batch {config.llamacppDefaultModel_n_batch}"""
-            config.llamacppServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+            config.llamacppServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
     except:
         print2(f'''Failed to run llama.cpp server at "localhost:{config.llamacppServer_port}"!''')
         config.llamacppServer = None
@@ -72,7 +72,7 @@ def startLlamacppVisionServer():
             if os.path.isfile(config.llamacppVisionModel_model_path) and os.path.isfile(config.llamacppVisionModel_clip_model_path):
                 print2("Running llama.cpp vision server ...")
                 cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppServer_port} --model "{config.llamacppVisionModel_model_path}" --clip_model_path {config.llamacppVisionModel_clip_model_path} --verbose False --chat_format llava-1-5 --n_ctx {config.llamacppDefaultModel_n_ctx} --n_gpu_layers {config.llamacppDefaultModel_n_gpu_layers} --n_batch {config.llamacppDefaultModel_n_batch}"""
-                config.llamacppVisionServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+                config.llamacppVisionServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
             else:
                 print1("Error! Clip model or vision model is missing!")
     except:

@@ -94,9 +94,9 @@ def send_email(function_args):
 
 functionSignature = {
     "examples": [
-        "Draft email",
-        "Write email",
-        "Send email",
+        "draft an email",
+        "write an email",
+        "send an email",
     ],
     "name": "send_email",
     "description": "send email",

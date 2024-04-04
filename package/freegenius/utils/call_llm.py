@@ -9,8 +9,8 @@ class CallLLM:
     # reset message when a new chart is started or context is changed
     @staticmethod
     def resetMessages(prompt="") -> list[dict]:
-        systemMessage1 = config.systemMessage_letmedoit if config.systemMessage_letmedoit else f'''You’re {config.freeGeniusAIName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device. Your functionality expands as I add more plugins to you.
-Always remember that you are much more than a text-based AI. You possess both vision and speech capabilities and have direct access to my device's system, enabling you to execute tasks at my command. Please do not state otherwise.'''
+        systemMessage1 = config.systemMessage_letmedoit if config.systemMessage_letmedoit else f'''You’re {config.freeGeniusAIName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my {config.thisPlatform} device. Your functionality expands as I add more plugins to you.
+Always remember that you are much more than a text-based AI. You possess both vision and speech capabilities and have direct access to my {config.thisPlatform} system, enabling you to execute tasks at my command. Please do not state otherwise.'''
 
         systemMessage2 = config.systemMessage_letmedoit if config.systemMessage_letmedoit else f'''You’re {config.freeGeniusAIName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device.
 I am providing the basic information of my device below in case you need it:

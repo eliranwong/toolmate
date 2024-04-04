@@ -57,7 +57,7 @@ def remove_image_background2(function_args):
 
 functionSignature = {
     "examples": [
-        "Remove image background",
+        "remove image background",
     ],
     "name": "remove_image_background",
     "description": f'''Remove image background''',

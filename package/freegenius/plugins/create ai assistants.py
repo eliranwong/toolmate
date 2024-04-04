@@ -29,8 +29,9 @@ def build_agents(function_args):
 
 functionSignature = {
     "examples": [
-        "Ask autobuilder",
-        "Create a team of agents / assistants",
+        "autobuilder",
+        "create a team of assistants",
+        "create a crew of agents",
     ],
     "name": "build_agents",
     "description": "build a group of AI assistants or agents to execute a complicated task that other functions cannot resolve",

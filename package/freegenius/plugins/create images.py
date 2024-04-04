@@ -73,6 +73,7 @@ def create_image(function_args):
 functionSignature = {
     "examples": [
         "generate image",
+        "create image",
     ],
     "name": "create_image",
     "description": "create an image",

@@ -112,12 +112,10 @@ def load_chats(function_args):
     return "[INVALID]"
 
 functionSignature1 = {
-    "intent": [
-        "memory / record access",
-    ],
     "examples": [
-        "Search chat record",
-        "Find in chat history",
+        "search our conversations",
+        "search chat records",
+        "find in chat history",
     ],
     "name": "search_chats",
     "description": """Search chat records""",
@@ -134,12 +132,9 @@ functionSignature1 = {
 }
 
 functionSignature2 = {
-    "intent": [
-        "memory / record access",
-    ],
     "examples": [
-        "Load chat record",
-        "Open chat history",
+        "load chat record",
+        "open chat history",
     ],
     "name": "load_chats",
     "description": """Load or open old saved chat records if chat ID / timestamp / file path is given""",

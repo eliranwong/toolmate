@@ -27,9 +27,9 @@ def pronunce_words(function_args):
 
 functionSignature = {
     "examples": [
-        "pronounce words",
+        "pronounce",
         "speak in",
-        "read",
+        "read aloud",
     ],
     "name": "pronunce_words",
     "description": "pronounce words or sentences",

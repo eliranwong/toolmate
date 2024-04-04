@@ -44,6 +44,7 @@ def analyze_files(function_args):
 functionSignature = {
     "examples": [
         "analyze files",
+        "retrieve file information",
     ],
     "name": "analyze_files",
     "description": "retrieve information from files",

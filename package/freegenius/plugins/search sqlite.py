@@ -60,7 +60,7 @@ And run python code to resolve my request: {request}
 
 Please consider individual table information below for code generation:
 {info}"""
-        _, function_call_response = CallLLM.getSingleFunctionCallResponse(userInput, "execute_python_code")
+        _, function_call_response = CallLLM.getSingleFunctionCallResponse(userInput, "execute_computing_task")
         return function_call_response
     except:
         showErrors()
@@ -68,8 +68,8 @@ Please consider individual table information below for code generation:
 
 functionSignature = {
     "examples": [
-        "Connect to SQLite file",
-        "Search SQLite file",
+        "connect SQLite",
+        "search SQLite",
     ],
     "name": "search_sqlite",
     "description": f'''Search or manage SQLite file, e.g. fetch data, update records, etc. Remember, use this function ONLY IF I provide you with a sqlite file path.''',

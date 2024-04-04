@@ -109,11 +109,11 @@ Acess the risk level of this Python code:
 
 @check_openai_errors
 def autoCorrectPythonCode(code, trace):
-    for i in range(config.max_consecutive_auto_heal):
+    for i in range(config.max_consecutive_auto_correction):
         userInput = f"Original python code:\n```\n{code}\n```\n\nTraceback:\n```\n{trace}\n```"
         messages = [{"role": "user", "content" : userInput}]
         print3(f"Auto-correction attempt: {(i + 1)}")
-        function_call_message, function_call_response = CallChatGPT.getSingleFunctionCallResponse(messages, "heal_python") if config.llmBackend == "chatgpt" else CallLetMeDoIt.getSingleFunctionCallResponse(messages, "heal_python")
+        function_call_message, function_call_response = CallChatGPT.getSingleFunctionCallResponse(messages, "correct_python") if config.llmBackend == "chatgpt" else CallLetMeDoIt.getSingleFunctionCallResponse(messages, "correct_python")
         # display response
         print1(config.divider)
         if config.developer:
@@ -134,7 +134,7 @@ def autoCorrectPythonCode(code, trace):
         else:
             return ""
     # ask if user want to manually edit the code
-    print1(f"Failed to execute the code {(config.max_consecutive_auto_heal + 1)} times in a row!")
+    print1(f"Failed to execute the code {(config.max_consecutive_auto_correction + 1)} times in a row!")
     print1("Do you want to manually edit it? [y]es / [N]o")
     confirmation = prompt(style=config.promptStyle2, default="N")
     if confirmation.lower() in ("y", "yes"):
@@ -267,7 +267,7 @@ def finetuneSingleFunctionCallResponse(func_arguments, function_name):
         except:
             trace = showErrors()
             print1(config.divider)
-            if config.max_consecutive_auto_heal > 0:
+            if config.max_consecutive_auto_correction > 0:
                 return autoCorrectPythonCode(refinedCode, trace)
             else:
                 return "[INVALID]"

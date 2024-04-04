@@ -69,14 +69,12 @@ def retrieve_memory(function_args):
     return json.dumps(info)
 
 functionSignature1 = {
-    "intent": [
-        "memory / record access",
-        "arrange activities",
-    ],
     "examples": [
-        "Remember,",
-        "Save in your memory",
-        "Keep in mind",
+        "remember, ",
+        "save in your memory",
+        "keep in mind",
+        "memorize",
+        "take a note",
     ],
     "name": "save_memory",
     "description": """Use this function if I mention something which you think would be useful in the future and should be saved as a memory. Saved memories will allow you to retrieve snippets of past conversations when needed.""",
@@ -105,14 +103,10 @@ functionSignature1 = {
     }
 }
 functionSignature2 = {
-    "intent": [
-        "memory / record access",
-        "arrange activities",
-    ],
     "examples": [
-        "Search your memory",
-        "Recall from your memory",
-        "Retrieve from your memory",
+        "search your memory",
+        "recall from your memory",
+        "do you remember",
     ],
     "name": "retrieve_memory",
     "description": """Recall memories of important conversation snippets that we had in the past.""",

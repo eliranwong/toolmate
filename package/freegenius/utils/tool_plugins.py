@@ -37,7 +37,7 @@ class Plugins:
         # always include the following plugins
         requiredPlugins = (
             "auto correct python code",
-            "execute python code",
+            "execute computing tasks",
             "execute termux command",
         )
         for i in requiredPlugins:
@@ -63,8 +63,7 @@ class Plugins:
     @staticmethod
     def addFunctionCall(signature: str, method: Callable[[dict], str]):
         name = signature["name"]
-        if not name in config.toolFunctionSchemas:
-            # prevent duplication
+        if not name in config.toolFunctionSchemas: # prvent duplicaiton
             config.toolFunctionSchemas[name] = {key: value for key, value in signature.items() if not key in ("intent", "examples")}
             config.toolFunctionMethods[name] = method
             ToolStore.add_tool(signature)
@@ -87,10 +86,14 @@ class ToolStore:
         name, description, parameters = signature["name"], signature["description"], signature["parameters"]
         print(f"Adding tool: {name}")
         if "examples" in signature:
-            description = description + "\n" + "\n".join(signature["examples"])
+            #description = description + "\n" + "\n".join(signature["examples"])
+            description = "\n".join(signature["examples"])
         collection = get_or_create_collection(config.tool_store_client, "tools")
         metadata = {
             "name": name,
             "parameters": json.dumps(parameters),
         }
         add_vector(collection, description, metadata)
+        # add input suggestions
+        if "examples" in signature:
+            config.inputSuggestions += signature["examples"]

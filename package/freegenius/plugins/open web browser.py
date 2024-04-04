@@ -19,9 +19,10 @@ def open_browser(function_args):
 # Function Signature
 functionSignature = {
     "examples": [
-        "Open web browser",
-        "Open website",
-        "Open https://letmedoit.ai",
+        "open web browser",
+        "browse website",
+        "https://",
+        "open url",
     ],
     "name": "open_browser",
     "description": f'''Open https:// url with web browser''',

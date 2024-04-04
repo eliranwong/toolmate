@@ -137,7 +137,7 @@ class SharedUtil:
         except:
             trace = showErrors()
             print1(config.divider)
-            if config.max_consecutive_auto_heal > 0:
+            if config.max_consecutive_auto_correction > 0:
                 return CallLLM.autoCorrectPythonCode(code, trace)
             else:
                 return "[INVALID]"

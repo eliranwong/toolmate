@@ -28,8 +28,12 @@ def create_statistical_graphics(function_args):
 
 functionSignature = {
     "examples": [
-        "Create a plot / graph / bar chart / par chart",
-        "Visualize data",
+        "plot a graph",
+        "create a chart",
+        "create a bar chart",
+        "create a par chart",
+        "visualize data",
+        "statistics",
     ],
     "name": "create_statistical_graphics",
     "description": f'''Create statistical plots, such as pie charts or bar charts, to visualize statistical data''',

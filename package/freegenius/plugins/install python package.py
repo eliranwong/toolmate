@@ -21,7 +21,7 @@ def install_package(function_args):
 # Function Signature
 functionSignature = {
     "examples": [
-        "Install package",
+        "install python package",
     ],
     "name": "install_package",
     "description": f'''Install python package''',

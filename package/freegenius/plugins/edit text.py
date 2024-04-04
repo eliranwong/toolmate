@@ -37,7 +37,7 @@ def edit_text(function_args):
 
 functionSignature = {
     "examples": [
-        "Edit test.txt",
+        "edit text file",
     ],
     "name": "edit_text",
     "description": f'''Edit text files with extensions: '*.{"', '*.".join(config.textFileExtensions)}'.''',

@@ -151,7 +151,7 @@ class CallLlamaCpp:
         # swap to code model
         CallLlamaCpp.swapModels()
 
-        for i in range(config.max_consecutive_auto_heal):
+        for i in range(config.max_consecutive_auto_correction):
             userInput = f"""I encountered these errors:
 ```
 {trace}
@@ -167,7 +167,7 @@ Please rewrite the code to make it work.
 Remember, give me the python code ONLY, without additional notes or explanation.""" # alternative: Please generate another copy of code that fix the errors.
             messages = [{"role": "user", "content" : userInput}]
             print3(f"Auto-correction attempt: {(i + 1)}")
-            function_call_message, function_call_response = CallLlamaCpp.getSingleFunctionCallResponse(messages, "heal_python")
+            function_call_message, function_call_response = CallLlamaCpp.getSingleFunctionCallResponse(messages, "correct_python")
             arguments = function_call_message["function_call"]["arguments"]
             if not arguments:
                 print2("Generating code ...")
@@ -179,7 +179,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                         "missing": [],
                         "issue": "",
                     }
-                    function_call_response = executeToolFunction(arguments, "heal_python")
+                    function_call_response = executeToolFunction(arguments, "correct_python")
                 else:
                     continue
 
@@ -207,7 +207,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             else:
                 return ""
         # ask if user want to manually edit the code
-        print1(f"Failed to execute the code {(config.max_consecutive_auto_heal + 1)} times in a row!")
+        print1(f"Failed to execute the code {(config.max_consecutive_auto_correction + 1)} times in a row!")
         print1("Do you want to manually edit it? [y]es / [N]o")
         confirmation = prompt(style=config.promptStyle2, default="N")
         if confirmation.lower() in ("y", "yes"):

@@ -18,7 +18,15 @@ class LlamacppChat:
     It is created for use with 3rd-party applications.
     """
 
-    def __init__(self, name="Llama.cpp chatbot", temperature=config.llmTemperature, max_output_tokens=config.llamacppDefaultModel_max_tokens):
+    def __init__(self, name="", temperature=config.llmTemperature, max_output_tokens=config.llamacppDefaultModel_max_tokens):
+        if not name:
+            if config.llamacppDefaultModel_model_path and os.path.isfile(config.llamacppDefaultModel_model_path):
+                if config.llamacppDefaultModel_model_path.lower().endswith(".gguf"):
+                    name = os.path.splitext(os.path.basename(config.llamacppDefaultModel_model_path))
+                elif config.llamacppDefaultModel_ollama_tag:
+                    name = config.llamacppDefaultModel_ollama_tag
+            else:
+                name = "Llama.cpp chatbot"
         self.name, self.temperature, self.max_output_tokens = name, temperature, max_output_tokens
         
         if not hasattr(config, "llamacppDefaultModel"):

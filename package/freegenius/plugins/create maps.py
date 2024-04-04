@@ -25,7 +25,8 @@ def create_map(function_args):
 
 functionSignature = {
     "examples": [
-        "Create a map",
+        "create map",
+        "pin on map",
     ],
     "name": "create_map",
     "description": f'''Create maps''',

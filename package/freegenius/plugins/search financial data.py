@@ -22,7 +22,7 @@ def search_finance(function_args):
 
 functionSignature = {
     "examples": [
-        "Check stock price",
+        "check stock price",
     ],
     "name": "search_finance",
     "description": f'''Search or analyze financial data. Use this function ONLY WHEN package yfinance is useful to resolve my request''',

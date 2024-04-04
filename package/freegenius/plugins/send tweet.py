@@ -19,8 +19,8 @@ def send_tweet(function_args):
 
 functionSignature = {
     "examples": [
-        "Send a tweet",
-        "write twitter",
+        "send a tweet",
+        "post to twitter",
     ],
     "name": "send_tweet",
     "description": f'''Send a tweet to twitter''',

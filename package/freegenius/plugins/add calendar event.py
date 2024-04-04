@@ -124,8 +124,8 @@ def add_calendar_event(function_args):
 
 functionSignature = {
     "examples": [
-        "add to my google calendar",
-        "add to my outlook calendar",
+        "add a google calendar event",
+        "add an outlook calendar event",
     ],
     "name": "add_calendar_event",
     "description": "add calendar event",

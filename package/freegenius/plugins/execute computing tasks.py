@@ -1,7 +1,7 @@
 """
-FreeGenius AI Plugin - execute python code
+FreeGenius AI Plugin - execute computing tasks
 
-execute python code
+execute computing tasks
 
 [FUNCTION_CALL]
 """
@@ -16,7 +16,7 @@ from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit import print_formatted_text
 from prompt_toolkit.styles import Style
 
-def execute_python_code(function_args):
+def execute_computing_task(function_args):
     # retrieve argument values from a dictionary
     risk = function_args.get("risk") # required
     title = function_args.get("title") # required
@@ -56,24 +56,29 @@ def execute_python_code(function_args):
 
 functionSignature = {
     "examples": [
-        "Run python code",
-        "Run system command",
-        "Execute python code",
-        "Execute system command",
-        "Execute computing task",
+        "execute computing task",
+        "system command",
+        "device information",
+        "file access",
+        "move files",
+        "search files",
+        "delete files",
+        "convert file",
+        "open folder",
+        "open directory",
     ],
-    "name": "execute_python_code",
-    "description": "Execute python code to execute a computing task or access device information",
+    "name": "execute_computing_task",
+    "description": "execute computing task or gain access to device information",
     "parameters": {
         "type": "object",
         "properties": {
             "code": {
                 "type": "string",
-                "description": "Python code that integrates any relevant packages to resolve my request",
+                "description": "Generate Python code that integrates any relevant packages to resolve my request",
             },
             "title": {
                 "type": "string",
-                "description": "title for the python code",
+                "description": "Title for the task",
             },
             "risk": {
                 "type": "string",
@@ -85,26 +90,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=execute_python_code)
-
-
-### A dummy function to redirect q&a task about python, otherwise, it may be mistaken by execute_python_code
-def python_qa(_):
-    return "[INVALID]"
-functionSignature = {
-    "examples": [
-        "How in python",
-    ],
-    "name": "python_qa",
-    "description": f'''Answer questions or provide information about python''',
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "query": {
-                "type": "string",
-                "description": "my query",
-            },
-        },
-    },
-}
-config.addFunctionCall(signature=functionSignature, method=python_qa)
+config.addFunctionCall(signature=functionSignature, method=execute_computing_task)

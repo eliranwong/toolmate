@@ -88,7 +88,7 @@ defaultSettings = (
     ('mouseSupport', False),
     ('autoUpgrade', True),
     #('chatbot', 'chatgpt'),
-    ('customTrayCommands', ['starling-lm', 'orca2', 'mistral', 'llama2', 'codellama', 'llava']),
+    ('customTrayCommands', ['mistral', 'llama2']),
     ('chatGPTApiModel', 'gpt-3.5-turbo'),
     ('chatGPTApiMaxTokens', 4000),
     ('chatGPTApiMinTokens', 256),

@@ -74,9 +74,9 @@ def download_web_content(function_args):
 
 functionSignature = {
     "examples": [
-        "Download Youtube video",
-        "Download Youtube audio into mp3 format",
-        "Download this webpage",
+        "download Youtube video",
+        "download Youtube audio into mp3 format",
+        "download webpage",
     ],
     "name": "download_web_content",
     "description": "download Youtube video into mp4 file or download audio into mp3 file or download webcontent",

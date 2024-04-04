@@ -135,7 +135,7 @@ class FreeGenius:
             ".maxtokens": ("change maximum response tokens", self.setMaxTokens),
             ".mintokens": ("change minimum response tokens", self.setMinTokens),
             ".dynamictokencount": ("change dynamic token count", self.setDynamicTokenCount),
-            ".maxautocorrect": ("change maximum consecutive auto-heal", self.setMaxAutoCorrect),
+            ".maxautocorrect": ("change maximum consecutive auto-correction", self.setMaxAutoCorrect),
             ".maxmemorymatches": ("change maximum memory matches", self.setMemoryClosestMatches),
             ".maxchatrecordmatches": ("change maximum chat record matches", self.setChatRecordClosestMatches),
             ".plugins": ("change plugins", self.selectPlugins),
@@ -1121,14 +1121,14 @@ class FreeGenius:
             print3(f"Number of memory closest matches: {config.memoryClosestMatches}")
 
     def setMaxAutoCorrect(self):
-        print1(f"The auto-heal feature enables {config.freeGeniusAIName} to automatically fix broken Python code if it was not executed properly.")
-        print1("Please specify maximum number of auto-heal attempts below:")
-        print1("(Remarks: Enter '0' if you want to disable auto-heal feature)")
-        maxAutoCorrect = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.max_consecutive_auto_heal))
+        print1(f"The auto-correction feature enables {config.freeGeniusAIName} to automatically fix broken Python code if it was not executed properly.")
+        print1("Please specify maximum number of auto-correction attempts below:")
+        print1("(Remarks: Enter '0' if you want to disable auto-correction feature)")
+        maxAutoCorrect = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.max_consecutive_auto_correction))
         if maxAutoCorrect and not maxAutoCorrect.strip().lower() == config.exit_entry and int(maxAutoCorrect) >= 0:
-            config.max_consecutive_auto_heal = int(maxAutoCorrect)
+            config.max_consecutive_auto_correction = int(maxAutoCorrect)
             config.saveConfig()
-            print3(f"Maximum consecutive auto-heal: {config.max_consecutive_auto_heal}")
+            print3(f"Maximum consecutive auto-correction: {config.max_consecutive_auto_correction}")
 
     def setMinTokens(self):
         print1("Please specify minimum response tokens below:")
@@ -1500,7 +1500,7 @@ class FreeGenius:
             trace = traceback.format_exc()
             print(trace if config.developer else "Error encountered!")
             print1(config.divider)
-            if config.max_consecutive_auto_heal > 0:
+            if config.max_consecutive_auto_correction > 0:
                 CallLLM.autoCorrectPythonCode(script, trace)
 
     def startChats(self):

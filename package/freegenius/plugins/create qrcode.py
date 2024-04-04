@@ -32,7 +32,7 @@ def create_qrcode(function_args):
 
 functionSignature = {
     "examples": [
-        "Create a QR code",
+        "create QR code",
     ],
     "name": "create_qrcode",
     "description": f'''Create QR code''',

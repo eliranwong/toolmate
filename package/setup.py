@@ -51,9 +51,9 @@ open(os.path.join(package, "config.py"), "w").close()
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name=package,
-    version="0.0.64",
+    version="0.0.65",
     python_requires=">=3.8, <3.12",
-    description=f"{appFullName}, an advanced AI assistant, leveraging the capabilities of ChatGPT API, Gemini Pro and AutoGen, capable of engaging in conversations, executing codes with auto-healing, and assisting you with a wide range of tasks on your local devices.",
+    description=f"{appFullName}, an advanced AI assistant that can talk and take multi-step actions. Supports numerous open-source LLMs via Llama.cpp or Ollama, with optional integration with AutoGen agents, OpenAI API, Google Gemini Pro and unlimited plugins.",
     long_description=long_description,
     author="Eliran Wong",
     author_email="support@letmedoit.ai",
@@ -168,7 +168,7 @@ setup(
             f"orca2={package}.ollamachat:orca2",
         ],
     },
-    keywords="ai assistant openai chatgpt gemini autogen rag interpreter auto-heal",
+    keywords="ai assistant ollama llama llamacpp openai chatgpt gemini autogen rag agent",
     url="https://letmedoit.ai",
     project_urls={
         "Source": "https://github.com/eliranwong/letmedoit",

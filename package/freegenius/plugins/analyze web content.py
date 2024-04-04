@@ -47,7 +47,8 @@ def analyze_web_content(function_args):
 functionSignature = {
     "examples": [
         "analyze this url",
-        "summarize this website",
+        "retrieve website information",
+        "summarize this webpage",
     ],
     "name": "analyze_web_content",
     "description": "retrieve information from a webpage if an url is provided",

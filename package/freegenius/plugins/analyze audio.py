@@ -158,9 +158,9 @@ def analyze_audio(function_args):
 # Function Signature
 functionSignature = {
     "examples": [
-        "analyze audio",
+        "analyze speech",
         "audio transcript",
-        "transcibe speech",
+        "transcibe audio",
     ],
     "name": "analyze_audio",
     "description": f'''Transcribe audio into text or retrieve information from an audio''',

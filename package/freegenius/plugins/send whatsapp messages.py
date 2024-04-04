@@ -21,7 +21,7 @@ def send_whatsapp(function_args):
 
 functionSignature = {
     "examples": [
-        "Send WhatsApp",
+        "send WhatsApp",
     ],
     "name": "send_whatsapp",
     "description": f'''Send WhatsApp messages''',

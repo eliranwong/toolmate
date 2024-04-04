@@ -34,7 +34,8 @@ def integrate_google_searches(function_args):
 
 functionSignature = {
     "examples": [
-        "Search online",
+        "access real-time information",
+        "search online",
         "Google search",
     ],
     "name": "integrate_google_searches",

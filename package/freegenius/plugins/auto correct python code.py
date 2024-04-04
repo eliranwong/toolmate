@@ -11,13 +11,13 @@ functionalities:
 * install missing packages
 * fixed broken codes
 
-User can define the maximum number of auto-healing attempts by editing "max_consecutive_auto_heal" in config.py.
-The default value of config.max_consecutive_auto_heal is 3.
+User can define the maximum number of auto-correctioning attempts by editing "max_consecutive_auto_correction" in config.py.
+The default value of config.max_consecutive_auto_correction is 3.
 
 [FUNCTION_CALL]
 """
 
-def heal_python(function_args):
+def correct_python(function_args):
     # get the sql query statement
     issue = function_args.get("issue") # required
     print(f"Issue: {issue}")
@@ -45,9 +45,10 @@ def heal_python(function_args):
 
 functionSignature = {
     "examples": [
-        "Fix python code",
+        "fix bug",
+        "correct code",
     ],
-    "name": "heal_python",
+    "name": "correct_python",
     "description": "Fix python code if both original code and traceback error are provided",
     "parameters": {
         "type": "object",
@@ -72,8 +73,8 @@ functionSignature = {
 # configs particular to this plugin
 # persistent
 persistentConfigs = (
-    ("max_consecutive_auto_heal", 5),
+    ("max_consecutive_auto_correction", 5),
 )
 config.setConfig(persistentConfigs)
 
-config.addFunctionCall(signature=functionSignature, method=heal_python)
+config.addFunctionCall(signature=functionSignature, method=correct_python)

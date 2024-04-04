@@ -16,8 +16,9 @@ def datetimes(function_args):
 
 functionSignature = {
     "examples": [
-        "What time is it now?",
-        "What is the current time",
+        "what time is it",
+        "current time",
+        "dates",
     ],
     "name": "datetimes",
     "description": f'''Get information about dates and times''',

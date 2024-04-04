@@ -24,7 +24,8 @@ if config.openweathermapApi:
 
     functionSignature = {
         "examples": [
-            "What's the current weather",
+            "current weather",
+            "search weather",
         ],
         "name": "search_weather_info",
         "description": f'''Answer about weather''',

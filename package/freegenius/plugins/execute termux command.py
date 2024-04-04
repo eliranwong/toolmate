@@ -75,7 +75,8 @@ if config.terminalEnableTermuxAPI:
 
     functionSignature = {
         "examples": [
-            "Run Termux command",
+            "run Termux command",
+            "run on Android",
         ],
         "name": "execute_termux_command",
         "description": "Execute Termux command on Android",
@@ -84,7 +85,7 @@ if config.terminalEnableTermuxAPI:
             "properties": {
                 "code": {
                     "type": "string",
-                    "description": "Termux command, e.g. am start -n com.android.chrome/com.google.android.apps.chrome.Main",
+                    "description": "Generate Termux command to resolve my request, e.g. am start -n com.android.chrome/com.google.android.apps.chrome.Main",
                 },
                 "title": {
                     "type": "string",

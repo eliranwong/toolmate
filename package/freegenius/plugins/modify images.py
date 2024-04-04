@@ -143,6 +143,7 @@ def create_image(description, original_filename):
 functionSignature = {
     "examples": [
         "change image",
+        "modify image",
     ],
     "name": "modify_images",
     "description": "modify images",

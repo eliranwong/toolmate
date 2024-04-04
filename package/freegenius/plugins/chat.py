@@ -16,6 +16,7 @@ functionSignature = {
     "examples": [
         "Hi",
         "How are you?",
+        "In python, how"
     ],
     "name": "chat",
     "description": f'''chat''',

@@ -58,16 +58,16 @@ class OllamaChat:
     def run(self, prompt="", model="mistral") -> None:        
         def extractImages(content) -> list:
             template = {
-                "imageList": [],
-                "queryAboutImages": "",
+                "image_filepath_list": [],
+                "query": "",
             }
             promptPrefix = f"""Use this template:
 
 {template}
 
-To generate a JSON that contains two keys, "imageList" and "queryAboutImages", based on my request.
-"imageList" is a list of image paths specified in my request.  If no path is specified, return an empty list [] for its value.
-"queryAboutImages" is the query about the images in the list.
+To generate a JSON that contains two keys, "image_filepath_list" and "query", based on my request.
+"image_filepath_list" is a list of image paths specified in my request.  If no path is specified, return an empty list [] for its value.
+"query" is the query about the images in the list.
 
 Here is my request:
 """
@@ -81,12 +81,18 @@ Here is my request:
                 ],
                 format="json",
                 stream=False,
+                options=Options(
+                    temperature=0.0,
+                    num_ctx=config.ollamaDefaultModel_num_ctx,
+                    num_batch=config.ollamaDefaultModel_num_batch,
+                    num_predict=config.ollamaDefaultModel_num_predict,
+                ),
             )
             output = json.loads(completion["message"]["content"])
             if config.developer:
                 print2("Input:")
                 print(output)
-            imageList = output["imageList"]
+            imageList = output["image_filepath_list"]
             images = [i for i in imageList if os.path.isfile(i) and is_valid_image_file(i)]
 
             return images
@@ -161,6 +167,9 @@ Here is my request:
                         stream=True,
                         options=Options(
                             temperature=config.llmTemperature,
+                            num_ctx=config.ollamaDefaultModel_num_ctx,
+                            num_batch=config.ollamaDefaultModel_num_batch,
+                            num_predict=config.ollamaDefaultModel_num_predict,
                         ),
                     )
                     # Create a new thread for the streaming task

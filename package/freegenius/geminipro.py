@@ -158,9 +158,9 @@ class GeminiPro:
                     # Note: At the time of writing, function call feature with Gemini Pro is very weak, compared with the function call feature offerred by ChatGPT:
                     # 1. Gemini Pro do not accept multiple tools in a single message
                     # 2. Gemini Pro is weak to determine if it is appropriate to use the given tool or not.  When a tool is given, it is called by mistake so often.  In contrast, ChatGPT has the "auto" setting which makes ChatGPT obviously smarter than Gemini Pro.
-                    #if "[NO_FUNCTION_CALL]" in prompt or not self.enableVision:
+                    #if "[NO_TOOL]" in prompt or not self.enableVision:
                     #    allow_function_call = False
-                    #    prompt = prompt.replace("[NO_FUNCTION_CALL]", "")
+                    #    prompt = prompt.replace("[NO_TOOL]", "")
                     #else:
                     #    allow_function_call = True
                     completion = chat.send_message(

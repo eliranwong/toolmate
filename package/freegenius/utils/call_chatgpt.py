@@ -370,34 +370,39 @@ class CallChatGPT:
             return CallChatGPT.regularCall(messages)
         else:
             # 2. Tool Selection
-            if config.developer:
-                print1("selecting tool ...")
-            tool_collection = get_or_create_collection(config.tool_store_client, "tools")
-            search_result = query_vectors(tool_collection, user_request, config.tool_selection_max_choices)
-            
-            # no tool is available; return a regular call instead
-            if not search_result:
-                return CallChatGPT.regularCall(messages)
-
-            # check the closest distance
-            closest_distance = search_result["distances"][0][0]
-            
-            # when a tool is irrelevant
-            if closest_distance > config.tool_dependence:
-                return CallChatGPT.regularCall(messages)
-
-            # auto or manual selection
-            selected_index = selectTool(search_result, closest_distance)
-            if selected_index is None:
-                return CallChatGPT.regularCall(messages)
+            if config.selectedTool and config.selectedTool in config.toolFunctionSchemas:
+                tool_name = config.selectedTool
+                tool_schema = config.toolFunctionSchemas[tool_name]
+                config.selectedTool = ""
             else:
-                semantic_distance = search_result["distances"][0][selected_index]
-                metadatas = search_result["metadatas"][0][selected_index]
+                if config.developer:
+                    print1("selecting tool ...")
+                tool_collection = get_or_create_collection(config.tool_store_client, "tools")
+                search_result = query_vectors(tool_collection, user_request, config.tool_selection_max_choices)
+                
+                # no tool is available; return a regular call instead
+                if not search_result:
+                    return CallChatGPT.regularCall(messages)
 
-            tool_name = metadatas["name"]
-            tool_schema = config.toolFunctionSchemas[tool_name]
-            if config.developer:
-                print3(f"Selected: {tool_name} ({semantic_distance})")
+                # check the closest distance
+                closest_distance = search_result["distances"][0][0]
+                
+                # when a tool is irrelevant
+                if closest_distance > config.tool_dependence:
+                    return CallChatGPT.regularCall(messages)
+
+                # auto or manual selection
+                selected_index = selectTool(search_result, closest_distance)
+                if selected_index is None:
+                    return CallChatGPT.regularCall(messages)
+                else:
+                    semantic_distance = search_result["distances"][0][selected_index]
+                    metadatas = search_result["metadatas"][0][selected_index]
+
+                tool_name = metadatas["name"]
+                tool_schema = config.toolFunctionSchemas[tool_name]
+                if config.developer:
+                    print3(f"Selected: {tool_name} ({semantic_distance})")
             # 3. Parameter Extraction
             if config.developer:
                 print1("extracting parameters ...")
@@ -521,7 +526,7 @@ class CallLetMeDoIt:
         def runThisCompletion(thisThisMessage):
             nonlocal functionJustCalled
             if config.toolFunctionSchemas and not functionJustCalled and not noFunctionCall:
-                toolFunctionSchemas = [config.toolFunctionSchemas[config.runSpecificFuntion]] if config.runSpecificFuntion and config.runSpecificFuntion in config.toolFunctionSchemas else config.toolFunctionSchemas.values()
+                toolFunctionSchemas = [config.toolFunctionSchemas[config.selectedTool]] if config.selectedTool and config.selectedTool in config.toolFunctionSchemas else config.toolFunctionSchemas.values()
                 return config.oai_client.chat.completions.create(
                     model=config.chatGPTApiModel,
                     messages=thisThisMessage,
@@ -529,7 +534,7 @@ class CallLetMeDoIt:
                     temperature=config.llmTemperature,
                     max_tokens=getDynamicTokens(thisThisMessage, toolFunctionSchemas),
                     tools=convertFunctionSignaturesIntoTools(toolFunctionSchemas),
-                    tool_choice={"type": "function", "function": {"name": config.runSpecificFuntion}} if config.runSpecificFuntion else config.chatGPTApiFunctionCall,
+                    tool_choice={"type": "function", "function": {"name": config.selectedTool}} if config.selectedTool else config.chatGPTApiFunctionCall,
                     stream=True,
                 )
             return config.oai_client.chat.completions.create(
@@ -543,7 +548,7 @@ class CallLetMeDoIt:
 
         while True:
             completion = runThisCompletion(thisMessage)
-            config.runSpecificFuntion = ""
+            config.selectedTool = ""
             try:
                 # consume the first delta
                 for event in completion:

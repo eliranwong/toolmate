@@ -163,7 +163,7 @@ functionSignature = {
         "transcibe speech",
     ],
     "name": "analyze_audio",
-    "description": f'''Answer questions about the content of an audio file or transcribe a audio speech file into text''',
+    "description": f'''Transcribe audio into text or retrieve information from an audio''',
     "parameters": {
         "type": "object",
         "properties": {

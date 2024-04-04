@@ -75,6 +75,7 @@ defaultSettings = (
     ('max_group_chat_round', 12), # AutoGen group chat maximum round
     ('env_QT_QPA_PLATFORM_PLUGIN_PATH', ''), # e.g. # deal with error: qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "~/apps/letmedoit/lib/python3.10/site-packages/cv2/qt/plugins" even though it was found.
     ('systemMessage_letmedoit', ''), # letmedoit system message
+    ('systemMessage_llamacpp', 'You are a helpful assistant.'), # system message for standalone llamacpp chatbot
     ('systemMessage_chatgpt', 'You are a helpful assistant.'), # system message for standalone chatgpt chatbot
     ('systemMessage_geminipro', 'You are a helpful assistant.'), # system message for standalone geminipro chatbot
     ('systemMessage_palm2', 'You are a helpful assistant.'), # system message for standalone palm2 chatbot
@@ -86,7 +87,7 @@ defaultSettings = (
     ('wrapWords', True),
     ('mouseSupport', False),
     ('autoUpgrade', True),
-    ('chatbot', 'chatgpt'),
+    #('chatbot', 'chatgpt'),
     ('customTrayCommands', ['starling-lm', 'orca2', 'mistral', 'llama2', 'codellama', 'llava']),
     ('chatGPTApiModel', 'gpt-3.5-turbo'),
     ('chatGPTApiMaxTokens', 4000),
@@ -214,7 +215,7 @@ temporaryConfigs = [
     "initialCompletionCheck",
     "promptStyle1",
     "promptStyle2",
-    "runSpecificFuntion",
+    "selectedTool",
     "pluginsWithFunctionCall",
     "restartApp",
     "saveConfig",

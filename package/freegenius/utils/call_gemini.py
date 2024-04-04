@@ -210,34 +210,39 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             return CallGemini.regularCall(messages)
         else:
             # 2. Tool Selection
-            if config.developer:
-                print1("selecting tool ...")
-            tool_collection = get_or_create_collection(config.tool_store_client, "tools")
-            search_result = query_vectors(tool_collection, user_request, config.tool_selection_max_choices)
-            
-            # no tool is available; return a regular call instead
-            if not search_result:
-                return CallGemini.regularCall(messages)
-
-            # check the closest distance
-            closest_distance = search_result["distances"][0][0]
-            
-            # when a tool is irrelevant
-            if closest_distance > config.tool_dependence:
-                return CallGemini.regularCall(messages)
-
-            # auto or manual selection
-            selected_index = selectTool(search_result, closest_distance)
-            if selected_index is None:
-                return CallGemini.regularCall(messages)
+            if config.selectedTool and config.selectedTool in config.toolFunctionSchemas:
+                tool_name = config.selectedTool
+                tool_schema = config.toolFunctionSchemas[tool_name]
+                config.selectedTool = ""
             else:
-                semantic_distance = search_result["distances"][0][selected_index]
-                metadatas = search_result["metadatas"][0][selected_index]
+                if config.developer:
+                    print1("selecting tool ...")
+                tool_collection = get_or_create_collection(config.tool_store_client, "tools")
+                search_result = query_vectors(tool_collection, user_request, config.tool_selection_max_choices)
+                
+                # no tool is available; return a regular call instead
+                if not search_result:
+                    return CallGemini.regularCall(messages)
 
-            tool_name = metadatas["name"]
-            tool_schema = config.toolFunctionSchemas[tool_name]
-            if config.developer:
-                print3(f"Selected: {tool_name} ({semantic_distance})")
+                # check the closest distance
+                closest_distance = search_result["distances"][0][0]
+                
+                # when a tool is irrelevant
+                if closest_distance > config.tool_dependence:
+                    return CallGemini.regularCall(messages)
+
+                # auto or manual selection
+                selected_index = selectTool(search_result, closest_distance)
+                if selected_index is None:
+                    return CallGemini.regularCall(messages)
+                else:
+                    semantic_distance = search_result["distances"][0][selected_index]
+                    metadatas = search_result["metadatas"][0][selected_index]
+
+                tool_name = metadatas["name"]
+                tool_schema = config.toolFunctionSchemas[tool_name]
+                if config.developer:
+                    print3(f"Selected: {tool_name} ({semantic_distance})")
             # 3. Parameter Extraction
             if config.developer:
                 print1("extracting parameters ...")

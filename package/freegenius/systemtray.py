@@ -53,6 +53,7 @@ class SystemTrayIcon(QSystemTrayIcon):
 
         commandPrefix = [
             package,
+            "llamacpp",
             "ollamachat",
             "chatgpt",
             "geminipro",

@@ -72,7 +72,7 @@ functionSignature = {
         "Search SQLite file",
     ],
     "name": "search_sqlite",
-    "description": f'''Ask SQLite file. To retrieve information from or make changes in a sqlite file, e.g. fetch data, update records, etc. Remember, use this function ONLY IF I provide you with a sqlite file path.''',
+    "description": f'''Search or manage SQLite file, e.g. fetch data, update records, etc. Remember, use this function ONLY IF I provide you with a sqlite file path.''',
     "parameters": {
         "type": "object",
         "properties": {
@@ -92,5 +92,5 @@ functionSignature = {
 config.addFunctionCall(signature=functionSignature, method=search_sqlite)
 
 config.inputSuggestions.append("""Connect the following SQLite file and tell me about the tables that it contains:
-[CALL_search_sqlite]
+[TOOL_search_sqlite]
 \n""")

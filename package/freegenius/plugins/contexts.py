@@ -7,14 +7,14 @@ add pre-defined contexts
 """
 
 config.predefinedContexts["Let me Summarize"] = """Provide me with a summary of the following content:
-[NO_FUNCTION_CALL]"""
+[NO_TOOL]"""
 
 config.predefinedContexts["Let me Explain"] = """Explain the meaning of the following content:
-[NO_FUNCTION_CALL]"""
+[NO_TOOL]"""
 
 config.predefinedContexts["Let me Translate"] = """Assist me by acting as a translator.
 Please translate the following content:
-[NO_FUNCTION_CALL]"""
+[NO_TOOL]"""
 
 config.predefinedContexts["Let me Pronounce"] = """Pronounce the following content:"""
 

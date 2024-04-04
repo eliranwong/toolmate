@@ -147,52 +147,6 @@ You are welcome to make contributions to this project by:
 
 Support link: https://www.paypal.me/letmedoitai
 
-# Tested Function Call Plugins:
-
-So far, we tested the following function call plugins:
-
-* pronunce words
-* open web browser
-* add calender event
-* integrate google searches
-* dates and times
-* search weather info
-* create qr code
-* analyze audio
-* analyze files
-* solve math problems
-* ask chatgpt
-* ask codey
-* ask gemini pro
-* ask gemma
-* ask ollama
-* ask palm2
-* ask llama2
-* ask mistral
-* ask ollama
-* analyze web content
-* auto correct python code
-* create ai assistants
-* create maps
-* execute python code
-* download youtube or web content
-* install python package
-* memory
-* modify images
-* search financial data
-* search latest news
-* send tweet
-* send emails
-* remove image background
-
-pending:
-
-* analyze images
-* create images
-* ask llava
-* ask sqlite
-* create statistical graphics
-
 # Documentation
 
 Pending ...

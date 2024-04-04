@@ -1,6 +1,6 @@
 from freegenius import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage
 from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits
-from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels
+from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode
 from freegenius.utils.call_llm import CallLLM
 from freegenius.utils.tool_plugins import ToolStore
 import openai, threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys
@@ -33,6 +33,8 @@ from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.text_utils import TextUtil
 from freegenius.utils.sttLanguages import googleSpeeckToTextLanguages, whisperSpeeckToTextLanguages
 from freegenius.chatgpt import ChatGPT
+from freegenius.llamacpp import LlamacppChat
+from freegenius.ollamachat import OllamaChat
 if not config.isTermux:
     from freegenius.autobuilder import AutoGenBuilder
     from freegenius.geminipro import GeminiPro
@@ -75,7 +77,7 @@ class FreeGenius:
         config.launchPager = self.launchPager
         config.addPagerText = self.addPagerText
         config.changeOpenweathermapApi = self.changeOpenweathermapApi
-        config.runSpecificFuntion = ""
+        config.selectedTool = ""
         # env variables
         os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = config.env_QT_QPA_PLATFORM_PLUGIN_PATH
 
@@ -164,6 +166,7 @@ class FreeGenius:
             ".toggleimprovedwriting": (f"toggle improved writing {str(config.hotkey_toggle_writing_improvement)}", self.toggleImprovedWriting),
             ".toggleinputaudio": (f"toggle input audio {str(config.hotkey_toggle_input_audio)}", self.toggleinputaudio),
             ".toggleresponseaudio": (f"toggle response audio {str(config.hotkey_toggle_response_audio)}", self.toggleresponseaudio),
+            ".code": (f"extract python code from the last response {str(config.hotkey_edit_last_response)}", self.extractPythonCodeFromLastResponse),
             ".editresponse": (f"edit the last response {str(config.hotkey_edit_last_response)}", self.editLastResponse),
             ".editconfigs": ("edit configuration settings", self.editConfigs),
             ".install": ("install python package", self.installPythonPackage),
@@ -488,7 +491,7 @@ class FreeGenius:
         # customise chat context
         context = self.getCurrentContext()
         if SharedUtil.is_valid_url(userInput) and config.predefinedContext in ("Let me Summarize", "Let me Explain"):
-            context = context.replace("the following content:\n[NO_FUNCTION_CALL]", "the content in the this web url:\n")
+            context = context.replace("the following content:\n[NO_TOOL]", "the content in the this web url:\n")
         elif SharedUtil.is_valid_url(userInput) and config.predefinedContext == "Let me Translate":
             userInput = SharedUtil.getWebText(userInput)
         if context and (not config.conversationStarted or (config.conversationStarted and config.applyPredefinedContextAlways)):
@@ -504,6 +507,7 @@ class FreeGenius:
         options = tuple(self.actions.keys())
         descriptions = [i[0] for i in self.actions.values()]
         if not feature or not feature in self.actions:
+            # filter avilable actions
             if feature.startswith("."):
                 query = feature[1:]
             feature = self.dialogs.getValidOptions(
@@ -743,6 +747,10 @@ class FreeGenius:
         customTextEditor = config.customTextEditor if config.customTextEditor else f"{sys.executable} {os.path.join(config.freeGeniusAIFolder, 'eTextEdit.py')}"
         pydoc.pipepager(config.pagerContent, cmd=customTextEditor)
         set_title(config.freeGeniusAIName)
+
+    def extractPythonCodeFromLastResponse(self):
+        config.defaultEntry = f'''```python
+{extractPythonCode(config.pagerContent)}```'''
 
     # change configs
     def editConfigs(self):
@@ -1644,7 +1652,7 @@ class FreeGenius:
                     if userInput and config.ttsInput:
                         TTSUtil.play(userInput)
                     # Feature: improve writing:
-                    specialEntryPattern = "\[CALL_[^\[\]]*?\]|\[NO_FUNCTION_CALL\]|\[NO_SCREENING\]"
+                    specialEntryPattern = "\[TOOL_[^\[\]]*?\]|\[NO_TOOL\]|\[NO_SCREENING\]"
                     specialEntry = re.search(specialEntryPattern, userInput)
                     specialEntry = specialEntry.group(0) if specialEntry else ""
                     userInput = re.sub(specialEntryPattern, "", userInput) # remove special entry temporarily
@@ -1687,7 +1695,7 @@ My writing:
                     # check special entries
                     # if user call a chatbot without function calling
                     if "[CHAT]" in fineTunedUserInput:
-                        chatbot = config.chatbot
+                        chatbot = config.llmBackend
                     elif callChatBot := re.search("\[CHAT_([^\[\]]+?)\]", fineTunedUserInput):
                         chatbot = callChatBot.group(1).lower() if callChatBot and callChatBot.group(1).lower() in ("chatgpt", "geminipro", "palm2", "codey") else ""
                     else:
@@ -1697,13 +1705,14 @@ My writing:
                         fineTunedUserInput = re.sub("\[CHAT\]|\[CHAT_[^\[\]]+?\]", "", fineTunedUserInput)
                         self.launchChatbot(chatbot, fineTunedUserInput)
                         continue
-                    # if user don't want function call or a particular function call
-                    noFunctionCall = ("[NO_FUNCTION_CALL]" in fineTunedUserInput)
-                    checkCallSpecificFunction = re.search("\[CALL_([^\[\]]+?)\]", fineTunedUserInput)
-                    config.runSpecificFuntion = checkCallSpecificFunction.group(1) if checkCallSpecificFunction and checkCallSpecificFunction.group(1) in config.toolFunctionMethods else ""
-                    if config.developer and config.runSpecificFuntion:
-                        #print1(f"calling function '{config.runSpecificFuntion}' ...")
-                        print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Calling function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{config.runSpecificFuntion}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
+                    # when user don't want a function call
+                    noFunctionCall = ("[NO_TOOL]" in fineTunedUserInput)
+                    # when user want to call a particular function
+                    checkCallSpecificFunction = re.search("\[TOOL_([^\[\]]+?)\]", fineTunedUserInput)
+                    config.selectedTool = checkCallSpecificFunction.group(1) if checkCallSpecificFunction and checkCallSpecificFunction.group(1) in config.toolFunctionMethods else ""
+                    if config.developer and config.selectedTool:
+                        #print1(f"calling function '{config.selectedTool}' ...")
+                        print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Calling function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{config.selectedTool}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
                     fineTunedUserInput = re.sub(specialEntryPattern, "", fineTunedUserInput)
                     config.currentMessages.append({"role": "user", "content": fineTunedUserInput})
 
@@ -1771,10 +1780,17 @@ My writing:
                     storagedirectory, config.currentMessages = startChat()
 
     def launchChatbot(self, chatbot, fineTunedUserInput):
+        if not chatbot:
+            chatbot = config.llmBackend
         if config.isTermux:
-            chatbot = "chatgpt"
+            #chatbot = "chatgpt"
+            ...
         chatbots = {
+            "llamacpp": lambda: LlamacppChat().run(fineTunedUserInput),
+            "ollama": lambda: OllamaChat().run(fineTunedUserInput, model=config.ollamaDefaultModel),
             "chatgpt": lambda: ChatGPT().run(fineTunedUserInput),
+            "letmedoit": lambda: ChatGPT().run(fineTunedUserInput),
+            "gemini": lambda: GeminiPro(temperature=config.llmTemperature).run(fineTunedUserInput),
             "geminipro": lambda: GeminiPro(temperature=config.llmTemperature).run(fineTunedUserInput),
             "palm2": lambda: Palm2().run(fineTunedUserInput, temperature=config.llmTemperature),
             "codey": lambda: Codey().run(fineTunedUserInput, temperature=config.llmTemperature),

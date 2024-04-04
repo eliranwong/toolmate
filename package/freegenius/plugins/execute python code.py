@@ -63,7 +63,7 @@ functionSignature = {
         "Execute computing task",
     ],
     "name": "execute_python_code",
-    "description": "Execute python code to resolve a computing task",
+    "description": "Execute python code to execute a computing task or access device information",
     "parameters": {
         "type": "object",
         "properties": {
@@ -93,16 +93,16 @@ def python_qa(_):
     return "[INVALID]"
 functionSignature = {
     "examples": [
-        "How to use decorators in python",
+        "How in python",
     ],
     "name": "python_qa",
     "description": f'''Answer questions or provide information about python''',
     "parameters": {
         "type": "object",
         "properties": {
-            "qa": {
+            "query": {
                 "type": "string",
-                "description": "empty string ''",
+                "description": "my query",
             },
         },
     },

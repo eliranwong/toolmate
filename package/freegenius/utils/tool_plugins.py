@@ -55,7 +55,7 @@ class Plugins:
             del config.toolFunctionSchemas["integrate_google_searches"]
         for i in config.toolFunctionMethods:
             if not i in ("python_qa",):
-                callEntry = f"[CALL_{i}]"
+                callEntry = f"[TOOL_{i}]"
                 if not callEntry in config.inputSuggestions:
                     config.inputSuggestions.append(callEntry)
 

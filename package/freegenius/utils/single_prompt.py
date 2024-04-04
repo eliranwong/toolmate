@@ -49,13 +49,13 @@ class SinglePrompt:
                 r = sr.Recognizer()
                 with sr.Microphone() as source:
                     if config.voiceTypingNotification:
-                        TTSUtil.playAudioFilePygame(os.path.join(packageFolder, "audio", "notification1_mild.mp3"))
+                        TTSUtil.playAudioFilePygame(os.path.join(config.freeGeniusAIFolder, "audio", "notification1_mild.mp3"))
                     #run_in_terminal(lambda: print2("Listensing to your voice ..."))
                     if config.voiceTypingAdjustAmbientNoise:
                         r.adjust_for_ambient_noise(source)
                     audio = r.listen(source)
                 if config.voiceTypingNotification:
-                    TTSUtil.playAudioFilePygame(os.path.join(packageFolder, "audio", "notification2_mild.mp3"))
+                    TTSUtil.playAudioFilePygame(os.path.join(config.freeGeniusAIFolder, "audio", "notification2_mild.mp3"))
                 #run_in_terminal(lambda: print2("Processing to your voice ..."))
                 if config.voiceTypingPlatform == "google":
                     # recognize speech using Google Speech Recognition

@@ -13,7 +13,7 @@ config.inputSuggestions += [
         "[CHAT_geminipro] ",
         "[CHAT_palm2] ",
         "[CHAT_codey] ",
-        "[NO_FUNCTION_CALL] ",
+        "[NO_TOOL] ",
         f"!{config.open} ",
         f"!{sys.executable} ",
         "open with default application: ",

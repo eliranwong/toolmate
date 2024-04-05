@@ -1,6 +1,6 @@
 from freegenius import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage
 from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits
-from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode
+from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url
 from freegenius.utils.call_llm import CallLLM
 from freegenius.utils.tool_plugins import ToolStore
 import openai, threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys
@@ -138,6 +138,7 @@ class FreeGenius:
             ".maxautocorrect": ("change maximum consecutive auto-correction", self.setMaxAutoCorrect),
             ".maxmemorymatches": ("change maximum memory matches", self.setMemoryClosestMatches),
             ".maxchatrecordmatches": ("change maximum chat record matches", self.setChatRecordClosestMatches),
+            ".tools": ("change tool selection configurations", self.setToolSelectionConfigs),
             ".plugins": ("change plugins", self.selectPlugins),
             ".functioncall": ("change function call", self.setFunctionCall),
             ".functioncallintegration": ("change function call integration", self.setFunctionResponse),
@@ -490,9 +491,9 @@ class FreeGenius:
     def fineTuneUserInput(self, userInput):
         # customise chat context
         context = self.getCurrentContext()
-        if SharedUtil.is_valid_url(userInput) and config.predefinedContext in ("Let me Summarize", "Let me Explain"):
+        if is_valid_url(userInput) and config.predefinedContext in ("Let me Summarize", "Let me Explain"):
             context = context.replace("the following content:\n[NO_TOOL]", "the content in the this web url:\n")
-        elif SharedUtil.is_valid_url(userInput) and config.predefinedContext == "Let me Translate":
+        elif is_valid_url(userInput) and config.predefinedContext == "Let me Translate":
             userInput = SharedUtil.getWebText(userInput)
         if context and (not config.conversationStarted or (config.conversationStarted and config.applyPredefinedContextAlways)):
             # context may start with "You will be provided with my input delimited with a pair of XML tags, <input> and </input>. ...
@@ -799,6 +800,51 @@ class FreeGenius:
             config.llmTemperature = round(temperature, 1)
             config.saveConfig()
             print3(f"LLM Temperature: {temperature}")
+
+    def setToolSelectionConfigs(self):
+        print2("# Introduction. FreeGenius AI enhances LLM capabilities by offering tools through plugins. When a user makes a request, FreeGenius AI searches for and selects a suitable tool from its tool store. This search involves finding similarities between the user query and the examples provided in the tool plugins. Users have the flexibility to customize the tool selection process by adjusting three key configurations:")
+        print2("""1) tool_dependence
+2) tool_auto_selection_threshold
+3) tool_selection_max_choices""")
+        print2("# Tool Dependence. The value of 'tool_dependence' determines how you want to rely on tools.")
+        print1("Acceptable range: 0.0 - 1.0")
+        print1("A value of 0.0 indicates that tools are disabled. FreeGenius's responses are totally based on capabilities of the selected LLM.")
+        print1("A value of 1.0 indicates that tools always apply for each response.")
+        print1("A value between 0.0 and 0.1 indicates that a tool is selected only when tool distance search is less than or equal to its value.")
+        print1("Therefore, you are more likely to use tools when you set a higher value.")
+        print2("Please enter a value between 0.0 and 1.0 to set its value:")
+        tool_dependence = self.prompts.simplePrompt(style=self.prompts.promptStyle2, validator=FloatValidator(), default=str(config.tool_dependence))
+        if tool_dependence and not tool_dependence.strip().lower() == config.exit_entry:
+            tool_dependence = float(tool_dependence)
+            if tool_dependence < 0:
+                tool_dependence = 0.0
+            elif tool_dependence > 1:
+                tool_dependence = 1.0
+            config.tool_dependence = tool_dependence
+            print3(f"Tool Dependence: {tool_dependence}")
+        print2("# Tool Auto Selection Threshold. The value of 'tool_auto_selection_threshold' determines the threshold of automatic tool selection.")
+        print1("Acceptable range: 0.0 - [the value of tool_dependence]")
+        print1("A value of 0.0 indicates that automatic tool selection is disabled. Users must manually choose a tool from the most relevant options identified in each tool search.")
+        print1("A value that is equal to or larger than the value of 'tool_dependence' indicates that tool selection is always automatic.")
+        print1("A value between 0.0 and the value of 'tool_dependence' indicates that tool selection is only automatic when its value is larger than or equal to the tool search distance. Users need to choose a tool from the most relevant options in case automatic tool selection is not applied and tool search distance is less than or equal to the value of tool_dependence.")
+        print2(f"Please enter a value between 0.0 and {config.tool_dependence} to set its value:")
+        tool_auto_selection_threshold = self.prompts.simplePrompt(style=self.prompts.promptStyle2, validator=FloatValidator(), default=str(config.tool_auto_selection_threshold))
+        if tool_auto_selection_threshold and not tool_auto_selection_threshold.strip().lower() == config.exit_entry:
+            tool_auto_selection_threshold = float(tool_auto_selection_threshold)
+            if tool_auto_selection_threshold < 0:
+                tool_auto_selection_threshold = 0.0
+            elif tool_auto_selection_threshold > config.tool_dependence:
+                tool_auto_selection_threshold = config.tool_dependence
+            config.tool_auto_selection_threshold = tool_auto_selection_threshold
+            print3(f"Tool Auto Selection Threshold: {tool_auto_selection_threshold}")
+        print2("# Tool Selection Max Choices. The value of 'tool_selection_max_choices' determines the maximum number of available options for manual tool selection.")
+        print1("Default value: 4")
+        print2("Please enter a number for this value:")
+        tool_selection_max_choices = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.tool_selection_max_choices))
+        if tool_selection_max_choices and not tool_selection_max_choices.strip().lower() == config.exit_entry:
+            config.tool_selection_max_choices = int(tool_selection_max_choices)
+            print3(f"Tool Selection Max Choices: {tool_selection_max_choices}")
+        config.saveConfig()
 
     def selectLlmBackend(self):
         instruction = "Select a backend:"
@@ -1729,7 +1775,7 @@ My writing:
                             print1("Unable to load internet resources.")
                             showErrors()
 
-                    completion = CallLLM.runAutoFunctionCall(config.currentMessages, noFunctionCall)
+                    completion = CallLLM.runGeniusCall(config.currentMessages, noFunctionCall)
                     
                     # stop spinning
                     config.runPython = True

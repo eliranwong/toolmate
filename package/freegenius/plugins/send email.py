@@ -90,7 +90,7 @@ def send_email(function_args):
 
     SharedUtil.openURL(getOutlookLink() if email == "outlook" else getGoogleLink())
 
-    return "Done!"
+    return ""
 
 functionSignature = {
     "examples": [

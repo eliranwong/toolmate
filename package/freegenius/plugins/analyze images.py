@@ -21,7 +21,7 @@ Reference: https://platform.openai.com/docs/guides/vision
 [FUNCTION_CALL]
 """
 
-from freegenius import config, print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer
+from freegenius import config, print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url
 from freegenius.utils.shared_utils import SharedUtil
 from freegenius.utils.call_chatgpt import check_openai_errors
 import os
@@ -63,7 +63,7 @@ def analyze_images(function_args):
     content = []
     # valid image paths
     for i in files:
-        if SharedUtil.is_valid_url(i) and is_valid_image_url(i):
+        if is_valid_url(i) and is_valid_image_url(i):
             content.append({"type": "image_url", "image_url": {"url": i,},})
         elif os.path.isfile(i) and is_valid_image_file(i):
             content.append({"type": "image_url", "image_url": SharedUtil.encode_image(i),})

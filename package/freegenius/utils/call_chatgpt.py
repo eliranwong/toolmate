@@ -359,7 +359,7 @@ class CallChatGPT:
     # Auto Function Call equivalence
 
     @staticmethod
-    def runAutoFunctionCall(messages: dict, noFunctionCall: bool = False):
+    def runGeniusCall(messages: dict, noFunctionCall: bool = False):
         user_request = messages[-1]["content"]
         if config.intent_screening:
             # 1. Intent Screening
@@ -403,6 +403,8 @@ class CallChatGPT:
                 tool_schema = config.toolFunctionSchemas[tool_name]
                 if config.developer:
                     print3(f"Selected: {tool_name} ({semantic_distance})")
+            if tool_name == "chat":
+                return CallChatGPT.regularCall(messages)
             # 3. Parameter Extraction
             if config.developer:
                 print1("extracting parameters ...")
@@ -418,38 +420,41 @@ class CallChatGPT:
             if tool_response == "[INVALID]":
                 # invalid tool call; return a regular call instead
                 return CallChatGPT.regularCall(messages)
-            elif tool_response:
-                if config.developer:
-                    print2(config.divider)
-                    print2("Tool output:")
-                    print(tool_response)
-                    print2(config.divider)
-                # update message chain
-                messages.append(
-                    {
-                        "role": "assistant",
-                        "content": "",
-                        "function_call": {
-                            "name": tool_name,
-                            "arguments": json.dumps(tool_parameters),
+            else:
+                # record tool selection
+                config.currentMessages[-1]["tool"] = tool_name
+                if tool_response:
+                    if config.developer:
+                        print2(config.divider)
+                        print2("Tool output:")
+                        print(tool_response)
+                        print2(config.divider)
+                    # update message chain
+                    messages.append(
+                        {
+                            "role": "assistant",
+                            "content": "",
+                            "function_call": {
+                                "name": tool_name,
+                                "arguments": json.dumps(tool_parameters),
+                            }
                         }
-                    }
-                )
-                messages.append(
-                    {
-                        "role": "function",
-                        "name": tool_name,
-                        "content": tool_response if tool_response else config.tempContent,
-                    }
-                )
-                config.tempContent = ""
+                    )
+                    messages.append(
+                        {
+                            "role": "function",
+                            "name": tool_name,
+                            "content": tool_response if tool_response else config.tempContent,
+                        }
+                    )
+                    config.tempContent = ""
 
-                return CallChatGPT.regularCall(messages)
-            elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
-                # tool function executed without chat extension
-                config.currentMessages.append({"role": "assistant", "content": config.tempContent if config.tempContent else "Done!"})
-                config.tempContent = ""
-                return None
+                    return CallChatGPT.regularCall(messages)
+                elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
+                    # tool function executed without chat extension
+                    config.currentMessages.append({"role": "assistant", "content": config.tempContent if config.tempContent else "Done!"})
+                    config.tempContent = ""
+                    return None
 
     @staticmethod
     def screen_user_request(messages: dict) -> bool:
@@ -521,7 +526,7 @@ class CallLetMeDoIt:
 
     @staticmethod
     @check_openai_errors
-    def runAutoFunctionCall(thisMessage, noFunctionCall=False):
+    def runGeniusCall(thisMessage, noFunctionCall=False):
         functionJustCalled = False
         def runThisCompletion(thisThisMessage):
             nonlocal functionJustCalled
@@ -601,6 +606,9 @@ class CallLetMeDoIt:
                                 "arguments": func_arguments,
                             }
                         }
+                        lastRole = thisMessage[-1].get("role", "")
+                        if lastRole == "user":
+                            thisMessage[-1]["tool"] = func_name
                         thisMessage.append(function_call_message) # extend conversation with assistant's reply
                         thisMessage.append(
                             {

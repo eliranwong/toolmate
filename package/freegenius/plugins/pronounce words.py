@@ -23,7 +23,7 @@ def pronunce_words(function_args):
     language = function_args.get("language") # required
     print1("Loading speech feature ...")
     TTSUtil.play(words, language)
-    return "Finished! Speech engine closed!"
+    return ""
 
 functionSignature = {
     "examples": [

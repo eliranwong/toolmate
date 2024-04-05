@@ -8,7 +8,7 @@ analyze web content with "AutoGen Retriever"
 
 
 from freegenius import config
-from freegenius import print1, print2, print3
+from freegenius import print1, print2, print3, is_valid_url
 from freegenius.utils.shared_utils import SharedUtil
 from freegenius.autoretriever import AutoGenRetriever
 from freegenius.rag import RAG
@@ -16,7 +16,7 @@ from freegenius.rag import RAG
 def analyze_web_content(function_args):
     query = function_args.get("query") # required
     url = function_args.get("url") # required
-    if not url or not SharedUtil.is_valid_url(url):
+    if not url or not is_valid_url(url):
         print1(f"'{url}' is not a valid url" if url else "No url is provided!")
         return "[INVALID]"
     config.stopSpinning()

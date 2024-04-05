@@ -28,12 +28,12 @@ def edit_text(function_args):
     # in case folder name is mistaken
     if os.path.isdir(filename):
         os.system(f"""{config.open} {filename}""")
-        return "Finished! Directory opened!"
+        return ""
     else:
         command = f"{customTextEditor} {filename}" if filename else customTextEditor
         config.stopSpinning()
         os.system(command)
-        return "Finished! Text editor closed!"
+        return ""
 
 functionSignature = {
     "examples": [

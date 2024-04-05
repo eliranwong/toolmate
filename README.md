@@ -4,23 +4,9 @@ FreeGenius AI is an ambitious project sparked by the pioneering work of [LetMeDo
 
 As with [LetMeDoIt AI](https://github.com/eliranwong/letmedoit), FreeGenius AI is designed to be capable of engaging in intuitive conversations, executing codes, providing up-to-date information, and performing a wide range of tasks. It's designed to learn, adapt, and grow with the user, offering personalized experiences and interactions.
 
-# Status
-
-This project is still in early development and testing, not for production yet.
-
 # Beyond LetMeDoIt AI
 
-The genesis of this project stems from our aspiration to augment the capabilities of [LetMeDoIt AI](https://github.com/eliranwong/letmedoit) significantly.
-
-[LetMeDoIt AI](https://github.com/eliranwong/letmedoit) boasts advanced functionalities in both conversational interaction and task execution. However, its fundamental operations rely extensively on OpenAI's function calling capabilities. This reliance has led to a variety of user requests, including:
-
-- Integration with open-source Large Language Models (LLMs), such as those available on [https://huggingface.co](https://huggingface.co). While LetMeDoIt AI currently facilitates chat interactions using open-source models, it does not utilize these models for essential tasks and operations.
-- The ability to operate on offline local LLM servers, such as Ollama and Llama.cpp, is highly desirable. Enabling LetMeDoIt AI to function without an internet connection and to be fully self-contained on a local device would be a significant improvement.
-- The option to use LetMeDoIt AI without the necessity for OpenAI ChatGPT API keys, addressing concerns related to privacy, cost, or other constraints. In commercial environments, there is a clear preference to avoid transmitting sensitive data to OpenAI servers for processing.
-- Enhanced support for Google Gemini API for core functionalities. At present, LetMeDoIt AI utilizes Gemini Pro for chat and vision capabilities. However, due to [limited and inadequate support for function calling](https://github.com/eliranwong/letmedoit/issues/52) within the Gemini API, it has not been leveraged for the core features of LetMeDoIt AI.
-- The capability to manage more complex, multi-stage, or multi-step tasks/projects. Our goal is to expand LetMeDoIt AI's ability to automate intricate tasks through the simple application of flexible plugins.
-
-Beyond responding to user requests, the creator of LetMeDoIt AI harbors a vision that, in the near future, everyone will have access to a customizable, tailor-made and personal AI assistant, reminiscent of Iron Man's Jarvis. It is crucial that these personal AI assistants are compatible with standard computer hardware, removing the barrier of requiring expensive technological investments from users. This initiative is geared towards constructing FreeGenius AI that champions compatibility with readily available and affordable computing hardware.
+https://github.com/eliranwong/freegenius/wiki/Beyond-LetMeDoIt-AI
 
 # Goals
 
@@ -34,7 +20,7 @@ The author aims to equip FreeGenius AI, as an AI suite that is able to:
 - devlops strategies plugin framework to execute multi-step generation or task execution
 - run with common computer hardwares with reasonable and affordable cost
 
-## For Testing and Contributions
+# Installation
 
 Install FreeGenius AI, by running:
 
@@ -56,17 +42,15 @@ To run:
 
 > freegenius
 
-We appreciate anyone who help testing / codeing.
+# Guick Guide
 
-Please kindly report of any issues at https://github.com/eliranwong/freegenius/issues
+https://github.com/eliranwong/freegenius/wiki/Quick-Guide
 
 # Supported LLM Backend / Models
 
 LLM Backend is determined by the value of config.llmBackend
 
 Default: 'llamacpp'
-
-Testing:
 
 * [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library)
 
@@ -94,48 +78,200 @@ https://github.com/eliranwong/freegenius/wiki/Change-Model
 
 https://github.com/eliranwong/freegenius/wiki/Set-up-Optional-Credentials
 
-# Approach to Run Function Calling Equivalent Features Offline with Affordable Hardwares
+# Function Calling Approach with Any LLM
 
-Currently, [LetMeDoIt AI](https://github.com/eliranwong/letmedoit) core features heavily reply on the strengths of OpenAI function calling features, which offer abilities:
+https://github.com/eliranwong/freegenius/wiki/Function-Calling-Approach-with-Any-LLMs
 
-- to organize structured data from unstructured query
-- to accept multiple functions in a single guery
-- to automatically choose an appropriate function from numerouse available functions specified, by using the "auto" option.
+# Tool Dependence Configurations
 
-Challenges in Using Function Calling Features Without an OpenAI API Key:
+https://github.com/eliranwong/freegenius/wiki/Tool-Selection-Configurations
 
-- Many popular open-source AI models lack support for function calling capabilities.
-- Utilizing function calling with these open-source models often demands high-end hardware to ensure smooth and timely operation.
-- Although a limited number of models, including Gemini Pro and certain open-source options, do offer function calling, their capacity is significantly limited, typically handling only one function at a time. This limitation places them well behind the advanced functionality of OpenAI, which can intelligently and efficiently select from multiple user-specified functions in a single request.
-- In our exploratory research and tests, we discovered [a viable workaround](https://medium.com/11tensors/connect-an-ai-agent-with-your-api-intel-neural-chat-7b-llm-can-replace-open-ai-function-calling-242d771e7c79). This method, however, is practical only for those willing to endure a wait of approximately 10 minutes [on a 64GB RAM device without GPU] for the execution of even a simple single task when numerous functions are specified simultaneously.
+# Documentation
 
-In essence, no existing solution matches the capabilities of OpenAI's function calling feature. There is a clear need for an innovative and efficient method to implement function calling features with open-source models on standard hardware. After extensive experimentation and overcoming numerous challenges, the author has developed a new approach:
+In progress at: https://github.com/eliranwong/freegenius/wiki
 
-This novel strategy involves breaking down the function calling process into several distinct steps for multiple generations:
+Most current features follow https://github.com/eliranwong/letmedoit/wiki
 
-1. Intent Screening (optional; config.intent_screening is set to False by default)
-2. Tool Selection (config.tool_dependence is introduced from version 0.0.13; read next section)
-3. Parameter Extraction
-4. Function Execution
-5. Chat Extension
+Particularly, plugin structure follows https://github.com/eliranwong/letmedoit/wiki/Plugins-%E2%80%90-Overview
 
-This methodology has been found to work effectively with freely available open-source models, even on devices lacking a GPU.
+# TODO
 
-In case you are interested, you may check, for example, [how we implement this approach with Llama.cpp](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/utils/call_llamacpp.py)
+https://github.com/eliranwong/freegenius/issues/4
 
-We invite [further discussion and contributions](https://github.com/eliranwong/freegenius/issues) to refine and enhance this strategy.
+# Examples (selective only):
 
-# Tool Dependence
+FreeGenius AI Plugins allow you to acheive variety of tasks with simple words:
 
-A new config item "tool_dependence" is introduced in FreeGenius AI from version 0.0.13.
+* generate tweets
 
-This value helps the assistance to determine if a function call plugin is needed.
+> Post a short tweet about LetMeDoIt AI
 
-Its value ranges from 0.0 to 1.0:
+* analyze audio
 
-* 0.0 means totally independent of function call plugins. Responses are totally depends on models' own abilities or knowledge base
-* 1.0 means fually dependent on function call tools that at least a function call plugin, among available tools, is used to extend model's capabilities
-* setting a value between 0.0 and 1.0 allow users to customise how they want to depends on function call plugins.
+> transcribe "meeting_records.mp3"
+
+* search / analyze financial data
+
+> What was the average stock price of Apple Inc. in 2023?
+
+> Analyze Apple Inc's stock price over last 5 years.
+
+* search weather information
+
+> what is the current weather in New York?
+
+* search latest news
+
+> tell me the latest news about ChatGPT
+
+* search old conversations
+
+> search for "joke" in chat records
+
+* load old conversations
+
+> load chat records with this ID: 2024-01-20_19_21_04
+
+* connect a sqlite file and fetch data or make changes
+
+> connect /temp/my_database.sqlite and tell me about the tables that it contains
+
+* integrated Google PaLM 2 multiturn chat, e.g.
+
+> ask PaLM 2 to write an article about Google
+
+* integrated Google Codey multiturn chat, e.g.
+
+> ask Codey how to use decorators in python
+
+* execute python codes with auto-healing feature and risk assessment, e.g.
+
+> join "01.mp3" and "02.mp3" into a single file
+
+* execute system commands to achieve specific tasks, e.g.
+
+> Launch VLC player and play music in folder "music_folder"
+
+* manipulate files, e.g.
+
+> remove all desktop files with names starting with "Screenshot"
+
+> zip "folder1"
+
+* save memory, e.g.
+
+> Remember, my birthday is January 1st.
+
+* send Whatsapp messages, e.g.
+
+> send Whatsapp message "come to office 9am tomorrow" to "staff" group
+
+* retrieve memory, e.g.
+
+> When is my birthday?
+
+* search for online information when ChatGPT lacks information, e.g.
+
+> Tell me somtheing about LetMeDoIt AI?
+
+* add google or outlook calendar events, e.g.
+
+> I am going to London on Friday. Add it to my outlook calendar
+
+* send google or outlook emails, e.g.
+
+> Email an appreciation letter to someone@someone.com
+
+* analyze files, e.g.
+
+> Summarize 'Hello_World.docx'
+
+* analyze web content, e.g.
+
+> Give me a summary on https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1171397/CC3_feb20.pdf 
+
+* analyze images, e.g.
+
+> Describe the image 'Hello.png' in detail
+
+> Compare images insider folder 'images'
+
+* remove image background, e.g.
+
+> Remove image background of "my_photo.png"
+
+* create qrcode, e.g.
+
+> Create a QR code for the website: https://letmedoit.ai
+
+* create maps, e.g.
+
+> Show me a map with Hype Park Corner and Victoria stations pinned
+
+* create statistical graphics, e.g.
+
+> Create a bar chart that illustrates the correlation between each of the 12 months and their respective number of days
+
+> Create a pie chart: Mary £10, Peter £8, John £15
+
+* solve queries about dates and times, e.g.
+
+> What is the current time in Hong Kong?
+
+* solve math problem, e.g.
+
+> You have a standard deck of 52 playing cards, which is composed of 4 suits: hearts, diamonds, clubs, and spades. Each suit has 13 cards: Ace through 10, and the face cards Jack, Queen, and King. If you draw 5 cards from the deck, in how many ways can you draw exactly 3 cards of one suit and exactly 2 cards of another suit?  
+
+* pronounce words in different dialects, e.g.
+
+> read tomato in American English
+
+> read tomato in British English
+
+> read 中文 in Mandarin
+
+> read 中文 in Cantonese
+
+* download Youtube video files, e.g.
+
+> Download https://www.youtube.com/watch?v=CDdvReNKKuk
+
+* download Youtube audio files and convert them into mp3 format, e.g.
+
+> Download https://www.youtube.com/watch?v=CDdvReNKKuk and convert it into mp3
+
+* edit text with built-in or custom text editors, e.g.
+
+> Edit README.md
+
+* improve language skills, e.g. British English trainer, e.g.
+
+> Improve my writing according to British English style
+
+* convert text display, e.g. from simplified Chinese to traditional Chinese, e.g.
+
+> Translate your last response into Chinese
+
+
+## Fetures with OpenAI API key ONLY
+
+Currently, the following features work only with a valid OpenAI API key
+
+* create ai assistants based on the requested task, e.g.
+
+> create a team of AI assistants to write a Christmas drama
+
+> create a team of AI assistants to build a scalable and customisable python application to remove image noise
+
+* create images, e.g.
+
+> Create an app icon for "LetMeDoIt AI"
+
+* modify images, e.g.
+
+> Make a cartoon verion of image "my_photo.png"
+
+You can modify plugins or create your own ones. Read more about Plugins at https://github.com/eliranwong/letmedoit/wiki/Plugins-%E2%80%90-Overview
 
 # Welcome Contributions
 
@@ -147,14 +283,4 @@ You are welcome to make contributions to this project by:
 
 Support link: https://www.paypal.me/letmedoitai
 
-# Documentation
-
-Pending ...
-
-Most current features follow https://github.com/eliranwong/letmedoit/wiki
-
-Particularly, plugin structure follows https://github.com/eliranwong/letmedoit/wiki/Plugins-%E2%80%90-Overview
-
-# TODO
-
-https://github.com/eliranwong/freegenius/issues/4
+Please kindly report of any issues at https://github.com/eliranwong/freegenius/issues

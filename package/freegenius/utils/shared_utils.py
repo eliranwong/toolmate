@@ -82,19 +82,6 @@ class SharedUtil:
             showErrors()
             return ("", "")
 
-    @staticmethod
-    def is_valid_url(url):
-        # Regular expression pattern for URL validation
-        pattern = re.compile(
-            r'^(http|https)://'  # http:// or https://
-            r'([a-zA-Z0-9.-]+)'  # domain name
-            r'(\.[a-zA-Z]{2,63})'  # dot and top-level domain (e.g. .com, .org)
-            r'(:[0-9]{1,5})?'  # optional port number
-            r'(/.*)?$'  # optional path
-        )
-        return bool(re.match(pattern, url))
-
-
     # Function to encode the image
     @staticmethod
     def encode_image(image_path):

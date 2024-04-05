@@ -120,7 +120,7 @@ def add_calendar_event(function_args):
 
     SharedUtil.openURL(getOutlookLink() if calendar == "outlook" else getGoogleLink())
 
-    return "Done!"
+    return ""
 
 functionSignature = {
     "examples": [

@@ -112,7 +112,8 @@ class StreamingWordWrapper:
                 # RETRIEVE THE TEXT FROM THE RESPONSE
                 if openai:
                     # openai
-                    answer = event.choices[0].delta.content
+                    # when open api key is invalid for some reasons, event response in string
+                    answer = event if isinstance(event, str) else event.choices[0].delta.content
                 elif isinstance(event, dict):
                     if "message" in event:
                         # ollama chat

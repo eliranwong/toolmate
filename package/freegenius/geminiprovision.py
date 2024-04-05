@@ -5,7 +5,7 @@ from vertexai.generative_models._generative_models import (
     HarmCategory,
     HarmBlockThreshold,
 )
-from freegenius import config, showErrors, is_valid_image_file, is_valid_image_url, wrapText, print1, print2, print3
+from freegenius import config, showErrors, is_valid_image_file, is_valid_image_url, wrapText, print2, print3, is_valid_url
 from freegenius.utils.single_prompt import SinglePrompt
 
 import http.client
@@ -89,16 +89,6 @@ class GeminiProVision:
         print2("\nGemini Pro Vision closed!")
 
     def analyze_images(self, function_args):
-        def is_valid_url(url: str) -> bool:
-            # Regular expression pattern for URL validation
-            pattern = re.compile(
-                r'^(http|https)://'  # http:// or https://
-                r'([a-zA-Z0-9.-]+)'  # domain name
-                r'(\.[a-zA-Z]{2,63})'  # dot and top-level domain (e.g. .com, .org)
-                r'(:[0-9]{1,5})?'  # optional port number
-                r'(/.*)?$'  # optional path
-            )
-            return bool(re.match(pattern, url))
         def load_image_from_url(image_url: str) -> Image:
             with urllib.request.urlopen(image_url) as response:
                 response = typing.cast(http.client.HTTPResponse, response)

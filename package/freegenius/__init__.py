@@ -183,6 +183,17 @@ def isUrlAlive(url):
         return False
     return True if request.status_code == 200 else False
 
+def is_valid_url(url: str) -> bool:
+    # Regular expression pattern for URL validation
+    pattern = re.compile(
+        r'^(http|https)://'  # http:// or https://
+        r'([a-zA-Z0-9.-]+)'  # domain name
+        r'(\.[a-zA-Z]{2,63})'  # dot and top-level domain (e.g. .com, .org)
+        r'(:[0-9]{1,5})?'  # optional port number
+        r'(/.*)?$'  # optional path
+    )
+    return bool(re.match(pattern, url))
+
 # files
 
 def getUnstructuredFiles(dir_path: str) -> list:
@@ -804,10 +815,10 @@ def setToolDependence(entry: Any) -> bool:
                 tool_auto_selection_threshold = float(tool_auto_selection_threshold)
                 if 0 <= tool_auto_selection_threshold <=1.0:
                     config.tool_auto_selection_threshold = tool_auto_selection_threshold
-                    print3(f"Tool auto selection threshold changed to: {tool_auto_selection_threshold}")
             else:
                 # 3/4 of config.tool_dependence
                 config.tool_auto_selection_threshold = round(config.tool_dependence * 5/8, 5)
+            print3(f"Tool auto selection threshold changed to: {config.tool_auto_selection_threshold}")
 
             config.saveConfig()
 

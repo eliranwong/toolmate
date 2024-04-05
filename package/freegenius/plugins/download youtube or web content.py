@@ -10,7 +10,7 @@ FreeGenius AI Plugin - download youtube or web content
 [FUNCTION_CALL]
 """
 
-from freegenius import config, showErrors, isCommandInstalled, print1, print3
+from freegenius import config, showErrors, isCommandInstalled, print1, print3, is_valid_url
 import re, subprocess, os
 from freegenius.utils.shared_utils import SharedUtil
 from pathlib import Path
@@ -58,13 +58,13 @@ def download_web_content(function_args):
         downloadCommand = "yt-dlp -x --audio-format mp3" if format == "audio" else "yt-dlp -f bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4"
         terminalDownloadYoutubeFile(downloadCommand, url, location)
         return "Finished! Youtube downloader closed!"
-    elif SharedUtil.is_valid_url(url):
+    elif is_valid_url(url):
         try:
             folder = config.localStorage
             folder = os.path.join(folder, "Downloads")
             Path(folder).mkdir(parents=True, exist_ok=True)
             SharedUtil.downloadWebContent(url, folder=folder, ignoreKind=True)
-            return "Downloaded!"
+            return ""
         except:
             showErrors()
             return "[INVALID]"

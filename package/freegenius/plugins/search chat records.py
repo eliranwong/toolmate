@@ -11,7 +11,6 @@ from freegenius import print1, print2, print3
 from pathlib import Path
 from chromadb.config import Settings
 import os, chromadb, re
-from freegenius.utils.shared_utils import SharedUtil
 from prompt_toolkit import print_formatted_text, HTML
 
 chat_store = os.path.join(config.localStorage, "chats")
@@ -22,6 +21,7 @@ chroma_client = chromadb.PersistentClient(chat_store, Settings(anonymized_teleme
 def save_chat_record(timestamp, order, record):
     role = record.get("role", "")
     content = record.get("content", "")
+    tool = record.get("tool", "")
     if role and role in ("user", "assistant") and content:
         collection = get_or_create_collection(chroma_client, "chats")
         metadata = {
@@ -29,6 +29,7 @@ def save_chat_record(timestamp, order, record):
             "timestamp": timestamp,
             "order": order,
             "role": role,
+            "tool": tool,
         }
         add_vector(collection, content, metadata)
 config.save_chat_record = save_chat_record

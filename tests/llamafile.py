@@ -4,7 +4,7 @@ class CallLlamaFile:
     # not workable yet; may not support it
 
     @staticmethod
-    def runAutoFunctionCall(messages: dict, noFunctionCall: bool = False):
+    def runGeniusCall(messages: dict, noFunctionCall: bool = False):
         user_request = messages[-1]["content"]
         if config.intent_screening:
             # 1. Intent Screening

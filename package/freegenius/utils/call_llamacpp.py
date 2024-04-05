@@ -296,7 +296,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     # Auto Function call equivalence
 
     @staticmethod
-    def runAutoFunctionCall(messages: dict, noFunctionCall: bool = False):
+    def runGeniusCall(messages: dict, noFunctionCall: bool = False):
         user_request = messages[-1]["content"]
         if config.intent_screening:
             # 1. Intent Screening
@@ -339,6 +339,8 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                 tool_name, tool_schema = metadatas["name"], json.loads(metadatas["parameters"])
                 if config.developer:
                     print3(f"Selected: {tool_name} ({semantic_distance})")
+            if tool_name == "chat":
+                return CallLlamaCpp.regularCall(messages)
             # 3. Parameter Extraction
             if config.developer:
                 print1("extracting parameters ...")
@@ -353,13 +355,16 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             if tool_response == "[INVALID]":
                 # invalid tool call; return a regular call instead
                 return CallLlamaCpp.regularCall(messages)
-            elif tool_response:
-                if config.developer:
-                    print2(config.divider)
-                    print2("Tool output:")
-                    print(tool_response)
-                    print2(config.divider)
-                messages[-1]["content"] = f"""Response to the following query according to given supplementary information.
+            else:
+                # record tool selection
+                config.currentMessages[-1]["tool"] = tool_name
+                if tool_response:
+                    if config.developer:
+                        print2(config.divider)
+                        print2("Tool output:")
+                        print(tool_response)
+                        print2(config.divider)
+                    messages[-1]["content"] = f"""Response to the following query according to given supplementary information.
 
 Query:
 <query>
@@ -370,12 +375,12 @@ Supplementary information:
 <supplementary_information>
 {tool_response}
 </supplementary_information>"""
-                return CallLlamaCpp.regularCall(messages)
-            elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
-                # tool function executed without chat extension
-                config.currentMessages.append({"role": "assistant", "content": config.tempContent if config.tempContent else "Done!"})
-                config.tempContent = ""
-                return None
+                    return CallLlamaCpp.regularCall(messages)
+                elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
+                    # tool function executed without chat extension
+                    config.currentMessages.append({"role": "assistant", "content": config.tempContent if config.tempContent else "Done!"})
+                    config.tempContent = ""
+                    return None
 
     @staticmethod
     def screen_user_request(messages: dict, user_request: str) -> bool:

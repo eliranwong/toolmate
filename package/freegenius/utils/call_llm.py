@@ -120,14 +120,14 @@ Always remember that you are much more than a text-based AI. You possess both vi
         return CallLetMeDoIt.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
 
     @staticmethod
-    def runAutoFunctionCall(messages, noFunctionCall=False):
+    def runGeniusCall(messages, noFunctionCall=False):
         if config.llmBackend == "ollama":
-            return CallOllama.runAutoFunctionCall(messages, noFunctionCall)
+            return CallOllama.runGeniusCall(messages, noFunctionCall)
         elif config.llmBackend == "llamacpp":
-            return CallLlamaCpp.runAutoFunctionCall(messages, noFunctionCall)
+            return CallLlamaCpp.runGeniusCall(messages, noFunctionCall)
         elif config.llmBackend == "gemini":
-            return CallGemini.runAutoFunctionCall(messages, noFunctionCall)
+            return CallGemini.runGeniusCall(messages, noFunctionCall)
         elif config.llmBackend == "chatgpt":
-            return CallChatGPT.runAutoFunctionCall(messages, noFunctionCall)
+            return CallChatGPT.runGeniusCall(messages, noFunctionCall)
         # letmedoit
-        return CallLetMeDoIt.runAutoFunctionCall(messages, noFunctionCall)
+        return CallLetMeDoIt.runGeniusCall(messages, noFunctionCall)

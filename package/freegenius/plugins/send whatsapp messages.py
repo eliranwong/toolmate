@@ -17,7 +17,7 @@ def send_whatsapp(function_args):
         pywhatkit.sendwhatmsg_instantly(recipient, message)
     else:
         pywhatkit.sendwhatmsg_to_group_instantly(recipient, message)
-    return "Done!"
+    return ""
 
 functionSignature = {
     "examples": [

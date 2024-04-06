@@ -42,6 +42,10 @@ To run:
 
 > freegenius
 
+## Ollama [Optional]
+
+Install [Ollama](https://ollama.com/) to use [Ollama models](https://ollama.com/library) with either Llama.cpp or Ollama.
+
 # Guick Guide
 
 https://github.com/eliranwong/freegenius/wiki/Quick-Guide
@@ -52,19 +56,51 @@ LLM Backend is determined by the value of config.llmBackend
 
 Default: 'llamacpp'
 
-* [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library)
+* llamacpp - [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library)
+Remarks: From version 0.0.44 onwards, FreeGenius AI supports loading Ollama models with "llamacpp".
 
-Remarks: From version 0.0.44, FreeGenius AI supports loading Ollama hosted models with "llamacpp" set as the backend.  It is recommended to use Ollama hosted models with Llama.cpp for two reasons.  First, Llama.cpp-compatible models are easily to be downloaded via Ollama. We added a prompt for user to easily choose models from numeral choices. Second, Llama.cpp loads and responses faster for the same model, compared against Ollama.  The speed advantage of Llama.cpp is more obvious with average hardware.
+* ollama - [Ollama](https://ollama.com/) / [Ollama Hosted models](https://ollama.com/library)
 
-* [Ollama](https://ollama.com/) / [Ollama Hosted models](https://ollama.com/library)
+* gemini - [Google Vertex AI](https://cloud.google.com/vertex-ai) / [Gemini Pro & Gemini Pro Vision](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
 
-* [Google Vertex AI](https://cloud.google.com/vertex-ai) / [Gemini Pro & Gemini Pro Vision](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
+* openai - [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
 
-* [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
+* letmedoit - [LetMeDoIt mode](https://github.com/eliranwong/freegenius/wiki/LetMeDoIt-Mode) / [ChatGPT models](https://platform.openai.com/docs/models)
 
-* [LetMeDoIt mode](https://github.com/eliranwong/freegenius/wiki/LetMeDoIt-Mode) / [ChatGPT models](https://platform.openai.com/docs/models)
+## Vision
 
-Remarks: To use Ollama hosted models, installation [Ollama](https://ollama.com/) is required.
+llamacpp & ollama: Llava
+
+gemini: Gemini Pro Vision
+
+openai & letmedoit: ChatGPT-4 Vision
+
+## Audio Analysis
+
+llamacpp & ollama: OpenAI Whisper [offline]
+
+gemini: Google Cloud Speech-to-Text Service
+
+openai & letmedoit: Whisper [online; API]
+
+## Image Creation and Modification
+
+llamacpp, ollama & gemini: stable-diffusion [upcoming ...]
+
+openai: dall-e-3
+
+## Voice Typing Options
+
+1. Google Speech-to-Text (Generic)
+2. Google Speech-to-Text (API)
+3. OpenAI Whisper [offline]
+
+## Speech-to-Text Options
+
+1. Google Text-to-Speech (Generic)
+2. Google Text-to-Speech (API)
+3. Elevenlabs (API)
+4. Custom system commands
 
 # How to Change LLM Backend?
 

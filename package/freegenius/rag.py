@@ -158,7 +158,7 @@ Please answer my question, based on the context given above."""
 
             # Create a new thread for the streaming task
             streaming_event = threading.Event()
-            self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmBackend in ("chatgpt", "letmedoit") else False))
+            self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmPlatform in ("chatgpt", "letmedoit") else False))
             # Start the streaming thread
             self.streaming_thread.start()
 

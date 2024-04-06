@@ -44,11 +44,47 @@ from PIL import Image
 from openai import OpenAI
 from freegenius.utils.terminal_mode_dialogs import TerminalModeDialogs
 from autogen.retrieve_utils import TEXT_FORMATS
+from huggingface_hub import hf_hub_download
 
 # a dummy import line to resolve ALSA error display on Linux
 import sounddevice
 
 # local llm
+
+def downloadStableDiffusionFiles():
+    # llm directory
+    llm_directory = os.path.join(config.localStorage, "LLMs", "stable_diffusion")
+    Path(llm_directory).mkdir(parents=True, exist_ok=True)
+    filename = "v1-5-pruned-emaonly.safetensors"
+    stableDiffusion_model_path = os.path.join(llm_directory, filename)
+    if not config.stableDiffusion_model_path or not os.path.isfile(config.stableDiffusion_model_path):
+        config.stableDiffusion_model_path = stableDiffusion_model_path
+
+    if not os.path.isfile(config.stableDiffusion_model_path):
+        print2("Downloading stable-diffusion model ...")
+        hf_hub_download(
+            repo_id="runwayml/stable-diffusion-v1-5",
+            filename=filename,
+            local_dir=llm_directory,
+            local_dir_use_symlinks=False,
+        )
+        stableDiffusion_model_path = os.path.join(llm_directory, filename)
+        if os.path.isfile(stableDiffusion_model_path):
+            config.stableDiffusion_model_path = stableDiffusion_model_path
+            config.saveConfig()
+
+    llm_directory = os.path.join(llm_directory, "lora")
+    filename = "pytorch_lora_weights.safetensors"
+    lora_file = os.path.join(llm_directory, filename)
+    if not os.path.isfile(lora_file):
+        print2("Downloading stable-diffusion LCM-LoRA ...")
+        hf_hub_download(
+            repo_id="latent-consistency/lcm-lora-sdv1-5",
+            filename=filename,
+            local_dir=llm_directory,
+            local_dir_use_symlinks=False,
+        )
+        stableDiffusion_model_path = os.path.join(llm_directory, filename)
 
 def startLlamacppServer():
     try:
@@ -57,7 +93,7 @@ def startLlamacppServer():
             print2("Running llama.cpp server ...")
             cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppServer_port} --model "{config.llamacppDefaultModel_model_path}" --verbose False --chat_format chatml --n_ctx {config.llamacppDefaultModel_n_ctx} --n_gpu_layers {config.llamacppDefaultModel_n_gpu_layers} --n_batch {config.llamacppDefaultModel_n_batch}"""
             config.llamacppServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
-            while config.llamacppServer is None:
+            while not check_server("127.0.0.1", config.llamacppServer_port):
                 # wait til the server is up
                 ...
     except:
@@ -66,8 +102,9 @@ def startLlamacppServer():
 
 def stopLlamacppServer():
     if hasattr(config, "llamacppServer") and config.llamacppServer is not None:
-        print2("Stopping llama.cpp server ...")
-        os.killpg(os.getpgid(config.llamacppServer.pid), signal.SIGTERM)
+        if check_server("127.0.0.1", config.llamacppServer_port):
+            print2("Stopping llama.cpp server ...")
+            os.killpg(os.getpgid(config.llamacppServer.pid), signal.SIGTERM)
         config.llamacppServer = None
 
 def startLlamacppVisionServer():
@@ -78,7 +115,7 @@ def startLlamacppVisionServer():
                 print2("Running llama.cpp vision server ...")
                 cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppServer_port} --model "{config.llamacppVisionModel_model_path}" --clip_model_path {config.llamacppVisionModel_clip_model_path} --verbose False --chat_format llava-1-5 --n_ctx {config.llamacppDefaultModel_n_ctx} --n_gpu_layers {config.llamacppDefaultModel_n_gpu_layers} --n_batch {config.llamacppDefaultModel_n_batch}"""
                 config.llamacppVisionServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
-                while config.llamacppVisionServer is None:
+                while not check_server("127.0.0.1", config.llamacppServer_port):
                     # wait til the server is up
                     ...
             else:
@@ -89,8 +126,9 @@ def startLlamacppVisionServer():
 
 def stopLlamacppVisionServer():
     if hasattr(config, "llamacppVisionServer") and config.llamacppVisionServer is not None:
-        print2("Stopping llama.cpp vision server ...")
-        os.killpg(os.getpgid(config.llamacppVisionServer.pid), signal.SIGTERM)
+        if check_server("127.0.0.1", config.llamacppServer_port):
+            print2("Stopping llama.cpp vision server ...")
+            os.killpg(os.getpgid(config.llamacppVisionServer.pid), signal.SIGTERM)
         config.llamacppVisionServer = None
 
 def getOllamaModelDir():
@@ -141,7 +179,6 @@ def getDownloadedOllamaModels() -> dict:
     return models
 
 def getDownloadedGgufModels() -> dict:
-    # support when config.store_llm_in_user_dir is set to True
     llm_directory = os.path.join(config.localStorage, "LLMs", "gguf")
     models = {}
     for f in getFilenamesWithoutExtension(llm_directory, "gguf"):
@@ -174,6 +211,16 @@ def selectTool(search_result, closest_distance) -> Optional[int]:
     return None
 
 # connectivity
+
+def check_server(ip, port):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(2)  # Timeout in case of server not responding
+    try:
+        sock.connect((ip, port))
+        sock.close()
+        return True
+    except socket.error:
+        return False
 
 def isUrlAlive(url):
     #print(urllib.request.urlopen("https://letmedoit.ai").getcode())

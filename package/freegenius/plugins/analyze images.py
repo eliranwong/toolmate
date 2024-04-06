@@ -3,7 +3,7 @@ FreeGenius AI Plugin - analyze images
 
 analyze images
 
-Backend: llamacpp, ollama
+Platform: llamacpp, ollama
 Model: llava <- customizable
 To customise:
 Change in config.py:
@@ -11,10 +11,10 @@ llamacppVisionModel_model_path
 llamacppVisionModel_clip_model_path
 ollamaVisionModel
 
-Backend: gemini
+Platform: gemini
 Model: Gemini Pro Vision
 
-Backend: chaptgpt, letmedoit
+Platform: chaptgpt, letmedoit
 Model "gpt-4-vision-preview"
 Reference: https://platform.openai.com/docs/guides/vision
 
@@ -33,14 +33,14 @@ from freegenius.utils.call_ollama import CallOllama
 def analyze_images(function_args):
     from freegenius import config
 
-    if config.llmBackend == "gemini":
+    if config.llmPlatform == "gemini":
         answer = GeminiProVision(temperature=config.llmTemperature).analyze_images(function_args)
         if answer:
             config.tempContent = answer
             return ""
         else:
             return "[INVALID]"
-    elif config.llmBackend in ("chatgpt", "letmedoit") and not config.openaiApiKey:
+    elif config.llmPlatform in ("chatgpt", "letmedoit") and not config.openaiApiKey:
         return "OpenAI API key not found!"
 
     query = function_args.get("query") # required
@@ -71,13 +71,13 @@ def analyze_images(function_args):
             files.remove(i)
 
     if content:
-        if config.llmBackend in ("chatgpt", "letmedoit"):
+        if config.llmPlatform in ("chatgpt", "letmedoit"):
             client = OpenAI()
-        elif config.llmBackend == "llamacpp":
+        elif config.llmPlatform == "llamacpp":
             # start llama.cpp vision server
             startLlamacppVisionServer()
             client = OpenAI(base_url=f"http://localhost:{config.llamacppServer_port}/v1", api_key="freegenius")
-        elif config.llmBackend == "ollama":
+        elif config.llmPlatform == "ollama":
             config.currentMessages[-1] = {'role': 'user', 'content': query, 'images': files}
             answer = CallOllama.getSingleChatResponse("", config.currentMessages, model=config.ollamaVisionModel)
             config.tempContent = answer
@@ -107,7 +107,7 @@ def analyze_images(function_args):
         print2("```")
 
         # stop llama.cpp vision server
-        if config.llmBackend == "llamacpp":
+        if config.llmPlatform == "llamacpp":
             stopLlamacppVisionServer()
 
         return ""

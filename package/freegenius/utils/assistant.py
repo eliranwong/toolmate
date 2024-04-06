@@ -846,8 +846,8 @@ class FreeGenius:
             print3(f"Tool Selection Max Choices: {tool_selection_max_choices}")
         config.saveConfig()
 
-    def selectLlmBackend(self):
-        instruction = "Select a backend:"
+    def selectLlmPlatform(self):
+        instruction = "Select a platform:"
         print1(instruction)
         options = {
             "llamacpp": "Llama.cpp",
@@ -856,15 +856,15 @@ class FreeGenius:
             "chatgpt": "OpenAI ChatGPT",
             "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",
         }
-        llmBackend = self.dialogs.getValidOptions(
+        llmPlatform = self.dialogs.getValidOptions(
             options=options.keys(),
             descriptions=list(options.values()),
-            title="LLM Backend",
-            default=config.llmBackend,
+            title="LLM Platform",
+            default=config.llmPlatform,
             text=instruction,
         )
-        if llmBackend:
-            config.llmBackend = llmBackend
+        if llmPlatform:
+            config.llmPlatform = llmPlatform
             CallLLM.checkCompletion()
 
     def setLlmModel(self):
@@ -883,21 +883,21 @@ class FreeGenius:
                 return True
             return False
 
-        self.selectLlmBackend()
+        self.selectLlmPlatform()
         print1("Select models ...")
-        if config.llmBackend == "ollama":
+        if config.llmPlatform == "ollama":
             print2("# For general purpose")
             self.setLlmModel_ollama()
             if askAdditionalCodeModel():
                 print2("# For code generation")
                 self.setLlmModel_ollama("code")
-        elif config.llmBackend == "llamacpp":
+        elif config.llmPlatform == "llamacpp":
             print2("# For general purpose")
             self.setLlmModel_llamacpp()
             if askAdditionalCodeModel():
                 print2("# For code generation")
                 self.setLlmModel_llamacpp("code")
-        elif config.llmBackend == "gemini":
+        elif config.llmPlatform == "gemini":
             print3("Model selected: Google Gemini Pro")
         else:
             self.setLlmModel_chatgpt()
@@ -912,7 +912,7 @@ class FreeGenius:
         completer = FuzzyCompleter(WordCompleter(sorted(ollama_models), ignore_case=True))
         bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
         default = config.ollamaCodeModel if feature == "code" else config.ollamaDefaultModel
-        if config.llmBackend == "llamacpp":
+        if config.llmPlatform == "llamacpp":
             if feature == "default" and config.llamacppDefaultModel_ollama_tag:
                 default = config.llamacppDefaultModel_ollama_tag
             elif feature == "code" and config.llamacppCodeModel_ollama_tag:
@@ -1006,13 +1006,6 @@ class FreeGenius:
                 self.setCustomModelPath(feature=feature)
 
     def setCustomModelPath(self, feature="default"):
-        #historyFolder = os.path.join(config.localStorage, "history")
-        #Path(historyFolder).mkdir(parents=True, exist_ok=True)
-        #model_path_history = os.path.join(historyFolder, "llamacpp_code_model_path" if feature == "code" else "llamacpp_default_model_path")
-        #model_path_session = PromptSession(history=FileHistory(model_path_history))
-        #bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
-        #print1("Enter a custom model path:")
-        #model_path = self.prompts.simplePrompt(style=self.prompts.promptStyle2, promptSession=model_path_session, bottom_toolbar=bottom_toolbar, default=config.llamacppCodeModel_model_path if feature == "code" else config.llamacppDefaultModel_model_path)
         model_path = self.getPath.getFilePath(
             check_isfile=True,
             empty_to_cancel=True,
@@ -1043,9 +1036,11 @@ class FreeGenius:
             if feature == "default":
                 config.llamacppDefaultModel_repo_id = repo_id
                 config.llamacppDefaultModel_filename = filename
+                config.llamacppDefaultModel_model_path = ""
             elif feature == "code":
                 config.llamacppCodeModel_repo_id = repo_id
                 config.llamacppCodeModel_filename = filename
+                config.llamacppCodeModel_model_path = ""
             CallLLM.checkCompletion()
         else:
             print2("Action cancelled due to insufficient information!")
@@ -1690,7 +1685,7 @@ class FreeGenius:
                     if config.conversationStarted:
                         self.saveChat(config.currentMessages)
                     storagedirectory, config.currentMessages = startChat()
-            elif userInputLower == ".new" and config.conversationStarted:
+            elif userInputLower == ".new":
                 self.saveChat(config.currentMessages)
                 storagedirectory, config.currentMessages = startChat()
             elif userInput and not userInputLower in featuresLower:
@@ -1741,7 +1736,7 @@ My writing:
                     # check special entries
                     # if user call a chatbot without function calling
                     if "[CHAT]" in fineTunedUserInput:
-                        chatbot = config.llmBackend
+                        chatbot = config.llmPlatform
                     elif callChatBot := re.search("\[CHAT_([^\[\]]+?)\]", fineTunedUserInput):
                         chatbot = callChatBot.group(1).lower() if callChatBot and callChatBot.group(1).lower() in ("chatgpt", "geminipro", "palm2", "codey") else ""
                     else:
@@ -1785,7 +1780,7 @@ My writing:
                         # Create a new thread for the streaming task
                         streamingWordWrapper = StreamingWordWrapper()
                         streaming_event = threading.Event()
-                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmBackend in ("chatgpt", "letmedoit") else False))
+                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmPlatform in ("chatgpt", "letmedoit") else False))
                         # Start the streaming thread
                         self.streaming_thread.start()
 
@@ -1827,7 +1822,7 @@ My writing:
 
     def launchChatbot(self, chatbot, fineTunedUserInput):
         if not chatbot:
-            chatbot = config.llmBackend
+            chatbot = config.llmPlatform
         if config.isTermux:
             #chatbot = "chatgpt"
             ...

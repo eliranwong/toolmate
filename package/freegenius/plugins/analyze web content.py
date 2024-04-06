@@ -32,7 +32,7 @@ def analyze_web_content(function_args):
         print3("Running function: 'analyze_images'")
         return config.toolFunctionMethods["analyze_images"](function_args)
 
-    if config.rag_useAutoRetriever and not config.llmBackend == "gemini":
+    if config.rag_useAutoRetriever and not config.llmPlatform == "gemini":
         # process with AutoGen Retriever
         print2("AutoGen Retriever launched!")
         last_message = AutoGenRetriever().getResponse(filename, query, True)

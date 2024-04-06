@@ -1,5 +1,5 @@
 from freegenius import config, showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
-from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode
+from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, downloadStableDiffusionFiles
 from typing import Optional
 from llama_cpp import Llama
 from prompt_toolkit import prompt
@@ -12,81 +12,34 @@ class CallLlamaCpp:
 
     @staticmethod
     def checkCompletion():
-        # llm directory
+        
+        # check vision model
+        # https://llama-cpp-python.readthedocs.io/en/latest/server/
         llm_directory = os.path.join(config.localStorage, "LLMs", "gguf")
         Path(llm_directory).mkdir(parents=True, exist_ok=True)
 
-        # check vision model
-        # https://llama-cpp-python.readthedocs.io/en/latest/server/
-        if not config.llamacppVisionModel_model_path or not os.path.isfile(config.llamacppVisionModel_model_path):
-            # download llava model
-            filename = "ggml-model-q4_k.gguf"
-            hf_hub_download(
-                repo_id="mys/ggml_llava-v1.5-7b",
-                filename=filename,
-                local_dir=llm_directory,
-                local_dir_use_symlinks=False,
-            )
-            llamacppVisionModel_model_path = os.path.join(llm_directory, filename)
-            if os.path.isfile(llamacppVisionModel_model_path):
-                config.llamacppVisionModel_model_path = llamacppVisionModel_model_path
-                config.saveConfig()
-
-        if not config.llamacppVisionModel_clip_model_path or not os.path.isfile(config.llamacppVisionModel_clip_model_path):
-            # download llava clip model
-            filename = "mmproj-model-f16.gguf"
-            hf_hub_download(
-                repo_id="mys/ggml_llava-v1.5-7b",
-                filename=filename,
-                local_dir=llm_directory,
-                local_dir_use_symlinks=False,
-            )
-            llamacppVisionModel_clip_model_path = os.path.join(llm_directory, filename)
-            if os.path.isfile(llamacppVisionModel_clip_model_path):
-                config.llamacppVisionModel_clip_model_path = llamacppVisionModel_clip_model_path
-                config.saveConfig()
-
-        # check if model paths are valid
-        if config.llamacppDefaultModel_model_path and not os.path.isfile(config.llamacppDefaultModel_model_path):
-            config.llamacppDefaultModel_model_path = ""
-            config.saveConfig()
-        if config.llamacppCodeModel_model_path and not os.path.isfile(config.llamacppCodeModel_model_path):
-            config.llamacppCodeModel_model_path = ""
-            config.saveConfig()
-
-        # check available model files in FreeGenius directory
-        llamacppDefaultModel_model_path = os.path.join(llm_directory, config.llamacppDefaultModel_filename)
-        if (not config.llamacppDefaultModel_model_path or not os.path.isfile(config.llamacppDefaultModel_model_path)) and os.path.isfile(llamacppDefaultModel_model_path):
-            config.llamacppDefaultModel_model_path = llamacppDefaultModel_model_path
-            config.saveConfig()
-        llamacppCodeModel_model_path = os.path.join(llm_directory, config.llamacppCodeModel_filename)
-        if (not config.llamacppCodeModel_model_path or not os.path.isfile(config.llamacppCodeModel_model_path)) and os.path.isfile(llamacppCodeModel_model_path):
-            config.llamacppCodeModel_model_path = llamacppCodeModel_model_path
-            config.saveConfig()
-
+        # Download default and code models
         try:
-            # llamacppDefaultModel
-            if config.llamacppDefaultModel_model_path and os.path.isfile(config.llamacppDefaultModel_model_path):
-                config.llamacppDefaultModel = Llama(
-                    model_path=config.llamacppDefaultModel_model_path,
-                    chat_format="chatml",
-                    n_ctx=config.llamacppDefaultModel_n_ctx,
-                    n_batch=config.llamacppDefaultModel_n_batch,
-                    verbose=False,
-                    n_gpu_layers=config.llamacppDefaultModel_n_gpu_layers,
-                )
-            else:
-                config.llamacppDefaultModel = Llama.from_pretrained(
+            llamacppDefaultModel_model_path = os.path.join(llm_directory, config.llamacppDefaultModel_filename)
+            if not config.llamacppDefaultModel_model_path or not os.path.isfile(config.llamacppDefaultModel_model_path):
+                config.llamacppDefaultModel_model_path = llamacppDefaultModel_model_path
+            if not os.path.isfile(config.llamacppDefaultModel_model_path):
+                # download llava clip model
+                print2("Downloading default model ...")
+                hf_hub_download(
                     repo_id=config.llamacppDefaultModel_repo_id,
                     filename=config.llamacppDefaultModel_filename,
                     local_dir=llm_directory,
-                    local_dir_use_symlinks=False if config.store_llm_in_user_dir else True,
-                    chat_format="chatml",
-                    n_ctx=config.llamacppDefaultModel_n_ctx,
-                    n_batch=config.llamacppDefaultModel_n_batch,
-                    verbose=False,
-                    n_gpu_layers=config.llamacppDefaultModel_n_gpu_layers,
+                    local_dir_use_symlinks=False,
                 )
+            config.llamacppDefaultModel = Llama(
+                model_path=config.llamacppDefaultModel_model_path,
+                chat_format="chatml",
+                n_ctx=config.llamacppDefaultModel_n_ctx,
+                n_batch=config.llamacppDefaultModel_n_batch,
+                verbose=False,
+                n_gpu_layers=config.llamacppDefaultModel_n_gpu_layers,
+            )
         except:
             # restore default config
             print2("Errors! Restoring default model!")
@@ -97,7 +50,7 @@ class CallLlamaCpp:
                 repo_id=config.llamacppDefaultModel_repo_id,
                 filename=config.llamacppDefaultModel_filename,
                 local_dir=llm_directory,
-                local_dir_use_symlinks=False if config.store_llm_in_user_dir else True,
+                local_dir_use_symlinks=False,
                 chat_format="chatml",
                 n_ctx=config.llamacppDefaultModel_n_ctx,
                 n_batch=config.llamacppDefaultModel_n_batch,
@@ -106,28 +59,26 @@ class CallLlamaCpp:
             )
 
         try:
-            # llamacppCodeModel_model_path
-            if config.llamacppCodeModel_model_path and os.path.isfile(config.llamacppCodeModel_model_path):
-                config.llamacppCodeModel = Llama(
-                    model_path=config.llamacppCodeModel_model_path,
-                    chat_format="chatml",
-                    n_ctx=config.llamacppCodeModel_n_ctx,
-                    n_batch=config.llamacppCodeModel_n_batch,
-                    verbose=False,
-                    n_gpu_layers=config.llamacppCodeModel_n_gpu_layers,
-                )
-            else:
-                config.llamacppCodeModel = Llama.from_pretrained(
+            llamacppCodeModel_model_path = os.path.join(llm_directory, config.llamacppCodeModel_filename)
+            if not config.llamacppCodeModel_model_path or not os.path.isfile(config.llamacppCodeModel_model_path):
+                config.llamacppCodeModel_model_path = llamacppCodeModel_model_path
+            if not os.path.isfile(config.llamacppCodeModel_model_path):
+                # download llava clip model
+                print2("Downloading code generation model ...")
+                hf_hub_download(
                     repo_id=config.llamacppCodeModel_repo_id,
                     filename=config.llamacppCodeModel_filename,
                     local_dir=llm_directory,
-                    local_dir_use_symlinks=False if config.store_llm_in_user_dir else True,
-                    chat_format="chatml",
-                    n_ctx=config.llamacppCodeModel_n_ctx,
-                    n_batch=config.llamacppCodeModel_n_batch,
-                    verbose=False,
-                    n_gpu_layers=config.llamacppCodeModel_n_gpu_layers,
+                    local_dir_use_symlinks=False,
                 )
+            config.llamacppCodeModel = Llama(
+                model_path=config.llamacppCodeModel_model_path,
+                chat_format="chatml",
+                n_ctx=config.llamacppCodeModel_n_ctx,
+                n_batch=config.llamacppCodeModel_n_batch,
+                verbose=False,
+                n_gpu_layers=config.llamacppCodeModel_n_gpu_layers,
+            )
         except:
             # restore default config
             print2("Errors! Restoring default model!")
@@ -138,13 +89,47 @@ class CallLlamaCpp:
                 repo_id=config.llamacppCodeModel_repo_id,
                 filename=config.llamacppCodeModel_filename,
                 local_dir=llm_directory,
-                local_dir_use_symlinks=False if config.store_llm_in_user_dir else True,
+                local_dir_use_symlinks=False,
                 chat_format="chatml",
                 n_ctx=config.llamacppCodeModel_n_ctx,
                 n_batch=config.llamacppCodeModel_n_batch,
                 verbose=False,
                 n_gpu_layers=config.llamacppCodeModel_n_gpu_layers,
             )
+
+        # Download vision model
+        filename = "ggml-model-q4_k.gguf"
+        llamacppVisionModel_model_path = os.path.join(llm_directory, filename)
+        if not config.llamacppVisionModel_model_path or not os.path.isfile(config.llamacppVisionModel_model_path):
+            config.llamacppVisionModel_model_path = llamacppVisionModel_model_path
+        if not os.path.isfile(config.llamacppVisionModel_model_path):
+            # download llava model
+            print2(f"Downloading llava model ...")
+            hf_hub_download(
+                repo_id="mys/ggml_llava-v1.5-7b",
+                filename=filename,
+                local_dir=llm_directory,
+                local_dir_use_symlinks=False,
+            )
+
+        filename = "mmproj-model-f16.gguf"
+        llamacppVisionModel_clip_model_path = os.path.join(llm_directory, filename)
+        if not config.llamacppVisionModel_clip_model_path or not os.path.isfile(config.llamacppVisionModel_clip_model_path):
+            config.llamacppVisionModel_clip_model_path = llamacppVisionModel_clip_model_path
+        if not os.path.isfile(config.llamacppVisionModel_clip_model_path):
+            # download llava clip model
+            print2("Downloading clip model ...")
+            hf_hub_download(
+                repo_id="mys/ggml_llava-v1.5-7b",
+                filename=filename,
+                local_dir=llm_directory,
+                local_dir_use_symlinks=False,
+            )
+
+        # download stable diffusion files
+        downloadStableDiffusionFiles()
+        
+        config.saveConfig()
 
     @staticmethod
     def autoCorrectPythonCode(code, trace):
@@ -380,6 +365,7 @@ Supplementary information:
                     # tool function executed without chat extension
                     config.currentMessages.append({"role": "assistant", "content": config.tempContent if config.tempContent else "Done!"})
                     config.tempContent = ""
+                    config.conversationStarted = True
                     return None
 
     @staticmethod

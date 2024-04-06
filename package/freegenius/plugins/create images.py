@@ -6,7 +6,7 @@ generate images with model "dall-e-3"
 [FUNCTION_CALL]
 """
 
-from freegenius import config
+from freegenius import config, print2, print3
 import os
 from base64 import b64decode
 from freegenius.utils.shared_utils import SharedUtil
@@ -14,10 +14,66 @@ from freegenius.utils.call_chatgpt import check_openai_errors
 from freegenius.utils.terminal_mode_dialogs import TerminalModeDialogs
 from openai import OpenAI
 from pathlib import Path
+from stable_diffusion_cpp import StableDiffusion
+from freegenius.utils.single_prompt import SinglePrompt
+from prompt_toolkit.styles import Style
+from freegenius.utils.promptValidator import NumberValidator
+
 
 @check_openai_errors
 def create_image(function_args):
+    def openImageFile(imageFile):
+        print3(f"Saved image: {imageFile}")
+        if config.terminalEnableTermuxAPI:
+            SharedUtil.getCliOutput(f"termux-share {imageFile}")
+        else:
+            os.system(f"{config.open} {imageFile}")
+
     prompt = function_args.get("prompt") # required
+
+    # image file path
+    folder = os.path.join(config.localStorage, "images")
+    Path(folder).mkdir(parents=True, exist_ok=True)
+    imageFile = os.path.join(folder, f"{SharedUtil.getCurrentDateTime()}.png")
+
+    if config.llmPlatform in ("llamacpp", "ollama", "gemini"):
+        config.stopSpinning()
+
+        # customize width and height
+        promptStyle = Style.from_dict({
+            # User input (default text).
+            "": config.terminalCommandEntryColor2,
+            # Prompt.
+            "indicator": config.terminalPromptIndicatorColor2,
+        })
+        change = False
+        print2("Specify the width:")
+        new_width = SinglePrompt.run(style=promptStyle, default=str(config.stableDiffusion_output_width), validator=NumberValidator())
+        if new_width and not new_width.strip().lower() == config.exit_entry and int(new_width) > 0 and not new_width == config.stableDiffusion_output_width:
+            config.stableDiffusion_output_width = int(new_width)
+            change = True
+        print2("Specify the height:")
+        new_height = SinglePrompt.run(style=promptStyle, default=str(config.stableDiffusion_output_height), validator=NumberValidator())
+        if new_height and not new_height.strip().lower() == config.exit_entry and int(new_height) > 0 and not new_height == config.stableDiffusion_output_height:
+            config.stableDiffusion_output_height = int(new_height)
+            change = True
+        if change:
+            config.saveConfig()
+
+        stable_diffusion = StableDiffusion(
+            model_path=config.stableDiffusion_model_path,
+            lora_model_dir=os.path.join(config.localStorage, "LLMs", "stable_diffusion", "lora"),
+            wtype="default", # Weight type (options: default, f32, f16, q4_0, q4_1, q5_0, q5_1, q8_0)
+            # seed=1337, # Uncomment to set a specific seed
+        )
+        stable_diffusion.txt_to_img(
+            prompt,
+            width=config.stableDiffusion_output_width,
+            height=config.stableDiffusion_output_height,
+        )[0].save(imageFile)
+        openImageFile(imageFile)
+        return ""
+
     dialogs = TerminalModeDialogs(None)
     # size selection
     options = ("1024x1024", "1024x1792", "1792x1024")
@@ -30,6 +86,7 @@ def create_image(function_args):
     if not size:
         config.stopSpinning()
         return "[INVALID]"
+
     # quality selection
     options = ("standard", "hd")
     quality = dialogs.getValidOptions(
@@ -57,18 +114,11 @@ def create_image(function_args):
     #jsonFile = os.path.join(config.freeGeniusAIFolder, "temp", "openai_image.json")
     #with open(jsonFile, mode="w", encoding="utf-8") as fileObj:
     #    json.dump(response.data[0].b64_json, fileObj)
-    folder = os.path.join(config.localStorage, "images")
-    Path(folder).mkdir(parents=True, exist_ok=True)
-    imageFile = os.path.join(folder, f"{SharedUtil.getCurrentDateTime()}.png")
     image_data = b64decode(response.data[0].b64_json)
     with open(imageFile, mode="wb") as pngObj:
         pngObj.write(image_data)
-    config.stopSpinning()
-    if config.terminalEnableTermuxAPI:
-        SharedUtil.getCliOutput(f"termux-share {imageFile}")
-    else:
-        os.system(f"{config.open} {imageFile}")
-    return f"Saved as '{imageFile}'"
+    openImageFile(imageFile)
+    return ""
 
 functionSignature = {
     "examples": [

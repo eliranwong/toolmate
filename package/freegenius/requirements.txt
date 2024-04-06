@@ -53,3 +53,4 @@ llama-cpp-python[server]==0.2.57
 huggingface-hub
 langchain==0.1.13
 pydub
+stable-diffusion-cpp-python

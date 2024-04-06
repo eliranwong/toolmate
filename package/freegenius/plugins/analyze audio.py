@@ -28,7 +28,7 @@ def analyze_audio(function_args):
     language = function_args.get("language") # required
 
     if audio_file and os.path.isfile(audio_file):
-        if config.llmBackend in ("chatgpt", "letmedoit"):
+        if config.llmPlatform in ("chatgpt", "letmedoit"):
             if not check_file_format(audio_file):
                 print3("This feature supports the following input file types only: '.mp3', '.mp4', '.mpeg', '.mpga', '.m4a', '.wav', '.webm'!")
                 return ""
@@ -43,7 +43,7 @@ def analyze_audio(function_args):
                         response_format="text"
                     )
                 transcript = f"The transcript of the audio is: {transcript}"
-                if config.llmBackend == "letmedoit" and config.developer:
+                if config.llmPlatform == "letmedoit" and config.developer:
                     config.print2(config.divider)
                     config.print3(transcript)
                     config.print2(config.divider)
@@ -52,7 +52,7 @@ def analyze_audio(function_args):
             except:
                 showErrors()
 
-        elif config.llmBackend == "gemini":
+        elif config.llmPlatform == "gemini":
 
             # create a speech recognition object
             r = sr.Recognizer()
@@ -80,7 +80,7 @@ def analyze_audio(function_args):
 
             return ""
 
-        elif config.llmBackend == "gemini_alternative":
+        elif config.llmPlatform == "gemini_alternative":
             #https://cloud.google.com/speech-to-text/docs/sync-recognize#speech-sync-recognize-python
 
             # not supported on Android; so import here
@@ -126,7 +126,7 @@ def analyze_audio(function_args):
                 print1("Read https://github.com/openai/whisper/tree/main#setup")
                 return ""
             # https://github.com/openai/whisper/tree/main#python-usage
-            # backend: llamacpp or ollama
+            # platform: llamacpp or ollama
             if language.lower() in ("english", "non-english"):
                 model = whisper.load_model(config.voiceTypingWhisperEnglishModel if language.lower() == "english" else "large")
                 result = model.transcribe(audio_file)
@@ -174,7 +174,7 @@ functionSignature = {
             "language": {
                 "type": "string",
                 "description": "Audio language",
-                "enum": list(googleSpeeckToTextLanguages.values()) if config.llmBackend == "gemini" else ["English", "non-English"],
+                "enum": list(googleSpeeckToTextLanguages.values()) if config.llmPlatform == "gemini" else ["English", "non-English"],
             },
         },
         "required": ["audio_filepath", "language"],

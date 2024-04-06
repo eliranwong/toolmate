@@ -20,6 +20,61 @@ The author aims to equip FreeGenius AI, as an AI suite that is able to:
 - devlops strategies plugin framework to execute multi-step generation or task execution
 - run with common computer hardwares with reasonable and affordable cost
 
+# Supported LLM Platform / Models
+
+FreeGenius AI incorporates four platforms: llamcpp, ollama, gemini, and ollama. It also maintains backward compatibility with LetMeDoIt AI in LetMeDoIt Mode. The configuration of the LLM Platform is determined by the value of config.llmPlatform, which defaults to 'llamacpp'.
+
+* llamacpp - [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library)
+
+* ollama - [Ollama](https://ollama.com/) / [Ollama Hosted models](https://ollama.com/library)
+
+* gemini - [Google Vertex AI](https://cloud.google.com/vertex-ai) / [Gemini Pro & Gemini Pro Vision](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
+
+* chatgpt - [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
+
+* letmedoit - [LetMeDoIt mode](https://github.com/eliranwong/freegenius/wiki/LetMeDoIt-Mode) / [ChatGPT models](https://platform.openai.com/docs/models)
+
+Note: You can use Ollama models with either "llamacpp" or "ollama" set as platform.
+
+FreeGenius AI also integrates the following models to enhance its abilities.
+
+## Vision
+
+llamacpp & ollama: Llava
+
+gemini: Gemini Pro Vision
+
+chatgpt & letmedoit: ChatGPT-4 Vision
+
+## Audio Analysis
+
+llamacpp & ollama: OpenAI Whisper (offline)
+
+gemini: Google Cloud Speech-to-Text Service
+
+chatgpt & letmedoit: Whisper (online API)
+
+## Image Creation and Modification
+
+llamacpp, ollama & gemini: stable-diffusion
+
+gemini: imagen (when imagen is open to public access)
+
+chatgpt: dall-e-3
+
+## Voice Typing Options
+
+1. Google Speech-to-Text (Generic)
+2. Google Speech-to-Text (API)
+3. OpenAI Whisper (offline)
+
+## Speech-to-Text Options
+
+1. Google Text-to-Speech (Generic)
+2. Google Text-to-Speech (API)
+3. Elevenlabs (API)
+4. Custom system commands
+
 # Installation
 
 Install FreeGenius AI, by running:
@@ -42,77 +97,37 @@ To run:
 
 > freegenius
 
-## Ollama [Optional]
+## What to Expect During the Initial Launch?
 
-Install [Ollama](https://ollama.com/) to use [Ollama models](https://ollama.com/library) with either Llama.cpp or Ollama.
+https://github.com/eliranwong/freegenius/wiki/Initial-Launch
+
+## Download for Offline Use
+
+FreeGenius AI can work with downloaded LLMs without internet. Upon the initial launch of FreeGenius AI, it will automatically download all necessary LLMs for core features and configure them for your convenience.
+
+Additional featured models are automatically downloaded based on specific feature requests. For instance, the Whisper model is automatically downloaded for offline use when users request the transcription of an audio file.
+
+https://github.com/eliranwong/freegenius/wiki/Change-Model
+
+## Install Ollama
+
+This is optional. Install [Ollama](https://ollama.com/) to use [Ollama models](https://ollama.com/library) with either Llama.cpp or Ollama.
 
 # Guick Guide
 
 https://github.com/eliranwong/freegenius/wiki/Quick-Guide
 
-# Supported LLM Backend / Models
+# How to Change LLM Platform?
 
-LLM Backend is determined by the value of config.llmBackend
-
-Default: 'llamacpp'
-
-* llamacpp - [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library)
-Remarks: From version 0.0.44 onwards, FreeGenius AI supports loading Ollama models with "llamacpp".
-
-* ollama - [Ollama](https://ollama.com/) / [Ollama Hosted models](https://ollama.com/library)
-
-* gemini - [Google Vertex AI](https://cloud.google.com/vertex-ai) / [Gemini Pro & Gemini Pro Vision](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
-
-* openai - [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
-
-* letmedoit - [LetMeDoIt mode](https://github.com/eliranwong/freegenius/wiki/LetMeDoIt-Mode) / [ChatGPT models](https://platform.openai.com/docs/models)
-
-## Vision
-
-llamacpp & ollama: Llava
-
-gemini: Gemini Pro Vision
-
-openai & letmedoit: ChatGPT-4 Vision
-
-## Audio Analysis
-
-llamacpp & ollama: OpenAI Whisper [offline]
-
-gemini: Google Cloud Speech-to-Text Service
-
-openai & letmedoit: Whisper [online; API]
-
-## Image Creation and Modification
-
-llamacpp, ollama & gemini: stable-diffusion [upcoming ...]
-
-openai: dall-e-3
-
-## Voice Typing Options
-
-1. Google Speech-to-Text (Generic)
-2. Google Speech-to-Text (API)
-3. OpenAI Whisper [offline]
-
-## Speech-to-Text Options
-
-1. Google Text-to-Speech (Generic)
-2. Google Text-to-Speech (API)
-3. Elevenlabs (API)
-4. Custom system commands
-
-# How to Change LLM Backend?
-
-https://github.com/eliranwong/freegenius/wiki/Change-LLM-Backend
+https://github.com/eliranwong/freegenius/wiki/Change-LLM-Platform
 
 # How to Change Models?
 
 https://github.com/eliranwong/freegenius/wiki/Change-Model
 
-# How to Set up Google or OpenAI Credentials? [Optional]
+# How to Set up Google or OpenAI Credentials?
 
-https://github.com/eliranwong/freegenius/wiki/Set-up-Optional-Credentials
+This is optional. Read https://github.com/eliranwong/freegenius/wiki/Set-up-Optional-Credentials
 
 # Function Calling Approach with Any LLM
 

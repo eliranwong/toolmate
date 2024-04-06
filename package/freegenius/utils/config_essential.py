@@ -26,7 +26,7 @@ if config.isTermux:
 
 defaultSettings = (
     # unique configs in FreeGenius AI
-    ('llmBackend', "llamacpp"), # "llamacpp", "ollama", "gemini", "chatgpt", "letmedoit"
+    ('llmPlatform', "llamacpp"), # "llamacpp", "ollama", "gemini", "chatgpt", "letmedoit"
     ('intent_screening', False), # set True to increase both reliability and waiting time
     ('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools
     ('tool_auto_selection_threshold', 0.5), # range: 0.0 - 1.0; tool auto selection is implemented when the closest tool match has a semantic distance lower than its value; manual selection from top matched tools is implemented when the closest distance fall between its value and tool_dependence
@@ -35,6 +35,9 @@ defaultSettings = (
     ('includeDeviceInfoInContext', False),
     ('includeIpInDeviceInfo', False),
     ('useAdditionalCodeModel', False),
+    ('stableDiffusion_model_path', ""),
+    ('stableDiffusion_output_width', 512),
+    ('stableDiffusion_output_height', 512),
     ('ollamaVisionModel', 'llava'), # ollama model used for vision
     ('ollamaDefaultModel', 'phi'), # ollama model used for general purposes
     ('ollamaDefaultModel_num_ctx', 100000), # ollama default model context window
@@ -65,7 +68,6 @@ defaultSettings = (
     ('llamacppCodeModel_max_tokens', 10000), # llama.cpp code model maximum tokens
     ('llamacppCodeModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
     ('llamacppCodeModel_n_batch', 512), # The batch size to use per eval
-    ('store_llm_in_user_dir', True), # when True downloaded llms are stored in "~/freegenius/LLMs/" to improve portability
     ('geminipro_max_output_tokens', 8192), # check supported value at https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
     # common configs as in LetMeDoIt AI
     ('translateToLanguage', ''),

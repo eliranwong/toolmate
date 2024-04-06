@@ -1,5 +1,5 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
-from freegenius import print1, print2, print3, selectTool, restartApp, getPythonFunctionResponse, extractPythonCode, isValidPythodCode
+from freegenius import print1, print2, print3, selectTool, restartApp, getPythonFunctionResponse, extractPythonCode, isValidPythodCode, downloadStableDiffusionFiles
 from freegenius import config
 import shutil, re, traceback, json, ollama, pprint
 from typing import Optional
@@ -29,15 +29,18 @@ class CallOllama:
     @staticmethod
     @check_ollama_errors
     def checkCompletion():
+        # download stable diffusion files
+        downloadStableDiffusionFiles() 
+
         if shutil.which("ollama"):
-            for i in (config.ollamaDefaultModel, config.ollamaCodeModel):
+            for i in (config.ollamaDefaultModel, config.ollamaCodeModel, config.ollamaVisionModel):
                 Downloader.downloadOllamaModel(i)
         else:
             print("Ollama not found! Install it first!")
             print("Check https://ollama.com")
-            config.llmBackend = "llamacpp"
+            config.llmPlatform = "llamacpp"
             config.saveConfig()
-            print("LLM backend changed back to 'llamacpp'")
+            print("LLM platform changed back to 'llamacpp'")
             #print("Restarting 'FreeGenius AI' ...")
             #restartApp()
 
@@ -297,6 +300,7 @@ Your response:
                     # tool function executed without chat extension
                     config.currentMessages.append({"role": "assistant", "content": config.tempContent if config.tempContent else "Done!"})
                     config.tempContent = ""
+                    config.conversationStarted = True
                     return None
 
     @staticmethod

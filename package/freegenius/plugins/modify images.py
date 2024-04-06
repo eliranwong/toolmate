@@ -6,7 +6,7 @@ modify the given images according to changes specified by users
 [FUNCTION_CALL]
 """
 
-from freegenius import config, is_valid_image_file, is_valid_image_url, print1
+from freegenius import config, is_valid_image_file, is_valid_image_url, print1, print3, startLlamacppVisionServer, stopLlamacppVisionServer, print2
 import os
 from openai import OpenAI
 from freegenius.utils.shared_utils import SharedUtil
@@ -14,12 +14,16 @@ from freegenius.utils.call_chatgpt import check_openai_errors
 from freegenius.utils.terminal_mode_dialogs import TerminalModeDialogs
 from base64 import b64decode
 from urllib.parse import quote
+from stable_diffusion_cpp import StableDiffusion
+from PIL import Image
+from freegenius.utils.single_prompt import SinglePrompt
+from prompt_toolkit.styles import Style
+from freegenius.utils.promptValidator import NumberValidator
+
 
 def modify_images(function_args):
-    if not config.openaiApiKey:
-        return "OpenAI API key not found! This feature works with ChatGPT models only!"
-    changes = function_args.get("changes") # required
-    files = function_args.get("files") # required
+    changes = function_args.get("requested_changes_in_detail") # required
+    files = function_args.get("image_fullpath") # required
     #print(files)
     if isinstance(files, str):
         if not files.startswith("["):
@@ -36,6 +40,68 @@ def modify_images(function_args):
                     file_path = os.path.join(root, file)
                     files.append(file_path)
             files.remove(item)
+
+    def openImageFile(imageFile):
+        print3(f"Saved image: {imageFile}")
+        if config.terminalEnableTermuxAPI:
+            SharedUtil.getCliOutput(f"termux-share {imageFile}")
+        else:
+            os.system(f"{config.open} {imageFile}")
+
+    if config.llmPlatform in ("llamacpp", "ollama", "gemini"):
+        config.stopSpinning()
+        promptStyle = Style.from_dict({
+            # User input (default text).
+            "": config.terminalCommandEntryColor2,
+            # Prompt.
+            "indicator": config.terminalPromptIndicatorColor2,
+        })
+        startLlamacppVisionServer()
+        stable_diffusion = StableDiffusion(
+            model_path=config.stableDiffusion_model_path,
+            lora_model_dir=os.path.join(config.localStorage, "LLMs", "stable_diffusion", "lora"),
+            wtype="default", # Weight type (options: default, f32, f16, q4_0, q4_1, q5_0, q5_1, q8_0)
+            # seed=1337, # Uncomment to set a specific seed
+        )
+        for imageFile in files:
+            width, height = Image.open(imageFile).size
+            print2("Specify the width:")
+            new_width = SinglePrompt.run(style=promptStyle, default=str(width), validator=NumberValidator())
+            if new_width and not new_width.strip().lower() == config.exit_entry and int(new_width) > 0:
+                width = int(new_width)
+            print2("Specify the height:")
+            new_height = SinglePrompt.run(style=promptStyle, default=str(height), validator=NumberValidator())
+            if new_height and not new_height.strip().lower() == config.exit_entry and int(new_height) > 0:
+                height = int(new_height)
+            image_description = OpenAI(base_url=f"http://localhost:{config.llamacppServer_port}/v1", api_key="freegenius").chat.completions.create(
+                model="gpt-4-vision-preview",
+                messages=[
+                    {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": "Describe image in detail",},
+                        {"type": "image_url", "image_url": SharedUtil.encode_image(imageFile),}
+                    ],
+                    }
+                ],
+                max_tokens=4096,
+            ).choices[0].message.content
+            imageFile_modified = f"{os.path.splitext(imageFile)[0]}_modified.png"
+            output = stable_diffusion.img_to_img(
+                image=imageFile,
+                prompt=f"""Description of the original image:
+{image_description}
+
+Make the following changes in your output:
+{changes}""",
+                width=width,
+                height=height,
+            )
+            #print(output)
+            output[0].save(imageFile_modified)
+            openImageFile(imageFile_modified)
+        stopLlamacppVisionServer()
+        return ""
 
     for i in files:
         description, filename = get_description(i)
@@ -128,7 +194,7 @@ def create_image(description, original_filename):
     #with open(jsonFile, mode="w", encoding="utf-8") as fileObj:
     #    json.dump(response.data[0].b64_json, fileObj)
     image_data = b64decode(response.data[0].b64_json)
-    imageFile = f"{original_filename}_modified.png"
+    imageFile = f"{os.path.splitext(original_filename)[0]}_modified.png"
     with open(imageFile, mode="wb") as pngObj:
         pngObj.write(image_data)
     config.stopSpinning()
@@ -150,16 +216,16 @@ functionSignature = {
     "parameters": {
         "type": "object",
         "properties": {
-            "changes": {
+            "requested_changes_in_detail": {
                 "type": "string",
                 "description": "The requested changes in as much detail as possible. Return an empty string '' if changes are not specified.",
             },
-            "files": {
+            "image_fullpath": {
                 "type": "string",
                 "description": """Return a list of image paths, e.g. '["image1.png", "/tmp/image2.png"]'. Return '[]' if image path is not provided.""",
             },
         },
-        "required": ["changes", "files"],
+        "required": ["image_fullpath", "requested_changes_in_detail"],
     },
 }
 

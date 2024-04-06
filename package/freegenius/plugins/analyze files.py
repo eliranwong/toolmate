@@ -28,7 +28,7 @@ def analyze_files(function_args):
             print3("Running function: 'analyze_images'")
             return config.toolFunctionMethods["analyze_images"](function_args)
         config.stopSpinning()
-        if config.rag_useAutoRetriever and not config.llmBackend == "gemini":
+        if config.rag_useAutoRetriever and not config.llmPlatform == "gemini":
             print2("AutoGen Retriever launched!")
             last_message = AutoGenRetriever().getResponse(files, query, True)
             config.currentMessages += last_message

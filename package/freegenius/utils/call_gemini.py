@@ -1,5 +1,5 @@
 from freegenius import getDeviceInfo, showErrors, get_or_create_collection, query_vectors, toGeminiMessages, executeToolFunction, extractPythonCode
-from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, isValidPythodCode
+from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, isValidPythodCode, downloadStableDiffusionFiles
 from freegenius import config
 from prompt_toolkit import prompt
 import traceback, os, json, pprint
@@ -16,14 +16,17 @@ class CallGemini:
 
     @staticmethod
     def checkCompletion():
+        # download stable diffusion files
+        downloadStableDiffusionFiles()
+
         if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enabledGoogleAPIs:
             config.geminipro_model = GenerativeModel("gemini-pro")
         else:
             print("Vertex AI is disabled!")
             print("Read https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup for setting up Google API.")
-            config.llmBackend = "llamacpp"
+            config.llmPlatform = "llamacpp"
             config.saveConfig()
-            print("LLM backend changed back to 'llamacpp'")
+            print("LLM platform changed back to 'llamacpp'")
         # initiation
         vertexai.init()
         
@@ -280,6 +283,7 @@ Your response:
                     # tool function executed without chat extension
                     config.currentMessages.append({"role": "assistant", "content": config.tempContent if config.tempContent else "Done!"})
                     config.tempContent = ""
+                    config.conversationStarted = True
                     return None
 
     @staticmethod

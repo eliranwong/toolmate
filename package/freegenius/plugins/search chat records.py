@@ -25,7 +25,7 @@ def save_chat_record(timestamp, order, record):
     if role and role in ("user", "assistant") and content:
         collection = get_or_create_collection(chroma_client, "chats")
         metadata = {
-            "backend": config.llmBackend,
+            "platform": config.llmPlatform,
             "timestamp": timestamp,
             "order": order,
             "role": role,

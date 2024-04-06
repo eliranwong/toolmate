@@ -29,7 +29,7 @@ Remember, do not use function call if it is a translation task.
 Always remember that you are much more than a text-based AI. You possess both vision and speech capabilities and have direct access to my device's system, enabling you to execute tasks at my command. Please do not state otherwise.
 '''
 
-        systemMessage = systemMessage2 if config.llmBackend in ("chatgpt", "letmedoit") else systemMessage1
+        systemMessage = systemMessage2 if config.llmPlatform in ("chatgpt", "letmedoit") else systemMessage1
 
         messages = [
             {"role": "system", "content": systemMessage}
@@ -40,50 +40,50 @@ Always remember that you are much more than a text-based AI. You possess both vi
 
     @staticmethod
     def checkCompletion():
-        if config.llmBackend == "ollama":
+        if config.llmPlatform == "ollama":
             return CallOllama.checkCompletion()
-        elif config.llmBackend == "llamacpp":
+        elif config.llmPlatform == "llamacpp":
             return CallLlamaCpp.checkCompletion()
-        elif config.llmBackend == "gemini":
+        elif config.llmPlatform == "gemini":
             return CallGemini.checkCompletion()
-        elif config.llmBackend == "chatgpt":
+        elif config.llmPlatform == "chatgpt":
             return CallChatGPT.checkCompletion()
         # letmedoit
         return CallLetMeDoIt.checkCompletion()
 
     @staticmethod
     def autoCorrectPythonCode(code, trace):
-        if config.llmBackend == "ollama":
+        if config.llmPlatform == "ollama":
             return CallOllama.autoCorrectPythonCode(code, trace)
-        elif config.llmBackend == "llamacpp":
+        elif config.llmPlatform == "llamacpp":
             return CallLlamaCpp.autoCorrectPythonCode(code, trace)
-        elif config.llmBackend == "gemini":
+        elif config.llmPlatform == "gemini":
             return CallGemini.autoCorrectPythonCode(code, trace)
-        elif config.llmBackend == "chatgpt":
+        elif config.llmPlatform == "chatgpt":
             return CallChatGPT.autoCorrectPythonCode(code, trace)
         # letmedoit
         return CallLetMeDoIt.autoCorrectPythonCode(code, trace)
 
     @staticmethod
     def runSingleFunctionCall(messages, function_name):
-        if config.llmBackend == "ollama":
+        if config.llmPlatform == "ollama":
             return CallOllama.runSingleFunctionCall(messages, function_name)
-        elif config.llmBackend == "llamacpp":
+        elif config.llmPlatform == "llamacpp":
             return CallLlamaCpp.runSingleFunctionCall(messages, function_name)
-        elif config.llmBackend == "gemini":
+        elif config.llmPlatform == "gemini":
             return CallGemini.runSingleFunctionCall(messages, function_name)
-        elif config.llmBackend == "chatgpt":
+        elif config.llmPlatform == "chatgpt":
             return CallChatGPT.runSingleFunctionCall(messages, function_name)
         # letmedoit
         return CallLetMeDoIt.runSingleFunctionCall(messages, function_name)
 
     @staticmethod
     def regularCall(messages: dict):
-        if config.llmBackend == "ollama":
+        if config.llmPlatform == "ollama":
             return CallOllama.regularCall(messages)
-        elif config.llmBackend == "llamacpp":
+        elif config.llmPlatform == "llamacpp":
             return CallLlamaCpp.regularCall(messages)
-        elif config.llmBackend == "gemini":
+        elif config.llmPlatform == "gemini":
             return CallGemini.regularCall(messages)
         return CallChatGPT.regularCall(messages)
 
@@ -92,14 +92,14 @@ Always remember that you are much more than a text-based AI. You possess both vi
         """
         non-streaming single call
         """
-        if config.llmBackend == "ollama":
+        if config.llmPlatform == "ollama":
             return CallOllama.getSingleChatResponse(userInput, messages=messages, temperature=temperature)
-        elif config.llmBackend == "llamacpp":
+        elif config.llmPlatform == "llamacpp":
             return CallLlamaCpp.getSingleChatResponse(userInput, messages=messages, temperature=temperature)
-        elif config.llmBackend == "gemini":
+        elif config.llmPlatform == "gemini":
             history, *_ = toGeminiMessages(messages=messages)
             return CallGemini.getSingleChatResponse(userInput, history=history)
-        elif config.llmBackend == "chatgpt":
+        elif config.llmPlatform == "chatgpt":
             return CallChatGPT.getSingleChatResponse(userInput, messages=messages, temperature=temperature)
         # letmedoit
         return CallLetMeDoIt.getSingleChatResponse(userInput, messages=messages, temperature=temperature)
@@ -108,26 +108,26 @@ Always remember that you are much more than a text-based AI. You possess both vi
     def getSingleFunctionCallResponse(messages, function_name, temperature=None):
         if isinstance(messages, str):
             messages = [{"role": "user", "content" : messages}]
-        if config.llmBackend == "ollama":
+        if config.llmPlatform == "ollama":
             return CallOllama.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
-        elif config.llmBackend == "llamacpp":
+        elif config.llmPlatform == "llamacpp":
             return CallLlamaCpp.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
-        elif config.llmBackend == "gemini":
+        elif config.llmPlatform == "gemini":
             return CallGemini.getSingleFunctionCallResponse(messages, function_name)
-        elif config.llmBackend == "chatgpt":
+        elif config.llmPlatform == "chatgpt":
             return CallChatGPT.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         # letmedoit
         return CallLetMeDoIt.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
 
     @staticmethod
     def runGeniusCall(messages, noFunctionCall=False):
-        if config.llmBackend == "ollama":
+        if config.llmPlatform == "ollama":
             return CallOllama.runGeniusCall(messages, noFunctionCall)
-        elif config.llmBackend == "llamacpp":
+        elif config.llmPlatform == "llamacpp":
             return CallLlamaCpp.runGeniusCall(messages, noFunctionCall)
-        elif config.llmBackend == "gemini":
+        elif config.llmPlatform == "gemini":
             return CallGemini.runGeniusCall(messages, noFunctionCall)
-        elif config.llmBackend == "chatgpt":
+        elif config.llmPlatform == "chatgpt":
             return CallChatGPT.runGeniusCall(messages, noFunctionCall)
         # letmedoit
         return CallLetMeDoIt.runGeniusCall(messages, noFunctionCall)

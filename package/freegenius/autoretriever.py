@@ -48,11 +48,11 @@ class AutoGenRetriever:
         """
         os.environ["AUTOGEN_USE_DOCKER"] = "False"
 
-        if config.llmBackend == "llamacpp":
+        if config.llmPlatform == "llamacpp":
             startLlamacppServer()
 
     def __del__(self):
-        if config.llmBackend == "llamacpp":
+        if config.llmPlatform == "llamacpp":
             stopLlamacppServer()
 
     def getResponse(self, docs_path, message, auto=False):
@@ -88,7 +88,7 @@ class AutoGenRetriever:
                 print2("File format not supported!")
                 return None
 
-        if config.llmBackend == "chatgpt":
+        if config.llmPlatform == "chatgpt":
             llm = config.chatGPTApiModel
             config_list = autogen.config_list_from_json(
                 env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
@@ -98,7 +98,7 @@ class AutoGenRetriever:
                     }
                 }
             )
-        elif config.llmBackend == "ollama":
+        elif config.llmPlatform == "ollama":
             llm = config.ollamaDefaultModel
             config_list = [
                 {
@@ -108,7 +108,7 @@ class AutoGenRetriever:
                     "api_key": "freegenius",
                 }
             ]
-        elif config.llmBackend == "llamacpp":
+        elif config.llmPlatform == "llamacpp":
             llm = config.llamacppDefaultModel_model_path
             config_list = [
                 {

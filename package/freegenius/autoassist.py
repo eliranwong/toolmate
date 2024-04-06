@@ -43,11 +43,11 @@ class AutoGenAssistant:
         """
         os.environ["AUTOGEN_USE_DOCKER"] = "False"
 
-        if config.llmBackend == "llamacpp":
+        if config.llmPlatform == "llamacpp":
             startLlamacppServer()
 
     def __del__(self):
-        if config.llmBackend == "llamacpp":
+        if config.llmPlatform == "llamacpp":
             stopLlamacppServer()
 
     def getResponse(self, message, auto=False):
@@ -58,7 +58,7 @@ class AutoGenAssistant:
 Below is my message:
 {message}"""
 
-        if config.llmBackend == "chatgpt":
+        if config.llmPlatform == "chatgpt":
             config_list = autogen.config_list_from_json(
                 env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
                 filter_dict={
@@ -67,7 +67,7 @@ Below is my message:
                     }
                 }
             )
-        elif config.llmBackend == "ollama":
+        elif config.llmPlatform == "ollama":
             config_list = [
                 {
                     "model": config.ollamaDefaultModel,
@@ -76,7 +76,7 @@ Below is my message:
                     "api_key": "freegenius",
                 }
             ]
-        elif config.llmBackend == "llamacpp":
+        elif config.llmPlatform == "llamacpp":
             config_list = [
                 {
                     "model": config.llamacppDefaultModel_model_path,

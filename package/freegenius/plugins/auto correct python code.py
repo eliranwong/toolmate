@@ -23,7 +23,7 @@ def correct_python(function_args):
     print(f"Issue: {issue}")
 
     fix = function_args.get("code") # required
-    missing = function_args.get("missing") # required
+    missing = function_args.get("missing_modules") # required
 
     try:
         if missing:
@@ -57,7 +57,7 @@ functionSignature = {
                 "type": "string",
                 "description": "Improved version of python code that resolved the traceback error. Return the original code instead only if traceback shows an import error.",
             },
-            "missing": {
+            "missing_modules": {
                 "type": "string",
                 "description": """List of missing packages identified from import errors, e.g. "['datetime', 'requests']". Return "[]" if there is no import error in the traceback.""",
             },
@@ -66,7 +66,7 @@ functionSignature = {
                 "description": """Briefly explain the error""",
             },
         },
-        "required": ["code", "missing", "issue"],
+        "required": ["code", "missing_modules", "issue"],
     },
 }
 

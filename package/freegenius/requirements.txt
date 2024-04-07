@@ -54,3 +54,5 @@ huggingface-hub
 langchain==0.1.13
 pydub
 stable-diffusion-cpp-python
+pytz
+geopy

@@ -947,3 +947,9 @@ createShortcuts()
 # setup optional credentials
 setChatGPTAPIkey()
 setGoogleCredentials()
+
+# context
+g = geocoder.ip('me')
+config.country = g.country
+config.state = g.state
+config.dayOfWeek = getDayOfWeek()

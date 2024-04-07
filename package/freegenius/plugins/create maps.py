@@ -6,7 +6,7 @@ Create maps
 [FUNCTION_CALL]
 """
 
-from freegenius import config
+from freegenius import config, print3
 from freegenius.utils.shared_utils import SharedUtil
 import re, os
 
@@ -18,7 +18,8 @@ def create_map(function_args):
     if match:
         htmlFile = match.group(1)
         os.system(f"{config.open} {htmlFile}")
-        return f"Saved as '{htmlFile}'"
+        print3(f"Saved: {htmlFile}")
+        return ""
     elif information:
         return information
     return ""

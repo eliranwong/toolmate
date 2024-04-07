@@ -865,37 +865,40 @@ class FreeGenius:
         )
         if llmPlatform:
             config.llmPlatform = llmPlatform
+            if not config.llmPlatform == "llamacpp" and hasattr(config, "llamacppMainModel"):
+                config.llamacppMainModel = None
             CallLLM.checkCompletion()
 
     def setLlmModel(self):
-        def askAdditionalCodeModel() -> bool:
+        def askAdditionalChatModel() -> bool:
             options = ("yes", "no")
-            question = "Do you want an additional model for generating code?"
+            question = "Do you want an additional model for running chat-only features?"
             print1(question)
-            useAdditionalCodeModel = self.dialogs.getValidOptions(
+            useAdditionalChatModel = self.dialogs.getValidOptions(
                 options=options,
-                title="Additional Code Model",
-                default="yes" if config.useAdditionalCodeModel else "no",
+                title="Additional Chat Model",
+                default="yes" if config.useAdditionalChatModel else "no",
                 text=question,
             )
-            if useAdditionalCodeModel and useAdditionalCodeModel == "yes":
-                config.useAdditionalCodeModel = True
+            if useAdditionalChatModel and useAdditionalChatModel == "yes":
+                config.useAdditionalChatModel = True
                 return True
             return False
 
         self.selectLlmPlatform()
+
         print1("Select models ...")
         if config.llmPlatform == "ollama":
-            print2("# For general purpose")
+            print2("# Main Model - for both task execution and conversation")
             self.setLlmModel_ollama()
-            if askAdditionalCodeModel():
-                print2("# For code generation")
+            if askAdditionalChatModel():
+                print2("# Chat Model - for conversation only")
                 self.setLlmModel_ollama("code")
         elif config.llmPlatform == "llamacpp":
-            print2("# For general purpose")
+            print2("# Main Model - for both task execution and conversation")
             self.setLlmModel_llamacpp()
-            if askAdditionalCodeModel():
-                print2("# For code generation")
+            if askAdditionalChatModel():
+                print2("# Chat Model - for conversation only")
                 self.setLlmModel_llamacpp("code")
         elif config.llmPlatform == "gemini":
             print3("Model selected: Google Gemini Pro")
@@ -911,12 +914,12 @@ class FreeGenius:
         model_session = PromptSession(history=FileHistory(model_history))
         completer = FuzzyCompleter(WordCompleter(sorted(ollama_models), ignore_case=True))
         bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
-        default = config.ollamaCodeModel if feature == "code" else config.ollamaDefaultModel
+        default = config.ollamaChatModel if feature == "code" else config.ollamaMainModel
         if config.llmPlatform == "llamacpp":
-            if feature == "default" and config.llamacppDefaultModel_ollama_tag:
-                default = config.llamacppDefaultModel_ollama_tag
-            elif feature == "code" and config.llamacppCodeModel_ollama_tag:
-                default = config.llamacppCodeModel_ollama_tag
+            if feature == "default" and config.llamacppMainModel_ollama_tag:
+                default = config.llamacppMainModel_ollama_tag
+            elif feature == "code" and config.llamacppChatModel_ollama_tag:
+                default = config.llamacppChatModel_ollama_tag
         # prompt
         print1(message)
         print1("(For details, visit https://ollama.com/library)")
@@ -931,17 +934,17 @@ class FreeGenius:
             downloadedOllamaModels = getDownloadedOllamaModels()
             if model in downloadedOllamaModels:
                 if feature == "default":
-                    config.ollamaDefaultModel = model
+                    config.ollamaMainModel = model
                 elif feature == "code":
-                    config.ollamaCodeModel = model
+                    config.ollamaChatModel = model
             else:
                 if shutil.which("ollama"):
                     try:
                         Downloader.downloadOllamaModel(model, True)
                         if feature == "default":
-                            config.ollamaDefaultModel = model
+                            config.ollamaMainModel = model
                         elif feature == "code":
-                            config.ollamaCodeModel = model
+                            config.ollamaChatModel = model
                     except:
                         print2(f"Failed to download '{model}'! Please make sure you enter a valid model name or tag.")
                 else:
@@ -962,9 +965,9 @@ class FreeGenius:
                     downloadedOllamaModels = getDownloadedOllamaModels()
                     if model in downloadedOllamaModels:
                         if feature == "default":
-                            config.llamacppDefaultModel_model_path = downloadedOllamaModels[model]
+                            config.llamacppMainModel_model_path = downloadedOllamaModels[model]
                         elif feature == "code":
-                            config.llamacppCodeModel_model_path = downloadedOllamaModels[model]
+                            config.llamacppChatModel_model_path = downloadedOllamaModels[model]
                     else:
                         if shutil.which("ollama"):
                             try:
@@ -972,18 +975,18 @@ class FreeGenius:
                                 # refresh download list
                                 downloadedOllamaModels = getDownloadedOllamaModels()
                                 if feature == "default":
-                                    config.llamacppDefaultModel_model_path = downloadedOllamaModels[model]
+                                    config.llamacppMainModel_model_path = downloadedOllamaModels[model]
                                 elif feature == "code":
-                                    config.llamacppCodeModel_model_path = downloadedOllamaModels[model]
+                                    config.llamacppChatModel_model_path = downloadedOllamaModels[model]
                             except:
                                 print2(f"Failed to download '{model}'! Please make sure you enter a valid model name or tag.")
                         else:
                             print("Ollama not found! Install Ollama first to use Ollama model library!")
                             print("To install Ollama, visit https://ollama.com")
                     if feature == "default":
-                        config.llamacppDefaultModel_ollama_tag = model
+                        config.llamacppMainModel_ollama_tag = model
                     elif feature == "code":
-                        config.llamacppCodeModel_ollama_tag = model
+                        config.llamacppChatModel_ollama_tag = model
             elif library == "Huggingface Hub":
                 downloadedGgufModels = getDownloadedGgufModels()
                 if not downloadedGgufModels:
@@ -999,9 +1002,9 @@ class FreeGenius:
                         if model == "Others ...":
                             self.setCustomHuggingfaceModel(feature=feature)
                         elif feature == "default":
-                            config.llamacppDefaultModel_model_path = downloadedGgufModels[model]
+                            config.llamacppMainModel_model_path = downloadedGgufModels[model]
                         elif feature == "code":
-                            config.llamacppCodeModel_model_path = downloadedGgufModels[model]
+                            config.llamacppChatModel_model_path = downloadedGgufModels[model]
             elif library == "Custom GGUF":
                 self.setCustomModelPath(feature=feature)
 
@@ -1012,13 +1015,13 @@ class FreeGenius:
             list_content_on_directory_change=True,
             keep_startup_directory=True,
             message="Enter a custom model path:",
-            default=config.llamacppCodeModel_model_path if feature == "code" else config.llamacppDefaultModel_model_path,
+            default=config.llamacppChatModel_model_path if feature == "code" else config.llamacppMainModel_model_path,
         )
         if model_path and os.path.isfile(model_path):
             if feature == "default":
-                config.llamacppDefaultModel_model_path = model_path
+                config.llamacppMainModel_model_path = model_path
             elif feature == "code":
-                config.llamacppCodeModel_model_path = model_path
+                config.llamacppChatModel_model_path = model_path
 
     def setCustomHuggingfaceModel(self, feature="default"):
         historyFolder = os.path.join(config.localStorage, "history")
@@ -1029,18 +1032,18 @@ class FreeGenius:
         filename_session = PromptSession(history=FileHistory(filename_history))
         bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
         print1("Please specify the huggingface repo id of a *.gguf model:")
-        repo_id = self.prompts.simplePrompt(style=self.prompts.promptStyle2, promptSession=repo_id_session, bottom_toolbar=bottom_toolbar, default=config.llamacppCodeModel_repo_id if feature == "code" else config.llamacppDefaultModel_repo_id)
+        repo_id = self.prompts.simplePrompt(style=self.prompts.promptStyle2, promptSession=repo_id_session, bottom_toolbar=bottom_toolbar, default=config.llamacppChatModel_repo_id if feature == "code" else config.llamacppMainModel_repo_id)
         print2("Please specify a filename or glob pattern to match the model file in the repo:")
-        filename = self.prompts.simplePrompt(style=self.prompts.promptStyle2, promptSession=filename_session, bottom_toolbar=bottom_toolbar, default=config.llamacppCodeModel_filename if feature == "code" else config.llamacppDefaultModel_filename)
+        filename = self.prompts.simplePrompt(style=self.prompts.promptStyle2, promptSession=filename_session, bottom_toolbar=bottom_toolbar, default=config.llamacppChatModel_filename if feature == "code" else config.llamacppMainModel_filename)
         if (repo_id and not repo_id.lower() == config.exit_entry) and (filename and not filename.lower() == config.exit_entry):
             if feature == "default":
-                config.llamacppDefaultModel_repo_id = repo_id
-                config.llamacppDefaultModel_filename = filename
-                config.llamacppDefaultModel_model_path = ""
+                config.llamacppMainModel_repo_id = repo_id
+                config.llamacppMainModel_filename = filename
+                config.llamacppMainModel_model_path = ""
             elif feature == "code":
-                config.llamacppCodeModel_repo_id = repo_id
-                config.llamacppCodeModel_filename = filename
-                config.llamacppCodeModel_model_path = ""
+                config.llamacppChatModel_repo_id = repo_id
+                config.llamacppChatModel_filename = filename
+                config.llamacppChatModel_model_path = ""
             CallLLM.checkCompletion()
         else:
             print2("Action cancelled due to insufficient information!")
@@ -1827,8 +1830,8 @@ My writing:
             #chatbot = "chatgpt"
             ...
         chatbots = {
-            "llamacpp": lambda: LlamacppChat().run(fineTunedUserInput),
-            "ollama": lambda: OllamaChat().run(fineTunedUserInput, model=config.ollamaDefaultModel),
+            "llamacpp": lambda: LlamacppChat(model=None if config.useAdditionalChatModel else config.llamacppMainModel).run(fineTunedUserInput),
+            "ollama": lambda: OllamaChat().run(fineTunedUserInput, model=config.ollamaChatModel if config.useAdditionalChatModel else config.ollamaMainModel),
             "chatgpt": lambda: ChatGPT().run(fineTunedUserInput),
             "letmedoit": lambda: ChatGPT().run(fineTunedUserInput),
             "gemini": lambda: GeminiPro(temperature=config.llmTemperature).run(fineTunedUserInput),

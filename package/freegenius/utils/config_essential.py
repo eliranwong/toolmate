@@ -34,40 +34,40 @@ defaultSettings = (
     ('tokenizers_parallelism', 'true'), # 'true' / 'false'
     ('includeDeviceInfoInContext', False),
     ('includeIpInDeviceInfo', False),
-    ('useAdditionalCodeModel', False),
+    ('useAdditionalChatModel', False),
     ('stableDiffusion_model_path', ""),
     ('stableDiffusion_output_width', 512),
     ('stableDiffusion_output_height', 512),
     ('ollamaVisionModel', 'llava'), # ollama model used for vision
-    ('ollamaDefaultModel', 'phi'), # ollama model used for general purposes
-    ('ollamaDefaultModel_num_ctx', 100000), # ollama default model context window
-    ('ollamaDefaultModel_num_batch', 512), # ollama code model batch size
-    ('ollamaDefaultModel_num_predict', -1), # ollama default model maximum tokens
-    ('ollamaDefaultModel_keep_alive', "5m"), # ollama default model keep alive time
-    ('ollamaCodeModel', 'phi'), # ollama model used for code generation
-    ('ollamaCodeModel_num_ctx', 100000), # ollama code model context window
-    ('ollamaCodeModel_num_batch', 512), # ollama code model batch size
-    ('ollamaCodeModel_num_predict', -1), # ollama code model maximum tokens
-    ('ollamaCodeModel_keep_alive', "5m"), # ollama code model keep alive time
+    ('ollamaMainModel', 'mistral'), # ollama model used for both task execution and conversation
+    ('ollamaMainModel_num_ctx', 100000), # ollama main model context window
+    ('ollamaMainModel_num_batch', 512), # ollama chat model batch size
+    ('ollamaMainModel_num_predict', -1), # ollama main model maximum tokens
+    ('ollamaMainModel_keep_alive', "5m"), # ollama main model keep alive time
+    ('ollamaChatModel', 'phi'), # ollama model used for chat
+    ('ollamaChatModel_num_ctx', 100000), # ollama chat model context window
+    ('ollamaChatModel_num_batch', 512), # ollama chat model batch size
+    ('ollamaChatModel_num_predict', -1), # ollama chat model maximum tokens
+    ('ollamaChatModel_keep_alive', "5m"), # ollama chat model keep alive time
     ('llamacppServer_port', 8000),
     ('llamacppVisionModel_model_path', ''), # specify file path of llama.cpp model for vision
     ('llamacppVisionModel_clip_model_path', ''), # specify file path of llama.cpp clip model for vision
-    ('llamacppDefaultModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
-    ('llamacppDefaultModel_model_path', ''), # specify file path of llama.cpp model for general purpose
-    ('llamacppDefaultModel_repo_id', 'TheBloke/phi-2-GGUF'), # llama.cpp model used for general purposes, e.g. 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
-    ('llamacppDefaultModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for general purposes, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
-    ('llamacppDefaultModel_n_ctx', 0), # llama.cpp default model context window
-    ('llamacppDefaultModel_max_tokens', 10000), # llama.cpp default model maximum tokens
-    ('llamacppDefaultModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
-    ('llamacppDefaultModel_n_batch', 512), # The batch size to use per eval
-    ('llamacppCodeModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
-    ('llamacppCodeModel_model_path', ''), # specify file path of llama.cpp model for code generation
-    ('llamacppCodeModel_repo_id', 'TheBloke/phi-2-GGUF'), # llama.cpp model used for code generation, e.g. 'TheBloke/CodeLlama-7B-Python-GGUF'
-    ('llamacppCodeModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for code generation, e.g. 'codellama-7b-python.Q4_K_M.gguf'
-    ('llamacppCodeModel_n_ctx', 0), # llama.cpp code model context window
-    ('llamacppCodeModel_max_tokens', 10000), # llama.cpp code model maximum tokens
-    ('llamacppCodeModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
-    ('llamacppCodeModel_n_batch', 512), # The batch size to use per eval
+    ('llamacppMainModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
+    ('llamacppMainModel_model_path', ''), # specify file path of llama.cpp model for general purpose
+    ('llamacppMainModel_repo_id', 'TheBloke/Mistral-7B-Instruct-v0.2-GGUF'), # llama.cpp model used for both task execution and conversation, e.g. 'TheBloke/phi-2-GGUF', 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
+    ('llamacppMainModel_filename', 'mistral-7b-instruct-v0.2.Q4_K_M.gguf'), # llama.cpp model used for both task execution and conversation, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
+    ('llamacppMainModel_n_ctx', 0), # llama.cpp main model context window
+    ('llamacppMainModel_max_tokens', 10000), # llama.cpp main model maximum tokens
+    ('llamacppMainModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
+    ('llamacppMainModel_n_batch', 512), # The batch size to use per eval
+    ('llamacppChatModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
+    ('llamacppChatModel_model_path', ''), # specify file path of llama.cpp model for chat
+    ('llamacppChatModel_repo_id', 'TheBloke/phi-2-GGUF'), # llama.cpp model used for chat, e.g. 'TheBloke/CodeLlama-7B-Python-GGUF'
+    ('llamacppChatModel_filename', 'phi-2.Q4_K_M.gguf'), # llama.cpp model used for chat, e.g. 'codellama-7b-python.Q4_K_M.gguf'
+    ('llamacppChatModel_n_ctx', 0), # llama.cpp chat model context window
+    ('llamacppChatModel_max_tokens', 10000), # llama.cpp chat model maximum tokens
+    ('llamacppChatModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
+    ('llamacppChatModel_n_batch', 512), # The batch size to use per eval
     ('geminipro_max_output_tokens', 8192), # check supported value at https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
     # common configs as in LetMeDoIt AI
     ('translateToLanguage', ''),
@@ -201,8 +201,8 @@ temporaryConfigs = [
     "geminipro_model",
     "geminipro_generation_config",
     "geminipro_safety_settings",
-    "llamacppDefaultModel",
-    "llamacppCodeModel",
+    "llamacppMainModel",
+    "llamacppChatModel",
     "new_chat_response",
     "runPython",
     "freeGeniusActions",

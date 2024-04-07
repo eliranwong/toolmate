@@ -10,6 +10,7 @@ from prompt_toolkit.history import FileHistory
 from prompt_toolkit.shortcuts import clear
 from pathlib import Path
 import threading, argparse, os, traceback
+from llama_cpp import Llama
 
 
 class LlamacppChat:
@@ -18,24 +19,46 @@ class LlamacppChat:
     It is created for use with 3rd-party applications.
     """
 
-    def __init__(self, name="", temperature=config.llmTemperature, max_output_tokens=config.llamacppDefaultModel_max_tokens):
-        if not name:
-            if config.llamacppDefaultModel_model_path and os.path.isfile(config.llamacppDefaultModel_model_path):
-                if config.llamacppDefaultModel_model_path.lower().endswith(".gguf"):
-                    name = os.path.splitext(os.path.basename(config.llamacppDefaultModel_model_path))
-                elif config.llamacppDefaultModel_ollama_tag:
-                    name = config.llamacppDefaultModel_ollama_tag
-            else:
-                name = "Llama.cpp chatbot"
+    def __init__(self, name="", temperature=config.llmTemperature, max_output_tokens=config.llamacppChatModel_max_tokens, model=None):
+        if model is None:
+            # chat model
+            self.model = self.loadChatModel()
+            if not name:
+                if config.llamacppChatModel_model_path and os.path.isfile(config.llamacppChatModel_model_path):
+                    if config.llamacppChatModel_model_path.lower().endswith(".gguf"):
+                        name = os.path.splitext(os.path.basename(config.llamacppChatModel_model_path))[0]
+                    elif config.llamacppChatModel_ollama_tag:
+                        name = config.llamacppChatModel_ollama_tag
+                else:
+                    name = "Llama.cpp chatbot"
+        else:
+            # main model
+            self.model = model
+            if not name:
+                if config.llamacppMainModel_model_path and os.path.isfile(config.llamacppMainModel_model_path):
+                    if config.llamacppMainModel_model_path.lower().endswith(".gguf"):
+                        name = os.path.splitext(os.path.basename(config.llamacppMainModel_model_path))[0]
+                    elif config.llamacppMainModel_ollama_tag:
+                        name = config.llamacppMainModel_ollama_tag
+                else:
+                    name = "Llama.cpp chatbot"
+
         self.name, self.temperature, self.max_output_tokens = name, temperature, max_output_tokens
-        
-        if not hasattr(config, "llamacppDefaultModel"):
-            CallLlamaCpp.checkCompletion()
 
         self.messages = self.resetMessages()
         if hasattr(config, "currentMessages") and config.currentMessages:
             self.messages += config.currentMessages[:-1]
         self.defaultPrompt = ""
+
+    def loadChatModel(self):
+        return Llama(
+            model_path=config.llamacppChatModel_model_path,
+            chat_format="chatml",
+            n_ctx=config.llamacppChatModel_n_ctx,
+            n_batch=config.llamacppChatModel_n_batch,
+            verbose=False,
+            n_gpu_layers=config.llamacppChatModel_n_gpu_layers,
+        )
 
     def resetMessages(self):
         return [{"role": "system", "content": config.systemMessage_llamacpp},]
@@ -85,7 +108,7 @@ class LlamacppChat:
                 config.pagerContent = ""
 
                 try:
-                    completion = config.llamacppDefaultModel.create_chat_completion(
+                    completion = self.model.create_chat_completion(
                         messages=self.messages,
                         temperature=self.temperature,
                         max_tokens=self.max_output_tokens,

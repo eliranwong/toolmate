@@ -10,7 +10,7 @@ class CallLlamaFile:
             # 1. Intent Screening
             if config.developer:
                 print1("screening ...")
-            noFunctionCall = True if noFunctionCall else CallOllama.screen_user_request(messages=messages, user_request=user_request, model=config.ollamaDefaultModel)
+            noFunctionCall = True if noFunctionCall else CallOllama.screen_user_request(messages=messages, user_request=user_request, model=config.ollamaMainModel)
         if noFunctionCall:
             return CallOllama.regularCall(messages)
         else:
@@ -182,11 +182,11 @@ Remember, answer in JSON with the filled template ONLY.""",
             ]
 
             # switch to a dedicated model for code generation
-            ollamaDefaultModel = config.ollamaDefaultModel
-            config.ollamaDefaultModel = config.ollamaCodeModel
+            ollamaMainModel = config.ollamaMainModel
+            config.ollamaMainModel = config.ollamaChatModel
             code = CallOllama.getResponseDict(messages)
             parameters["code"] = code["code"]
-            config.ollamaDefaultModel = ollamaDefaultModel
+            config.ollamaMainModel = ollamaMainModel
         return parameters
 
     @staticmethod

@@ -83,9 +83,9 @@ Here is my request:
                 stream=False,
                 options=Options(
                     temperature=0.0,
-                    num_ctx=config.ollamaDefaultModel_num_ctx,
-                    num_batch=config.ollamaDefaultModel_num_batch,
-                    num_predict=config.ollamaDefaultModel_num_predict,
+                    num_ctx=config.ollamaMainModel_num_ctx,
+                    num_batch=config.ollamaMainModel_num_batch,
+                    num_predict=config.ollamaMainModel_num_predict,
                 ),
             )
             output = json.loads(completion["message"]["content"])
@@ -106,11 +106,11 @@ Here is my request:
         if model.startswith("llava"):
             Downloader.downloadOllamaModel("gemma:2b")
         
-        previoiusModel = config.ollamaDefaultModel
-        config.ollamaDefaultModel = model
-        if not config.ollamaDefaultModel:
-            config.ollamaDefaultModel = "mistral"
-        if not config.ollamaDefaultModel == previoiusModel:
+        previoiusModel = config.ollamaMainModel
+        config.ollamaMainModel = model
+        if not config.ollamaMainModel:
+            config.ollamaMainModel = "mistral"
+        if not config.ollamaMainModel == previoiusModel:
             config.saveConfig()
 
         historyFolder = os.path.join(config.localStorage, "history")
@@ -167,9 +167,9 @@ Here is my request:
                         stream=True,
                         options=Options(
                             temperature=config.llmTemperature,
-                            num_ctx=config.ollamaDefaultModel_num_ctx,
-                            num_batch=config.ollamaDefaultModel_num_batch,
-                            num_predict=config.ollamaDefaultModel_num_predict,
+                            num_ctx=config.ollamaMainModel_num_ctx,
+                            num_batch=config.ollamaMainModel_num_batch,
+                            num_predict=config.ollamaMainModel_num_predict,
                         ),
                     )
                     # Create a new thread for the streaming task
@@ -265,13 +265,13 @@ def main(thisModel=""):
             print2("Ollama chat launched!")
             print("Select a model below:")
             print("Note: You should have at least 8 GB of RAM available to run the 7B models, 16 GB to run the 13B models, and 32 GB to run the 33B models.")
-            model = SinglePrompt.run(style=promptStyle, promptSession=model_session, bottom_toolbar=bottom_toolbar, default=config.ollamaDefaultModel, completer=completer)
+            model = SinglePrompt.run(style=promptStyle, promptSession=model_session, bottom_toolbar=bottom_toolbar, default=config.ollamaMainModel, completer=completer)
             if model and model.lower() == config.exit_entry:
                 print2("\nOllama chat closed!")
                 return None
 
     if not model:
-        model = config.ollamaDefaultModel
+        model = config.ollamaMainModel
     # Run chat bot
     OllamaChat().run(
         prompt=prompt,

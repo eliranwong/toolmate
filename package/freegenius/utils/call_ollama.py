@@ -33,7 +33,7 @@ class CallOllama:
         downloadStableDiffusionFiles() 
 
         if shutil.which("ollama"):
-            for i in (config.ollamaDefaultModel, config.ollamaCodeModel, config.ollamaVisionModel):
+            for i in (config.ollamaMainModel, config.ollamaChatModel, config.ollamaVisionModel):
                 Downloader.downloadOllamaModel(i)
         else:
             print("Ollama not found! Install it first!")
@@ -46,9 +46,6 @@ class CallOllama:
 
     @staticmethod
     def autoCorrectPythonCode(code, trace):
-        # swap to code model
-        CallOllama.swapModels()
-
         for i in range(config.max_consecutive_auto_correction):
             userInput = f"""I encountered these errors:
 ```
@@ -95,9 +92,6 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                 code = arguments.get("code")
                 trace = function_call_response
             print1(config.divider)
-        
-        # swap back to default model
-        CallOllama.swapModels()
 
         # return information if any
         if function_call_response == "EXECUTED":
@@ -120,15 +114,15 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     @check_ollama_errors
     def regularCall(messages: dict, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
         return ollama.chat(
-            keep_alive=config.ollamaDefaultModel_keep_alive,
-            model=config.ollamaDefaultModel,
+            keep_alive=config.ollamaMainModel_keep_alive,
+            model=config.ollamaMainModel,
             messages=messages,
             stream=True,
             options=Options(
                 temperature=temperature if temperature is not None else config.llmTemperature,
-                num_ctx=num_ctx if num_ctx is not None else config.ollamaDefaultModel_num_ctx,
-                num_batch=num_batch if num_batch is not None else config.ollamaDefaultModel_num_batch,
-                num_predict=num_predict if num_predict is not None else config.ollamaDefaultModel_num_predict,
+                num_ctx=num_ctx if num_ctx is not None else config.ollamaMainModel_num_ctx,
+                num_batch=num_batch if num_batch is not None else config.ollamaMainModel_num_batch,
+                num_predict=num_predict if num_predict is not None else config.ollamaMainModel_num_predict,
             ),
             **kwargs,
         )
@@ -139,16 +133,16 @@ Remember, give me the python code ONLY, without additional notes or explanation.
         #pprint.pprint(messages)
         try:
             completion = ollama.chat(
-                #keep_alive=config.ollamaDefaultModel_keep_alive,
-                model=config.ollamaDefaultModel,
+                #keep_alive=config.ollamaMainModel_keep_alive,
+                model=config.ollamaMainModel,
                 messages=messages,
                 format="json",
                 stream=False,
                 options=Options(
                     temperature=temperature if temperature is not None else config.llmTemperature,
-                    num_ctx=num_ctx if num_ctx is not None else config.ollamaDefaultModel_num_ctx,
-                    num_batch=num_batch if num_batch is not None else config.ollamaDefaultModel_num_batch,
-                    num_predict=num_predict if num_predict is not None else config.ollamaDefaultModel_num_predict,
+                    num_ctx=num_ctx if num_ctx is not None else config.ollamaMainModel_num_ctx,
+                    num_batch=num_batch if num_batch is not None else config.ollamaMainModel_num_batch,
+                    num_predict=num_predict if num_predict is not None else config.ollamaMainModel_num_predict,
                 ),
                 **kwargs,
             )
@@ -170,14 +164,14 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             messages.append({"role": "user", "content" : userInput})
         try:
             completion = ollama.chat(
-                model=model if model is not None else config.ollamaDefaultModel,
+                model=model if model is not None else config.ollamaMainModel,
                 messages=messages,
                 stream=False,
                 options=Options(
                     temperature=temperature if temperature is not None else config.llmTemperature,
-                    num_ctx=num_ctx if num_ctx is not None else config.ollamaDefaultModel_num_ctx,
-                    num_batch=num_batch if num_batch is not None else config.ollamaDefaultModel_num_batch,
-                    num_predict=num_predict if num_predict is not None else config.ollamaDefaultModel_num_predict,
+                    num_ctx=num_ctx if num_ctx is not None else config.ollamaMainModel_num_ctx,
+                    num_batch=num_batch if num_batch is not None else config.ollamaMainModel_num_batch,
+                    num_predict=num_predict if num_predict is not None else config.ollamaMainModel_num_predict,
                 ),
                 **kwargs,
             )
@@ -347,12 +341,12 @@ Remember, response in JSON with the filled template ONLY.""",
 
     @staticmethod
     def swapModels():
-        if config.useAdditionalCodeModel:
-            config.ollamaDefaultModel, config.ollamaCodeModel = config.ollamaCodeModel, config.ollamaDefaultModel
-            config.ollamaDefaultModel_num_ctx, config.ollamaCodeModel_num_ctx = config.ollamaCodeModel_num_ctx, config.ollamaDefaultModel_num_ctx
-            config.ollamaDefaultModel_num_predict, config.ollamaCodeModel_num_predict = config.ollamaCodeModel_num_predict, config.ollamaDefaultModel_num_predict
-            config.ollamaDefaultModel_num_batch, config.ollamaCodeModel_num_batch = config.ollamaCodeModel_num_batch, config.ollamaDefaultModel_num_batch
-            config.ollamaDefaultModel_keep_alive, config.ollamaCodeModel_keep_alive = config.ollamaCodeModel_keep_alive, config.ollamaDefaultModel_keep_alive
+        if config.useAdditionalChatModel:
+            config.ollamaMainModel, config.ollamaChatModel = config.ollamaChatModel, config.ollamaMainModel
+            config.ollamaMainModel_num_ctx, config.ollamaChatModel_num_ctx = config.ollamaChatModel_num_ctx, config.ollamaMainModel_num_ctx
+            config.ollamaMainModel_num_predict, config.ollamaChatModel_num_predict = config.ollamaChatModel_num_predict, config.ollamaMainModel_num_predict
+            config.ollamaMainModel_num_batch, config.ollamaChatModel_num_batch = config.ollamaChatModel_num_batch, config.ollamaMainModel_num_batch
+            config.ollamaMainModel_keep_alive, config.ollamaChatModel_keep_alive = config.ollamaChatModel_keep_alive, config.ollamaMainModel_keep_alive
 
     @staticmethod
     def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, **kwargs) -> dict:
@@ -429,14 +423,8 @@ Remember, answer in JSON with the filled template ONLY.""",
                 },
             ]
 
-            # swap to code model
-            CallOllama.swapModels()
-
             code = CallOllama.getResponseDict(messages, temperature=temperature, num_ctx=num_ctx, num_batch=num_batch, num_predict=num_predict, **kwargs)
             parameters["code"] = code["code"]
-
-            # swap back to default model
-            CallOllama.swapModels()
 
         if config.developer:
             print2("```parameters")

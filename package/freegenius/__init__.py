@@ -91,7 +91,7 @@ def startLlamacppServer():
         if not hasattr(config, "llamacppServer") or config.llamacppServer is None:
             config.llamacppServer = None
             print2("Running llama.cpp server ...")
-            cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppServer_port} --model "{config.llamacppDefaultModel_model_path}" --verbose False --chat_format chatml --n_ctx {config.llamacppDefaultModel_n_ctx} --n_gpu_layers {config.llamacppDefaultModel_n_gpu_layers} --n_batch {config.llamacppDefaultModel_n_batch}"""
+            cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppServer_port} --model "{config.llamacppMainModel_model_path}" --verbose False --chat_format chatml --n_ctx {config.llamacppMainModel_n_ctx} --n_gpu_layers {config.llamacppMainModel_n_gpu_layers} --n_batch {config.llamacppMainModel_n_batch}"""
             config.llamacppServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
             while not check_server("127.0.0.1", config.llamacppServer_port):
                 # wait til the server is up
@@ -113,7 +113,7 @@ def startLlamacppVisionServer():
             if os.path.isfile(config.llamacppVisionModel_model_path) and os.path.isfile(config.llamacppVisionModel_clip_model_path):
                 config.llamacppVisionServer = None
                 print2("Running llama.cpp vision server ...")
-                cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppServer_port} --model "{config.llamacppVisionModel_model_path}" --clip_model_path {config.llamacppVisionModel_clip_model_path} --verbose False --chat_format llava-1-5 --n_ctx {config.llamacppDefaultModel_n_ctx} --n_gpu_layers {config.llamacppDefaultModel_n_gpu_layers} --n_batch {config.llamacppDefaultModel_n_batch}"""
+                cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppServer_port} --model "{config.llamacppVisionModel_model_path}" --clip_model_path {config.llamacppVisionModel_clip_model_path} --verbose False --chat_format llava-1-5 --n_ctx {config.llamacppMainModel_n_ctx} --n_gpu_layers {config.llamacppMainModel_n_gpu_layers} --n_batch {config.llamacppMainModel_n_batch}"""
                 config.llamacppVisionServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
                 while not check_server("127.0.0.1", config.llamacppServer_port):
                     # wait til the server is up
@@ -914,12 +914,19 @@ thisPlatform = platform.system()
 config.thisPlatform = "macOS" if thisPlatform == "Darwin" else thisPlatform
 if config.terminalEnableTermuxAPI:
     config.open = "termux-share"
+    config.thisDistro = ""
 elif thisPlatform == "Linux":
     config.open = "xdg-open"
+    try:
+        config.thisDistro = subprocess.check_output('lsb_release -i -s', shell=True).decode('utf-8')
+    except:
+        config.thisDistro = ""
 elif thisPlatform == "Darwin":
     config.open = "open"
+    config.thisDistro = ""
 elif thisPlatform == "Windows":
     config.open = "start"
+    config.thisDistro = ""
 
 config.excludeConfigList = []
 config.includeIpInDeviceInfoTemp = config.includeIpInDeviceInfo

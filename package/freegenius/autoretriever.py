@@ -99,20 +99,20 @@ class AutoGenRetriever:
                 }
             )
         elif config.llmPlatform == "ollama":
-            llm = config.ollamaDefaultModel
+            llm = config.ollamaMainModel
             config_list = [
                 {
-                    "model": config.ollamaDefaultModel,
+                    "model": config.ollamaMainModel,
                     "base_url": "http://localhost:11434/v1",
                     "api_type": "open_ai",
                     "api_key": "freegenius",
                 }
             ]
         elif config.llmPlatform == "llamacpp":
-            llm = config.llamacppDefaultModel_model_path
+            llm = config.llamacppMainModel_model_path
             config_list = [
                 {
-                    "model": config.llamacppDefaultModel_model_path,
+                    "model": config.llamacppMainModel_model_path,
                     "base_url": f"http://localhost:{config.config.llamacppServer_port}/v1",
                     "api_type": "open_ai",
                     "api_key": "freegenius",

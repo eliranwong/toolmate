@@ -48,7 +48,7 @@ HERE IS MY REQUEST:
         print(completion["message"]["content"])
 
 if __name__ == "__main__":
-    config.ollamaDefaultModel = "mistral"
+    config.ollamaMainModel = "mistral"
     user_request = """What time is it now?"""
     screen_user_request(user_request)
 

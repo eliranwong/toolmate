@@ -12,90 +12,70 @@ class CallLlamaCpp:
 
     @staticmethod
     def checkCompletion():
-        
+
+        def loadMainModel():
+            llamacppMainModel_model_path = os.path.join(llm_directory, config.llamacppMainModel_filename)
+            if not config.llamacppMainModel_model_path or not os.path.isfile(config.llamacppMainModel_model_path):
+                config.llamacppMainModel_model_path = llamacppMainModel_model_path
+            if not os.path.isfile(config.llamacppMainModel_model_path):
+                # download llava clip model
+                print2("Downloading main model ...")
+                hf_hub_download(
+                    repo_id=config.llamacppMainModel_repo_id,
+                    filename=config.llamacppMainModel_filename,
+                    local_dir=llm_directory,
+                    local_dir_use_symlinks=False,
+                )
+            config.llamacppMainModel = Llama(
+                model_path=config.llamacppMainModel_model_path,
+                chat_format="chatml",
+                n_ctx=config.llamacppMainModel_n_ctx,
+                n_batch=config.llamacppMainModel_n_batch,
+                verbose=False,
+                n_gpu_layers=config.llamacppMainModel_n_gpu_layers,
+            )
+
+        def downloadChatModel():
+            llamacppChatModel_model_path = os.path.join(llm_directory, config.llamacppChatModel_filename)
+            if not config.llamacppChatModel_model_path or not os.path.isfile(config.llamacppChatModel_model_path):
+                config.llamacppChatModel_model_path = llamacppChatModel_model_path
+            if not os.path.isfile(config.llamacppChatModel_model_path):
+                # download llava clip model
+                print2("Downloading chat model ...")
+                hf_hub_download(
+                    repo_id=config.llamacppChatModel_repo_id,
+                    filename=config.llamacppChatModel_filename,
+                    local_dir=llm_directory,
+                    local_dir_use_symlinks=False,
+                )
+
         # check vision model
         # https://llama-cpp-python.readthedocs.io/en/latest/server/
         llm_directory = os.path.join(config.localStorage, "LLMs", "gguf")
         Path(llm_directory).mkdir(parents=True, exist_ok=True)
 
-        # Download default and code models
+        # Download main and code models
         try:
-            llamacppDefaultModel_model_path = os.path.join(llm_directory, config.llamacppDefaultModel_filename)
-            if not config.llamacppDefaultModel_model_path or not os.path.isfile(config.llamacppDefaultModel_model_path):
-                config.llamacppDefaultModel_model_path = llamacppDefaultModel_model_path
-            if not os.path.isfile(config.llamacppDefaultModel_model_path):
-                # download llava clip model
-                print2("Downloading default model ...")
-                hf_hub_download(
-                    repo_id=config.llamacppDefaultModel_repo_id,
-                    filename=config.llamacppDefaultModel_filename,
-                    local_dir=llm_directory,
-                    local_dir_use_symlinks=False,
-                )
-            config.llamacppDefaultModel = Llama(
-                model_path=config.llamacppDefaultModel_model_path,
-                chat_format="chatml",
-                n_ctx=config.llamacppDefaultModel_n_ctx,
-                n_batch=config.llamacppDefaultModel_n_batch,
-                verbose=False,
-                n_gpu_layers=config.llamacppDefaultModel_n_gpu_layers,
-            )
+            loadMainModel()
         except:
             # restore default config
-            print2("Errors! Restoring default model!")
-            config.llamacppDefaultModel_model_path = ""
-            config.llamacppDefaultModel_repo_id = "TheBloke/phi-2-GGUF"
-            config.llamacppDefaultModel_filename = "phi-2.Q4_K_M.gguf"
-            config.llamacppDefaultModel = Llama.from_pretrained(
-                repo_id=config.llamacppDefaultModel_repo_id,
-                filename=config.llamacppDefaultModel_filename,
-                local_dir=llm_directory,
-                local_dir_use_symlinks=False,
-                chat_format="chatml",
-                n_ctx=config.llamacppDefaultModel_n_ctx,
-                n_batch=config.llamacppDefaultModel_n_batch,
-                verbose=False,
-                n_gpu_layers=config.llamacppDefaultModel_n_gpu_layers,
-            )
+            print2("Errors! Restoring default main model!")
+            config.llamacppMainModel_ollama_tag = ""
+            config.llamacppMainModel_model_path = ""
+            config.llamacppMainModel_repo_id = "TheBloke/Mistral-7B-Instruct-v0.2-GGUF"
+            config.llamacppMainModel_filename = "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
+            loadMainModel()
 
         try:
-            llamacppCodeModel_model_path = os.path.join(llm_directory, config.llamacppCodeModel_filename)
-            if not config.llamacppCodeModel_model_path or not os.path.isfile(config.llamacppCodeModel_model_path):
-                config.llamacppCodeModel_model_path = llamacppCodeModel_model_path
-            if not os.path.isfile(config.llamacppCodeModel_model_path):
-                # download llava clip model
-                print2("Downloading code generation model ...")
-                hf_hub_download(
-                    repo_id=config.llamacppCodeModel_repo_id,
-                    filename=config.llamacppCodeModel_filename,
-                    local_dir=llm_directory,
-                    local_dir_use_symlinks=False,
-                )
-            config.llamacppCodeModel = Llama(
-                model_path=config.llamacppCodeModel_model_path,
-                chat_format="chatml",
-                n_ctx=config.llamacppCodeModel_n_ctx,
-                n_batch=config.llamacppCodeModel_n_batch,
-                verbose=False,
-                n_gpu_layers=config.llamacppCodeModel_n_gpu_layers,
-            )
+            downloadChatModel()
         except:
             # restore default config
-            print2("Errors! Restoring default model!")
-            config.llamacppCodeModel_model_path = ""
-            config.llamacppCodeModel_repo_id = "TheBloke/phi-2-GGUF"
-            config.llamacppCodeModel_filename = "phi-2.Q4_K_M.gguf"
-            config.llamacppCodeModel = Llama.from_pretrained(
-                repo_id=config.llamacppCodeModel_repo_id,
-                filename=config.llamacppCodeModel_filename,
-                local_dir=llm_directory,
-                local_dir_use_symlinks=False,
-                chat_format="chatml",
-                n_ctx=config.llamacppCodeModel_n_ctx,
-                n_batch=config.llamacppCodeModel_n_batch,
-                verbose=False,
-                n_gpu_layers=config.llamacppCodeModel_n_gpu_layers,
-            )
+            print2("Errors! Restoring default chat model!")
+            config.llamacppChatModel_ollama_tag = ""
+            config.llamacppChatModel_model_path = ""
+            config.llamacppChatModel_repo_id = "TheBloke/phi-2-GGUF"
+            config.llamacppChatModel_filename = "phi-2.Q4_K_M.gguf"
+            downloadChatModel()
 
         # Download vision model
         filename = "ggml-model-q4_k.gguf"
@@ -133,9 +113,6 @@ class CallLlamaCpp:
 
     @staticmethod
     def autoCorrectPythonCode(code, trace):
-        # swap to code model
-        CallLlamaCpp.swapModels()
-
         for i in range(config.max_consecutive_auto_correction):
             userInput = f"""I encountered these errors:
 ```
@@ -181,9 +158,6 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                 trace = function_call_response
             print1(config.divider)
         
-        # swap back to default model
-        CallLlamaCpp.swapModels()
-        
         # return information if any
         if function_call_response == "EXECUTED":
             pythonFunctionResponse = getPythonFunctionResponse(code)
@@ -203,10 +177,10 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs):
-        return config.llamacppDefaultModel.create_chat_completion(
+        return config.llamacppMainModel.create_chat_completion(
             messages=messages,
             temperature=temperature if temperature is not None else config.llmTemperature,
-            max_tokens=max_tokens if max_tokens is not None else config.llamacppDefaultModel_max_tokens,
+            max_tokens=max_tokens if max_tokens is not None else config.llamacppMainModel_max_tokens,
             stream=True,
             **kwargs,
         )
@@ -215,11 +189,11 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     def getResponseDict(messages: list, schema: dict={}, temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs) -> dict:
         schema = toParameterSchema(schema)
         try:
-            completion = config.llamacppDefaultModel.create_chat_completion(
+            completion = config.llamacppMainModel.create_chat_completion(
                 messages=messages,
                 response_format={"type": "json_object", "schema": schema} if schema else {"type": "json_object"},
                 temperature=temperature if temperature is not None else config.llmTemperature,
-                max_tokens=max_tokens if max_tokens is not None else config.llamacppDefaultModel_max_tokens,
+                max_tokens=max_tokens if max_tokens is not None else config.llamacppMainModel_max_tokens,
                 stream=False,
                 **kwargs,
             )
@@ -236,10 +210,10 @@ Remember, give me the python code ONLY, without additional notes or explanation.
         # non-streaming single call
         messages.append({"role": "user", "content" : userInput})
         try:
-            completion = config.llamacppDefaultModel.create_chat_completion(
+            completion = config.llamacppMainModel.create_chat_completion(
                 messages=messages,
                 temperature=temperature if temperature is not None else config.llmTemperature,
-                max_tokens=max_tokens if max_tokens is not None else config.llamacppDefaultModel_max_tokens,
+                max_tokens=max_tokens if max_tokens is not None else config.llamacppMainModel_max_tokens,
                 stream=False,
                 **kwargs,
             )
@@ -429,11 +403,6 @@ Remember, response in JSON with the filled template ONLY.""",
         return True if (not output) or str(output).lower() == "yes" else False
 
     @staticmethod
-    def swapModels():
-        if config.useAdditionalCodeModel:
-            config.llamacppDefaultModel, config.llamacppCodeModel = config.llamacppCodeModel, config.llamacppDefaultModel
-
-    @staticmethod
     def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs) -> dict:
         """
         Extract action parameters
@@ -494,9 +463,6 @@ Remember, output in JSON.""",
                 },
             ]
 
-            # swap to code model
-            CallLlamaCpp.swapModels()
-
             this_schema = {
                 "type": "object",
                 "properties": {
@@ -509,9 +475,6 @@ Remember, output in JSON.""",
             }
             code = CallLlamaCpp.getResponseDict(messages, this_schema, temperature=temperature, max_tokens=max_tokens, **kwargs)
             parameters["code"] = code["code"]
-
-            # swap back to default model
-            CallLlamaCpp.swapModels()
 
         if config.developer:
             print2("```parameters")

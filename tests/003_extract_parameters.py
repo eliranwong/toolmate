@@ -8,7 +8,7 @@ def getResponseDict(messages, **kwargs):
     try:
         completion = ollama.chat(
             #keep_alive=0,
-            model=config.ollamaDefaultModel,
+            model=config.ollamaMainModel,
             messages=messages,
             format="json",
             stream=False,
@@ -59,7 +59,7 @@ Here is my input:
     return template
 
 if __name__ == "__main__":
-    config.ollamaDefaultModel = "mistral"
+    config.ollamaMainModel = "mistral"
     #parameters = {'code': {'type': 'string', 'description': 'Python code that integrates package pendulum to resolve my query'}}
     #print(extractToolParameters(parameters, "What time is it now?"))
     schema = {'email': {'type': 'string', 'description': "The email application. Return 'gmail' if not given.", 'enum': ['gmail', 'outlook']}, 'recipient': {'type': 'string', 'description': 'The recipient of the email.'}, 'subject': {'type': 'string', 'description': 'Give a title to the email.'}, 'body': {'type': 'string', 'description': 'The body or content of the email.'}}

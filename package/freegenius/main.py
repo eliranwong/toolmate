@@ -132,5 +132,8 @@ def main():
     # clear title
     clear_title()
 
+    if hasattr(config, "llamacppMainModel"):
+        del config.llamacppMainModel
+
 if __name__ == "__main__":
     main()

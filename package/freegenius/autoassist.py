@@ -70,7 +70,7 @@ Below is my message:
         elif config.llmPlatform == "ollama":
             config_list = [
                 {
-                    "model": config.ollamaDefaultModel,
+                    "model": config.ollamaMainModel,
                     "base_url": "http://localhost:11434/v1",
                     "api_type": "open_ai",
                     "api_key": "freegenius",
@@ -79,7 +79,7 @@ Below is my message:
         elif config.llmPlatform == "llamacpp":
             config_list = [
                 {
-                    "model": config.llamacppDefaultModel_model_path,
+                    "model": config.llamacppMainModel_model_path,
                     "base_url": f"http://localhost:{config.config.llamacppServer_port}/v1",
                     "api_type": "open_ai",
                     "api_key": "freegenius",

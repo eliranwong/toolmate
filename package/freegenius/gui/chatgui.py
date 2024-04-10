@@ -1,6 +1,5 @@
 from freegenius import config
 from freegenius.utils.call_llm import CallLLM
-from freegenius.utils.shared_utils import SharedUtil
 from freegenius.utils.tool_plugins import Plugins
 from freegenius.gui.worker import Worker
 import json, getpass

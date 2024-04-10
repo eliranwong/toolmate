@@ -8,8 +8,7 @@ analyze web content with "AutoGen Retriever"
 
 
 from freegenius import config
-from freegenius import print1, print2, print3, is_valid_url
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius import print1, print2, print3, is_valid_url, downloadWebContent
 from freegenius.autoretriever import AutoGenRetriever
 from freegenius.rag import RAG
 
@@ -20,7 +19,7 @@ def analyze_web_content(function_args):
         print1(f"'{url}' is not a valid url" if url else "No url is provided!")
         return "[INVALID]"
     config.stopSpinning()
-    kind, filename = SharedUtil.downloadWebContent(url)
+    kind, filename = downloadWebContent(url)
     if not filename:
         return "[INVALID]"
     elif kind == "image":
@@ -32,7 +31,7 @@ def analyze_web_content(function_args):
         print3("Running function: 'analyze_images'")
         return config.toolFunctionMethods["analyze_images"](function_args)
 
-    if config.rag_useAutoRetriever and not config.llmPlatform == "gemini":
+    if config.rag_useAutoRetriever and not config.llmInterface == "gemini":
         # process with AutoGen Retriever
         print2("AutoGen Retriever launched!")
         last_message = AutoGenRetriever().getResponse(filename, query, True)

@@ -2,7 +2,7 @@ from freegenius import config, fineTunePythonCode
 from freegenius import print1, print2, print3
 import traceback
 from freegenius import installPipPackage
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius.utils.python_utils import PythonUtil
 
 """
 FreeGenius AI Plugin - auto correct python code
@@ -37,7 +37,7 @@ def correct_python(function_args):
                 installPipPackage(f"--upgrade {i}")
         print2("Running improved code ...")
         if config.developer or config.codeDisplay:
-            SharedUtil.displayPythonCode(fix)
+            PythonUtil.displayPythonCode(fix)
         exec(fineTunePythonCode(fix), globals())
         return "EXECUTED"
     except:

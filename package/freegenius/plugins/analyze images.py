@@ -21,8 +21,7 @@ Reference: https://platform.openai.com/docs/guides/vision
 [FUNCTION_CALL]
 """
 
-from freegenius import config, print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius import config, print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url, encode_image
 from freegenius.utils.call_chatgpt import check_openai_errors
 import os
 from openai import OpenAI
@@ -33,14 +32,14 @@ from freegenius.utils.call_ollama import CallOllama
 def analyze_images(function_args):
     from freegenius import config
 
-    if config.llmPlatform == "gemini":
+    if config.llmInterface == "gemini":
         answer = GeminiProVision(temperature=config.llmTemperature).analyze_images(function_args)
         if answer:
             config.tempContent = answer
             return ""
         else:
             return "[INVALID]"
-    elif config.llmPlatform in ("chatgpt", "letmedoit") and not config.openaiApiKey:
+    elif config.llmInterface in ("chatgpt", "letmedoit") and not config.openaiApiKey:
         return "OpenAI API key not found!"
 
     query = function_args.get("query") # required
@@ -66,18 +65,18 @@ def analyze_images(function_args):
         if is_valid_url(i) and is_valid_image_url(i):
             content.append({"type": "image_url", "image_url": {"url": i,},})
         elif os.path.isfile(i) and is_valid_image_file(i):
-            content.append({"type": "image_url", "image_url": SharedUtil.encode_image(i),})
+            content.append({"type": "image_url", "image_url": encode_image(i),})
         else:
             files.remove(i)
 
     if content:
-        if config.llmPlatform in ("chatgpt", "letmedoit"):
+        if config.llmInterface in ("chatgpt", "letmedoit"):
             client = OpenAI()
-        elif config.llmPlatform == "llamacpp":
+        elif config.llmInterface == "llamacpp":
             # start llama.cpp vision server
             startLlamacppVisionServer()
             client = OpenAI(base_url=f"http://localhost:{config.llamacppServer_port}/v1", api_key="freegenius")
-        elif config.llmPlatform == "ollama":
+        elif config.llmInterface == "ollama":
             config.currentMessages[-1] = {'role': 'user', 'content': query, 'images': files}
             answer = CallOllama.getSingleChatResponse("", config.currentMessages, model=config.ollamaVisionModel)
             config.tempContent = answer
@@ -107,7 +106,7 @@ def analyze_images(function_args):
         print2("```")
 
         # stop llama.cpp vision server
-        if config.llmPlatform == "llamacpp":
+        if config.llmInterface == "llamacpp":
             stopLlamacppVisionServer()
 
         return ""

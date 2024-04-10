@@ -7,14 +7,14 @@ create statistical graphics to visulize data
 """
 
 from freegenius import config
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius.utils.python_utils import PythonUtil
 import os, re
 
 def create_statistical_graphics(function_args):
     config.stopSpinning()
 
     code = function_args.get("code") # required
-    information = SharedUtil.showAndExecutePythonCode(code)
+    information = PythonUtil.showAndExecutePythonCode(code)
 
     pngPattern = """\.savefig\(["']([^\(\)]+\.png)["']\)"""
     match = re.search(pngPattern, code)

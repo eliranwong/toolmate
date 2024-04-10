@@ -11,7 +11,6 @@ from prompt_toolkit.clipboard.pyperclip import PyperclipClipboard
 from freegenius.utils.prompt_shared_key_bindings import prompt_shared_key_bindings
 from freegenius.utils.prompt_multiline_shared_key_bindings import prompt_multiline_shared_key_bindings
 from freegenius.utils.promptValidator import NumberValidator
-from freegenius.utils.shared_utils import SharedUtil
 from freegenius.utils.tts_utils import TTSUtil
 # import sounddevice to solve alsa error display
 # read https://github.com/Uberi/speech_recognition/issues/182#issuecomment-1426939447

@@ -1,7 +1,7 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
-from freegenius import print1, print2, print3, selectTool, restartApp, getPythonFunctionResponse, extractPythonCode, isValidPythodCode, downloadStableDiffusionFiles
+from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, isValidPythodCode, downloadStableDiffusionFiles
 from freegenius import config
-import shutil, re, traceback, json, ollama, pprint
+import shutil, re, traceback, json, ollama, pprint, copy
 from typing import Optional
 from freegenius.utils.download import Downloader
 from ollama import Options
@@ -38,9 +38,9 @@ class CallOllama:
         else:
             print("Ollama not found! Install it first!")
             print("Check https://ollama.com")
-            config.llmPlatform = "llamacpp"
+            config.llmInterface = "llamacpp"
             config.saveConfig()
-            print("LLM platform changed back to 'llamacpp'")
+            print("LLM interface changed back to 'llamacpp'")
             #print("Restarting 'FreeGenius AI' ...")
             #restartApp()
 
@@ -183,7 +183,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     def runSingleFunctionCall(messages, function_name):
-        messagesCopy = messages[:]
+        messagesCopy = copy.deepcopy(messages)
         try:
             _, function_call_response = CallOllama.getSingleFunctionCallResponse(messages, function_name)
             function_call_response = function_call_response if function_call_response else config.tempContent

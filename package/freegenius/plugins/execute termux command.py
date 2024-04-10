@@ -8,8 +8,7 @@ execute termux command
 """
 
 from freegenius import config, showRisk, confirmExecution, getPygmentsStyle, showErrors
-from freegenius import print1, print2, print3
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius import print1, runSystemCommand
 from freegenius.utils.single_prompt import SinglePrompt
 import textwrap, re, pygments, json, pydoc
 from pygments.lexers.shell import BashLexer
@@ -63,7 +62,7 @@ if config.terminalEnableTermuxAPI:
                 function_response = "Done!"
             else:
                 # display both output and error
-                function_response = SharedUtil.runSystemCommand(function_args)
+                function_response = runSystemCommand(function_args)
             print1(function_response)
         except:
             showErrors()

@@ -6,10 +6,9 @@ modify the given images according to changes specified by users
 [FUNCTION_CALL]
 """
 
-from freegenius import config, is_valid_image_file, is_valid_image_url, print1, print3, startLlamacppVisionServer, stopLlamacppVisionServer, print2
+from freegenius import config, is_valid_image_file, is_valid_image_url, print1, print3, startLlamacppVisionServer, stopLlamacppVisionServer, print2, encode_image, getCliOutput
 import os
 from openai import OpenAI
-from freegenius.utils.shared_utils import SharedUtil
 from freegenius.utils.call_chatgpt import check_openai_errors
 from freegenius.utils.terminal_mode_dialogs import TerminalModeDialogs
 from base64 import b64decode
@@ -44,11 +43,11 @@ def modify_images(function_args):
     def openImageFile(imageFile):
         print3(f"Saved image: {imageFile}")
         if config.terminalEnableTermuxAPI:
-            SharedUtil.getCliOutput(f"termux-share {imageFile}")
+            getCliOutput(f"termux-share {imageFile}")
         else:
             os.system(f"{config.open} {imageFile}")
 
-    if config.llmPlatform in ("llamacpp", "ollama", "gemini"):
+    if config.llmInterface in ("llamacpp", "ollama", "gemini"):
         config.stopSpinning()
         promptStyle = Style.from_dict({
             # User input (default text).
@@ -80,7 +79,7 @@ def modify_images(function_args):
                     "role": "user",
                     "content": [
                         {"type": "text", "text": "Describe image in detail",},
-                        {"type": "image_url", "image_url": SharedUtil.encode_image(imageFile),}
+                        {"type": "image_url", "image_url": encode_image(imageFile),}
                     ],
                     }
                 ],
@@ -129,7 +128,7 @@ def get_description(filename):
         content.append({"type": "image_url", "image_url": {"url": filename,},})
         filename = quote(filename, safe="")
     elif is_valid_image_file(filename):
-        content.append({"type": "image_url", "image_url": SharedUtil.encode_image(filename),})
+        content.append({"type": "image_url", "image_url": encode_image(filename),})
 
     if content:
         content.insert(0, {"type": "text", "text": "Describe this image in as much detail as possible, including color patterns, positions and orientations of all objects and backgrounds in the image",})
@@ -199,7 +198,7 @@ def create_image(description, original_filename):
         pngObj.write(image_data)
     config.stopSpinning()
     if config.terminalEnableTermuxAPI:
-        SharedUtil.getCliOutput(f"termux-share {imageFile}")
+        getCliOutput(f"termux-share {imageFile}")
     else:
         os.system(f"{config.open} {imageFile}")
 

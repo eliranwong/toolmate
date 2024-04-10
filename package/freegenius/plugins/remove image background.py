@@ -7,8 +7,8 @@ Remove image background
 """
 
 from freegenius import config, is_valid_image_file
-from freegenius import print1, print2, print3
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius import print2, print3
+from freegenius.utils.python_utils import PythonUtil
 import os, json, rembg
 
 
@@ -44,7 +44,7 @@ def remove_image_background(function_args):
 
 def remove_image_background2(function_args):
     code = function_args.get("code") # required
-    information = SharedUtil.showAndExecutePythonCode(code)
+    information = PythonUtil.showAndExecutePythonCode(code)
     if information:
         filepath = json.loads(information)["information"]
         if os.path.isfile(filepath):

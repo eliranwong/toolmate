@@ -1,8 +1,7 @@
-from freegenius import config
+from freegenius import config, getCliOutput
 import pydoc, os, re, sys
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.shortcuts import set_title
-from freegenius.utils.shared_utils import SharedUtil
 
 prompt_shared_key_bindings = KeyBindings()
 
@@ -42,7 +41,7 @@ def _(event):
     buffer = event.app.current_buffer
     buffer.cut_selection()
     if config.terminalEnableTermuxAPI:
-        clipboardText = SharedUtil.getCliOutput("termux-clipboard-get")
+        clipboardText = getCliOutput("termux-clipboard-get")
     else:
         clipboardText = config.clipboard.get_data().text
     buffer.insert_text(clipboardText)

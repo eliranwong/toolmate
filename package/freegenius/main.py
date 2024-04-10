@@ -25,7 +25,10 @@ def set_log_file_max_lines(log_file, max_lines):
             filename = os.path.basename(log_file)
             print(f"{num_lines_to_delete} old lines deleted from log file '{filename}'.")
 
-def main():
+def letmedoit():
+    main("letmedoit")
+
+def main(tempInterface=""):
     print(f"launching {config.freeGeniusAIName} ...")
 
     # Create the parser
@@ -40,9 +43,18 @@ def main():
     parser.add_argument('-r', '--run', action='store', dest='run', help="run default entry with -r flag; accepts a string; ignored when -l/rf/f flag is used")
     parser.add_argument('-rf', '--runfile', action='store', dest='runfile', help="read file text as default entry and run with -rf flag; accepts a file path; ignored when -l flag is used")
     parser.add_argument('-u', '--update', action='store', dest='update', help="set 'true' to force or 'false' to bypass automatic update with -u flag")
+    parser.add_argument('-t', '--temp', action='store', dest='temp', help="set temporary llm interface with -t flag; llamacpp/ollama/gemini/chatgpt/letmedoit; all changes in configs are temporary")
     # Parse arguments
     args = parser.parse_args()
     # Check what kind of arguments were provided and perform actions accordingly
+
+    # update to the latest version
+    config.tempInterface = tempInterface
+    if args.temp:
+        if args.temp.lower() in ("llamacpp", "ollama", "gemini", "chatgpt", "letmedoit"):
+            config.tempInterface = args.temp.lower()
+    if config.tempInterface:
+        config.llmInterface = config.tempInterface
 
     # update to the latest version
     if args.update:

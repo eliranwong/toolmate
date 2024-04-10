@@ -10,9 +10,8 @@ FreeGenius AI Plugin - download youtube or web content
 [FUNCTION_CALL]
 """
 
-from freegenius import config, showErrors, isCommandInstalled, print1, print3, is_valid_url
+from freegenius import config, showErrors, isCommandInstalled, print1, print3, is_valid_url, downloadWebContent
 import re, subprocess, os
-from freegenius.utils.shared_utils import SharedUtil
 from pathlib import Path
 
 
@@ -63,7 +62,7 @@ def download_web_content(function_args):
             folder = config.localStorage
             folder = os.path.join(folder, "Downloads")
             Path(folder).mkdir(parents=True, exist_ok=True)
-            SharedUtil.downloadWebContent(url, folder=folder, ignoreKind=True)
+            downloadWebContent(url, folder=folder, ignoreKind=True)
             return ""
         except:
             showErrors()

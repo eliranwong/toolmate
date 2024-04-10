@@ -1,9 +1,9 @@
-from freegenius import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage
+from freegenius import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather
 from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits
-from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url
+from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK
 from freegenius.utils.call_llm import CallLLM
 from freegenius.utils.tool_plugins import ToolStore
-import openai, threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys
+import openai, threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy
 from pathlib import Path
 from freegenius.utils.download import Downloader
 from freegenius.utils.ollama_models import ollama_models
@@ -24,9 +24,7 @@ from freegenius.utils.get_path_prompt import GetPath
 from freegenius.utils.prompt_shared_key_bindings import swapTerminalColors
 
 from freegenius.utils.terminal_system_command_prompt import SystemCommandPrompt
-from freegenius.utils.shared_utils import SharedUtil
 from freegenius.utils.tool_plugins import Plugins
-from freegenius.utils.shared_utils import CallLLM
 from freegenius.utils.tts_utils import TTSUtil
 from freegenius.utils.ttsLanguages import TtsLanguages
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
@@ -174,8 +172,8 @@ class FreeGenius:
             ".system": (f"open system command prompt {str(config.hotkey_launch_system_prompt)}", lambda: SystemCommandPrompt().run(allowPathChanges=True)),
             ".content": ("display current directory content", self.getPath.displayDirectoryContent),
             ".keys": (f"display key bindings {str(config.hotkey_display_key_combo)}", config.showKeyBindings),
-            ".help": ("open LetMeDoIt wiki", lambda: SharedUtil.openURL('https://github.com/eliranwong/letmedoit/wiki')),
-            ".donate": ("donate and support LetMeDoIt AI", lambda: SharedUtil.openURL('https://www.paypal.com/paypalme/letmedoitai')),
+            ".help": ("open LetMeDoIt wiki", lambda: openURL('https://github.com/eliranwong/letmedoit/wiki')),
+            ".donate": ("donate and support LetMeDoIt AI", lambda: openURL('https://www.paypal.com/paypalme/letmedoitai')),
         }
 
         config.actionHelp = f"# Quick Actions\n(entries that start with '.')\n"
@@ -405,7 +403,7 @@ class FreeGenius:
             apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.openweathermapApi, is_password=True)
             if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
                 config.openweathermapApi = apikey
-            if SharedUtil.getWeather() is not None:
+            if getWeather() is not None:
                 config.saveConfig()
                 print2("Configurations updated!")
             else:
@@ -494,7 +492,7 @@ class FreeGenius:
         if is_valid_url(userInput) and config.predefinedContext in ("Let me Summarize", "Let me Explain"):
             context = context.replace("the following content:\n[NO_TOOL]", "the content in the this web url:\n")
         elif is_valid_url(userInput) and config.predefinedContext == "Let me Translate":
-            userInput = SharedUtil.getWebText(userInput)
+            userInput = getWebText(userInput)
         if context and (not config.conversationStarted or (config.conversationStarted and config.applyPredefinedContextAlways)):
             # context may start with "You will be provided with my input delimited with a pair of XML tags, <input> and </input>. ...
             userInput = re.sub("<content>|<content [^<>]*?>|</content>", "", userInput)
@@ -856,16 +854,16 @@ class FreeGenius:
             "chatgpt": "OpenAI ChatGPT",
             "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",
         }
-        llmPlatform = self.dialogs.getValidOptions(
+        llmInterface = self.dialogs.getValidOptions(
             options=options.keys(),
             descriptions=list(options.values()),
-            title="LLM Platform",
-            default=config.llmPlatform,
+            title="LLM Interface",
+            default=config.llmInterface,
             text=instruction,
         )
-        if llmPlatform:
-            config.llmPlatform = llmPlatform
-            if not config.llmPlatform == "llamacpp" and hasattr(config, "llamacppMainModel"):
+        if llmInterface:
+            config.llmInterface = llmInterface
+            if not config.llmInterface == "llamacpp" and hasattr(config, "llamacppMainModel"):
                 config.llamacppMainModel = None
             CallLLM.checkCompletion()
 
@@ -885,26 +883,31 @@ class FreeGenius:
                 return True
             return False
 
+        currentLlmInterface = config.llmInterface
         self.selectLlmPlatform()
 
         print1("Select models ...")
-        if config.llmPlatform == "ollama":
+        if config.llmInterface == "ollama":
             print2("# Main Model - for both task execution and conversation")
             self.setLlmModel_ollama()
             if askAdditionalChatModel():
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_ollama("code")
-        elif config.llmPlatform == "llamacpp":
+        elif config.llmInterface == "llamacpp":
             print2("# Main Model - for both task execution and conversation")
             self.setLlmModel_llamacpp()
             if askAdditionalChatModel():
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_llamacpp("code")
-        elif config.llmPlatform == "gemini":
+        elif config.llmInterface == "gemini":
             print3("Model selected: Google Gemini Pro")
         else:
             self.setLlmModel_chatgpt()
         config.saveConfig()
+        if not config.llmInterface == currentLlmInterface:
+            print2("LLM Interface changed! Starting a new chat session ...")
+            config.defaultEntry = ".new"
+            config.accept_default = True
 
     def selectOllamaModel(self, message="Select a model from Ollama Library:", feature="default") -> str:
         # history session
@@ -915,7 +918,7 @@ class FreeGenius:
         completer = FuzzyCompleter(WordCompleter(sorted(ollama_models), ignore_case=True))
         bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
         default = config.ollamaChatModel if feature == "code" else config.ollamaMainModel
-        if config.llmPlatform == "llamacpp":
+        if config.llmInterface == "llamacpp":
             if feature == "default" and config.llamacppMainModel_ollama_tag:
                 default = config.llamacppMainModel_ollama_tag
             elif feature == "code" and config.llamacppChatModel_ollama_tag:
@@ -1420,12 +1423,18 @@ class FreeGenius:
         config.saveConfig()
 
     def saveChat(self, messages):
+        messagesCopy = copy.deepcopy(messages)
+
         if config.conversationStarted:
-            timestamp = SharedUtil.getCurrentDateTime()
+            timestamp = getCurrentDateTime()
 
             if hasattr(config, "save_chat_record"):
                 # when plugin "save chat records" is enabled
-                for order, i in enumerate(messages):
+                messageLength = len(messagesCopy)
+                for order, i in enumerate(messagesCopy):
+                    isLastItem = (order == (messageLength - 1))
+                    if config.llmInterface in ("chatgpt", "letmedoit") and not isLastItem and i.get("role", "") == "user" and "function_call" in messagesCopy[order+1]:
+                        i["tool"] = messagesCopy[order+1]["function_call"].get("name", "")
                     config.save_chat_record(timestamp, order, i)
 
             try:
@@ -1434,7 +1443,7 @@ class FreeGenius:
                 if os.path.isdir(folderPath):
                     chatFile = os.path.join(folderPath, f"{timestamp}.txt")
                     with open(chatFile, "w", encoding="utf-8") as fileObj:
-                        fileObj.write(pprint.pformat(messages))
+                        fileObj.write(pprint.pformat(messagesCopy))
             except:
                 print2("Failed to save chat!\n")
                 showErrors()
@@ -1442,7 +1451,7 @@ class FreeGenius:
     def exportChat(self, messages, openFile=True):
         if config.conversationStarted:
             plainText = ""
-            timestamp = SharedUtil.getCurrentDateTime()
+            timestamp = getCurrentDateTime()
 
             for i in messages:
                 if i["role"] == "user":
@@ -1634,7 +1643,7 @@ class FreeGenius:
                 userInput = userInput.replace(alias, fullEntry)
 
             # open file / directory directly
-            docs_path = SharedUtil.isExistingPath(userInput)
+            docs_path = isExistingPath(userInput)
             if os.path.isfile(docs_path):
                 os.system(f"{config.open} {docs_path}")
                 continue
@@ -1739,7 +1748,7 @@ My writing:
                     # check special entries
                     # if user call a chatbot without function calling
                     if "[CHAT]" in fineTunedUserInput:
-                        chatbot = config.llmPlatform
+                        chatbot = config.llmInterface
                     elif callChatBot := re.search("\[CHAT_([^\[\]]+?)\]", fineTunedUserInput):
                         chatbot = callChatBot.group(1).lower() if callChatBot and callChatBot.group(1).lower() in ("chatgpt", "geminipro", "palm2", "codey") else ""
                     else:
@@ -1783,7 +1792,7 @@ My writing:
                         # Create a new thread for the streaming task
                         streamingWordWrapper = StreamingWordWrapper()
                         streaming_event = threading.Event()
-                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmPlatform in ("chatgpt", "letmedoit") else False))
+                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("chatgpt", "letmedoit") else False))
                         # Start the streaming thread
                         self.streaming_thread.start()
 
@@ -1825,7 +1834,7 @@ My writing:
 
     def launchChatbot(self, chatbot, fineTunedUserInput):
         if not chatbot:
-            chatbot = config.llmPlatform
+            chatbot = config.llmInterface
         if config.isTermux:
             #chatbot = "chatgpt"
             ...
@@ -1888,7 +1897,7 @@ My writing:
             words = words.split(" ")
             for index, item in enumerate(words):
                 isLastItem = (len(words) - index == 1)
-                if SharedUtil.is_CJK(item):
+                if is_CJK(item):
                     for iIndex, i in enumerate(item):
                         isSpaceItem = (not isLastItem and (len(item) - iIndex == 1))
                         iWidth = getStringWidth(i)

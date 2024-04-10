@@ -6,14 +6,13 @@ open a url with default web browser
 [FUNCTION_CALL]
 """
 
-from freegenius import config
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius import config, openURL
 
 # Function method
 def open_browser(function_args):
     url = function_args.get("url") # required
     if url:
-        SharedUtil.openURL(url)
+        openURL(url)
     return ""
 
 # Function Signature

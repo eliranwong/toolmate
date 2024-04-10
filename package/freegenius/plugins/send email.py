@@ -6,8 +6,7 @@ send google or outlook emails
 [FUNCTION_CALL]
 """
 
-from freegenius import config
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius import config, openURL
 import urllib.parse
 
 """
@@ -88,7 +87,7 @@ def send_email(function_args):
             link += f"&body={body}"
         return link
 
-    SharedUtil.openURL(getOutlookLink() if email == "outlook" else getGoogleLink())
+    openURL(getOutlookLink() if email == "outlook" else getGoogleLink())
 
     return ""
 

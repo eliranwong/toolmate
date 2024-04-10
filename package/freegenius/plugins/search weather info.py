@@ -11,13 +11,13 @@ if not config.openweathermapApi:
 
 if config.openweathermapApi:
     from freegenius import config
-    from freegenius import print1, print2, print3
-    from freegenius.utils.shared_utils import SharedUtil
+    from freegenius import print1, print3
+    from freegenius.utils.python_utils import PythonUtil
     import json
 
     def search_weather_info(function_args):
         code = function_args.get("code") # required
-        information = SharedUtil.showAndExecutePythonCode(code)
+        information = PythonUtil.showAndExecutePythonCode(code)
         if information:
             return json.loads(information)["information"]
         return "Not found!"

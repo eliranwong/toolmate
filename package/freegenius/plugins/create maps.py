@@ -7,12 +7,12 @@ Create maps
 """
 
 from freegenius import config, print3
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius.utils.python_utils import PythonUtil
 import re, os
 
 def create_map(function_args):
     code = function_args.get("code") # required
-    information = SharedUtil.showAndExecutePythonCode(code)
+    information = PythonUtil.showAndExecutePythonCode(code)
     htmlPattern = """\.save\(["']([^\(\)]+\.html)["']\)"""
     match = re.search(htmlPattern, code)
     if match:

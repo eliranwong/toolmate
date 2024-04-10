@@ -1,6 +1,5 @@
 from freegenius import config
 import os, sys, re, platform, subprocess, shutil
-from freegenius.utils.shared_utils import SharedUtil
 
 class VlcUtil:
 

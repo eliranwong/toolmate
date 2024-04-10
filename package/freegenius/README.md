@@ -20,9 +20,9 @@ The author aims to equip FreeGenius AI, as an AI suite that is able to:
 - devlops strategies plugin framework to execute multi-step generation or task execution
 - run with common computer hardwares with reasonable and affordable cost
 
-# Supported LLM Platform / Models
+# Supported LLM Interface / Models
 
-FreeGenius AI incorporates four platforms: llamcpp, ollama, gemini, and ollama. It also maintains backward compatibility with LetMeDoIt AI in LetMeDoIt Mode. The configuration of the LLM Platform is determined by the value of config.llmPlatform, which defaults to 'llamacpp'.
+FreeGenius AI supports four interfaces: llamcpp, ollama, gemini, and chatgpt. It also maintains backward compatibility with LetMeDoIt AI in LetMeDoIt Mode. The configuration of the LLM Interface is determined by the value of config.llmInterface, which defaults to 'llamacpp'.
 
 * llamacpp - [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library)
 
@@ -34,7 +34,7 @@ FreeGenius AI incorporates four platforms: llamcpp, ollama, gemini, and ollama. 
 
 * letmedoit - [LetMeDoIt mode](https://github.com/eliranwong/freegenius/wiki/LetMeDoIt-Mode) / [ChatGPT models](https://platform.openai.com/docs/models)
 
-Note: You can use Ollama models with either "llamacpp" or "ollama" set as platform.
+Note: You can use Ollama models with either "llamacpp" or "ollama" set as interface.
 
 FreeGenius AI also integrates the following models to enhance its abilities.
 
@@ -58,7 +58,7 @@ chatgpt & letmedoit: Whisper (online API)
 
 llamacpp, ollama & gemini: stable-diffusion
 
-gemini: imagen (when imagen is open to public access)
+gemini: plan for imagen when imagen is open to public access
 
 chatgpt: dall-e-3
 

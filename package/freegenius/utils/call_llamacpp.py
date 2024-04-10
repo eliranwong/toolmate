@@ -5,7 +5,7 @@ from llama_cpp import Llama
 from prompt_toolkit import prompt
 from pathlib import Path
 from huggingface_hub import hf_hub_download
-import traceback, json, re, os, pprint
+import traceback, json, re, os, pprint, copy
 
 
 class CallLlamaCpp:
@@ -225,7 +225,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     def runSingleFunctionCall(messages, function_name):
-        messagesCopy = messages[:]
+        messagesCopy = copy.deepcopy(messages)
         try:
             _, function_call_response = CallLlamaCpp.getSingleFunctionCallResponse(messages, function_name)
             function_call_response = function_call_response if function_call_response else config.tempContent

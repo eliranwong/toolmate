@@ -7,7 +7,8 @@ def createShortcuts():
     systemtrayFile = os.path.join(config.freeGeniusAIFolder, "systemtray.py")
 
     thisOS = platform.system()
-    appName = config.freeGeniusAIName.split()[0]
+    #appName = config.freeGeniusAIName.split()[0]
+    appName = "FreeGenius"
     # Windows icon
     if thisOS == "Windows":
         myappid = "letmedoit.ai"
@@ -121,7 +122,7 @@ Name={config.freeGeniusAIName}
                 pass
         # system tray shortcut
         def desktopSystemTrayFileContent():
-            iconPath = os.path.join(config.freeGeniusAIFolder, "icons", f"systemtray.png")
+            iconPath = os.path.join(config.freeGeniusAIFolder, "icons", f"ai.png")
             if not os.path.isfile(iconPath):
                 iconPath = os.path.join(config.freeGeniusAIFolder, "icons", "LetMeDoIt.png")
             return f"""#!/usr/bin/env xdg-open

@@ -1,8 +1,7 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution
 from freegenius import config
 from freegenius import print1, print2, print3, getDynamicTokens, selectTool
-import re, traceback, openai, pprint
-import textwrap, json, pygments
+import re, traceback, openai, pprint, copy, textwrap, json, pygments
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.formatted_text import PygmentsTokens
@@ -113,7 +112,7 @@ def autoCorrectPythonCode(code, trace):
         userInput = f"Original python code:\n```\n{code}\n```\n\nTraceback:\n```\n{trace}\n```"
         messages = [{"role": "user", "content" : userInput}]
         print3(f"Auto-correction attempt: {(i + 1)}")
-        function_call_message, function_call_response = CallChatGPT.getSingleFunctionCallResponse(messages, "correct_python") if config.llmPlatform == "chatgpt" else CallLetMeDoIt.getSingleFunctionCallResponse(messages, "correct_python")
+        function_call_message, function_call_response = CallChatGPT.getSingleFunctionCallResponse(messages, "correct_python") if config.llmInterface == "chatgpt" else CallLetMeDoIt.getSingleFunctionCallResponse(messages, "correct_python")
         # display response
         print1(config.divider)
         if config.developer:
@@ -181,7 +180,7 @@ def getSingleChatResponse(userInput, messages=[], temperature=None):
         return ""
 
 def runSingleFunctionCall(messages, function_name):
-    messagesCopy = messages[:]
+    messagesCopy = copy.deepcopy(messages)
     try:
         function_call_message, function_call_response = getSingleFunctionCallResponse(messages, function_name)
         messages.append(function_call_message)
@@ -422,7 +421,7 @@ class CallChatGPT:
                 return CallChatGPT.regularCall(messages)
             else:
                 # record tool selection
-                config.currentMessages[-1]["tool"] = tool_name
+                #config.currentMessages[-1]["tool"] = tool_name
                 if tool_response:
                     if config.developer:
                         print2(config.divider)
@@ -607,9 +606,9 @@ class CallLetMeDoIt:
                                 "arguments": func_arguments,
                             }
                         }
-                        lastRole = thisMessage[-1].get("role", "")
-                        if lastRole == "user":
-                            thisMessage[-1]["tool"] = func_name
+                        #lastRole = thisMessage[-1].get("role", "")
+                        #if lastRole == "user":
+                            #thisMessage[-1]["tool"] = func_name
                         thisMessage.append(function_call_message) # extend conversation with assistant's reply
                         thisMessage.append(
                             {

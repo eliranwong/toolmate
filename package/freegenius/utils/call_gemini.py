@@ -2,7 +2,7 @@ from freegenius import getDeviceInfo, showErrors, get_or_create_collection, quer
 from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, isValidPythodCode, downloadStableDiffusionFiles
 from freegenius import config
 from prompt_toolkit import prompt
-import traceback, os, json, pprint
+import traceback, os, json, pprint, copy
 from typing import Optional, List, Dict, Union
 import vertexai
 from vertexai.preview.generative_models import GenerativeModel, FunctionDeclaration, Tool
@@ -24,9 +24,9 @@ class CallGemini:
         else:
             print("Vertex AI is disabled!")
             print("Read https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup for setting up Google API.")
-            config.llmPlatform = "llamacpp"
+            config.llmInterface = "llamacpp"
             config.saveConfig()
-            print("LLM platform changed back to 'llamacpp'")
+            print("LLM interface changed back to 'llamacpp'")
         # initiation
         vertexai.init()
         
@@ -172,7 +172,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     def runSingleFunctionCall(messages: list, function_name: str) -> list:
-        messagesCopy = messages[:]
+        messagesCopy = copy.deepcopy(messages)
         try:
             _, function_call_response = CallGemini.getSingleFunctionCallResponse(messages, function_name)
             function_call_response = function_call_response if function_call_response else config.tempContent

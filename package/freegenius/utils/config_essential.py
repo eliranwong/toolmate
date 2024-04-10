@@ -26,7 +26,7 @@ if config.isTermux:
 
 defaultSettings = (
     # unique configs in FreeGenius AI
-    ('llmPlatform', "llamacpp"), # "llamacpp", "ollama", "gemini", "chatgpt", "letmedoit"
+    ('llmInterface', "llamacpp"), # "llamacpp", "ollama", "gemini", "chatgpt", "letmedoit"
     ('intent_screening', False), # set True to increase both reliability and waiting time
     ('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools
     ('tool_auto_selection_threshold', 0.5), # range: 0.0 - 1.0; tool auto selection is implemented when the closest tool match has a semantic distance lower than its value; manual selection from top matched tools is implemented when the closest distance fall between its value and tool_dependence
@@ -196,6 +196,7 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "tempInterface",
     "llamacppServer",
     "llamacppVisionServer",
     "geminipro_model",
@@ -274,15 +275,16 @@ temporaryConfigs = [
 ]
 
 def saveConfig():
-    configFile = os.path.join(config.freeGeniusAIFolder, "config.py")
-    with open(configFile, "w", encoding="utf-8") as fileObj:
-        for name in dir(config):
-            excludeConfigList = temporaryConfigs + config.excludeConfigList
-            if not name.startswith("__") and not name in excludeConfigList:
-                try:
-                    value = eval(f"config.{name}")
-                    if not callable(value) and not str(value).startswith("<"):
-                        fileObj.write("{0} = {1}\n".format(name, pprint.pformat(value)))
-                except:
-                    pass
+    if not config.tempInterface:
+        configFile = os.path.join(config.freeGeniusAIFolder, "config.py")
+        with open(configFile, "w", encoding="utf-8") as fileObj:
+            for name in dir(config):
+                excludeConfigList = temporaryConfigs + config.excludeConfigList
+                if not name.startswith("__") and not name in excludeConfigList:
+                    try:
+                        value = eval(f"config.{name}")
+                        if not callable(value) and not str(value).startswith("<"):
+                            fileObj.write("{0} = {1}\n".format(name, pprint.pformat(value)))
+                    except:
+                        pass
 config.saveConfig = saveConfig

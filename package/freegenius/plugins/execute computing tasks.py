@@ -7,8 +7,8 @@ execute computing tasks
 """
 
 from freegenius import config, fineTunePythonCode, showRisk, confirmExecution, getPygmentsStyle
-from freegenius import print1, print2, print3
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius import print1
+from freegenius.utils.python_utils import PythonUtil
 from freegenius.utils.single_prompt import SinglePrompt
 import pygments
 from pygments.lexers.python import PythonLexer
@@ -52,7 +52,7 @@ def execute_computing_task(function_args):
         if not confirmation.lower() in ("y", "yes"):
             config.runPython = False
             return "[INVALID]"
-    return SharedUtil.executePythonCode(refinedCode)
+    return PythonUtil.executePythonCode(refinedCode)
 
 functionSignature = {
     "examples": [

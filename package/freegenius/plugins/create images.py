@@ -6,10 +6,9 @@ generate images with model "dall-e-3"
 [FUNCTION_CALL]
 """
 
-from freegenius import config, print2, print3
+from freegenius import config, print2, print3, getCurrentDateTime, getCliOutput
 import os
 from base64 import b64decode
-from freegenius.utils.shared_utils import SharedUtil
 from freegenius.utils.call_chatgpt import check_openai_errors
 from freegenius.utils.terminal_mode_dialogs import TerminalModeDialogs
 from openai import OpenAI
@@ -25,7 +24,7 @@ def create_image(function_args):
     def openImageFile(imageFile):
         print3(f"Saved image: {imageFile}")
         if config.terminalEnableTermuxAPI:
-            SharedUtil.getCliOutput(f"termux-share {imageFile}")
+            getCliOutput(f"termux-share {imageFile}")
         else:
             os.system(f"{config.open} {imageFile}")
 
@@ -34,9 +33,9 @@ def create_image(function_args):
     # image file path
     folder = os.path.join(config.localStorage, "images")
     Path(folder).mkdir(parents=True, exist_ok=True)
-    imageFile = os.path.join(folder, f"{SharedUtil.getCurrentDateTime()}.png")
+    imageFile = os.path.join(folder, f"{getCurrentDateTime()}.png")
 
-    if config.llmPlatform in ("llamacpp", "ollama", "gemini"):
+    if config.llmInterface in ("llamacpp", "ollama", "gemini"):
         config.stopSpinning()
 
         # customize width and height

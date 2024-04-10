@@ -10,10 +10,7 @@ config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else
 config.freeGeniusAIFolder = packageFolder
 if not hasattr(config, "freeGeniusAIName") or not config.freeGeniusAIName:
     config.freeGeniusAIName = "FreeGenius AI"
-from freegenius.utils.shared_utils import SharedUtil
-from freegenius.utils.tool_plugins import Plugins
 from freegenius.utils.tool_plugins import ToolStore
-from freegenius import print1, print2, print3
 config.divider = "--------------------"
 ToolStore.setupToolStoreClient()
 os.environ["TOKENIZERS_PARALLELISM"] = config.tokenizers_parallelism
@@ -30,7 +27,7 @@ freeGeniusAIFile = os.path.realpath(__file__)
 freeGeniusAIFolder = os.path.dirname(freeGeniusAIFile)
 with open(os.path.join(freeGeniusAIFolder, "package_name.txt"), "r", encoding="utf-8") as fileObj:
     package = fileObj.read()
-iconFile = os.path.join(freeGeniusAIFolder, "icons", "systemtray.png")
+iconFile = os.path.join(freeGeniusAIFolder, "icons", "ai.png")
 thisOS = platform.system()
 
 
@@ -51,8 +48,19 @@ class SystemTrayIcon(QSystemTrayIcon):
 
         #    self.menu.addSeparator()
 
+        action = QAction(package, self)
+        action.triggered.connect(partial(self.runLetMeDoItCommand, package))
+        self.menu.addAction(action)
+
+        action = QAction("letmedoit", self)
+        action.triggered.connect(partial(self.runLetMeDoItCommand, "letmedoit"))
+        self.menu.addAction(action)
+
+        self.menu.addSeparator()
+
         commandPrefix = [
-            package,
+            #package,
+            #"letmedoit",
             "llamacpp",
             "ollamachat",
             "chatgpt",

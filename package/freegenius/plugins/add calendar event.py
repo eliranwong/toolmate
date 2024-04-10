@@ -1,6 +1,5 @@
-from freegenius import config
+from freegenius import config, openURL
 import datetime
-from freegenius.utils.shared_utils import SharedUtil
 import urllib.parse
 
 """
@@ -118,7 +117,7 @@ def add_calendar_event(function_args):
             link += f"&location={location}"
         return link
 
-    SharedUtil.openURL(getOutlookLink() if calendar == "outlook" else getGoogleLink())
+    openURL(getOutlookLink() if calendar == "outlook" else getGoogleLink())
 
     return ""
 

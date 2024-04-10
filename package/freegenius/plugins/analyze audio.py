@@ -28,7 +28,7 @@ def analyze_audio(function_args):
     language = function_args.get("language") # required
 
     if audio_file and os.path.isfile(audio_file):
-        if config.llmPlatform in ("chatgpt", "letmedoit"):
+        if config.llmInterface in ("chatgpt", "letmedoit"):
             if not check_file_format(audio_file):
                 print3("This feature supports the following input file types only: '.mp3', '.mp4', '.mpeg', '.mpga', '.m4a', '.wav', '.webm'!")
                 return ""
@@ -43,7 +43,7 @@ def analyze_audio(function_args):
                         response_format="text"
                     )
                 transcript = f"The transcript of the audio is: {transcript}"
-                if config.llmPlatform == "letmedoit" and config.developer:
+                if config.llmInterface == "letmedoit" and config.developer:
                     config.print2(config.divider)
                     config.print3(transcript)
                     config.print2(config.divider)
@@ -52,7 +52,7 @@ def analyze_audio(function_args):
             except:
                 showErrors()
 
-        elif config.llmPlatform == "gemini":
+        elif config.llmInterface == "gemini":
 
             # create a speech recognition object
             r = sr.Recognizer()
@@ -80,7 +80,7 @@ def analyze_audio(function_args):
 
             return ""
 
-        elif config.llmPlatform == "gemini_alternative":
+        elif config.llmInterface == "gemini_alternative":
             #https://cloud.google.com/speech-to-text/docs/sync-recognize#speech-sync-recognize-python
 
             # not supported on Android; so import here
@@ -174,7 +174,7 @@ functionSignature = {
             "language": {
                 "type": "string",
                 "description": "Audio language",
-                "enum": list(googleSpeeckToTextLanguages.values()) if config.llmPlatform == "gemini" else ["English", "non-English"],
+                "enum": list(googleSpeeckToTextLanguages.values()) if config.llmInterface == "gemini" else ["English", "non-English"],
             },
         },
         "required": ["audio_filepath", "language"],

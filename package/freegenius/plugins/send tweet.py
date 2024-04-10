@@ -6,15 +6,14 @@ send a tweet to twitter
 [FUNCTION_CALL]
 """
 
-from freegenius import config
-from freegenius.utils.shared_utils import SharedUtil
+from freegenius import config, openURL
 import urllib.parse
 
 def send_tweet(function_args):
     message = function_args.get("message") # required
     config.stopSpinning()
     if message:
-        SharedUtil.openURL(f"""https://twitter.com/intent/tweet?text={urllib.parse.quote(message)}""")
+        openURL(f"""https://twitter.com/intent/tweet?text={urllib.parse.quote(message)}""")
     return ""
 
 functionSignature = {

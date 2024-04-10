@@ -1,4 +1,8 @@
 ollama_models = (
+    "codegemma",
+    "codegemma:instruct",
+    "codegemma:code",
+    "codegemma:2b-code",
     "gemma",
     "gemma:2b",
     "gemma:7b",
@@ -163,6 +167,8 @@ ollama_models = (
     "starcoder2:7b",
     "starcoder2:15b",
     "dolphincoder",
+    "dolphincoder:7b",
+    "dolphincoder:15b",
     "mxbai-embed-large",
     "command-r",
 )

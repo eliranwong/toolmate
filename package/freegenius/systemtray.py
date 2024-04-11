@@ -48,19 +48,10 @@ class SystemTrayIcon(QSystemTrayIcon):
 
         #    self.menu.addSeparator()
 
-        action = QAction(package, self)
-        action.triggered.connect(partial(self.runLetMeDoItCommand, package))
-        self.menu.addAction(action)
-
-        action = QAction("letmedoit", self)
-        action.triggered.connect(partial(self.runLetMeDoItCommand, "letmedoit"))
-        self.menu.addAction(action)
-
-        self.menu.addSeparator()
-
         commandPrefix = [
-            #package,
-            #"letmedoit",
+            package,
+            "letmedoit",
+            "",
             "llamacpp",
             "ollamachat",
             "chatgpt",
@@ -68,22 +59,28 @@ class SystemTrayIcon(QSystemTrayIcon):
             "geminiprovision",
             "palm2",
             "codey",
+            "",
             "autoassist",
             "autoretriever",
             "autobuilder",
-            "rag",
         ]
         commandSuffix = [
+            "",
+            "rag",
+            "",
             "etextedit",
             "commandprompt",
         ]
 
-        commands = commandPrefix + config.customTrayCommands + commandSuffix if hasattr(config, "customTrayCommands") and config.customTrayCommands else commandPrefix + commandSuffix
+        commands = commandPrefix + [""] + config.customTrayCommands + commandSuffix if hasattr(config, "customTrayCommands") and config.customTrayCommands else commandPrefix + commandSuffix
 
         for i in commands:
-            action = QAction(i, self)
-            action.triggered.connect(partial(self.runLetMeDoItCommand, i))
-            self.menu.addAction(action)
+            if not i:
+                self.menu.addSeparator()
+            else:
+                action = QAction(i, self)
+                action.triggered.connect(partial(self.runLetMeDoItCommand, i))
+                self.menu.addAction(action)
 
         self.menu.addSeparator()
 

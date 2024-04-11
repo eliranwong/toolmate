@@ -40,6 +40,8 @@ defaultSettings = (
     ('stableDiffusion_output_height', 512),
     ('ollamaVisionModel', 'llava'), # ollama model used for vision
     ('ollamaMainModel', 'mistral'), # ollama model used for both task execution and conversation
+    ('ollamaMainModel_additional_options', {}),
+    ('ollamaChatModel_additional_options', {}),
     ('ollamaMainModel_num_ctx', 100000), # ollama main model context window
     ('ollamaMainModel_num_batch', 512), # ollama chat model batch size
     ('ollamaMainModel_num_predict', -1), # ollama main model maximum tokens
@@ -52,6 +54,11 @@ defaultSettings = (
     ('llamacppServer_port', 8000),
     ('llamacppVisionModel_model_path', ''), # specify file path of llama.cpp model for vision
     ('llamacppVisionModel_clip_model_path', ''), # specify file path of llama.cpp clip model for vision
+    ('llamacppVisionModel_additional_options', ''),
+    ('llamacppMainModel_model_additional_options', {}),
+    ('llamacppMainModel_chat_additional_options', {}),
+    ('llamacppChatModel_model_additional_options', {}),
+    ('llamacppChatModel_chat_additional_options', {}),
     ('llamacppMainModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
     ('llamacppMainModel_model_path', ''), # specify file path of llama.cpp model for general purpose
     ('llamacppMainModel_repo_id', 'TheBloke/Mistral-7B-Instruct-v0.2-GGUF'), # llama.cpp model used for both task execution and conversation, e.g. 'TheBloke/phi-2-GGUF', 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'

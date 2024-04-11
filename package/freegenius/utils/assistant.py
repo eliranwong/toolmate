@@ -130,8 +130,8 @@ class FreeGenius:
             ".embedding": ("change embedding model", self.setEmbeddingModel),
             ".changeapikey": ("change OpenAI API key", self.changeChatGPTAPIkey),
             ".temperature": ("change temperature", self.setTemperature),
-            ".maxtokens": ("change maximum response tokens", self.setMaxTokens),
-            ".mintokens": ("change minimum response tokens", self.setMinTokens),
+            ".maxtokens": ("change maximum output tokens", self.setMaxTokens),
+            ".mintokens": ("change minimum output tokens", self.setMinTokens),
             ".dynamictokencount": ("change dynamic token count", self.setDynamicTokenCount),
             ".maxautocorrect": ("change maximum consecutive auto-correction", self.setMaxAutoCorrect),
             ".maxmemorymatches": ("change maximum memory matches", self.setMemoryClosestMatches),
@@ -553,6 +553,7 @@ class FreeGenius:
             config.dynamicTokenCount = (option == "enable")
             config.saveConfig()
             print3(f"Dynamic token count: {option}d!")
+            print3("Note: Changes applicable to 'chatgpt' and 'letmedoit' interfaces only.")
 
     def setIncludeIpInSystemMessage(self):
         options = ("enable", "disable")
@@ -1063,7 +1064,7 @@ class FreeGenius:
             print3(f"ChatGPT model: {model}")
             # set max tokens
             config.chatGPTApiMaxTokens = self.getMaxTokens()[-1]
-            print3(f"Maximum response tokens: {config.chatGPTApiMaxTokens}")
+            print3(f"Maximum output tokens: {config.chatGPTApiMaxTokens}")
 
     def setChatbot(self):
         model = self.dialogs.getValidOptions(
@@ -1178,14 +1179,15 @@ class FreeGenius:
             print3(f"Maximum consecutive auto-correction: {config.max_consecutive_auto_correction}")
 
     def setMinTokens(self):
-        print1("Please specify minimum response tokens below:")
+        print1("Please specify minimum output tokens below:")
+        print1("(applicable to 'chatgpt' and 'letmedoit' interfaces only)")
         mintokens = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.chatGPTApiMinTokens))
         if mintokens and not mintokens.strip().lower() == config.exit_entry and int(mintokens) > 0:
             config.chatGPTApiMinTokens = int(mintokens)
             if config.chatGPTApiMinTokens > config.chatGPTApiMaxTokens:
                 config.chatGPTApiMinTokens = config.chatGPTApiMaxTokens
             config.saveConfig()
-            print3(f"Minimum tokens: {config.chatGPTApiMinTokens}")
+            print3(f"Minimum output tokens: {config.chatGPTApiMinTokens}")
 
     def getMaxTokens(self):
         contextWindowLimit = tokenLimits[config.chatGPTApiModel]
@@ -1200,10 +1202,35 @@ class FreeGenius:
             maxToken = 4096
         return contextWindowLimit, functionTokens, maxToken
 
+    def setMaxTokens_non_chatgpt(self):
+        print1("Please specify maximum output tokens below:")
+        if config.llmInterface == "gemini":
+            default = config.geminipro_max_output_tokens
+        elif config.llmInterface == "llamacpp":
+            default = config.llamacppMainModel_max_tokens
+        elif config.llmInterface == "ollama":
+            default = config.ollamaMainModel_num_predict
+        maxtokens = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(default))
+        if maxtokens and not maxtokens.strip().lower() == config.exit_entry and int(maxtokens) > 0:
+            maxtokens = int(maxtokens)
+            if config.llmInterface == "gemini":
+                config.geminipro_max_output_tokens = maxtokens
+            elif config.llmInterface == "llamacpp":
+                config.llamacppMainModel_max_tokens = maxtokens
+            elif config.llmInterface == "ollama":
+                config.ollamaMainModel_num_predict = maxtokens
+            config.saveConfig()
+            print3(f"Maximum output tokens: {config.chatGPTApiMinTokens}")
+
     def setMaxTokens(self):
+        # non-chatgpt settings
+        if not config.llmInterface in ("chatgpt", "letmedoit"):
+            self.setMaxTokens_non_chatgpt()
+            return None
+        # chatgpt settings
         contextWindowLimit, functionTokens, tokenLimit = self.getMaxTokens()
         if tokenLimit < config.chatGPTApiMinTokens:
-            print2(f"Function tokens [{functionTokens}] exceed {config.chatGPTApiModel} response token limit.")
+            print2(f"Function tokens [{functionTokens}] exceed {config.chatGPTApiModel} output token limit.")
             print1("Either change to a model with higher token limit or disable unused function-call plguins.")
         else:
             print1(self.divider)
@@ -1211,16 +1238,16 @@ class FreeGenius:
             print3(f"Current GPT model: {config.chatGPTApiModel}")
             print3(f"Maximum context length: {contextWindowLimit}")
             print3(f"Current function tokens: {functionTokens}")
-            print3(f"Maximum response token allowed (excl. functions): {tokenLimit}")
+            print3(f"Maximum output token allowed (excl. functions): {tokenLimit}")
             print1(self.divider)
-            print1("Please specify maximum response tokens below:")
+            print1("Please specify maximum output tokens below:")
             maxtokens = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.chatGPTApiMaxTokens))
             if maxtokens and not maxtokens.strip().lower() == config.exit_entry and int(maxtokens) > 0:
                 config.chatGPTApiMaxTokens = int(maxtokens)
                 if config.chatGPTApiMaxTokens > tokenLimit:
                     config.chatGPTApiMaxTokens = tokenLimit
                 config.saveConfig()
-                print3(f"Maximum tokens: {config.chatGPTApiMaxTokens}")
+                print3(f"Maximum output tokens: {config.chatGPTApiMaxTokens}")
 
     def runSystemCommand(self, command):
         command = command.strip()[1:]

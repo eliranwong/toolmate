@@ -33,6 +33,7 @@ class CallLlamaCpp:
                 n_batch=config.llamacppMainModel_n_batch,
                 verbose=False,
                 n_gpu_layers=config.llamacppMainModel_n_gpu_layers,
+                **config.llamacppMainModel_model_additional_options,
             )
 
         def downloadChatModel():
@@ -176,17 +177,17 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             return "[INVALID]"
 
     @staticmethod
-    def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs):
+    def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None):
         return config.llamacppMainModel.create_chat_completion(
             messages=messages,
             temperature=temperature if temperature is not None else config.llmTemperature,
             max_tokens=max_tokens if max_tokens is not None else config.llamacppMainModel_max_tokens,
             stream=True,
-            **kwargs,
+            **config.llamacppMainModel_chat_additional_options,
         )
 
     @staticmethod
-    def getResponseDict(messages: list, schema: dict={}, temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs) -> dict:
+    def getResponseDict(messages: list, schema: dict={}, temperature: Optional[float]=None, max_tokens: Optional[int]=None) -> dict:
         schema = toParameterSchema(schema)
         try:
             completion = config.llamacppMainModel.create_chat_completion(
@@ -195,7 +196,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                 temperature=temperature if temperature is not None else config.llmTemperature,
                 max_tokens=max_tokens if max_tokens is not None else config.llamacppMainModel_max_tokens,
                 stream=False,
-                **kwargs,
+                **config.llamacppMainModel_chat_additional_options,
             )
             jsonOutput = completion["choices"][0]["message"].get("content", "{}")
             jsonOutput = re.sub("^[^{]*?({.*?})[^}]*?$", r"\1", jsonOutput)
@@ -206,7 +207,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             return {}
 
     @staticmethod
-    def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs):
+    def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[float]=None, max_tokens: Optional[int]=None):
         # non-streaming single call
         messages.append({"role": "user", "content" : userInput})
         try:
@@ -215,7 +216,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                 temperature=temperature if temperature is not None else config.llmTemperature,
                 max_tokens=max_tokens if max_tokens is not None else config.llamacppMainModel_max_tokens,
                 stream=False,
-                **kwargs,
+                **config.llamacppMainModel_chat_additional_options,
             )
             return completion["choices"][0]["message"].get("content", "")
         except:

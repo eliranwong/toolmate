@@ -112,7 +112,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     @check_ollama_errors
-    def regularCall(messages: dict, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
+    def regularCall(messages: dict, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None):
         return ollama.chat(
             keep_alive=config.ollamaMainModel_keep_alive,
             model=config.ollamaMainModel,
@@ -123,17 +123,17 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                 num_ctx=num_ctx if num_ctx is not None else config.ollamaMainModel_num_ctx,
                 num_batch=num_batch if num_batch is not None else config.ollamaMainModel_num_batch,
                 num_predict=num_predict if num_predict is not None else config.ollamaMainModel_num_predict,
+                **config.ollamaMainModel_additional_options,
             ),
-            **kwargs,
         )
 
     @staticmethod
     @check_ollama_errors
-    def getResponseDict(messages: list, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
+    def getResponseDict(messages: list, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None):
         #pprint.pprint(messages)
         try:
             completion = ollama.chat(
-                #keep_alive=config.ollamaMainModel_keep_alive,
+                keep_alive=config.ollamaMainModel_keep_alive,
                 model=config.ollamaMainModel,
                 messages=messages,
                 format="json",
@@ -143,8 +143,8 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                     num_ctx=num_ctx if num_ctx is not None else config.ollamaMainModel_num_ctx,
                     num_batch=num_batch if num_batch is not None else config.ollamaMainModel_num_batch,
                     num_predict=num_predict if num_predict is not None else config.ollamaMainModel_num_predict,
+                    **config.ollamaMainModel_additional_options,
                 ),
-                **kwargs,
             )
             jsonOutput = completion["message"]["content"]
             jsonOutput = re.sub("^[^{]*?({.*?})[^}]*?$", r"\1", jsonOutput)
@@ -158,12 +158,13 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     @check_ollama_errors
-    def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, model: Optional[str]=None, **kwargs):
+    def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, model: Optional[str]=None):
         # non-streaming single call
         if userInput:
             messages.append({"role": "user", "content" : userInput})
         try:
             completion = ollama.chat(
+                keep_alive=config.ollamaMainModel_keep_alive,
                 model=model if model is not None else config.ollamaMainModel,
                 messages=messages,
                 stream=False,
@@ -172,8 +173,8 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                     num_ctx=num_ctx if num_ctx is not None else config.ollamaMainModel_num_ctx,
                     num_batch=num_batch if num_batch is not None else config.ollamaMainModel_num_batch,
                     num_predict=num_predict if num_predict is not None else config.ollamaMainModel_num_predict,
+                    **config.ollamaMainModel_additional_options,
                 ),
-                **kwargs,
             )
             return completion["message"]["content"]
         except:

@@ -61,6 +61,7 @@ def modify_images(function_args):
             lora_model_dir=os.path.join(config.localStorage, "LLMs", "stable_diffusion", "lora"),
             wtype="default", # Weight type (options: default, f32, f16, q4_0, q4_1, q5_0, q5_1, q8_0)
             # seed=1337, # Uncomment to set a specific seed
+            verbose=config.stableDiffusion_verbose,
         )
         for imageFile in files:
             width, height = Image.open(imageFile).size
@@ -72,7 +73,7 @@ def modify_images(function_args):
             new_height = SinglePrompt.run(style=promptStyle, default=str(height), validator=NumberValidator())
             if new_height and not new_height.strip().lower() == config.exit_entry and int(new_height) > 0:
                 height = int(new_height)
-            image_description = OpenAI(base_url=f"http://localhost:{config.llamacppServer_port}/v1", api_key="freegenius").chat.completions.create(
+            image_description = OpenAI(base_url=f"http://localhost:{config.llamacppMainModel_server_port}/v1", api_key="freegenius").chat.completions.create(
                 model="gpt-4-vision-preview",
                 messages=[
                     {

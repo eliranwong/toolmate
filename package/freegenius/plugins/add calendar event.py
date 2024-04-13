@@ -1,5 +1,5 @@
 from freegenius import config, openURL
-import datetime
+import datetime, re
 import urllib.parse
 
 """
@@ -70,7 +70,9 @@ def add_calendar_event(function_args):
     description = function_args.get("description") # required
     url = function_args.get("url", "") # optional
     start_time = function_args.get("start_time") # required
+    start_time = f"{re.sub('Z$', '', start_time.replace('-', ''))}000000"[:15]
     end_time = function_args.get("end_time", "") # optional
+    end_time = f"{re.sub('Z$', '', end_time.replace('-', ''))}000000"[:15]
     location = function_args.get("location", "") # optional
 
     title = urllib.parse.quote(title)
@@ -165,4 +167,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=add_calendar_event)
+config.addFunctionCall(signature=functionSignature, method=add_calendar_event, deviceInfo=True)

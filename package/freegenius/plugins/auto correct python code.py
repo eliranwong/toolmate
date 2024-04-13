@@ -24,6 +24,8 @@ def correct_python(function_args):
 
     fix = function_args.get("code") # required
     missing = function_args.get("missing_modules") # required
+    if missing == "[]":
+        missing = ""
 
     try:
         if missing:

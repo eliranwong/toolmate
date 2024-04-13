@@ -35,6 +35,7 @@ defaultSettings = (
     ('includeDeviceInfoInContext', False),
     ('includeIpInDeviceInfo', False),
     ('useAdditionalChatModel', False),
+    ('stableDiffusion_verbose', False),
     ('stableDiffusion_model_path', ""),
     ('stableDiffusion_output_width', 512),
     ('stableDiffusion_output_height', 512),
@@ -51,14 +52,18 @@ defaultSettings = (
     ('ollamaChatModel_num_batch', 512), # ollama chat model batch size
     ('ollamaChatModel_num_predict', -1), # ollama chat model maximum tokens
     ('ollamaChatModel_keep_alive', "5m"), # ollama chat model keep alive time
-    ('llamacppServer_port', 8000),
+    ('llamacppMainModel_verbose', False),
+    ('llamacppChatModel_verbose', False),
+    ('llamacppVisionModel_verbose', False),
+    ('llamacppMainModel_server_port', 8000),
+    ('llamacppVisionModel_server_port', 8000),
     ('llamacppVisionModel_model_path', ''), # specify file path of llama.cpp model for vision
     ('llamacppVisionModel_clip_model_path', ''), # specify file path of llama.cpp clip model for vision
     ('llamacppVisionModel_additional_options', ''),
-    ('llamacppMainModel_model_additional_options', {}),
-    ('llamacppMainModel_chat_additional_options', {}),
-    ('llamacppChatModel_model_additional_options', {}),
-    ('llamacppChatModel_chat_additional_options', {}),
+    ('llamacppMainModel_additional_model_options', {}),
+    ('llamacppMainModel_additional_chat_options', {}),
+    ('llamacppChatModel_additional_model_options', {}),
+    ('llamacppChatModel_additional_chat_options', {}),
     ('llamacppMainModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
     ('llamacppMainModel_model_path', ''), # specify file path of llama.cpp model for general purpose
     ('llamacppMainModel_repo_id', 'TheBloke/Mistral-7B-Instruct-v0.2-GGUF'), # llama.cpp model used for both task execution and conversation, e.g. 'TheBloke/phi-2-GGUF', 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'

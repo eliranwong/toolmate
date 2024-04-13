@@ -27,11 +27,11 @@ functionSignature = {
         "properties": {
             "code": {
                 "type": "string",
-                "description": f"Generate python code that uses my current date and time in {config.state}, {config.country} with package 'pytz' to resolve my request. Please pay attention to any specific locations or dates.",
+                "description": f"Generate python code that uses package 'pytz' to resolve my request. Please pay attention to any specific locations or dates.",
             },
         },
         "required": ["code"],
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=datetimes)
+config.addFunctionCall(signature=functionSignature, method=datetimes, deviceInfo=True)

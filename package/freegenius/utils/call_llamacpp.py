@@ -5,7 +5,7 @@ from llama_cpp import Llama
 from prompt_toolkit import prompt
 from pathlib import Path
 from huggingface_hub import hf_hub_download
-import traceback, json, re, os, pprint, copy
+import traceback, json, re, os, pprint, copy, datetime
 
 
 class CallLlamaCpp:
@@ -31,9 +31,9 @@ class CallLlamaCpp:
                 chat_format="chatml",
                 n_ctx=config.llamacppMainModel_n_ctx,
                 n_batch=config.llamacppMainModel_n_batch,
-                verbose=False,
+                verbose=config.llamacppMainModel_verbose,
                 n_gpu_layers=config.llamacppMainModel_n_gpu_layers,
-                **config.llamacppMainModel_model_additional_options,
+                **config.llamacppMainModel_additional_model_options,
             )
 
         def downloadChatModel():
@@ -183,7 +183,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             temperature=temperature if temperature is not None else config.llmTemperature,
             max_tokens=max_tokens if max_tokens is not None else config.llamacppMainModel_max_tokens,
             stream=True,
-            **config.llamacppMainModel_chat_additional_options,
+            **config.llamacppMainModel_additional_chat_options,
         )
 
     @staticmethod
@@ -196,7 +196,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                 temperature=temperature if temperature is not None else config.llmTemperature,
                 max_tokens=max_tokens if max_tokens is not None else config.llamacppMainModel_max_tokens,
                 stream=False,
-                **config.llamacppMainModel_chat_additional_options,
+                **config.llamacppMainModel_additional_chat_options,
             )
             jsonOutput = completion["choices"][0]["message"].get("content", "{}")
             jsonOutput = re.sub("^[^{]*?({.*?})[^}]*?$", r"\1", jsonOutput)
@@ -209,14 +209,15 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     @staticmethod
     def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[float]=None, max_tokens: Optional[int]=None):
         # non-streaming single call
-        messages.append({"role": "user", "content" : userInput})
+        if userInput:
+            messages.append({"role": "user", "content" : userInput})
         try:
             completion = config.llamacppMainModel.create_chat_completion(
                 messages=messages,
                 temperature=temperature if temperature is not None else config.llmTemperature,
                 max_tokens=max_tokens if max_tokens is not None else config.llamacppMainModel_max_tokens,
                 stream=False,
-                **config.llamacppMainModel_chat_additional_options,
+                **config.llamacppMainModel_additional_chat_options,
             )
             return completion["choices"][0]["message"].get("content", "")
         except:
@@ -301,6 +302,9 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                     print3(f"Selected: {tool_name} ({semantic_distance})")
             if tool_name == "chat":
                 return CallLlamaCpp.regularCall(messages)
+            elif tool_name in config.deviceInfoPlugins:
+                user_request = f"""Context: Today is {config.dayOfWeek}. The current date and time here in {config.state}, {config.country} is {str(datetime.datetime.now())}.
+{user_request}"""
             # 3. Parameter Extraction
             if config.developer:
                 print1("extracting parameters ...")
@@ -409,15 +413,38 @@ Remember, response in JSON with the filled template ONLY.""",
         Extract action parameters
         """
         schema = toParameterSchema(schema)
-        deviceInfo = f"""\n\nMy device information:\n{getDeviceInfo()}""" if config.includeDeviceInfoInContext else ""
-        if "code" in schema["properties"]:
-            enforceCodeOutput = """Remember, you should format the requested information, if any, into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."""
-            schema["properties"]["code"]["description"] += enforceCodeOutput
-            code_instruction = f"""\n\nParticularly, generate python code as the value of the JSON key "code" based on the following instruction:\n{schema["properties"]["code"]["description"]}"""
-        else:
-            code_instruction = ""
+        schemaCopy = copy.deepcopy(schema)
 
-        properties = schema["properties"]
+        # Generate Code when required
+        if "code" in schema["required"]:
+            del schemaCopy["properties"]["code"]
+            schemaCopy["required"].remove("code")
+            enforceCodeOutput = """ Remember, you should format the requested information, if any, into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."""
+            schema["properties"]["code"]["description"] += enforceCodeOutput
+            code_instruction = f"""Generate python code according to the following instruction:
+</instruction>
+{schema["properties"]["code"]["description"]}
+</instruction>
+
+Here is my request:
+<request>
+{userInput}
+</request>
+
+Remember, response with the required python code ONLY, WITHOUT extra notes or explanations."""
+
+            code = CallLlamaCpp.getSingleChatResponse(code_instruction, ongoingMessages[:-1]).replace(r"\\n", "\n")
+            code = extractPythonCode(code, keepInvalid=True)
+            if len(schema["properties"]) == 1:
+                return {"code": code}
+        else:
+            code = ""
+
+        codeContext = f"""
+
+Find required code below:
+{code}""" if code else ""
+
         messages = ongoingMessages[:-2] + [
             {
                 "role": "system",
@@ -428,54 +455,19 @@ Remember, response in JSON with the filled template ONLY.""",
                 "content": f"""Response in JSON based on the following content:
 
 <content>
-{userInput}{deviceInfo}
+{userInput}{codeContext}
 </content>
 
-Generate content to fill up the value of each required key in the JSON, if information is not provided.{code_instruction}
+Generate content to fill up the value of each required key in the JSON, if information is not provided.
 
 Remember, output in JSON.""",
             },
         ]
 
         # schema alternative: properties if len(properties) == 1 else schema
-        parameters = CallLlamaCpp.getResponseDict(messages, schema, temperature=temperature, max_tokens=max_tokens, **kwargs)
-
-        # enforce code generation
-        if (len(properties) == 1 or "code" in schema["required"]) and "code" in parameters and (not isinstance(parameters.get("code"), str) or not parameters.get("code").strip() or not isValidPythodCode(parameters.get("code").strip())):
-            code_description = properties["code"]["description"]
-            messages = ongoingMessages[:-2] + [
-                {
-                    "role": "system",
-                    "content": f"""You are a JSON builder expert that outputs in JSON.""",
-                },
-                {
-                    "role": "user",
-                    "content": f"""Generate code based on the following instruction:
-
-{code_description}
-
-Here is my request:
-
-<request>
-{userInput}
-</request>{deviceInfo}
-
-Remember, output in JSON.""",
-                },
-            ]
-
-            this_schema = {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "type": "string",
-                        "description": code_description,
-                    },
-                },
-                "required": ["code"],
-            }
-            code = CallLlamaCpp.getResponseDict(messages, this_schema, temperature=temperature, max_tokens=max_tokens, **kwargs)
-            parameters["code"] = code["code"]
+        parameters = CallLlamaCpp.getResponseDict(messages, schemaCopy, temperature=temperature, max_tokens=max_tokens, **kwargs)
+        if code:
+            parameters["code"] = code
 
         if config.developer:
             print2("```parameters")

@@ -74,7 +74,7 @@ functionSignature1 = {
         "save in your memory",
         "keep in mind",
         "memorize",
-        "take a note",
+        "make a note",
     ],
     "name": "save_memory",
     "description": """Use this function if I mention something which you think would be useful in the future and should be saved as a memory. Saved memories will allow you to retrieve snippets of past conversations when needed.""",

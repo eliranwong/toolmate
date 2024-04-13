@@ -64,6 +64,7 @@ def create_image(function_args):
             lora_model_dir=os.path.join(config.localStorage, "LLMs", "stable_diffusion", "lora"),
             wtype="default", # Weight type (options: default, f32, f16, q4_0, q4_1, q5_0, q5_1, q8_0)
             # seed=1337, # Uncomment to set a specific seed
+            verbose=config.stableDiffusion_verbose,
         )
         stable_diffusion.txt_to_img(
             prompt,

@@ -56,9 +56,9 @@ class LlamacppChat:
             chat_format="chatml",
             n_ctx=config.llamacppChatModel_n_ctx,
             n_batch=config.llamacppChatModel_n_batch,
-            verbose=False,
+            verbose=config.llamacppChatModel_verbose,
             n_gpu_layers=config.llamacppChatModel_n_gpu_layers,
-            **config.llamacppChatModel_model_additional_options,
+            **config.llamacppChatModel_additional_model_options,
         )
 
     def resetMessages(self):
@@ -114,7 +114,7 @@ class LlamacppChat:
                         temperature=self.temperature,
                         max_tokens=self.max_output_tokens,
                         stream=True,
-                        **config.llamacppChatModel_chat_additional_options,
+                        **config.llamacppChatModel_additional_chat_options,
                     )
 
                     # Create a new thread for the streaming task

@@ -1,7 +1,7 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
 from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, isValidPythodCode, downloadStableDiffusionFiles
 from freegenius import config
-import shutil, re, traceback, json, ollama, pprint, copy
+import shutil, re, traceback, json, ollama, pprint, copy, datetime
 from typing import Optional
 from freegenius.utils.download import Downloader
 from ollama import Options
@@ -260,6 +260,9 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                     print3(f"Selected: {tool_name} ({semantic_distance})")
             if tool_name == "chat":
                 return CallOllama.regularCall(messages)
+            elif tool_name in config.deviceInfoPlugins:
+                user_request = f"""Context: Today is {config.dayOfWeek}. The current date and time here in {config.state}, {config.country} is {str(datetime.datetime.now())}.
+{user_request}"""
             # 3. Parameter Extraction
             if config.developer:
                 print1("extracting parameters ...")
@@ -354,17 +357,40 @@ Remember, response in JSON with the filled template ONLY.""",
         """
         Extract action parameters
         """
-        
         schema = toParameterSchema(schema)
-        deviceInfo = f"""\n\nMy device information:\n{getDeviceInfo()}""" if config.includeDeviceInfoInContext else ""
-        if "code" in schema["properties"]:
+        schemaCopy = copy.deepcopy(schema)
+
+        # Generate Code when required
+        if "code" in schema["required"]:
+            del schemaCopy["properties"]["code"]
+            schemaCopy["required"].remove("code")
             enforceCodeOutput = """ Remember, you should format the requested information, if any, into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."""
             schema["properties"]["code"]["description"] += enforceCodeOutput
-            code_instruction = f"""\n\nParticularly, generate python code as the value of the JSON key "code" based on the following instruction:\n{schema["properties"]["code"]["description"]}"""
-        else:
-            code_instruction = ""
+            code_instruction = f"""Generate python code according to the following instruction:
+</instruction>
+{schema["properties"]["code"]["description"]}
+</instruction>
 
-        properties = schema["properties"]
+Here is my request:
+<request>
+{userInput}
+</request>
+
+Remember, response with the required python code ONLY, WITHOUT extra notes or explanations."""
+
+            code = CallOllama.getSingleChatResponse(code_instruction, ongoingMessages[:-1]).replace(r"\\n", "\n")
+            code = extractPythonCode(code, keepInvalid=True)
+            if len(schema["properties"]) == 1:
+                return {"code": code}
+        else:
+            code = ""
+
+        codeContext = f"""
+
+Find required code below:
+{code}""" if code else ""
+
+        properties = schemaCopy["properties"]
         template = {property: "" if properties[property]['type'] == "string" else [] for property in properties}
         
         messages = ongoingMessages[:-2] + [
@@ -383,7 +409,7 @@ Remember, response in JSON with the filled template ONLY.""",
 Base the value of each key, in the template, on the following content and your generation:
 
 <content>
-{userInput}{deviceInfo}
+{userInput}{codeContext}
 </content>
 
 Generate content to fill up the value of each required key in the JSON, if information is not provided.{code_instruction}
@@ -393,39 +419,8 @@ Remember, response in JSON with the filled template ONLY.""",
         ]
 
         parameters = CallOllama.getResponseDict(messages, temperature=temperature, num_ctx=num_ctx, num_batch=num_batch, num_predict=num_predict, **kwargs)
-
-        # enforce code generation
-        if (len(properties) == 1 or "code" in schema["required"]) and "code" in parameters and (not isinstance(parameters.get("code"), str) or not parameters.get("code").strip() or not isValidPythodCode(parameters.get("code").strip())):
-            template = {"code": ""}
-            messages = ongoingMessages[:-2] + [
-                {
-                    "role": "system",
-                    "content": f"""You are a JSON builder expert. You response to my input according to the following schema:
-
-{properties["code"]}""",
-                },
-                {
-                    "role": "user",
-                    "content": f"""Use the following template in your response:
-
-{template}
-
-Fill in the value of key "code", in the template, by code generation:
-
-{properties["code"]["description"]}
-
-Here is my request:
-
-<request>
-{userInput}
-</request>{deviceInfo}
-
-Remember, answer in JSON with the filled template ONLY.""",
-                },
-            ]
-
-            code = CallOllama.getResponseDict(messages, temperature=temperature, num_ctx=num_ctx, num_batch=num_batch, num_predict=num_predict, **kwargs)
-            parameters["code"] = code["code"]
+        if code:
+            parameters["code"] = code
 
         if config.developer:
             print2("```parameters")

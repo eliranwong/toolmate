@@ -45,13 +45,31 @@ class SystemTrayIcon(QSystemTrayIcon):
         #    chatgui = QAction("Desktop Assistant [experimental]", self)
         #    chatgui.triggered.connect(self.showGui)
         #    self.menu.addAction(chatgui)
-
         #    self.menu.addSeparator()
 
-        commandPrefix = [
-            package,
-            "letmedoit",
-            "",
+        for i in (package, "letmedoit"):
+            action = QAction(i, self)
+            action.triggered.connect(partial(self.runFreeGeniusCommand, i))
+            self.menu.addAction(action)
+        self.menu.addSeparator()
+
+        # submenu - servers
+        submenu = QMenu()
+        for i in (
+            "chatserver",
+            "visionserver",
+        ):
+            action = QAction(i, self)
+            action.triggered.connect(partial(self.runFreeGeniusCommand, i))
+            submenu.addAction(action)
+
+        menuAction = QAction("Servers", self)
+        menuAction.setMenu(submenu)
+        self.menu.addAction(menuAction)
+
+        # submenu - cahtbots
+        submenu = QMenu()
+        for i in (
             "llamacpp",
             "ollamachat",
             "chatgpt",
@@ -59,28 +77,55 @@ class SystemTrayIcon(QSystemTrayIcon):
             "geminiprovision",
             "palm2",
             "codey",
-            "",
-            "autoassist",
-            "autoretriever",
-            "autobuilder",
-        ]
-        commandSuffix = [
-            "",
+        ):
+            action = QAction("ollama" if i == "ollamachat" else i, self)
+            action.triggered.connect(partial(self.runFreeGeniusCommand, i))
+            submenu.addAction(action)
+
+        menuAction = QAction("Chatbots", self)
+        menuAction.setMenu(submenu)
+        self.menu.addAction(menuAction)
+
+        # submenu - autogen agents
+        submenu = QMenu()
+        for i in ("autoassist", "autoretriever", "autobuilder"):
+            action = QAction(i, self)
+            action.triggered.connect(partial(self.runFreeGeniusCommand, i))
+            submenu.addAction(action)
+
+        menuAction = QAction("AutoGen Agents", self)
+        menuAction.setMenu(submenu)
+        self.menu.addAction(menuAction)
+
+        # submenu - utilities
+        submenu = QMenu()
+        for i in (
             "rag",
-            "",
             "etextedit",
             "commandprompt",
-        ]
+        ):
+            action = QAction(i, self)
+            action.triggered.connect(partial(self.runFreeGeniusCommand, i))
+            submenu.addAction(action)
 
-        commands = commandPrefix + [""] + config.customTrayCommands + commandSuffix if hasattr(config, "customTrayCommands") and config.customTrayCommands else commandPrefix + commandSuffix
+        menuAction = QAction("Utilities", self)
+        menuAction.setMenu(submenu)
+        self.menu.addAction(menuAction)
 
-        for i in commands:
-            if not i:
-                self.menu.addSeparator()
-            else:
-                action = QAction(i, self)
-                action.triggered.connect(partial(self.runLetMeDoItCommand, i))
-                self.menu.addAction(action)
+        # submenu - custom commands
+        if hasattr(config, "customTrayCommands") and config.customTrayCommands:
+            submenu = QMenu()
+            for i in config.customTrayCommands:
+                if not i:
+                    self.menu.addSeparator()
+                else:
+                    action = QAction("ollama" if i == "ollamachat" else i, self)
+                    action.triggered.connect(partial(self.runFreeGeniusCommand, i))
+                    submenu.addAction(action)
+
+        menuAction = QAction("Custom", self)
+        menuAction.setMenu(submenu)
+        self.menu.addAction(menuAction)
 
         self.menu.addSeparator()
 
@@ -105,7 +150,7 @@ class SystemTrayIcon(QSystemTrayIcon):
         self.chatGui.hide()
         self.chatGui.show()
 
-    def runLetMeDoItCommand(self, command):
+    def runFreeGeniusCommand(self, command):
         def createShortcutFile(filePath, content):
             with open(filePath, "w", encoding="utf-8") as fileObj:
                 fileObj.write(content)

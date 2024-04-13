@@ -10,7 +10,7 @@ from freegenius import config, fineTunePythonCode, showRisk, confirmExecution, g
 from freegenius import print1
 from freegenius.utils.python_utils import PythonUtil
 from freegenius.utils.single_prompt import SinglePrompt
-import pygments
+import pygments, pprint
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit import print_formatted_text
@@ -52,7 +52,9 @@ def execute_computing_task(function_args):
         if not confirmation.lower() in ("y", "yes"):
             config.runPython = False
             return "[INVALID]"
-    return PythonUtil.executePythonCode(refinedCode)
+    config.tempContent = PythonUtil.executePythonCode(refinedCode)
+    pprint.pprint(config.tempContent)
+    return ""
 
 functionSignature = {
     "examples": [

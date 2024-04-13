@@ -66,18 +66,18 @@ def startLlamacppServer():
         if not hasattr(config, "llamacppServer") or config.llamacppServer is None:
             config.llamacppServer = None
             print2("Running llama.cpp server ...")
-            cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppServer_port} --model "{config.llamacppMainModel_model_path}" --verbose False --chat_format chatml --n_ctx {config.llamacppMainModel_n_ctx} --n_gpu_layers {config.llamacppMainModel_n_gpu_layers} --n_batch {config.llamacppMainModel_n_batch}"""
+            cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppMainModel_server_port} --model "{config.llamacppMainModel_model_path}" --verbose {config.llamacppMainModel_verbose} --chat_format chatml --n_ctx {config.llamacppMainModel_n_ctx} --n_gpu_layers {config.llamacppMainModel_n_gpu_layers} --n_batch {config.llamacppMainModel_n_batch}"""
             config.llamacppServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
-            while not check_server("127.0.0.1", config.llamacppServer_port):
+            while not isServerAlive("127.0.0.1", config.llamacppMainModel_server_port):
                 # wait til the server is up
                 ...
     except:
-        print2(f'''Failed to run llama.cpp server at "localhost:{config.llamacppServer_port}"!''')
+        print2(f'''Failed to run llama.cpp server at "localhost:{config.llamacppMainModel_server_port}"!''')
         config.llamacppServer = None
 
 def stopLlamacppServer():
     if hasattr(config, "llamacppServer") and config.llamacppServer is not None:
-        if check_server("127.0.0.1", config.llamacppServer_port):
+        if isServerAlive("127.0.0.1", config.llamacppMainModel_server_port):
             print2("Stopping llama.cpp server ...")
             os.killpg(os.getpgid(config.llamacppServer.pid), signal.SIGTERM)
         config.llamacppServer = None
@@ -88,20 +88,20 @@ def startLlamacppVisionServer():
             if os.path.isfile(config.llamacppVisionModel_model_path) and os.path.isfile(config.llamacppVisionModel_clip_model_path):
                 config.llamacppVisionServer = None
                 print2("Running llama.cpp vision server ...")
-                cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppServer_port} --model "{config.llamacppVisionModel_model_path}" --clip_model_path {config.llamacppVisionModel_clip_model_path} --verbose False --chat_format llava-1-5 --n_ctx {config.llamacppMainModel_n_ctx} --n_gpu_layers {config.llamacppMainModel_n_gpu_layers} --n_batch {config.llamacppMainModel_n_batch} {config.llamacppVisionModel_additional_options}"""
+                cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppVisionModel_server_port} --model "{config.llamacppVisionModel_model_path}" --clip_model_path {config.llamacppVisionModel_clip_model_path} --verbose {config.llamacppVisionModel_verbose} --chat_format llava-1-5 --n_ctx {config.llamacppMainModel_n_ctx} --n_gpu_layers {config.llamacppMainModel_n_gpu_layers} --n_batch {config.llamacppMainModel_n_batch} {config.llamacppVisionModel_additional_options}"""
                 config.llamacppVisionServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
-                while not check_server("127.0.0.1", config.llamacppServer_port):
+                while not isServerAlive("127.0.0.1", config.llamacppVisionModel_server_port):
                     # wait til the server is up
                     ...
             else:
                 print1("Error! Clip model or vision model is missing!")
     except:
-        print2(f'''Failed to run llama.cpp server at "localhost:{config.llamacppServer_port}"!''')
+        print2(f'''Failed to run llama.cpp server at "localhost:{config.llamacppVisionModel_server_port}"!''')
         config.llamacppVisionServer = None
 
 def stopLlamacppVisionServer():
     if hasattr(config, "llamacppVisionServer") and config.llamacppVisionServer is not None:
-        if check_server("127.0.0.1", config.llamacppServer_port):
+        if isServerAlive("127.0.0.1", config.llamacppVisionModel_server_port):
             print2("Stopping llama.cpp vision server ...")
             os.killpg(os.getpgid(config.llamacppVisionServer.pid), signal.SIGTERM)
         config.llamacppVisionServer = None
@@ -222,7 +222,7 @@ def selectTool(search_result, closest_distance) -> Optional[int]:
 
 # connectivity
 
-def check_server(ip, port):
+def isServerAlive(ip, port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(2)  # Timeout in case of server not responding
     try:
@@ -416,16 +416,24 @@ def isValidPythodCode(code):
     except:
         return None
 
-def extractPythonCode(content):
-    if code_only := re.search('```python\n(.+?)```', content, re.DOTALL):
-        content = code_only.group(1)
-    elif code_only := re.search('```\n(.+?)```', content, re.DOTALL):
-        content = code_only.group(1)
-    return content if isValidPythodCode(content) is not None else ""
+def extractPythonCode(content, keepInvalid=False):
+    content = content.replace("<python>", "")
+    content = content.replace("</python>", "")
+    content = content.replace("<\/python>", "")
+    content = re.sub("^python[ ]*\n", "", content).strip()
+    content = re.sub("^```python[ ]*\n", "", content).strip()
+    content = re.sub("\n```$", "", content).strip()
+    if code_only := re.search('```python[ ]*\n(.+?)```', content, re.DOTALL):
+        content = code_only.group(1).strip()
+    elif code_only := re.search('```[ ]*\n(.+?)```', content, re.DOTALL):
+        content = code_only.group(1).strip()
+    content = re.sub("\n```[^\n]*?$", "", content, flags=re.M)
+    return content if keepInvalid or isValidPythodCode(content) is not None else ""
 
 def fineTunePythonCode(code):
     # dedent
     code = textwrap.dedent(code).rstrip()
+    code = re.sub("^python[ ]*\n", "", code)
     # extract from code block, if any
     if code_only := re.search('```python\n(.+?)```', code, re.DOTALL):
         code = code_only.group(1)

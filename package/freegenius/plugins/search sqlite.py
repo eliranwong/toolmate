@@ -7,8 +7,8 @@ Ask SQLite file. To retrieve information from or make changes in a sqlite file, 
 """
 
 from freegenius import config, showErrors
-from freegenius import print1, print2, print3
-from freegenius.utils.shared_utils import CallLLM
+from freegenius import print2
+from freegenius.utils.call_llm import CallLLM
 import os, sqlite3, json
 
 def search_sqlite(function_args):

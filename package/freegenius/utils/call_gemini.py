@@ -2,7 +2,7 @@ from freegenius import getDeviceInfo, showErrors, get_or_create_collection, quer
 from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, isValidPythodCode, downloadStableDiffusionFiles
 from freegenius import config
 from prompt_toolkit import prompt
-import traceback, os, json, pprint, copy
+import traceback, os, json, pprint, copy, datetime
 from typing import Optional, List, Dict, Union
 import vertexai
 from vertexai.preview.generative_models import GenerativeModel, FunctionDeclaration, Tool
@@ -248,6 +248,9 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                     print3(f"Selected: {tool_name} ({semantic_distance})")            
             if tool_name == "chat":
                 return CallGemini.regularCall(messages)
+            elif tool_name in config.deviceInfoPlugins:
+                user_request = f"""Context: Today is {config.dayOfWeek}. The current date and time here in {config.state}, {config.country} is {str(datetime.datetime.now())}.
+{user_request}"""
             # 3. Parameter Extraction
             if config.developer:
                 print1("extracting parameters ...")

@@ -20,14 +20,14 @@ class PythonUtil:
 
     @staticmethod
     def showAndExecutePythonCode(code):
-        code = extractPythonCode(code)
-        if code:
+        validCode = extractPythonCode(code)
+        if validCode:
             config.stopSpinning()
-            PythonUtil.displayPythonCode(code)
-            refinedCode = fineTunePythonCode(code)
+            PythonUtil.displayPythonCode(validCode)
+            refinedCode = fineTunePythonCode(validCode)
             information = PythonUtil.executePythonCode(refinedCode)
             return information
-        return "[INVALID]"
+        return json.dumps({"information": code})
 
     @staticmethod
     def executePythonCode(code):

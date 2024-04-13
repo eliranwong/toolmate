@@ -103,7 +103,7 @@ defaultSettings = (
     ('autoUpgrade', True),
     #('chatbot', 'chatgpt'),
     ('customTrayCommands', ['mistral', 'llama2']),
-    ('chatGPTApiModel', 'gpt-3.5-turbo'),
+    ('chatGPTApiModel', 'gpt-4-turbo'),
     ('chatGPTApiMaxTokens', 4000),
     ('chatGPTApiMinTokens', 256),
     #('chatGPTApiNoOfChoices', 1),

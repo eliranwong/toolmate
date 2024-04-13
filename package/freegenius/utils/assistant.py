@@ -1194,6 +1194,7 @@ class FreeGenius:
         functionTokens = count_tokens_from_functions(config.toolFunctionSchemas.values())
         maxToken = contextWindowLimit - functionTokens - config.chatGPTApiMinTokens
         if maxToken > 4096 and config.chatGPTApiModel in (
+            "gpt-4-turbo",
             "gpt-4-turbo-preview",
             "gpt-4-0125-preview",
             "gpt-4-1106-preview",

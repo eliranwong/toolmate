@@ -11,6 +11,7 @@ from openai import OpenAI
 # token limit
 # reference: https://platform.openai.com/docs/models/gpt-4
 tokenLimits = {
+    "gpt-4-turbo": 128000, # Returns a maximum of 4,096 output tokens.
     "gpt-4-turbo-preview": 128000, # Returns a maximum of 4,096 output tokens.
     "gpt-4-0125-preview": 128000, # Returns a maximum of 4,096 output tokens.
     "gpt-4-1106-preview": 128000, # Returns a maximum of 4,096 output tokens.

@@ -38,7 +38,7 @@ class AutoGenBuilder:
         #    api_version=None,
         #)
         # assign ChatGPT4 to run the builder
-        self.chatGPTmodel = "gpt-4-turbo-preview"
+        self.chatGPTmodel = "gpt-4-turbo"
         oai_config_list = []
         for model in (self.chatGPTmodel,):
             oai_config_list.append({"model": model, "api_key": config.openaiApiKey})

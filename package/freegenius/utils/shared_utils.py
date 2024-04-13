@@ -723,6 +723,7 @@ City: {g.city}"""
 # token limit
 # reference: https://platform.openai.com/docs/models/gpt-4
 tokenLimits = {
+    "gpt-4-turbo": 128000, # Returns a maximum of 4,096 output tokens.
     "gpt-4-turbo-preview": 128000, # Returns a maximum of 4,096 output tokens.
     "gpt-4-0125-preview": 128000, # Returns a maximum of 4,096 output tokens.
     "gpt-4-1106-preview": 128000, # Returns a maximum of 4,096 output tokens.
@@ -778,6 +779,7 @@ def count_tokens_from_messages(messages, model=""):
             "gpt-3.5-turbo-0613",
             "gpt-3.5-turbo-16k",
             "gpt-3.5-turbo-16k-0613",
+            "gpt-4-turbo",
             "gpt-4-turbo-preview",
             "gpt-4-0125-preview",
             "gpt-4-1106-preview",

@@ -412,7 +412,7 @@ Base the value of each key, in the template, on the following content and your g
 {userInput}{codeContext}
 </content>
 
-Generate content to fill up the value of each required key in the JSON, if information is not provided.{code_instruction}
+Generate content to fill up the value of each required key in the JSON, if information is not provided.
 
 Remember, response in JSON with the filled template ONLY.""",
             },

@@ -8,11 +8,15 @@ Retrieve information about dates and times
 
 from freegenius import config
 from freegenius.utils.python_utils import PythonUtil
+import pprint
 
 def datetimes(function_args):
     code = function_args.get("code") # required
-    information = PythonUtil.showAndExecutePythonCode(code)
-    return information
+    #information = PythonUtil.showAndExecutePythonCode(code)
+    #return information
+    config.tempContent = PythonUtil.showAndExecutePythonCode(code)
+    pprint.pprint(config.tempContent)
+    return ""
 
 functionSignature = {
     "examples": [

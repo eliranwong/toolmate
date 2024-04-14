@@ -23,20 +23,17 @@ def correct_python(function_args):
     print(f"Issue: {issue}")
 
     fix = function_args.get("code") # required
-    missing = function_args.get("missing_modules") # required
-    if missing == "[]":
+    missing = function_args.get("missing_module") # required
+    if missing in ("[]", "???"):
         missing = ""
 
     try:
         if missing:
             try:
-                if isinstance(missing, str):
-                    missing = eval(missing)
+                print3(f"Installing missing package: {missing}")
+                installPipPackage(f"--upgrade {missing}")
             except:
-                missing = [missing]
-            print2("Installing missing packages ...")
-            for i in missing:
-                installPipPackage(f"--upgrade {i}")
+                print(traceback.format_exc())
         print2("Running improved code ...")
         if config.developer or config.codeDisplay:
             PythonUtil.displayPythonCode(fix)
@@ -59,16 +56,16 @@ functionSignature = {
                 "type": "string",
                 "description": "Improved version of python code that resolved the traceback error. Return the original code instead only if traceback shows an import error.",
             },
-            "missing_modules": {
+            "missing_module": {
                 "type": "string",
-                "description": """List of missing packages identified from import errors, e.g. "['datetime', 'requests']". Return "[]" if there is no import error in the traceback.""",
+                "description": """The module name identified in ModuleNotFoundError, if any. Return '' if there is no import error in the traceback.""",
             },
             "issue": {
                 "type": "string",
                 "description": """Briefly explain the error""",
             },
         },
-        "required": ["code", "missing_modules", "issue"],
+        "required": ["code", "missing_module", "issue"],
     },
 }
 

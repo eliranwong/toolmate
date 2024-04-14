@@ -344,15 +344,6 @@ Remember, response in JSON with the filled template ONLY.""",
         return True if "yes" in str(output).lower() else False
 
     @staticmethod
-    def swapModels():
-        if config.useAdditionalChatModel:
-            config.ollamaMainModel, config.ollamaChatModel = config.ollamaChatModel, config.ollamaMainModel
-            config.ollamaMainModel_num_ctx, config.ollamaChatModel_num_ctx = config.ollamaChatModel_num_ctx, config.ollamaMainModel_num_ctx
-            config.ollamaMainModel_num_predict, config.ollamaChatModel_num_predict = config.ollamaChatModel_num_predict, config.ollamaMainModel_num_predict
-            config.ollamaMainModel_num_batch, config.ollamaChatModel_num_batch = config.ollamaChatModel_num_batch, config.ollamaMainModel_num_batch
-            config.ollamaMainModel_keep_alive, config.ollamaChatModel_keep_alive = config.ollamaChatModel_keep_alive, config.ollamaMainModel_keep_alive
-
-    @staticmethod
     def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, **kwargs) -> dict:
         """
         Extract action parameters
@@ -365,10 +356,10 @@ Remember, response in JSON with the filled template ONLY.""",
             del schemaCopy["properties"]["code"]
             schemaCopy["required"].remove("code")
             enforceCodeOutput = """ Remember, you should format the requested information, if any, into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."""
-            schema["properties"]["code"]["description"] += enforceCodeOutput
+            code_instruction = schema["properties"]["code"]["description"] + enforceCodeOutput
             code_instruction = f"""Generate python code according to the following instruction:
 </instruction>
-{schema["properties"]["code"]["description"]}
+{code_instruction}
 </instruction>
 
 Here is my request:

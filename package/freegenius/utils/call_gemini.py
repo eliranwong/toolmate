@@ -342,10 +342,10 @@ Here is my device information for additional reference:
         # Generate Code when required
         if "code" in schema["parameters"]["required"]:
             enforceCodeOutput = """ Remember, you should format the requested information, if any, into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."""
-            schema["parameters"]["properties"]["code"]["description"] += enforceCodeOutput
+            code_instruction = schema["parameters"]["properties"]["code"]["description"] + enforceCodeOutput
             code_instruction = f"""Generate python code according to the following instruction:
 </instruction>
-{schema["parameters"]["properties"]["code"]["description"]}
+{code_instruction}
 </instruction>
 
 Here is my request:

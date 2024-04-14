@@ -56,10 +56,6 @@ ollama_models = (
     "falcon:7b",
     "falcon:40b",
     "falcon:180b",
-    "wizard-math",
-    "wizard-math:7b",
-    "wizard-math:13b",
-    "wizard-math:70b",
     "nous-hermes",
     "nous-hermes:7b",
     "nous-hermes:13b",
@@ -89,7 +85,6 @@ ollama_models = (
     "meditron",
     "meditron:7b",
     "meditron:70b",
-    "magicoder",
     "yarn-llama2",
     "yarn-llama2:7b",
     "yarn-llama2:13b",
@@ -118,7 +113,6 @@ ollama_models = (
     "xwinlm:13b",
     "xwinlm:70b",
     "notus",
-    "duckdb-nsql",
     "command-r",
     # vision models
     "llava",
@@ -132,6 +126,8 @@ ollama_models = (
     "all-minilm",
     "mxbai-embed-large",
     # code models
+    "magicoder",
+    "magicoder:7b",
     "codebooga",
     "codebooga:34b",
     "wizardcoder",
@@ -186,8 +182,16 @@ ollama_models = (
     "dolphincoder",
     "dolphincoder:7b",
     "dolphincoder:15b",
+    # sql
+    "duckdb-nsql",
+    "duckdb-nsql:7b",
     "sqlcoder",
     "sqlcoder:7b",
     "sqlcoder:15b",
     "sqlcoder:70b",
+    # math
+    "wizard-math",
+    "wizard-math:7b",
+    "wizard-math:13b",
+    "wizard-math:70b",
 )

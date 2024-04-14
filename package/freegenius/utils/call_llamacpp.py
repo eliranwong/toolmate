@@ -115,19 +115,19 @@ class CallLlamaCpp:
     @staticmethod
     def autoCorrectPythonCode(code, trace):
         for i in range(config.max_consecutive_auto_correction):
-            userInput = f"""I encountered these errors:
-```
-{trace}
-```
-
-When I run the following python code:
+            userInput = f"""I ran this copy of python code:
 ```
 {code}
 ```
 
-Please rewrite the code to make it work.
+However, I got the following error:
+```
+{trace}
+```
 
-Remember, give me the python code ONLY, without additional notes or explanation.""" # alternative: Please generate another copy of code that fix the errors.
+Please generate another copy of python code that fix the error.
+
+Remember, output the new copy of python code ONLY, without additional notes or explanation."""
             messages = [{"role": "user", "content" : userInput}]
             print3(f"Auto-correction attempt: {(i + 1)}")
             function_call_message, function_call_response = CallLlamaCpp.getSingleFunctionCallResponse(messages, "correct_python")
@@ -420,10 +420,10 @@ Remember, response in JSON with the filled template ONLY.""",
             del schemaCopy["properties"]["code"]
             schemaCopy["required"].remove("code")
             enforceCodeOutput = """ Remember, you should format the requested information, if any, into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."""
-            schema["properties"]["code"]["description"] += enforceCodeOutput
+            code_instruction = schema["properties"]["code"]["description"] + enforceCodeOutput
             code_instruction = f"""Generate python code according to the following instruction:
 </instruction>
-{schema["properties"]["code"]["description"]}
+{code_instruction}
 </instruction>
 
 Here is my request:

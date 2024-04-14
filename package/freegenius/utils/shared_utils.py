@@ -421,13 +421,15 @@ def extractPythonCode(content, keepInvalid=False):
     content = content.replace("</python>", "")
     content = content.replace("<\/python>", "")
     content = re.sub("^python[ ]*\n", "", content).strip()
-    content = re.sub("^```python[ ]*\n", "", content).strip()
-    content = re.sub("\n```$", "", content).strip()
+    content = re.sub("^```.*?\n", "", content, flags=re.M).strip()
+    content = re.sub("\n```.*?$", "", content, flags=re.M).strip()
     if code_only := re.search('```python[ ]*\n(.+?)```', content, re.DOTALL):
         content = code_only.group(1).strip()
     elif code_only := re.search('```[ ]*\n(.+?)```', content, re.DOTALL):
         content = code_only.group(1).strip()
     content = re.sub("\n```[^\n]*?$", "", content, flags=re.M)
+    content = re.sub("^<[^<>]*?>", "", content)
+    content = re.sub("<[^<>]*?>$", "", content)
     return content if keepInvalid or isValidPythodCode(content) is not None else ""
 
 def fineTunePythonCode(code):
@@ -436,11 +438,18 @@ def fineTunePythonCode(code):
     code = re.sub("^python[ ]*\n", "", code)
     # extract from code block, if any
     if code_only := re.search('```python\n(.+?)```', code, re.DOTALL):
-        code = code_only.group(1)
+        code = code_only.group(1).strip()
     # make sure it is run as main program
-    if "if __name__ == '__main__':\n" in code:
-        half1, half2 = code.split("if __name__ == '__main__':\n", 1)
-        code = half1 + textwrap.dedent(half2)
+    if "\nif __name__ == '__main__':\n" in code:
+        code, main = code.split("\nif __name__ == '__main__':\n", 1)
+        code = code.strip()
+        main = "\n" + textwrap.dedent(main)
+    elif '\nif __name__ == "__main__":\n' in code:
+        code, main = code.split('\nif __name__ == "__main__":\n', 1)
+        code = code.strip()
+        main = "\n" + textwrap.dedent(main)
+    else:
+        main = ""
     # capture print output
     config.pythonFunctionResponse = ""
     insert_string = "from freegenius import config\nconfig.pythonFunctionResponse = "
@@ -456,7 +465,7 @@ def fineTunePythonCode(code):
             code = f"{substrings[0]}\n{lastLine}"
     else:
         code = f"{insert_string}{code}"
-    return code
+    return f"{code}{main}"
 
 def getPythonFunctionResponse(code):
     #return str(config.pythonFunctionResponse) if config.pythonFunctionResponse is not None and (type(config.pythonFunctionResponse) in (int, float, str, list, tuple, dict, set, bool) or str(type(config.pythonFunctionResponse)).startswith("<class 'numpy.")) and not ("os.system(" in code) else ""

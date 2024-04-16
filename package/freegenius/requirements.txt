@@ -1,4 +1,4 @@
-openai==1.14.3
+openai==1.19.0
 requests
 argparse
 pendulum
@@ -17,7 +17,7 @@ apsw
 gTTS
 google-cloud-speech
 google-cloud-texttospeech
-google-cloud-aiplatform==1.45.0
+google-cloud-aiplatform==1.47.0
 pywhatkit
 yt-dlp
 rembg
@@ -33,7 +33,8 @@ torchvision==0.17.2
 sentence-transformers
 chromadb==0.4.24
 unstructured[all-docs]
-pyautogen[retrievechat,autobuild]==0.2.21
+pyautogen[retrievechat,autobuild]==0.2.24
+autogenstudio==0.0.56
 tiktoken
 pygame
 PySide6
@@ -48,8 +49,8 @@ openai-whisper
 soundfile==0.12.1
 sounddevice==0.4.6
 elevenlabs==1.0.3
-ollama
-llama-cpp-python[server]==0.2.57
+ollama==0.1.8
+llama-cpp-python[server]==0.2.61
 huggingface-hub
 langchain==0.1.13
 pydub

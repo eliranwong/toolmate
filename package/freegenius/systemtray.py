@@ -16,6 +16,7 @@ ToolStore.setupToolStoreClient()
 os.environ["TOKENIZERS_PARALLELISM"] = config.tokenizers_parallelism
 
 import sys, platform, shutil, webbrowser
+from freegenius import startAutogenstudioServer
 from freegenius.gui.chatgui import ChatGui
 from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication
 from PySide6.QtGui import QIcon, QAction, QGuiApplication
@@ -92,6 +93,11 @@ class SystemTrayIcon(QSystemTrayIcon):
             action = QAction(i, self)
             action.triggered.connect(partial(self.runFreeGeniusCommand, i))
             submenu.addAction(action)
+
+        # autogenstudio
+        action = QAction("autogenstudio", self)
+        action.triggered.connect(startAutogenstudioServer)
+        submenu.addAction(action)
 
         menuAction = QAction("AutoGen Agents", self)
         menuAction.setMenu(submenu)

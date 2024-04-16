@@ -165,7 +165,8 @@ class FreeGenius:
             ".toggleimprovedwriting": (f"toggle improved writing {str(config.hotkey_toggle_writing_improvement)}", self.toggleImprovedWriting),
             ".toggleinputaudio": (f"toggle input audio {str(config.hotkey_toggle_input_audio)}", self.toggleinputaudio),
             ".toggleresponseaudio": (f"toggle response audio {str(config.hotkey_toggle_response_audio)}", self.toggleresponseaudio),
-            ".code": (f"extract python code from the last response {str(config.hotkey_edit_last_response)}", self.extractPythonCodeFromLastResponse),
+            ".code": (f"extract the python code from the last response", self.extractPythonCodeFromLastResponse),
+            ".run": (f"run the python code in the last response", self.runPythonCodeInLastResponse),
             ".editresponse": (f"edit the last response {str(config.hotkey_edit_last_response)}", self.editLastResponse),
             ".editconfigs": ("edit configuration settings", self.editConfigs),
             ".install": ("install python package", self.installPythonPackage),
@@ -750,7 +751,16 @@ class FreeGenius:
 
     def extractPythonCodeFromLastResponse(self):
         config.defaultEntry = f'''```python
-{extractPythonCode(config.pagerContent)}```'''
+{extractPythonCode(config.pagerContent, keepInvalid=True)}```'''
+
+    def runPythonCodeInLastResponse(self):
+        code = extractPythonCode(config.pagerContent)
+        if code:
+            config.defaultEntry = f'''```python
+{code}```'''
+            config.accept_default = True
+        else:
+            config.defaultEntry = extractPythonCode(config.pagerContent, keepInvalid=True)
 
     # change configs
     def editConfigs(self):

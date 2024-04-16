@@ -9,7 +9,7 @@ from prompt_toolkit.styles.pygments import style_from_pygments_cls
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit import prompt
 from typing import Optional, Any
-from vertexai.preview.generative_models import Content, Part
+from vertexai.generative_models import Content, Part
 from pathlib import Path
 from PIL import Image
 from openai import OpenAI
@@ -61,11 +61,33 @@ def downloadStableDiffusionFiles():
         )
         stableDiffusion_model_path = os.path.join(llm_directory, filename)
 
+def startAutogenstudioServer():
+    try:
+        if not hasattr(config, "autogenstudioServer") or config.autogenstudioServer is None:
+            config.autogenstudioServer = None
+            print2("Running Autogen Studio server ...")
+            cmd = f"""{sys.executable} -m autogenstudio.cli ui --host 127.0.0.1 --port {config.autogenstudio_server_port}"""
+            config.autogenstudioServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+            while not isServerAlive("127.0.0.1", config.autogenstudio_server_port):
+                # wait til the server is up
+                ...
+    except:
+        print2(f'''Failed to run Autogen Studio server at "localhost:{config.autogenstudio_server_port}"!''')
+        config.autogenstudioServer = None
+    webbrowser.open(f"http://127.0.0.1:{config.autogenstudio_server_port}")
+
+def stopAutogenstudioServer():
+    if hasattr(config, "autogenstudioServer") and config.autogenstudioServer is not None:
+        if isServerAlive("127.0.0.1", config.autogenstudio_server_port):
+            print2("Stopping Autogen Studio server ...")
+            os.killpg(os.getpgid(config.autogenstudioServer.pid), signal.SIGTERM)
+        config.autogenstudioServer = None
+
 def startLlamacppServer():
     try:
         if not hasattr(config, "llamacppServer") or config.llamacppServer is None:
             config.llamacppServer = None
-            print2("Running llama.cpp server ...")
+            print2("Running llama.cpp chat server ...")
             cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppMainModel_server_port} --model "{config.llamacppMainModel_model_path}" --verbose {config.llamacppMainModel_verbose} --chat_format chatml --n_ctx {config.llamacppMainModel_n_ctx} --n_gpu_layers {config.llamacppMainModel_n_gpu_layers} --n_batch {config.llamacppMainModel_n_batch}"""
             config.llamacppServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
             while not isServerAlive("127.0.0.1", config.llamacppMainModel_server_port):
@@ -74,11 +96,12 @@ def startLlamacppServer():
     except:
         print2(f'''Failed to run llama.cpp server at "localhost:{config.llamacppMainModel_server_port}"!''')
         config.llamacppServer = None
+    webbrowser.open(f"http://127.0.0.1:{config.llamacppMainModel_server_port}/docs")
 
 def stopLlamacppServer():
     if hasattr(config, "llamacppServer") and config.llamacppServer is not None:
         if isServerAlive("127.0.0.1", config.llamacppMainModel_server_port):
-            print2("Stopping llama.cpp server ...")
+            print2("Stopping llama.cpp chat server ...")
             os.killpg(os.getpgid(config.llamacppServer.pid), signal.SIGTERM)
         config.llamacppServer = None
 
@@ -98,6 +121,7 @@ def startLlamacppVisionServer():
     except:
         print2(f'''Failed to run llama.cpp server at "localhost:{config.llamacppVisionModel_server_port}"!''')
         config.llamacppVisionServer = None
+    webbrowser.open(f"http://127.0.0.1:{config.llamacppVisionModel_server_port}/docs")
 
 def stopLlamacppVisionServer():
     if hasattr(config, "llamacppVisionServer") and config.llamacppVisionServer is not None:
@@ -430,7 +454,11 @@ def extractPythonCode(content, keepInvalid=False):
     content = re.sub("\n```[^\n]*?$", "", content, flags=re.M)
     content = re.sub("^<[^<>]*?>", "", content)
     content = re.sub("<[^<>]*?>$", "", content)
-    return content if keepInvalid or isValidPythodCode(content) is not None else ""
+    if keepInvalid or isValidPythodCode(content) is not None:
+        config.pagerContent = f'''```python
+{content}```'''
+        return content
+    return ""
 
 def fineTunePythonCode(code):
     # dedent

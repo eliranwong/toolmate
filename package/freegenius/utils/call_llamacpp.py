@@ -310,6 +310,10 @@ Remember, output the new copy of python code ONLY, without additional notes or e
                 print1("extracting parameters ...")
             try:
                 tool_parameters = CallLlamaCpp.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
+                if not tool_parameters:
+                    if config.developer:
+                        print1("Failed to extract parameters!")
+                    return CallLlamaCpp.regularCall(messages)
                 # 4. Function Execution
                 tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
             except:

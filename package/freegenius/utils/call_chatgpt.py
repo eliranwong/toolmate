@@ -411,6 +411,10 @@ class CallChatGPT:
             try:
                 #tool_parameters = CallChatGPT.extractToolParameters(schema=tool_schema, ongoingMessages=messages)
                 tool_parameters = CallChatGPT.getResponseDict(messages=messages, schema=tool_schema)
+                if not tool_parameters:
+                    if config.developer:
+                        print1("Failed to extract parameters!")
+                    return CallChatGPT.regularCall(messages)
                 # 4. Function Execution
                 tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
             except:

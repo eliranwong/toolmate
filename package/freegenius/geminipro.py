@@ -1,5 +1,5 @@
 import vertexai, os, traceback, argparse
-from vertexai.preview.generative_models import GenerativeModel, Content, Part
+from vertexai.generative_models import GenerativeModel, Content, Part
 from vertexai.generative_models._generative_models import (
     GenerationConfig,
     HarmCategory,

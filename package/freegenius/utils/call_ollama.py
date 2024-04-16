@@ -268,6 +268,10 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                 print1("extracting parameters ...")
             try:
                 tool_parameters = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
+                if not tool_parameters:
+                    if config.developer:
+                        print1("Failed to extract parameters!")
+                    return CallOllama.regularCall(messages)
                 # 4. Function Execution
                 tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
             except:

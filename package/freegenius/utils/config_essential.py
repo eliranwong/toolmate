@@ -39,6 +39,7 @@ defaultSettings = (
     ('stableDiffusion_model_path', ""),
     ('stableDiffusion_output_width', 512),
     ('stableDiffusion_output_height', 512),
+    ('autogenstudio_server_port', 8081),
     ('ollamaVisionModel', 'llava'), # ollama model used for vision
     ('ollamaMainModel', 'codellama:7b-instruct'), # ollama model used for both task execution and conversation
     ('ollamaMainModel_additional_options', {}),
@@ -56,7 +57,7 @@ defaultSettings = (
     ('llamacppChatModel_verbose', False),
     ('llamacppVisionModel_verbose', False),
     ('llamacppMainModel_server_port', 8000),
-    ('llamacppVisionModel_server_port', 8000),
+    ('llamacppVisionModel_server_port', 8001),
     ('llamacppVisionModel_model_path', ''), # specify file path of llama.cpp model for vision
     ('llamacppVisionModel_clip_model_path', ''), # specify file path of llama.cpp clip model for vision
     ('llamacppVisionModel_additional_options', ''),
@@ -211,6 +212,7 @@ temporaryConfigs = [
     "tempInterface",
     "llamacppServer",
     "llamacppVisionServer",
+    "autogenstudioServer",
     "geminipro_model",
     "geminipro_generation_config",
     "geminipro_safety_settings",

@@ -2,10 +2,10 @@ from freegenius import getDeviceInfo, showErrors, get_or_create_collection, quer
 from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, isValidPythodCode, downloadStableDiffusionFiles
 from freegenius import config
 from prompt_toolkit import prompt
-import traceback, os, json, pprint, copy, datetime
+import traceback, os, json, pprint, copy, datetime, codecs
 from typing import Optional, List, Dict, Union
 import vertexai
-from vertexai.preview.generative_models import GenerativeModel, FunctionDeclaration, Tool
+from vertexai.generative_models import GenerativeModel, FunctionDeclaration, Tool
 from vertexai.generative_models._generative_models import (
     GenerationConfig,
     HarmCategory,
@@ -256,6 +256,10 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                 print1("extracting parameters ...")
             try:
                 tool_parameters = CallGemini.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
+                if not tool_parameters:
+                    if config.developer:
+                        print1("Failed to extract parameters!")
+                    return CallGemini.regularCall(messages)
                 # 4. Function Execution
                 tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
             except:
@@ -357,12 +361,12 @@ Remember, response with the required python code ONLY, WITHOUT extra notes or ex
             code = CallGemini.getSingleChatResponse(code_instruction, history=history)
             if len(schema["parameters"]["properties"]) == 1:
                 if code := extractPythonCode(code):
-                    return {"code": code}
+                    return {"code": codecs.decode(code, "unicode_escape")}
             code = f"""The required code is given below:
 <code>
 {code}
 </code>"""
-            code = code.replace(r"\\n", "\n")
+            code = codecs.decode(code, "unicode_escape")
         else:
             code = ""
         
@@ -375,7 +379,7 @@ When necessary, generate content based on your knowledge."""
         parameters = CallGemini.getResponseDict(history=history, schema=schema, userMessage=userMessage, **kwargs)
         # fix linebreak
         if code and "code" in parameters:
-            parameters["code"] = parameters["code"].replace("\\n", "\n")
+            parameters["code"] = codecs.decode(parameters["code"], "unicode_escape")
 
         if config.developer:
             print2("```parameters")

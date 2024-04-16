@@ -1,5 +1,5 @@
 import vertexai, os, argparse, re
-from vertexai.preview.generative_models import GenerativeModel
+from vertexai.generative_models import GenerativeModel
 from vertexai.generative_models._generative_models import (
     GenerationConfig,
     HarmCategory,
@@ -11,7 +11,7 @@ from freegenius.utils.single_prompt import SinglePrompt
 import http.client
 import typing
 import urllib.request
-from vertexai.preview.generative_models import Image
+from vertexai.generative_models import Image
 from prompt_toolkit.styles import Style
 
 

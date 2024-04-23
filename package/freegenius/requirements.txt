@@ -57,3 +57,4 @@ pydub
 stable-diffusion-cpp-python
 pytz
 geopy
+guidance==0.1.13

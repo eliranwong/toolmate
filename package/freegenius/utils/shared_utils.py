@@ -16,6 +16,7 @@ from openai import OpenAI
 from huggingface_hub import hf_hub_download
 from bs4 import BeautifulSoup
 from urllib.parse import quote
+from guidance import select, gen
 
 # non-Android only
 if not config.isTermux:
@@ -23,6 +24,73 @@ if not config.isTermux:
 
 # a dummy import line to resolve ALSA error display on Linux
 import sounddevice
+
+
+# guidance
+
+def screening(lm, user_input) -> bool:
+    tool = False
+
+    print2("```screening")
+    thought = "Thought: First, I must carefully distinguish whether the given request is formulated like a greeting, a question, a command, a statement, an issue, a description."
+    print3(thought)
+    lm += f"""<|im_start|>user
+Assess the following request and comment whether an additional tool is needed to address it:
+<request>{user_input}</request><|im_end|>
+<|im_start|>assistant
+{thought}
+Observation: The given request is formulated like {select(["a question", "a command", "a statement", "an issue", "a description"], name="question")}.
+"""
+    question = lm.get("question")
+    print3(f"""Observation: The given request is formulated like {question}.""")
+    if question in ("a greeting", "a question", "an issue", "a description"):
+        #thought = "Thought: Next, I need to ascertain the nature of the requested information, determining whether it is static, time-sensitive, changing over time, unchanging over time, published, well-established, common, documented, foundational, historical, technical, prone to periodic updates, subject to changes, evolving, ongoing, location-specific, or unknown." # more categories: "context-specific", "user-dependent", "subject to fluctuation"
+        thought = "Thought: Next, I must carefully distinguish whether the requested information is about greeting, common knowledge, math, translation, published content, acquired knowledge, historical records, programming knowledge, religious knowledge, insights obtainable from literature, textbook material, evolving data, recent updates, latest information, current time, current weather, up-to-date news, information specific to your device, or information unknown to me."
+        print3(thought)
+        lm += f"""{thought}
+Observation: The requested information is about {select(["greeting", "common knowledge", "math", "translation", "published content", "trained knowledge", "historical records", "programming knowledge", "religious knowledge", "insights obtainable from literature", "textbook content", "evolving data", "recent updates", "latest information", "current time", "current weather", "up-to-date news", "information specific to your device", "information unknown to me"], name="information")}.
+"""
+        #Observation: The nature of the requested information is {select(["static", "time-sensitive", "changing over time", "unchanging over time", "published", "well-established", "common", "documented", "foundational", "historical", "technical", "prone to periodic updates", "subject to changes", "evolving", "ongoing", "location-specific", "unknown"], name="information")}.
+        information = lm.get("information")
+        print3(f"""Observation: The requested information is about {information}.""")
+        if information in ("evolving data", "recent updates", "latest information", "current time", "current weather", "up-to-date news", "information specific to your device", "information unknown to me"):
+            tool = True
+    else:
+        thought = "Thought: Next, I must carefully distinguish whether the given request asks for generating a text-response or carrying out a task on your device."
+        print3(thought)
+        lm += f"""{thought}
+Observation: The given request asks for {select(["greeting", "calculation", "translation", "writing a text-response", "carrying out a task on your device"], name="action")}.
+"""
+        action = lm.get("action")
+        print3(f"""Observation: The given request asks for {action}.""")
+        if action in ("carrying out a task on your device",):
+            tool = True
+
+    print3(f"""Comment: Tool may {"" if tool else "not "}be required.""")
+    print2("```")
+
+    return tool
+
+def select_tool(lm, user_input):
+    tool_names = list(config.toolFunctionSchemas.keys())
+    tools = {i:config.toolFunctionSchemas[i]["description"] for i in config.toolFunctionSchemas}
+
+    lm += f"""<|im_start|>user
+Select an action to resolve the request as best you can. You have access only to the following tools:
+
+{tools}
+
+Use the following format:
+
+Request: the input request you must resolve
+Thought: you should always think about what to do
+Action: the action to take, has to be one of {tool_names}<|im_end|>
+<|im_start|>assistant
+Request: {user_input}
+Thought: {gen(stop=".")}.
+Action: {select(tool_names, name="tool")}"""
+    
+    return lm.get("tool")
 
 # local llm
 

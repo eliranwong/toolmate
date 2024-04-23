@@ -1,11 +1,12 @@
 from freegenius import config, showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
-from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, downloadStableDiffusionFiles
+from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, downloadStableDiffusionFiles, screening
 from typing import Optional
 from llama_cpp import Llama
 from prompt_toolkit import prompt
 from pathlib import Path
 from huggingface_hub import hf_hub_download
 import traceback, json, re, os, pprint, copy, datetime
+from guidance import models
 
 
 class CallLlamaCpp:
@@ -261,8 +262,6 @@ Remember, output the new copy of python code ONLY, without additional notes or e
         user_request = messages[-1]["content"]
         if config.intent_screening:
             # 1. Intent Screening
-            if config.developer:
-                print1("screening ...")
             noFunctionCall = True if noFunctionCall else CallLlamaCpp.screen_user_request(messages=messages, user_request=user_request)
         if noFunctionCall or config.tool_dependence <= 0.0:
             return CallLlamaCpp.regularCall(messages)
@@ -353,6 +352,26 @@ Supplementary information:
 
     @staticmethod
     def screen_user_request(messages: dict, user_request: str) -> bool:
+        lm = models.LlamaCpp(
+            config.llamacppMainModel_model_path,
+            echo = False,
+            chat_format="chatml",
+            n_ctx=config.llamacppMainModel_n_ctx,
+            n_batch=config.llamacppMainModel_n_batch,
+            verbose=config.llamacppMainModel_verbose,
+            n_gpu_layers=config.llamacppMainModel_n_gpu_layers,
+            **config.llamacppMainModel_additional_model_options,
+        )
+        try:
+            tool = screening(lm, user_request)
+        except:
+            tool = True
+        lm.reset()
+        del lm
+        return not tool
+
+    @staticmethod
+    def screen_user_request_old(messages: dict, user_request: str) -> bool:
         
         deviceInfo = f"""\n\nMy device information:\n{getDeviceInfo()}""" if config.includeDeviceInfoInContext else ""
         answer = {

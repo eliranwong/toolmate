@@ -363,8 +363,6 @@ class CallChatGPT:
         user_request = messages[-1]["content"]
         if config.intent_screening:
             # 1. Intent Screening
-            if config.developer:
-                print1("screening ...")
             noFunctionCall = True if noFunctionCall else CallChatGPT.screen_user_request(messages=messages)
         if noFunctionCall or config.tool_dependence <= 0.0:
             return CallChatGPT.regularCall(messages)

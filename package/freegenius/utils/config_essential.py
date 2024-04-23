@@ -71,7 +71,7 @@ defaultSettings = (
     ('llamacppMainModel_filename', 'codellama-7b-instruct.Q4_K_M.gguf'), # llama.cpp model used for both task execution and conversation, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
     ('llamacppMainModel_n_ctx', 0), # llama.cpp main model context window
     ('llamacppMainModel_max_tokens', 10000), # llama.cpp main model maximum tokens
-    ('llamacppMainModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
+    ('llamacppMainModel_n_gpu_layers', -1), # change to -1 to use GPU acceleration
     ('llamacppMainModel_n_batch', 512), # The batch size to use per eval
     ('llamacppChatModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
     ('llamacppChatModel_model_path', ''), # specify file path of llama.cpp model for chat
@@ -79,7 +79,7 @@ defaultSettings = (
     ('llamacppChatModel_filename', 'mistral-7b-instruct-v0.2.Q4_K_M.gguf'), # llama.cpp model used for chat, e.g. 'codellama-7b-python.Q4_K_M.gguf'
     ('llamacppChatModel_n_ctx', 0), # llama.cpp chat model context window
     ('llamacppChatModel_max_tokens', 10000), # llama.cpp chat model maximum tokens
-    ('llamacppChatModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
+    ('llamacppChatModel_n_gpu_layers', -1), # change to -1 to use GPU acceleration
     ('llamacppChatModel_n_batch', 512), # The batch size to use per eval
     ('geminipro_max_output_tokens', 8192), # check supported value at https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
     # common configs as in LetMeDoIt AI

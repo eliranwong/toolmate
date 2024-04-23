@@ -206,8 +206,6 @@ Remember, give me the python code ONLY, without additional notes or explanation.
         user_request = messages[-1]["content"]
         if config.intent_screening:
             # 1. Intent Screening
-            if config.developer:
-                print1("screening ...")
             noFunctionCall = True if noFunctionCall else CallGemini.screen_user_request(messages=messages, user_request=user_request)
         if noFunctionCall or config.tool_dependence <= 0.0:
             return CallGemini.regularCall(messages)

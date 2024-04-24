@@ -17,6 +17,10 @@ except:
         #print2("Installing 'portaudio' and 'Pyaudio' ...")
         #os.system("pkg install portaudio")
         #config.pyaudioInstalled = True if installPipPackage("--upgrade PyAudio") else False
+    elif isCommandInstalled("brew"):
+        print2("Installing 'portaudio' and 'Pyaudio' ...")
+        os.system("brew install portaudio")
+        config.pyaudioInstalled = True if installPipPackage("--upgrade PyAudio") else False
     elif isCommandInstalled("apt"):
         print2("Installing 'portaudio19-dev' and 'Pyaudio' ...")
         os.system("sudo apt update && sudo apt install portaudio19-dev")
@@ -24,10 +28,6 @@ except:
     elif isCommandInstalled("dnf"):
         print2("Installing 'portaudio-devel' and 'Pyaudio' ...")
         os.system("sudo dnf update && sudo dnf install portaudio-devel")
-        config.pyaudioInstalled = True if installPipPackage("--upgrade PyAudio") else False
-    elif isCommandInstalled("brew"):
-        print2("Installing 'portaudio' and 'Pyaudio' ...")
-        os.system("brew install portaudio")
         config.pyaudioInstalled = True if installPipPackage("--upgrade PyAudio") else False
     else:
         config.pyaudioInstalled = False

@@ -67,7 +67,7 @@ defaultSettings = (
     ('llamacppChatModel_additional_chat_options', {}),
     ('llamacppMainModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
     ('llamacppMainModel_model_path', ''), # specify file path of llama.cpp model for general purpose
-    ('llamacppMainModel_repo_id', 'CodeLlama-7B-Instruct-GGUF'), # llama.cpp model used for both task execution and conversation, e.g. 'TheBloke/phi-2-GGUF', 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
+    ('llamacppMainModel_repo_id', 'TheBloke/CodeLlama-7B-Instruct-GGUF'), # llama.cpp model used for both task execution and conversation, e.g. 'TheBloke/phi-2-GGUF', 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
     ('llamacppMainModel_filename', 'codellama-7b-instruct.Q4_K_M.gguf'), # llama.cpp model used for both task execution and conversation, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
     ('llamacppMainModel_n_ctx', 0), # llama.cpp main model context window
     ('llamacppMainModel_max_tokens', 10000), # llama.cpp main model maximum tokens

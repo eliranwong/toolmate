@@ -64,8 +64,8 @@ class CallLlamaCpp:
             print2("Errors! Restoring default main model!")
             config.llamacppMainModel_ollama_tag = ""
             config.llamacppMainModel_model_path = ""
-            config.llamacppMainModel_repo_id = "TheBloke/Mistral-7B-Instruct-v0.2-GGUF"
-            config.llamacppMainModel_filename = "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
+            config.llamacppMainModel_repo_id = "TheBloke/CodeLlama-7B-Instruct-GGUF"
+            config.llamacppMainModel_filename = "codellama-7b-instruct.Q4_K_M.gguf"
             loadMainModel()
 
         try:
@@ -75,8 +75,8 @@ class CallLlamaCpp:
             print2("Errors! Restoring default chat model!")
             config.llamacppChatModel_ollama_tag = ""
             config.llamacppChatModel_model_path = ""
-            config.llamacppChatModel_repo_id = "TheBloke/phi-2-GGUF"
-            config.llamacppChatModel_filename = "phi-2.Q4_K_M.gguf"
+            config.llamacppChatModel_repo_id = "TheBloke/Mistral-7B-Instruct-v0.2-GGUF"
+            config.llamacppChatModel_filename = "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
             downloadChatModel()
 
         # Download vision model

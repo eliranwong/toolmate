@@ -17,6 +17,7 @@ from huggingface_hub import hf_hub_download
 from bs4 import BeautifulSoup
 from urllib.parse import quote
 from guidance import select, gen
+from typing import Union
 
 # non-Android only
 if not config.isTermux:
@@ -32,37 +33,48 @@ def screening(lm, user_input) -> bool:
     tool = False
 
     print2("```screening")
-    thought = "Thought: First, I must carefully distinguish whether the given request is formulated like a greeting, a question, a command, a statement, an issue, a description."
+    thought = "Question: Is the given request formulated like a greeting, a question, a command, a statement, an issue, a description?"
     print3(thought)
     lm += f"""<|im_start|>user
-Assess the following request and comment whether an additional tool is needed to address it:
-<request>{user_input}</request><|im_end|>
+Please answer my questions with regards to the following request:
+<request>{user_input}</request>
+<|im_end|>
 <|im_start|>assistant
+Certainly! Please provide me with the questions.
+<|im_end|>
+<|im_start|>user
 {thought}
-Observation: The given request is formulated like {select(["a question", "a command", "a statement", "an issue", "a description"], name="question")}.
+Answer: The given request is formulated like {select(["a question", "a command", "a statement", "an issue", "a description"], name="question")}.
+<|im_end|>
 """
     question = lm.get("question")
-    print3(f"""Observation: The given request is formulated like {question}.""")
+    print3(f"""Answer: The given request is formulated like {question}.""")
     if question in ("a greeting", "a question", "an issue", "a description"):
-        #thought = "Thought: Next, I need to ascertain the nature of the requested information, determining whether it is static, time-sensitive, changing over time, unchanging over time, published, well-established, common, documented, foundational, historical, technical, prone to periodic updates, subject to changes, evolving, ongoing, location-specific, or unknown." # more categories: "context-specific", "user-dependent", "subject to fluctuation"
-        thought = "Thought: Next, I must carefully distinguish whether the requested information is about greeting, common knowledge, math, translation, published content, acquired knowledge, historical records, programming knowledge, religious knowledge, insights obtainable from literature, textbook material, evolving data, recent updates, latest information, current time, current weather, up-to-date news, information specific to your device, or information unknown to me."
+        thought = "Question: What is the request about?"
         print3(thought)
-        lm += f"""{thought}
-Observation: The requested information is about {select(["greeting", "common knowledge", "math", "translation", "published content", "trained knowledge", "historical records", "programming knowledge", "religious knowledge", "insights obtainable from literature", "textbook content", "evolving data", "recent updates", "latest information", "current time", "current weather", "up-to-date news", "information specific to your device", "information unknown to me"], name="information")}.
+        lm += f"""<|im_start|>assistant
+{thought}
+<|im_end|>
+<|im_start|>user
+Answer: The request is about {select(["greeting", "common knowledge", "math", "published content", "trained knowledge", "historical records", "programming knowledge", "religious knowledge", "insights obtainable from literature", "textbook content", "evolving data", "recent updates", "latest information", "current time", "current weather", "up-to-date news", "information specific to your device", "information unknown to me"], name="information")}.
+<|im_end|>
 """
-        #Observation: The nature of the requested information is {select(["static", "time-sensitive", "changing over time", "unchanging over time", "published", "well-established", "common", "documented", "foundational", "historical", "technical", "prone to periodic updates", "subject to changes", "evolving", "ongoing", "location-specific", "unknown"], name="information")}.
         information = lm.get("information")
-        print3(f"""Observation: The requested information is about {information}.""")
+        print3(f"""Answer: The request is about {information}.""")
         if information in ("evolving data", "recent updates", "latest information", "current time", "current weather", "up-to-date news", "information specific to your device", "information unknown to me"):
             tool = True
     else:
-        thought = "Thought: Next, I must carefully distinguish whether the given request asks for generating a text-response or carrying out a task on your device."
+        thought = "Question: Does the given request ask for generating a text-response or carrying out a task on your device?"
         print3(thought)
-        lm += f"""{thought}
-Observation: The given request asks for {select(["greeting", "calculation", "translation", "writing a text-response", "carrying out a task on your device"], name="action")}.
+        lm += f"""<|im_start|>assistant
+{thought}
+<|im_end|>
+<|im_start|>user
+Answer: The given request asks for {select(["greeting", "calculation", "translation", "writing a text-response", "carrying out a task on your device"], name="action")}.
+<|im_end|>
 """
         action = lm.get("action")
-        print3(f"""Observation: The given request asks for {action}.""")
+        print3(f"""Answer: The given request asks for {action}.""")
         if action in ("carrying out a task on your device",):
             tool = True
 
@@ -70,6 +82,33 @@ Observation: The given request asks for {select(["greeting", "calculation", "tra
     print2("```")
 
     return tool
+
+def outputStructuredData(lm, schema: dict, json_output: bool=False, messages: list = [], use_system_message: bool=True, request: str="", temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs) -> Union[dict, str]:
+    properties = toParameterSchema(schema)["properties"]
+    lm += toChatml(messages, use_system_message=use_system_message).rstrip()
+    lm += f"""<|im_start|>assistant.
+I am answering your questions based on the content in our conversation given above, particularly related to the following request:
+{request}
+<|im_end|>
+"""
+    for key, value in properties.items():
+        description = value["description"].replace("\n", " ")
+        if "enum" in value:
+            options = value["enum"]
+            options_str = "', '".join(value["enum"])
+            description += f" Its value must be one of these options: '{options_str}'"
+        lm += f'''<|im_start|>user
+Question: {description}
+<|im_end|>
+<|im_start|>assistant
+Answer: {select(options, name=key) if "enum" in value else gen(name=key, stop="<")}
+<|im_end|>
+'''
+
+    response = {}
+    for i in properties:
+        response[i] = lm.get(i, "").rstrip()
+    return json.dumps(response) if json_output else response
 
 def select_tool(lm, user_input):
     tool_names = list(config.toolFunctionSchemas.keys())
@@ -457,6 +496,20 @@ def toParameterSchema(schema) -> dict:
     if "parameters" in schema:
         return schema["parameters"]
     return schema
+
+def toChatml(messages: dict=[], use_system_message=True) -> str:
+    messages_str = ""
+    roles = {
+        "user": "<|im_start|>user\n{content}\n<|im_end|>\n",
+        "assistant": "<|im_start|>assistant\n{content}\n<|im_end|>\n",
+    }
+    if use_system_message:
+        roles["system"] = "<|im_start|>system\n{content}\n<|im_end|>\n"
+    for message in messages:
+        role, content = message.get("role", ""), message.get("content", "")
+        if role and role in roles and content:
+            messages_str += roles[role].format(content=content)
+    return messages_str.rstrip()
 
 def toGeminiMessages(messages: dict=[]) -> Optional[list]:
     systemMessage = ""

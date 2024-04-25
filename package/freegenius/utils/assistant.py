@@ -889,9 +889,12 @@ class FreeGenius:
                 default="yes" if config.useAdditionalChatModel else "no",
                 text=question,
             )
-            if useAdditionalChatModel and useAdditionalChatModel == "yes":
-                config.useAdditionalChatModel = True
-                return True
+            if useAdditionalChatModel:
+                if useAdditionalChatModel == "yes":
+                    config.useAdditionalChatModel = True
+                    return True
+                else:
+                    config.useAdditionalChatModel = False
             return False
         def askIntentScreening() -> bool:
             options = ("yes", "no")
@@ -903,9 +906,12 @@ class FreeGenius:
                 default="yes" if config.intent_screening else "no",
                 text=question,
             )
-            if intent_screening and intent_screening == "yes":
-                config.intent_screening = True
-                return True
+            if intent_screening:
+                if intent_screening == "yes":
+                    config.intent_screening = True
+                    return True
+                else:
+                    config.intent_screening = False
             return False
 
         currentLlmInterface = config.llmInterface

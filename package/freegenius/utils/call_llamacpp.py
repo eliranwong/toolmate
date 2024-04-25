@@ -1,12 +1,11 @@
 from freegenius import config, showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
-from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, downloadStableDiffusionFiles, screening
+from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, downloadStableDiffusionFiles, screening, isToolRequired
 from typing import Optional
 from llama_cpp import Llama
 from prompt_toolkit import prompt
 from pathlib import Path
 from huggingface_hub import hf_hub_download
 import traceback, json, re, os, pprint, copy, datetime
-from guidance import models
 
 
 class CallLlamaCpp:
@@ -262,7 +261,7 @@ Remember, output the new copy of python code ONLY, without additional notes or e
         user_request = messages[-1]["content"]
         if config.intent_screening:
             # 1. Intent Screening
-            noFunctionCall = True if noFunctionCall else CallLlamaCpp.screen_user_request(messages=messages, user_request=user_request)
+            noFunctionCall = True if noFunctionCall else (not isToolRequired(user_request))
         if noFunctionCall or config.tool_dependence <= 0.0:
             return CallLlamaCpp.regularCall(messages)
         else:
@@ -351,27 +350,7 @@ Supplementary information:
                     return None
 
     @staticmethod
-    def screen_user_request(messages: dict, user_request: str) -> bool:
-        lm = models.LlamaCpp(
-            config.llamacppMainModel_model_path,
-            echo = False,
-            chat_format="chatml",
-            n_ctx=config.llamacppMainModel_n_ctx,
-            n_batch=config.llamacppMainModel_n_batch,
-            verbose=config.llamacppMainModel_verbose,
-            n_gpu_layers=config.llamacppMainModel_n_gpu_layers,
-            **config.llamacppMainModel_additional_model_options,
-        )
-        try:
-            tool = screening(lm, user_request)
-        except:
-            tool = True
-        lm.reset()
-        del lm
-        return not tool
-
-    @staticmethod
-    def screen_user_request_old(messages: dict, user_request: str) -> bool:
+    def isChatOnly(messages: dict, user_request: str) -> bool:
         
         deviceInfo = f"""\n\nMy device information:\n{getDeviceInfo()}""" if config.includeDeviceInfoInContext else ""
         answer = {
@@ -429,6 +408,35 @@ Remember, response in JSON with the filled template ONLY.""",
         except:
             return False
         return True if (not output) or str(output).lower() == "yes" else False
+
+    @staticmethod
+    def extractToolParameters_testing(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs) -> dict:
+        lm = models.LlamaCpp(
+            config.llamacppMainModel_model_path,
+            echo = False,
+            chat_format="chatml",
+            n_ctx=config.llamacppMainModel_n_ctx,
+            n_batch=config.llamacppMainModel_n_batch,
+            verbose=config.llamacppMainModel_verbose,
+            n_gpu_layers=config.llamacppMainModel_n_gpu_layers,
+            **config.llamacppMainModel_additional_model_options,
+        )
+        try:
+            response = outputStructuredData(
+                lm=lm,
+                schema=schema,
+                json_output=False,
+                messages=ongoingMessages,
+                use_system_message=False,
+                request=userInput,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+        except:
+            response = {}
+        lm.reset()
+        del lm
+        return response
 
     @staticmethod
     def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs) -> dict:

@@ -4,6 +4,8 @@ FreeGenius AI is an ambitious project sparked by the pioneering work of [LetMeDo
 
 As with [LetMeDoIt AI](https://github.com/eliranwong/letmedoit), FreeGenius AI is designed to be capable of engaging in intuitive conversations, executing codes, providing up-to-date information, and performing a wide range of tasks. It's designed to learn, adapt, and grow with the user, offering personalized experiences and interactions.
 
+![freegenius_ai_screenshot](https://github.com/eliranwong/freegenius/assets/25262722/1e9dd18e-aa4b-4e2c-8d76-386af7ba00ea)
+
 # Beyond LetMeDoIt AI
 
 https://github.com/eliranwong/freegenius/wiki/Beyond-LetMeDoIt-AI
@@ -74,6 +76,10 @@ chatgpt: dall-e-3
 2. Google Text-to-Speech (API)
 3. Elevenlabs (API)
 4. Custom system commands
+
+# Highly Customizable
+
+![plugins](https://github.com/eliranwong/freegenius/assets/25262722/6bb4b2f6-5684-42c1-95e3-7b12c3a38db6)
 
 # Installation
 

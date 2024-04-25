@@ -363,7 +363,7 @@ class CallChatGPT:
         user_request = messages[-1]["content"]
         if config.intent_screening:
             # 1. Intent Screening
-            noFunctionCall = True if noFunctionCall else CallChatGPT.screen_user_request(messages=messages)
+            noFunctionCall = True if noFunctionCall else CallChatGPT.isChatOnly(messages=messages)
         if noFunctionCall or config.tool_dependence <= 0.0:
             return CallChatGPT.regularCall(messages)
         else:
@@ -460,7 +460,8 @@ class CallChatGPT:
                     return None
 
     @staticmethod
-    def screen_user_request(messages: dict) -> bool:
+    def isChatOnly(messages: dict) -> bool:
+        print2("```screening")
         properties = {
             "answer": {
                 "type": "string",
@@ -482,7 +483,10 @@ class CallChatGPT:
             },
         }
         output = CallChatGPT.getResponseDict(messages, schema=schema)
-        return True if "yes" in str(output).lower() else False
+        chatOnly = True if "yes" in str(output).lower() else False
+        print3(f"""Tool may {"not " if chatOnly else ""}be required.""")
+        print2("```")
+        return chatOnly
 
     @staticmethod
     def extractToolParameters(schema: dict, ongoingMessages: list = [], **kwargs) -> dict:

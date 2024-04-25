@@ -893,6 +893,20 @@ class FreeGenius:
                 config.useAdditionalChatModel = True
                 return True
             return False
+        def askIntentScreening() -> bool:
+            options = ("yes", "no")
+            question = "Do you want to check each request to see if a tool is required?"
+            print1(question)
+            intent_screening = self.dialogs.getValidOptions(
+                options=options,
+                title="Intent Screening",
+                default="yes" if config.intent_screening else "no",
+                text=question,
+            )
+            if intent_screening and intent_screening == "yes":
+                config.intent_screening = True
+                return True
+            return False
 
         currentLlmInterface = config.llmInterface
         self.selectLlmPlatform()
@@ -901,18 +915,24 @@ class FreeGenius:
         if config.llmInterface == "ollama":
             print2("# Main Model - for both task execution and conversation")
             self.setLlmModel_ollama()
+            askIntentScreening()
             if askAdditionalChatModel():
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_ollama("code")
         elif config.llmInterface == "llamacpp":
             print2("# Main Model - for both task execution and conversation")
             self.setLlmModel_llamacpp()
+            askIntentScreening()
             if askAdditionalChatModel():
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_llamacpp("code")
         elif config.llmInterface == "gemini":
             print3("Model selected: Google Gemini Pro")
+            askIntentScreening()
         else:
+            if config.llmInterface == "chatgpt":
+                # intent screening does not apply to letmedoit mode
+                askIntentScreening()
             self.setLlmModel_chatgpt()
         config.saveConfig()
         if not config.llmInterface == currentLlmInterface:

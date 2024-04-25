@@ -1,5 +1,5 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
-from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, isValidPythodCode, downloadStableDiffusionFiles
+from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, isValidPythodCode, downloadStableDiffusionFiles, isToolRequired
 from freegenius import config
 import shutil, re, traceback, json, ollama, pprint, copy, datetime
 from typing import Optional
@@ -221,7 +221,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             # 1. Intent Screening
             if config.developer:
                 print1("screening ...")
-            noFunctionCall = True if noFunctionCall else CallOllama.screen_user_request(messages=messages, user_request=user_request)
+            noFunctionCall = True if noFunctionCall else (not isToolRequired(user_request))
         if noFunctionCall or config.tool_dependence <= 0.0:
             return CallOllama.regularCall(messages)
         else:
@@ -306,7 +306,7 @@ Your response:
                     return None
 
     @staticmethod
-    def screen_user_request(messages: dict, user_request: str) -> bool:
+    def isChatOnly(messages: dict, user_request: str) -> bool:
         
         deviceInfo = f"""\n\nMy device information:\n{getDeviceInfo()}""" if config.includeDeviceInfoInContext else ""
         schema = {

@@ -206,7 +206,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
         user_request = messages[-1]["content"]
         if config.intent_screening:
             # 1. Intent Screening
-            noFunctionCall = True if noFunctionCall else CallGemini.screen_user_request(messages=messages, user_request=user_request)
+            noFunctionCall = True if noFunctionCall else CallGemini.isChatOnly(messages=messages, user_request=user_request)
         if noFunctionCall or config.tool_dependence <= 0.0:
             return CallGemini.regularCall(messages)
         else:
@@ -292,8 +292,8 @@ Your response:
                     return None
 
     @staticmethod
-    def screen_user_request(messages: dict, user_request: str) -> bool:
-        
+    def isChatOnly(messages: dict, user_request: str) -> bool:
+        print2("```screening")
         deviceInfo = f"""\n\nMy device information:\n{getDeviceInfo()}""" if config.includeDeviceInfoInContext else ""
         properties = {
             "answer": {
@@ -324,7 +324,10 @@ Your response:
         history, *_ = toGeminiMessages(messages=messages)
 
         output = CallGemini.getResponseDict(history, schema=schema, userMessage=userMessage)
-        return True if "yes" in str(output).lower() else False
+        chatOnly = True if "yes" in str(output).lower() else False
+        print3(f"""Tool may {"not " if chatOnly else ""}be required.""")
+        print2("```")
+        return chatOnly
 
     @staticmethod
     def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], **kwargs) -> dict:

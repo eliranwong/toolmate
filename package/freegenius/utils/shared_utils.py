@@ -1,7 +1,7 @@
 from freegenius import config
 from freegenius.utils.terminal_mode_dialogs import TerminalModeDialogs
 import sys, os, geocoder, platform, socket, geocoder, datetime, requests, netifaces, getpass, pendulum, pkg_resources, webbrowser, unicodedata
-import traceback, uuid, re, textwrap, signal, wcwidth, shutil, threading, time, tiktoken, subprocess, json, base64, html2text, pydoc
+import traceback, uuid, re, textwrap, signal, wcwidth, shutil, threading, time, tiktoken, subprocess, json, base64, html2text, pydoc, codecs
 from packaging import version
 from chromadb.utils import embedding_functions
 from pygments.styles import get_style_by_name
@@ -18,6 +18,8 @@ from bs4 import BeautifulSoup
 from urllib.parse import quote
 from guidance import select, gen
 from typing import Union
+from transformers import pipeline
+
 
 # non-Android only
 if not config.isTermux:
@@ -26,6 +28,40 @@ if not config.isTermux:
 # a dummy import line to resolve ALSA error display on Linux
 import sounddevice
 
+# transformers
+
+def classify(user_input, candidate_labels):
+    classifier = pipeline(task="zero-shot-classification", model=config.zero_shot_classification_model)
+    response = classifier(
+        user_input,
+        candidate_labels=candidate_labels,
+    )
+    labels = response["labels"]
+    return labels[0]
+
+def isToolRequired(user_input) -> bool:
+    tool = True
+    print2("```screening")
+    # check the kind of input
+    kind = classify(user_input, config.labels_kind)
+    print3(f"Kind: {kind}")
+    if kind in config.labels_kind_chat_only_options:
+        tool = False
+    elif kind in config.labels_kind_information_options:
+        # check the nature of the requested information
+        information = classify(user_input, config.labels_information)
+        print3(f"Information: {information}")
+        if information in config.labels_information_chat_only_options:
+            tool = False
+    else:
+        # check the nature of the requested response
+        action = classify(user_input, config.labels_action)
+        print3(f"Action: {action}")
+        if action in config.labels_action_chat_only_options:
+            tool = False
+    print3(f"""Comment: Tool may {"" if tool else "not "}be required.""")
+    print2("```")
+    return tool
 
 # guidance
 
@@ -85,10 +121,10 @@ Answer: The given request asks for {select(["greeting", "calculation", "translat
 
 def outputStructuredData(lm, schema: dict, json_output: bool=False, messages: list = [], use_system_message: bool=True, request: str="", temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs) -> Union[dict, str]:
     properties = toParameterSchema(schema)["properties"]
+    request = f", particularly related to the following request:\n{request}" if request else "."
     lm += toChatml(messages, use_system_message=use_system_message).rstrip()
     lm += f"""<|im_start|>assistant.
-I am answering your questions based on the content in our conversation given above, particularly related to the following request:
-{request}
+I am answering your questions based on the content in our conversation given above{request}
 <|im_end|>
 """
     for key, value in properties.items():
@@ -107,7 +143,7 @@ Answer: {select(options, name=key) if "enum" in value else gen(name=key, stop="<
 
     response = {}
     for i in properties:
-        response[i] = lm.get(i, "").rstrip()
+        response[i] = codecs.decode(lm.get(i, "").rstrip(), "unicode_escape")
     return json.dumps(response) if json_output else response
 
 def select_tool(lm, user_input):

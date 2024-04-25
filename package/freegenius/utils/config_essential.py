@@ -68,7 +68,14 @@ defaultSettings = (
     ('llamacppVisionModel_server_port', 8001),
     ('llamacppVisionModel_model_path', ''), # specify file path of llama.cpp model for vision
     ('llamacppVisionModel_clip_model_path', ''), # specify file path of llama.cpp clip model for vision
-    ('llamacppVisionModel_additional_options', ''),
+    ('llamacppVisionModel_additional_server_options', ''),
+    ('llamacppVisionModel_additional_model_options', {}),
+    ('llamacppVisionModel_additional_chat_options', {}),
+    ('llamacppVisionModel_max_tokens', 10000), # llama.cpp vision model maximum tokens
+    ('llamacppVisionModel_n_gpu_layers', 0), # -1 automatic if gpu is in place
+    ('llamacppVisionModel_n_batch', 512),
+    ('llamacppVisionModel_n_ctx', 0),
+    ('llamacppMainModel_additional_server_options', ''),
     ('llamacppMainModel_additional_model_options', {}),
     ('llamacppMainModel_additional_chat_options', {}),
     ('llamacppChatModel_additional_model_options', {}),

@@ -231,7 +231,7 @@ def startLlamacppServer():
         if not hasattr(config, "llamacppServer") or config.llamacppServer is None:
             config.llamacppServer = None
             print2("Running llama.cpp chat server ...")
-            cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppMainModel_server_port} --model "{config.llamacppMainModel_model_path}" --verbose {config.llamacppMainModel_verbose} --chat_format chatml --n_ctx {config.llamacppMainModel_n_ctx} --n_gpu_layers {config.llamacppMainModel_n_gpu_layers} --n_batch {config.llamacppMainModel_n_batch}"""
+            cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppMainModel_server_port} --model "{config.llamacppMainModel_model_path}" --verbose {config.llamacppMainModel_verbose} --chat_format chatml --n_ctx {config.llamacppMainModel_n_ctx} --n_gpu_layers {config.llamacppMainModel_n_gpu_layers} --n_batch {config.llamacppMainModel_n_batch} {config.llamacppMainModel_additional_server_options}"""
             config.llamacppServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
             while not isServerAlive("127.0.0.1", config.llamacppMainModel_server_port):
                 # wait til the server is up
@@ -254,7 +254,7 @@ def startLlamacppVisionServer():
             if os.path.isfile(config.llamacppVisionModel_model_path) and os.path.isfile(config.llamacppVisionModel_clip_model_path):
                 config.llamacppVisionServer = None
                 print2("Running llama.cpp vision server ...")
-                cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppVisionModel_server_port} --model "{config.llamacppVisionModel_model_path}" --clip_model_path {config.llamacppVisionModel_clip_model_path} --verbose {config.llamacppVisionModel_verbose} --chat_format llava-1-5 --n_ctx {config.llamacppMainModel_n_ctx} --n_gpu_layers {config.llamacppMainModel_n_gpu_layers} --n_batch {config.llamacppMainModel_n_batch} {config.llamacppVisionModel_additional_options}"""
+                cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppVisionModel_server_port} --model "{config.llamacppVisionModel_model_path}" --clip_model_path {config.llamacppVisionModel_clip_model_path} --verbose {config.llamacppVisionModel_verbose} --chat_format llava-1-5 --n_ctx {config.llamacppVisionModel_n_ctx} --n_gpu_layers {config.llamacppVisionModel_n_gpu_layers} --n_batch {config.llamacppVisionModel_n_batch} {config.llamacppVisionModel_additional_server_options}"""
                 config.llamacppVisionServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
                 while not isServerAlive("127.0.0.1", config.llamacppVisionModel_server_port):
                     # wait til the server is up
@@ -481,8 +481,8 @@ def getLocalStorage():
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
         base64_image = base64.b64encode(image_file.read()).decode('utf-8')
-    os.path.splitext(os.path.basename(image_path))[1]
-    return f"data:image/png;base64,{base64_image}"
+    ext = os.path.splitext(os.path.basename(image_path))[1][1:]
+    return f"data:image/{ext};base64,{base64_image}"
 
 def is_valid_image_url(url): 
     try: 

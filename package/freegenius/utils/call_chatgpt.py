@@ -361,7 +361,7 @@ class CallChatGPT:
     @staticmethod
     def runGeniusCall(messages: dict, noFunctionCall: bool = False):
         user_request = messages[-1]["content"]
-        if config.intent_screening:
+        if config.intent_screening and config.tool_dependence > 0.0:
             # 1. Intent Screening
             noFunctionCall = True if noFunctionCall else CallChatGPT.isChatOnly(messages=messages)
         if noFunctionCall or config.tool_dependence <= 0.0:

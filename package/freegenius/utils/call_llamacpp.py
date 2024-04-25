@@ -1,7 +1,8 @@
 from freegenius import config, showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
-from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, downloadStableDiffusionFiles, screening, isToolRequired
+from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, downloadStableDiffusionFiles, isToolRequired, encode_image
 from typing import Optional
 from llama_cpp import Llama
+from llama_cpp.llama_chat_format import Llava15ChatHandler
 from prompt_toolkit import prompt
 from pathlib import Path
 from huggingface_hub import hf_hub_download
@@ -187,6 +188,48 @@ Remember, output the new copy of python code ONLY, without additional notes or e
         )
 
     @staticmethod
+    def img_to_txt(file_path: str, query: str="Describe this image in detail please.", temperature: Optional[float]=None, max_tokens: Optional[int]=None, messages: Optional[list]=None):
+        chat_handler = Llava15ChatHandler(clip_model_path=config.llamacppVisionModel_clip_model_path)
+        llm = Llama(
+            model_path=config.llamacppVisionModel_model_path,
+            chat_handler=chat_handler,
+            logits_all=True, # needed to make llava work
+            n_ctx=config.llamacppVisionModel_n_ctx, # n_ctx should be increased to accomodate the image embedding
+            n_batch=config.llamacppVisionModel_n_batch,
+            verbose=config.llamacppVisionModel_verbose,
+            n_gpu_layers=config.llamacppVisionModel_n_gpu_layers,
+            **config.llamacppVisionModel_additional_model_options,
+        )
+        # update messages
+        if messages is None:
+            messages = [
+                {
+                    "role": "system",
+                    "content": "You are an assistant who perfectly describes images.",
+                },
+            ]
+        messages.append(
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image_url", "image_url": {"url": encode_image(file_path)}},
+                    {"type" : "text", "text": query},
+                ]
+            }
+        )
+        try:
+            completion = llm.create_chat_completion(
+                messages=messages,
+                temperature=temperature if temperature is not None else config.llmTemperature,
+                max_tokens=max_tokens if max_tokens is not None else config.llamacppVisionModel_max_tokens,
+                stream=False,
+                **config.llamacppVisionModel_additional_chat_options,
+            )
+            return completion["choices"][0]["message"].get("content", "")
+        except:
+            return ""
+
+    @staticmethod
     def getResponseDict(messages: list, schema: dict={}, temperature: Optional[float]=None, max_tokens: Optional[int]=None) -> dict:
         schema = toParameterSchema(schema)
         try:
@@ -259,7 +302,7 @@ Remember, output the new copy of python code ONLY, without additional notes or e
     @staticmethod
     def runGeniusCall(messages: dict, noFunctionCall: bool = False):
         user_request = messages[-1]["content"]
-        if config.intent_screening:
+        if config.intent_screening and config.tool_dependence > 0.0:
             # 1. Intent Screening
             noFunctionCall = True if noFunctionCall else (not isToolRequired(user_request))
         if noFunctionCall or config.tool_dependence <= 0.0:

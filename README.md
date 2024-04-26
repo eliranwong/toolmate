@@ -38,7 +38,7 @@ The author aims to equip FreeGenius AI, as an AI suite that is able to:
 - support optional, but not required, OpenAI ChatGPT and Google Gemini Pro API keys
 - support current LetMeDoIt AI equivalent features
 - devlops strategies plugin framework to execute multi-step generation or task execution
-- run with common computer hardwares with reasonable and affordable cost
+- run on average consumer hardware
 
 # Supported LLM Interface / Models
 
@@ -53,6 +53,10 @@ FreeGenius AI supports four interfaces: llamcpp, ollama, gemini, and chatgpt. It
 * chatgpt - [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
 
 * letmedoit - [LetMeDoIt mode](https://github.com/eliranwong/freegenius/wiki/LetMeDoIt-Mode) / [ChatGPT models](https://platform.openai.com/docs/models)
+
+Coming soon:
+
+[Groq cloud api and model](https://console.groq.com/keys) will be integrated.
 
 ## Open Source Models on Consumer Hardware
 

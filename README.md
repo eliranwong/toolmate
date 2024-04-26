@@ -4,6 +4,10 @@ FreeGenius AI is an ambitious project sparked by the pioneering work of [LetMeDo
 
 As with [LetMeDoIt AI](https://github.com/eliranwong/letmedoit), FreeGenius AI is designed to be capable of engaging in intuitive conversations, executing codes, providing up-to-date information, and performing a wide range of tasks. It's designed to learn, adapt, and grow with the user, offering personalized experiences and interactions.
 
+## Beyond LetMeDoIt AI
+
+https://github.com/eliranwong/freegenius/wiki/Beyond-LetMeDoIt-AI
+
 # Highly Customizable
 
 ![plugins](https://github.com/eliranwong/freegenius/assets/25262722/6bb4b2f6-5684-42c1-95e3-7b12c3a38db6)
@@ -12,13 +16,17 @@ As with [LetMeDoIt AI](https://github.com/eliranwong/letmedoit), FreeGenius AI i
 
 ![realtime_information](https://github.com/eliranwong/freegenius/assets/25262722/d94fd9c3-f242-4c8c-8564-308f866e9adb)
 
+# Access to Device Information
+
+![access_device_information](https://github.com/eliranwong/freegenius/assets/25262722/6e3386a4-7314-4ce5-a64f-fffe35dff92e)
+
 # Task Execution
 
 ![freegenius_ai_screenshot](https://github.com/eliranwong/freegenius/assets/25262722/1e9dd18e-aa4b-4e2c-8d76-386af7ba00ea)
 
-# Beyond LetMeDoIt AI
+# Content Creation
 
-https://github.com/eliranwong/freegenius/wiki/Beyond-LetMeDoIt-AI
+![content_creation](https://github.com/eliranwong/freegenius/assets/25262722/5582d519-b925-4e1b-8fd8-ecaa8422d391)
 
 # Goals
 

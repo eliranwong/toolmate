@@ -40,6 +40,14 @@ Note: You can use Ollama models with either "llamacpp" or "ollama" set as interf
 
 FreeGenius AI also integrates the following models to enhance its abilities.
 
+## Recommendation of Open Source Models on Consumer Hardware
+
+On PU-only devices, [wizardlm2:7b](https://ollama.com/library/wizardlm2) works quite well with FreeGenius AI.
+
+Download [ollama](https://ollama.com/) so that you may select this model via FreeGenius AI prompt.
+
+Read more for chainging models at: https://github.com/eliranwong/freegenius/wiki/Change-Model
+
 ## Vision
 
 llamacpp & ollama: Llava
@@ -80,6 +88,10 @@ chatgpt: dall-e-3
 # Highly Customizable
 
 ![plugins](https://github.com/eliranwong/freegenius/assets/25262722/6bb4b2f6-5684-42c1-95e3-7b12c3a38db6)
+
+# Access to Real-time Data
+
+![realtime_information](https://github.com/eliranwong/freegenius/assets/25262722/d94fd9c3-f242-4c8c-8564-308f866e9adb)
 
 # Installation
 

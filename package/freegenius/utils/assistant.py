@@ -101,13 +101,15 @@ class FreeGenius:
             print("Failed saving history!")
         config.saveConfig()
         
+        # check availability of api keys
+        if not config.groqApi_key:
+            self.changeGroqApi()
         if not config.openaiApiKey:
             self.changeChatGPTAPIkey()
-
-        if not config.openaiApiKey:
-            print2("ChatGPT API key not found!")
-            print3("Read: https://github.com/eliranwong/letmedoit/wiki/ChatGPT-API-Key")
-            exit(0)
+        if not config.openweathermapApi:
+            self.changeOpenweathermapApi()
+        if not config.elevenlabsApi:
+            self.changeElevenlabsApi()
 
         # initial completion check at startup
         if config.initialCompletionCheck:
@@ -128,7 +130,10 @@ class FreeGenius:
             ".model": ("change large language model", self.setLlmModel),
             #".chatmodel": ("change chat-only model", self.setChatbot),
             ".embedding": ("change embedding model", self.setEmbeddingModel),
-            ".changeapikey": ("change OpenAI API key", self.changeChatGPTAPIkey),
+            ".apikeys": ("change API keys", self.changeAPIkeys),
+            #".changeapikey": ("change OpenAI API key", self.changeChatGPTAPIkey),
+            #".openweathermapapi": ("change OpenWeatherMap API key", self.changeOpenweathermapApi),
+            #".elevenlabsapi": ("change ElevenLabs API key", self.changeElevenlabsApi),
             ".temperature": ("change temperature", self.setTemperature),
             ".maxtokens": ("change maximum output tokens", self.setMaxTokens),
             ".mintokens": ("change minimum output tokens", self.setMinTokens),
@@ -151,8 +156,6 @@ class FreeGenius:
             ".voicetypingconfig": ("change voice typing config", self.setVoiceTypingConfig),
             ".texttospeechconfig": ("change text-to-speech config", self.setTextToSpeechConfig),
             ".googleapiservice": ("change Google API service", self.selectGoogleAPIs),
-            ".openweathermapapi": ("change OpenWeatherMap API key", self.changeOpenweathermapApi),
-            ".elevenlabsapi": ("change ElevenLabs API key", self.changeElevenlabsApi),
             ".autobuilderconfig": ("change auto builder config", self.setAutoGenBuilderConfig),
             ".customtexteditor": ("change custom text editor", self.setCustomTextEditor),
             ".termuxapi": ("change Termux API integration", self.setTermuxApi),
@@ -379,8 +382,16 @@ class FreeGenius:
         except:
             return False
 
+    def changeAPIkeys(self):
+        self.changeGroqApi()
+        self.changeChatGPTAPIkey()
+        self.changeOpenweathermapApi()
+        self.changeElevenlabsApi()
+
     def changeChatGPTAPIkey(self):
         if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
+            print3("# ChatGPT API Key: allows access to ChatGPT models")
+            print1("To set up ChatGPT API Key, read:\nhttps://github.com/eliranwong/letmedoit/wiki/ChatGPT-API-Key#how-to-obtain\n")
             print1("Enter your OpenAI API Key [optional]:")
             apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.openaiApiKey, is_password=True)
             if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
@@ -396,10 +407,27 @@ class FreeGenius:
             print2("Configurations updated!")
             setChatGPTAPIkey()
 
+    def changeGroqApi(self):
+        if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
+            print3("# Groq Cloud API Key: allows access to Groq Cloud hosted LLMs")
+            print1("To set up Groq Cloud API Key, read:\nhttps://github.com/eliranwong/freegenius/wiki/Set-up-a-Groq-Cloud-API-Key\n")
+            print1("Enter your Groq Cloud API Key [optional]:")
+            print()
+            apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.groqApi_key, is_password=True)
+            if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+                config.groqApi_key = apikey
+            if getWeather() is not None:
+                config.saveConfig()
+                print2("Configurations updated!")
+            else:
+                config.groqApi_key = ""
+                print2("Invalid API key entered!")
+
     def changeOpenweathermapApi(self):
         if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
+            print3("# OpenWeatherMap API Key: allows access to real-time weather information")
             print1("To set up OpenWeatherMap API Key, read:\nhttps://github.com/eliranwong/letmedoit/wiki/OpenWeatherMap-API-Setup\n")
-            print1("Enter your OpenWeatherMap API Key:")
+            print1("Enter your OpenWeatherMap API Key [optional]:")
             print()
             apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.openweathermapApi, is_password=True)
             if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
@@ -413,6 +441,7 @@ class FreeGenius:
 
     def changeElevenlabsApi(self):
         if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
+            print3("# ElevenLabs API Key: allows access to voice generation feature offered by ElevenLabs")
             print1("To set up ElevenLabs API Key, read:\nhttps://elevenlabs.io/docs/api-reference/text-to-speech#authentication\n")
             print1("Enter your ElevenLabs API Key:")
             print()
@@ -1497,7 +1526,7 @@ class FreeGenius:
                 messageLength = len(messagesCopy)
                 for order, i in enumerate(messagesCopy):
                     isLastItem = (order == (messageLength - 1))
-                    if config.llmInterface in ("chatgpt", "letmedoit") and not isLastItem and i.get("role", "") == "user" and "function_call" in messagesCopy[order+1]:
+                    if config.llmInterface in ("chatgpt", "letmedoit", "groq") and not isLastItem and i.get("role", "") == "user" and "function_call" in messagesCopy[order+1]:
                         i["tool"] = messagesCopy[order+1]["function_call"].get("name", "")
                     config.save_chat_record(timestamp, order, i)
 
@@ -1856,7 +1885,7 @@ My writing:
                         # Create a new thread for the streaming task
                         streamingWordWrapper = StreamingWordWrapper()
                         streaming_event = threading.Event()
-                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("chatgpt", "letmedoit") else False))
+                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq") else False))
                         # Start the streaming thread
                         self.streaming_thread.start()
 

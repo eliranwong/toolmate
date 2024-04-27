@@ -3,6 +3,7 @@ from freegenius.utils.call_gemini import CallGemini
 from freegenius.utils.call_ollama import CallOllama
 from freegenius.utils.call_llamacpp import CallLlamaCpp
 from freegenius.utils.call_chatgpt import CallChatGPT, CallLetMeDoIt
+from freegenius.utils.call_groq import CallGroq
 
 class CallLLM:
 
@@ -43,6 +44,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
     def checkCompletion():
         if config.llmInterface == "ollama":
             return CallOllama.checkCompletion()
+        elif config.llmInterface == "groq":
+            return CallGroq.checkCompletion()
         elif config.llmInterface == "llamacpp":
             return CallLlamaCpp.checkCompletion()
         elif config.llmInterface == "gemini":
@@ -56,6 +59,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
     def autoCorrectPythonCode(code, trace):
         if config.llmInterface == "ollama":
             return CallOllama.autoCorrectPythonCode(code, trace)
+        elif config.llmInterface == "groq":
+            return CallGroq.autoCorrectPythonCode(code, trace)
         elif config.llmInterface == "llamacpp":
             return CallLlamaCpp.autoCorrectPythonCode(code, trace)
         elif config.llmInterface == "gemini":
@@ -69,6 +74,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
     def runSingleFunctionCall(messages, function_name):
         if config.llmInterface == "ollama":
             return CallOllama.runSingleFunctionCall(messages, function_name)
+        elif config.llmInterface == "groq":
+            CallGroq.runSingleFunctionCall(messages, function_name)
         elif config.llmInterface == "llamacpp":
             return CallLlamaCpp.runSingleFunctionCall(messages, function_name)
         elif config.llmInterface == "gemini":
@@ -82,6 +89,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
     def regularCall(messages: dict):
         if config.llmInterface == "ollama":
             return CallOllama.regularCall(messages)
+        elif config.llmInterface == "groq":
+            return CallGroq.regularCall(messages)
         elif config.llmInterface == "llamacpp":
             return CallLlamaCpp.regularCall(messages)
         elif config.llmInterface == "gemini":
@@ -95,6 +104,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
         """
         if config.llmInterface == "ollama":
             return CallOllama.getSingleChatResponse(userInput, messages=messages, temperature=temperature)
+        elif config.llmInterface == "groq":
+            return CallGroq.getSingleChatResponse(userInput, messages=messages, temperature=temperature)
         elif config.llmInterface == "llamacpp":
             return CallLlamaCpp.getSingleChatResponse(userInput, messages=messages, temperature=temperature)
         elif config.llmInterface == "gemini":
@@ -111,6 +122,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             messages = [{"role": "user", "content" : messages}]
         if config.llmInterface == "ollama":
             return CallOllama.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
+        elif config.llmInterface == "groq":
+            return CallGroq.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmInterface == "llamacpp":
             return CallLlamaCpp.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmInterface == "gemini":
@@ -124,6 +137,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
     def runGeniusCall(messages, noFunctionCall=False):
         if config.llmInterface == "ollama":
             return CallOllama.runGeniusCall(messages, noFunctionCall)
+        elif config.llmInterface == "groq":
+            return CallGroq.runGeniusCall(messages, noFunctionCall)
         elif config.llmInterface == "llamacpp":
             return CallLlamaCpp.runGeniusCall(messages, noFunctionCall)
         elif config.llmInterface == "gemini":

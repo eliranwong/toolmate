@@ -26,7 +26,7 @@ if config.isTermux:
 
 defaultSettings = (
     # unique configs in FreeGenius AI
-    ('llmInterface', "llamacpp"), # "llamacpp", "ollama", "gemini", "chatgpt", "letmedoit"
+    ('llmInterface', "llamacpp"), # "llamacpp", "ollama", "gemini", "chatgpt", "letmedoit", "groq"
     ('intent_screening', False), # set True to increase both reliability and waiting time
     ('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools
     ('tool_auto_selection_threshold', 0.5), # range: 0.0 - 1.0; tool auto selection is implemented when the closest tool match has a semantic distance lower than its value; manual selection from top matched tools is implemented when the closest distance fall between its value and tool_dependence
@@ -133,6 +133,9 @@ defaultSettings = (
     ('rag_retrieverSettings', {'search_kwargs': {'k': 5}}),
     ('chatRecordClosestMatches', 5),
     ('runPythonScriptGlobally', False),
+    ('groqApi_key', ''),
+    ('groqApi_model', 'mixtral-8x7b-32768'),
+    ('groqApi_max_tokens', 10000),
     ('openaiApiKey', ''),
     ('openaiApiOrganization', ''),
     ('loadingInternetSearches', "auto"),
@@ -243,6 +246,7 @@ temporaryConfigs = [
     "actionHelp",
     "isTermux",
     "oai_client",
+    "groq_client",
     "includeIpInDeviceInfoTemp",
     "initialCompletionCheck",
     "promptStyle1",

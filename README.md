@@ -48,15 +48,13 @@ FreeGenius AI supports four interfaces: llamcpp, ollama, gemini, and chatgpt. It
 
 * ollama - [Ollama](https://ollama.com/) / [Ollama Hosted models](https://ollama.com/library)
 
+* groq - [Groq cloud api and model](https://console.groq.com/keys) / [Groq Hosted models](https://console.groq.com/docs/models)
+
 * gemini - [Google Vertex AI](https://cloud.google.com/vertex-ai) / [Gemini Pro & Gemini Pro Vision](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
 
 * chatgpt - [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
 
 * letmedoit - [LetMeDoIt mode](https://github.com/eliranwong/freegenius/wiki/LetMeDoIt-Mode) / [ChatGPT models](https://platform.openai.com/docs/models)
-
-Coming soon:
-
-[Groq cloud api and model](https://console.groq.com/keys) will be integrated.
 
 ## Open Source Models on Consumer Hardware
 

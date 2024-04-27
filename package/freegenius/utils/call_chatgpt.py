@@ -6,7 +6,6 @@ from pygments.lexers.python import PythonLexer
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit import prompt
-from openai import OpenAI
 
 # token limit
 # reference: https://platform.openai.com/docs/models/gpt-4
@@ -169,7 +168,7 @@ def getSingleChatResponse(userInput, messages=[], temperature=None):
     """
     messages.append({"role": "user", "content" : userInput})
     try:
-        completion = OpenAI().chat.completions.create(
+        completion = config.oai_client.chat.completions.create(
             model=config.chatGPTApiModel,
             messages=messages,
             n=1,

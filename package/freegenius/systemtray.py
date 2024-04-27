@@ -73,13 +73,14 @@ class SystemTrayIcon(QSystemTrayIcon):
         for i in (
             "llamacpp",
             "ollamachat",
+            "groqchat",
             "chatgpt",
             "geminipro",
             "geminiprovision",
             "palm2",
             "codey",
         ):
-            action = QAction("ollama" if i == "ollamachat" else i, self)
+            action = QAction(i[:-4] if i.endswith("chat") else i, self)
             action.triggered.connect(partial(self.runFreeGeniusCommand, i))
             submenu.addAction(action)
 

@@ -30,7 +30,7 @@ from freegenius.utils.ttsLanguages import TtsLanguages
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.text_utils import TextUtil
 from freegenius.utils.sttLanguages import googleSpeeckToTextLanguages, whisperSpeeckToTextLanguages
-from freegenius.groq import GroqChatbot
+from freegenius.groqchat import GroqChatbot
 from freegenius.chatgpt import ChatGPT
 from freegenius.llamacpp import LlamacppChat
 from freegenius.ollamachat import OllamaChat
@@ -397,13 +397,13 @@ class FreeGenius:
             apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.openaiApiKey, is_password=True)
             if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
                 config.openaiApiKey = apikey
+                CallLLM.checkCompletion()
             else:
                 config.openaiApiKey = "freegenius"
             #print1("Enter your Organization ID [optional]:")
             #oid = self.prompts.simplePrompt(default=config.openaiApiOrganization, is_password=True)
             #if oid and not oid.strip().lower() in (config.cancel_entry, config.exit_entry):
             #    config.openaiApiOrganization = oid
-            CallLLM.checkCompletion()
             config.saveConfig()
             print2("Configurations updated!")
             setChatGPTAPIkey()
@@ -417,12 +417,12 @@ class FreeGenius:
             apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.groqApi_key, is_password=True)
             if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
                 config.groqApi_key = apikey
-            if getWeather() is not None:
-                config.saveConfig()
-                print2("Configurations updated!")
+                CallLLM.checkCompletion()
             else:
-                config.groqApi_key = ""
-                print2("Invalid API key entered!")
+                config.groqApi_key = "freegenius"
+            config.saveConfig()
+            print2("Configurations updated!")
+            setChatGPTAPIkey()
 
     def changeOpenweathermapApi(self):
         if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
@@ -434,11 +434,11 @@ class FreeGenius:
             if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
                 config.openweathermapApi = apikey
             if getWeather() is not None:
-                config.saveConfig()
                 print2("Configurations updated!")
             else:
-                config.openweathermapApi = ""
+                config.openweathermapApi = "freegenius"
                 print2("Invalid API key entered!")
+            config.saveConfig()
 
     def changeElevenlabsApi(self):
         if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
@@ -457,11 +457,11 @@ class FreeGenius:
                     voice=config.elevenlabsVoice,
                     model="eleven_multilingual_v2"
                 )
-                config.saveConfig()
                 print2("Configurations updated!")
             except:
-                config.elevenlabsApi = ""
+                config.elevenlabsApi = "freegenius"
                 print2("Invalid API key entered!")
+            config.saveConfig()
 
     def exitAction(self):
         message = "closing ..."

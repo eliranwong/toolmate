@@ -47,7 +47,7 @@ def modify_images(function_args):
         else:
             os.system(f"{config.open} {imageFile}")
 
-    if config.llmInterface in ("llamacpp", "ollama", "gemini"):
+    if config.llmInterface in ("llamacpp", "ollama", "gemini", "groq"):
         config.stopSpinning()
         promptStyle = Style.from_dict({
             # User input (default text).

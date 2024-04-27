@@ -126,7 +126,7 @@ def analyze_audio(function_args):
                 print1("Read https://github.com/openai/whisper/tree/main#setup")
                 return ""
             # https://github.com/openai/whisper/tree/main#python-usage
-            # platform: llamacpp or ollama
+            # platform: llamacpp or ollama or groq
             if language.lower() in ("english", "non-english"):
                 model = whisper.load_model(config.voiceTypingWhisperEnglishModel if language.lower() == "english" else "large")
                 result = model.transcribe(audio_file)

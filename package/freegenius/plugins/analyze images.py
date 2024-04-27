@@ -76,7 +76,7 @@ def analyze_images(function_args):
             # start llama.cpp vision server
             startLlamacppVisionServer()
             client = OpenAI(base_url=f"http://localhost:{config.llamacppMainModel_server_port}/v1", api_key="freegenius")
-        elif config.llmInterface == "ollama":
+        elif config.llmInterface in ("ollama", "groq"):
             config.currentMessages[-1] = {'role': 'user', 'content': query, 'images': files}
             answer = CallOllama.getSingleChatResponse("", config.currentMessages, model=config.ollamaVisionModel)
             config.tempContent = answer

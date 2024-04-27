@@ -51,9 +51,9 @@ open(os.path.join(package, "config.py"), "w").close()
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name=package,
-    version="0.1.0",
+    version="0.1.6",
     python_requires=">=3.8, <3.12",
-    description=f"{appFullName}, an advanced AI assistant that can talk and take multi-step actions. Supports numerous open-source LLMs via Llama.cpp or Ollama, with optional integration with AutoGen agents, OpenAI API, Google Gemini Pro and unlimited plugins.",
+    description=f"{appFullName}, an advanced AI assistant that can talk and take multi-step actions. Supports numerous open-source LLMs via Llama.cpp or Ollama or Groq Cloud API, with optional integration with AutoGen agents, OpenAI API, Google Gemini Pro and unlimited plugins.",
     long_description=long_description,
     author="Eliran Wong",
     author_email="support@letmedoit.ai",
@@ -153,6 +153,7 @@ setup(
             f"geminiprovision={package}.geminiprovision:main",
             f"palm2={package}.palm2:main",
             f"codey={package}.codey:main",
+            f"groqchat={package}.groqchat:main",
             f"chatgpt={package}.chatgpt:main",
             f"llamacpp={package}.llamacpp:main",
             f"ollamachat={package}.ollamachat:main",

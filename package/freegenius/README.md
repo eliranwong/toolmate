@@ -4,23 +4,41 @@ FreeGenius AI is an ambitious project sparked by the pioneering work of [LetMeDo
 
 As with [LetMeDoIt AI](https://github.com/eliranwong/letmedoit), FreeGenius AI is designed to be capable of engaging in intuitive conversations, executing codes, providing up-to-date information, and performing a wide range of tasks. It's designed to learn, adapt, and grow with the user, offering personalized experiences and interactions.
 
-![freegenius_ai_screenshot](https://github.com/eliranwong/freegenius/assets/25262722/1e9dd18e-aa4b-4e2c-8d76-386af7ba00ea)
-
-# Beyond LetMeDoIt AI
+## Beyond LetMeDoIt AI
 
 https://github.com/eliranwong/freegenius/wiki/Beyond-LetMeDoIt-AI
+
+# Highly Customizable
+
+![plugins](https://github.com/eliranwong/freegenius/assets/25262722/6bb4b2f6-5684-42c1-95e3-7b12c3a38db6)
+
+# Access to Real-time Data
+
+![realtime_information](https://github.com/eliranwong/freegenius/assets/25262722/d94fd9c3-f242-4c8c-8564-308f866e9adb)
+
+# Access to Device Information
+
+![access_device_information](https://github.com/eliranwong/freegenius/assets/25262722/6e3386a4-7314-4ce5-a64f-fffe35dff92e)
+
+# Task Execution
+
+![freegenius_ai_screenshot](https://github.com/eliranwong/freegenius/assets/25262722/1e9dd18e-aa4b-4e2c-8d76-386af7ba00ea)
+
+# Content Creation
+
+![content_creation](https://github.com/eliranwong/freegenius/assets/25262722/5582d519-b925-4e1b-8fd8-ecaa8422d391)
 
 # Goals
 
 The author aims to equip FreeGenius AI, as an AI suite that is able to:
 
-- run offline
-- support local LLM servers
+- support both offline and online backends
+- support local LLM backends
 - support open-source large language models
 - support optional, but not required, OpenAI ChatGPT and Google Gemini Pro API keys
 - support current LetMeDoIt AI equivalent features
 - devlops strategies plugin framework to execute multi-step generation or task execution
-- run with common computer hardwares with reasonable and affordable cost
+- run on average consumer hardware
 
 # Supported LLM Interface / Models
 
@@ -30,39 +48,53 @@ FreeGenius AI supports four interfaces: llamcpp, ollama, gemini, and chatgpt. It
 
 * ollama - [Ollama](https://ollama.com/) / [Ollama Hosted models](https://ollama.com/library)
 
+* groq - [Groq cloud api and model](https://console.groq.com/keys) / [Groq Hosted models](https://console.groq.com/docs/models)
+
 * gemini - [Google Vertex AI](https://cloud.google.com/vertex-ai) / [Gemini Pro & Gemini Pro Vision](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
 
 * chatgpt - [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
 
 * letmedoit - [LetMeDoIt mode](https://github.com/eliranwong/freegenius/wiki/LetMeDoIt-Mode) / [ChatGPT models](https://platform.openai.com/docs/models)
 
-Note: You can use Ollama models with either "llamacpp" or "ollama" set as interface.
+## Open Source Models on Consumer Hardware
+
+Even on CPU-only devices, FreeGenius AI works well with a wide range of tested LLMs, particularly [wizardlm2:7b](https://ollama.com/library/wizardlm2). Download [ollama](https://ollama.com/) so that you may select open source LLMs easily via FreeGenius AI prompt.
+
+Note: Ollama hosted models work with both "llamacpp" and "ollama" interfaces.
+
+Read more for chainging models at: https://github.com/eliranwong/freegenius/wiki/Change-Model
 
 FreeGenius AI also integrates the following models to enhance its abilities.
 
 ## Vision
 
-llamacpp & ollama: Llava
+llamacpp, ollama & groq: Llava (offline)
 
-gemini: Gemini Pro Vision
+gemini: Gemini Pro Vision (online)
 
-chatgpt & letmedoit: ChatGPT-4 Vision
+chatgpt & letmedoit: ChatGPT-4 Vision (online)
+
+Remarks: Groq cloud currently does not support multimodal models. Other backends are used in this case.
 
 ## Audio Analysis
 
-llamacpp & ollama: OpenAI Whisper (offline)
+llamacpp, ollama & groq: OpenAI Whisper (offline)
 
-gemini: Google Cloud Speech-to-Text Service
+gemini: Google Cloud Speech-to-Text Service (online)
 
-chatgpt & letmedoit: Whisper (online API)
+chatgpt & letmedoit: Whisper (online)
+
+Remarks: Groq cloud currently does not support multimodal models. Other backends are used in this case.
 
 ## Image Creation and Modification
 
-llamacpp, ollama & gemini: stable-diffusion
+llamacpp, ollama, groq & gemini: stable-diffusion
 
 gemini: plan for imagen when imagen is open to public access
 
 chatgpt: dall-e-3
+
+Remarks: Groq cloud currently does not support multimodal models. Other backends are used in this case.
 
 ## Voice Typing Options
 
@@ -76,10 +108,6 @@ chatgpt: dall-e-3
 2. Google Text-to-Speech (API)
 3. Elevenlabs (API)
 4. Custom system commands
-
-# Highly Customizable
-
-![plugins](https://github.com/eliranwong/freegenius/assets/25262722/6bb4b2f6-5684-42c1-95e3-7b12c3a38db6)
 
 # Installation
 
@@ -134,6 +162,10 @@ https://github.com/eliranwong/freegenius/wiki/Change-Model
 # How to Set up Google or OpenAI Credentials?
 
 This is optional. Read https://github.com/eliranwong/freegenius/wiki/Set-up-Optional-Credentials
+
+# Speed Up with GPU Acceleration
+
+https://github.com/eliranwong/freegenius/wiki/Speed-Up-with-GPU-Acceleration
 
 # Function Calling Approach with Any LLM
 

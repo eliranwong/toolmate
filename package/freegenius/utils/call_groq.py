@@ -1,6 +1,6 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution
 from freegenius import config
-from freegenius import print1, print2, print3, selectTool
+from freegenius import print1, print2, print3, selectTool, check_llm_errors
 import re, traceback, pprint, copy, textwrap, json, pygments
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit import print_formatted_text, HTML
@@ -36,6 +36,7 @@ class CallGroq:
         return [{"type": "function", "function": functionSignature} for functionSignature in functionSignatures]
 
     @staticmethod
+    @check_llm_errors
     def checkCompletion():
         config.groq_client = Groq(
             api_key=config.groqApi_key,
@@ -84,6 +85,7 @@ class CallGroq:
             return "[INVALID]"
 
     @staticmethod
+    @check_llm_errors
     def getSingleChatResponse(userInput, messages=[], temperature=None):
         """
         non-streaming single call
@@ -191,6 +193,7 @@ class CallGroq:
         return messages
 
     @staticmethod
+    @check_llm_errors
     def getSingleFunctionCallResponse(messages: list[dict], function_name: str, temperature=None, **kwargs):
         functionSignatures = [config.toolFunctionSchemas[function_name]]
         completion = config.groq_client.chat.completions.create(
@@ -219,6 +222,7 @@ class CallGroq:
         return function_call_message_mini, function_call_response
 
     @staticmethod
+    @check_llm_errors
     def regularCall(messages: dict, **kwargs):
         return config.groq_client.chat.completions.create(
             model=config.groqApi_main_model,
@@ -231,6 +235,7 @@ class CallGroq:
         )
 
     @staticmethod
+    @check_llm_errors
     def getResponseDict(messages: list, schema: dict, **kwargs) -> dict:
         completion = config.groq_client.chat.completions.create(
             model=config.groqApi_main_model,

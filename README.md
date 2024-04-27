@@ -68,27 +68,33 @@ FreeGenius AI also integrates the following models to enhance its abilities.
 
 ## Vision
 
-llamacpp & ollama: Llava
+llamacpp, ollama & groq: Llava (offline)
 
-gemini: Gemini Pro Vision
+gemini: Gemini Pro Vision (online)
 
-chatgpt & letmedoit: ChatGPT-4 Vision
+chatgpt & letmedoit: ChatGPT-4 Vision (online)
+
+Remarks: Groq cloud currently does not support multimodal models. Other backends are used in this case.
 
 ## Audio Analysis
 
-llamacpp & ollama: OpenAI Whisper (offline)
+llamacpp, ollama & groq: OpenAI Whisper (offline)
 
-gemini: Google Cloud Speech-to-Text Service
+gemini: Google Cloud Speech-to-Text Service (online)
 
-chatgpt & letmedoit: Whisper (online API)
+chatgpt & letmedoit: Whisper (online)
+
+Remarks: Groq cloud currently does not support multimodal models. Other backends are used in this case.
 
 ## Image Creation and Modification
 
-llamacpp, ollama & gemini: stable-diffusion
+llamacpp, ollama, groq & gemini: stable-diffusion
 
 gemini: plan for imagen when imagen is open to public access
 
 chatgpt: dall-e-3
+
+Remarks: Groq cloud currently does not support multimodal models. Other backends are used in this case.
 
 ## Voice Typing Options
 

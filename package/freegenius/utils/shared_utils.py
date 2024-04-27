@@ -19,6 +19,7 @@ from urllib.parse import quote
 from guidance import select, gen
 from typing import Union
 from transformers import pipeline
+from functools import wraps
 
 
 # non-Android only
@@ -769,6 +770,23 @@ def showErrors():
     trace = traceback.format_exc()
     print(trace if config.developer else "Error encountered!")
     return trace
+
+def check_llm_errors(func):
+    """A decorator that handles llm exceptions for the function it wraps."""
+    def wrapper(*args, **kwargs):
+        def finishError():
+            config.stopSpinning()
+            return "[INVALID]"
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            error_message = f"An error occurred in {func.__name__}: {e}"
+            error_traceback = traceback.format_exc()
+            print(error_message)
+            print(error_traceback)
+
+            return finishError()
+    return wrapper
 
 # online
 

@@ -41,7 +41,7 @@ class CallGroq:
             api_key=config.groqApi_key,
         )
         config.groq_client.chat.completions.create(
-            model=config.groqApi_model,
+            model=config.groqApi_main_model,
             messages=[{"role": "user", "content" : "hello"}],
             n=1,
             max_tokens=10,
@@ -91,7 +91,7 @@ class CallGroq:
         messages.append({"role": "user", "content" : userInput})
         try:
             completion = config.groq_client.chat.completions.create(
-                model=config.groqApi_model,
+                model=config.groqApi_main_model,
                 messages=messages,
                 n=1,
                 temperature=temperature if temperature is not None else config.llmTemperature,
@@ -194,7 +194,7 @@ class CallGroq:
     def getSingleFunctionCallResponse(messages: list[dict], function_name: str, temperature=None, **kwargs):
         functionSignatures = [config.toolFunctionSchemas[function_name]]
         completion = config.groq_client.chat.completions.create(
-            model=config.groqApi_model,
+            model=config.groqApi_main_model,
             messages=messages,
             n=1,
             temperature=temperature if temperature is not None else config.llmTemperature,
@@ -221,7 +221,7 @@ class CallGroq:
     @staticmethod
     def regularCall(messages: dict, **kwargs):
         return config.groq_client.chat.completions.create(
-            model=config.groqApi_model,
+            model=config.groqApi_main_model,
             messages=messages,
             n=1,
             temperature=config.llmTemperature,
@@ -233,7 +233,7 @@ class CallGroq:
     @staticmethod
     def getResponseDict(messages: list, schema: dict, **kwargs) -> dict:
         completion = config.groq_client.chat.completions.create(
-            model=config.groqApi_model,
+            model=config.groqApi_main_model,
             messages=messages,
             n=1,
             temperature=config.llmTemperature,

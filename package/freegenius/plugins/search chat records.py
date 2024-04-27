@@ -91,7 +91,7 @@ def load_chats(function_args):
             messages = fileObj.read()
         currentMessages = eval(messages)
         if type(currentMessages) == list:
-            config.currentMessages = [{"content": i.get("content", ""), "role": "user"} if i.get("role", "") == "user" and config.llmInterface in ("chatgpt", "letmedoit") else i for i in currentMessages] # make sure "tool" is not in user message
+            config.currentMessages = [{"content": i.get("content", ""), "role": "user"} if i.get("role", "") == "user" and config.llmInterface in ("chatgpt", "letmedoit", "groq") else i for i in currentMessages] # make sure "tool" is not in user message
             # display loaded messages
             print("")
             for index, i in enumerate(config.currentMessages):

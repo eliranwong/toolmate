@@ -32,8 +32,8 @@ https://github.com/eliranwong/freegenius/wiki/Beyond-LetMeDoIt-AI
 
 The author aims to equip FreeGenius AI, as an AI suite that is able to:
 
-- run offline
-- support local LLM servers
+- support both offline and online backends
+- support local LLM backends
 - support open-source large language models
 - support optional, but not required, OpenAI ChatGPT and Google Gemini Pro API keys
 - support current LetMeDoIt AI equivalent features

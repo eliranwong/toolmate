@@ -58,16 +58,7 @@ class AutoGenAssistant:
 Below is my message:
 {message}"""
 
-        if config.llmInterface == "chatgpt":
-            config_list = autogen.config_list_from_json(
-                env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
-                filter_dict={
-                    "model": {
-                        config.chatGPTApiModel,
-                    }
-                }
-            )
-        elif config.llmInterface == "ollama":
+        if config.llmInterface == "ollama":
             config_list = [
                 {
                     "model": config.ollamaMainModel,
@@ -80,11 +71,30 @@ Below is my message:
             config_list = [
                 {
                     "model": config.llamacppMainModel_model_path,
-                    "base_url": f"http://localhost:{config.config.llamacppMainModel_server_port}/v1",
+                    "base_url": f"http://localhost:{config.llamacppMainModel_server_port}/v1",
                     "api_type": "open_ai",
                     "api_key": "freegenius",
                 }
             ]
+        elif config.llmInterface == "groq":
+            config_list = [
+                {
+                    "model": config.groqApi_main_model,
+                    "base_url": "https://api.groq.com/openai/v1",
+                    "api_type": "open_ai",
+                    "api_key": config.groqApi_key,
+                }
+            ]
+        else:
+        #elif config.llmInterface == "chatgpt":
+            config_list = autogen.config_list_from_json(
+                env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
+                filter_dict={
+                    "model": {
+                        config.chatGPTApiModel,
+                    }
+                }
+            )
 
         assistant = autogen.AssistantAgent(
             name="assistant",

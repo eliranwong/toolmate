@@ -88,21 +88,11 @@ class AutoGenRetriever:
                 print2("File format not supported!")
                 return None
 
-        if config.llmInterface == "chatgpt":
-            llm = config.chatGPTApiModel
-            config_list = autogen.config_list_from_json(
-                env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
-                filter_dict={
-                    "model": {
-                        config.chatGPTApiModel,
-                    }
-                }
-            )
-        elif config.llmInterface == "ollama":
+        if config.llmInterface == "ollama":
             llm = config.ollamaMainModel
             config_list = [
                 {
-                    "model": config.ollamaMainModel,
+                    "model": llm,
                     "base_url": "http://localhost:11434/v1",
                     "api_type": "open_ai",
                     "api_key": "freegenius",
@@ -112,12 +102,33 @@ class AutoGenRetriever:
             llm = config.llamacppMainModel_model_path
             config_list = [
                 {
-                    "model": config.llamacppMainModel_model_path,
-                    "base_url": f"http://localhost:{config.config.llamacppMainModel_server_port}/v1",
+                    "model": llm,
+                    "base_url": f"http://localhost:{config.llamacppMainModel_server_port}/v1",
                     "api_type": "open_ai",
                     "api_key": "freegenius",
                 }
             ]
+        elif config.llmInterface == "groq":
+            llm = config.groqApi_main_model
+            config_list = [
+                {
+                    "model": llm,
+                    "base_url": "https://api.groq.com/openai/v1",
+                    "api_type": "open_ai",
+                    "api_key": config.groqApi_key,
+                }
+            ]
+        else:
+        #if config.llmInterface in ("chatgpt", "letmedoit", "gemini"):
+            llm = config.chatGPTApiModel
+            config_list = autogen.config_list_from_json(
+                env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
+                filter_dict={
+                    "model": {
+                        config.chatGPTApiModel,
+                    }
+                }
+            )
 
         # https://microsoft.github.io/autogen/docs/reference/agentchat/contrib/retrieve_assistant_agent
         assistant = RetrieveAssistantAgent(

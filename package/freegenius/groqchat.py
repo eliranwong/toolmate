@@ -1,5 +1,5 @@
 from freegenius import config
-from freegenius import print2
+from freegenius import print2, getGroqClient
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
 
@@ -20,7 +20,7 @@ class GroqChatbot:
 
     def __init__(self, name="Groq Chatbot", temperature=config.llmTemperature, max_output_tokens=config.groqApi_max_tokens):
         self.name, self.temperature, self.max_output_tokens = name, temperature, max_output_tokens
-        self.client = config.groq_client = Groq(api_key=config.groqApi_key)
+        self.client = getGroqClient()
         self.messages = self.resetMessages()
         if hasattr(config, "currentMessages") and config.currentMessages:
             self.messages += config.currentMessages[:-1]

@@ -19,8 +19,7 @@ from urllib.parse import quote
 from guidance import select, gen
 from typing import Union
 from transformers import pipeline
-from functools import wraps
-
+from groq import Groq
 
 # non-Android only
 if not config.isTermux:
@@ -169,6 +168,27 @@ Action: {select(tool_names, name="tool")}"""
     return lm.get("tool")
 
 # local llm
+
+def getGroqApi_key():
+    '''
+    support multiple grop api keys to work around rate limit
+    User can manually edit config to change the value of config.groqApi_key to a list of multiple api keys instead of a string of a single api key
+    '''
+    if config.groqApi_key:
+        if isinstance(config.groqApi_key, str):
+            return config.groqApi_key
+        elif isinstance(config.groqApi_key, list):
+            if len(config.groqApi_key) > 1:
+                # rotate multiple api keys
+                config.groqApi_key = config.groqApi_key[1:] + [config.groqApi_key[0]]
+            return config.groqApi_key[0]
+        else:
+            return ""
+    else:
+        return ""
+
+def getGroqClient():
+    return Groq(api_key=getGroqApi_key())
 
 def downloadStableDiffusionFiles():
     # llm directory

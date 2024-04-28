@@ -248,7 +248,6 @@ temporaryConfigs = [
     "actionHelp",
     "isTermux",
     "oai_client",
-    "groq_client",
     "includeIpInDeviceInfoTemp",
     "initialCompletionCheck",
     "promptStyle1",

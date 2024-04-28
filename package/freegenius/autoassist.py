@@ -12,7 +12,7 @@ if not hasattr(config, "max_consecutive_auto_reply"):
     config.max_consecutive_auto_reply = 10
 
 import autogen, os, json, traceback
-from freegenius import getDeviceInfo, startLlamacppServer, stopLlamacppServer, tokenLimits
+from freegenius import getDeviceInfo, startLlamacppServer, stopLlamacppServer, getGroqApi_key, tokenLimits
 from freegenius.utils.prompts import Prompts
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.styles import Style
@@ -82,7 +82,7 @@ Below is my message:
                     "model": config.groqApi_main_model,
                     "base_url": "https://api.groq.com/openai/v1",
                     "api_type": "open_ai",
-                    "api_key": config.groqApi_key,
+                    "api_key": getGroqApi_key(),
                 }
             ]
         else:

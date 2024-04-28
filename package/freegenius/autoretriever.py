@@ -13,7 +13,7 @@ if not hasattr(config, "max_consecutive_auto_reply"):
 
 from freegenius import print2, print3, tokenLimits
 
-from freegenius import getEmbeddingFunction, startLlamacppServer, stopLlamacppServer
+from freegenius import getEmbeddingFunction, startLlamacppServer, stopLlamacppServer, getGroqApi_key
 import autogen, os, json, traceback, chromadb, re, zipfile, datetime, traceback
 from chromadb.config import Settings
 from pathlib import Path
@@ -115,7 +115,7 @@ class AutoGenRetriever:
                     "model": llm,
                     "base_url": "https://api.groq.com/openai/v1",
                     "api_type": "open_ai",
-                    "api_key": config.groqApi_key,
+                    "api_key": getGroqApi_key(),
                 }
             ]
         else:

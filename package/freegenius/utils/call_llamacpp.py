@@ -230,7 +230,7 @@ Remember, output the new copy of python code ONLY, without additional notes or e
             return ""
 
     @staticmethod
-    def getResponseDict(messages: list, schema: dict={}, temperature: Optional[float]=None, max_tokens: Optional[int]=None) -> dict:
+    def getDictionaryOutput(messages: list, schema: dict={}, temperature: Optional[float]=None, max_tokens: Optional[int]=None) -> dict:
         schema = toParameterSchema(schema)
         try:
             completion = config.llamacppMainModel.create_chat_completion(
@@ -282,10 +282,10 @@ Remember, output the new copy of python code ONLY, without additional notes or e
         return messages
 
     @staticmethod
-    def getSingleFunctionCallResponse(messages: list, function_name: str, temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs):
+    def getSingleFunctionCallResponse(messages: list, function_name: str, temperature: Optional[float]=None, max_tokens: Optional[int]=None):
         tool_schema = config.toolFunctionSchemas[function_name]["parameters"]
         user_request = messages[-1]["content"]
-        func_arguments = CallLlamaCpp.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages, temperature=temperature, max_tokens=max_tokens, **kwargs)
+        func_arguments = CallLlamaCpp.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages, temperature=temperature, max_tokens=max_tokens)
         function_call_response = executeToolFunction(func_arguments=func_arguments, function_name=function_name)
         function_call_message_mini = {
             "role": "assistant",
@@ -445,7 +445,7 @@ Remember, response in JSON with the filled template ONLY.""",
             },
         ]
 
-        output = CallLlamaCpp.getResponseDict(messages_for_screening, schema=schema, temperature=0.0, max_tokens=20)
+        output = CallLlamaCpp.getDictionaryOutput(messages_for_screening, schema=schema, temperature=0.0, max_tokens=20)
         try:
             output = output["answer"]
         except:
@@ -454,6 +454,7 @@ Remember, response in JSON with the filled template ONLY.""",
 
     @staticmethod
     def extractToolParameters_testing(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs) -> dict:
+        # guidance
         lm = models.LlamaCpp(
             config.llamacppMainModel_model_path,
             echo = False,
@@ -482,7 +483,7 @@ Remember, response in JSON with the filled template ONLY.""",
         return response
 
     @staticmethod
-    def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs) -> dict:
+    def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, max_tokens: Optional[int]=None) -> dict:
         """
         Extract action parameters
         """
@@ -507,7 +508,7 @@ Here is my request:
 
 Remember, response with the required python code ONLY, WITHOUT extra notes or explanations."""
 
-            code = CallLlamaCpp.getSingleChatResponse(code_instruction, ongoingMessages[:-1]).replace(r"\\n", "\n")
+            code = CallLlamaCpp.getSingleChatResponse(code_instruction, ongoingMessages[:-1], temperature, max_tokens).replace(r"\\n", "\n")
             code = extractPythonCode(code, keepInvalid=True)
             if len(schema["properties"]) == 1:
                 return {"code": code}
@@ -539,7 +540,7 @@ Remember, output in JSON.""",
         ]
 
         # schema alternative: properties if len(properties) == 1 else schema
-        parameters = CallLlamaCpp.getResponseDict(messages, schemaCopy, temperature=temperature, max_tokens=max_tokens, **kwargs)
+        parameters = CallLlamaCpp.getDictionaryOutput(messages, schemaCopy, temperature=temperature, max_tokens=max_tokens)
         if code:
             parameters["code"] = code
 

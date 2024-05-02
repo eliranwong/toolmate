@@ -84,7 +84,7 @@ Response:
         return False
 
     @staticmethod
-    def getResponseDict(messages, **kwargs):
+    def getDictionaryOutput(messages, **kwargs):
         #pprint.pprint(messages)
         try:
             llamaFileClient = OpenAI(
@@ -149,7 +149,7 @@ Remember, generate values when required and answer in JSON with the filled templ
             },
         ]
 
-        parameters = CallOllama.getResponseDict(messages)
+        parameters = CallOllama.getDictionaryOutput(messages)
 
         # enforce code generation
         if "code" in schema["required"] and "code" in parameters and not parameters.get("code").strip():
@@ -184,7 +184,7 @@ Remember, answer in JSON with the filled template ONLY.""",
             # switch to a dedicated model for code generation
             ollamaMainModel = config.ollamaMainModel
             config.ollamaMainModel = config.ollamaChatModel
-            code = CallOllama.getResponseDict(messages)
+            code = CallOllama.getDictionaryOutput(messages)
             parameters["code"] = code["code"]
             config.ollamaMainModel = ollamaMainModel
         return parameters

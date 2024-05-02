@@ -1135,7 +1135,7 @@ class FreeGenius:
                 "llama3-70b-8192",
             ),
             title="Groq Model",
-            default=config.chatGPTApiModel if config.chatGPTApiModel in self.models else self.models[0],
+            default=config.groqApi_chat_model if feature == "chat" else config.groqApi_main_model,
             text="Select a function call model:\n(for both chat and task execution)",
         )
         if model:

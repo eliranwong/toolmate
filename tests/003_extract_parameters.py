@@ -4,7 +4,7 @@ import ollama
 from ollama import Options
 
 
-def getResponseDict(messages, **kwargs):
+def getDictionaryOutput(messages, **kwargs):
     try:
         completion = ollama.chat(
             #keep_alive=0,
@@ -55,7 +55,7 @@ Here is my input:
             *ongoingMessages,
             {"role": "user", "content": f"""{getPrompt(template, parameter, parameterDetails)}{userInput}"""},
         ]
-        template = getResponseDict(messages)
+        template = getDictionaryOutput(messages)
     return template
 
 if __name__ == "__main__":

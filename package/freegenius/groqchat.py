@@ -3,7 +3,6 @@ from freegenius import print2, getGroqClient
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
 
-from groq import Groq
 from prompt_toolkit.styles import Style
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory

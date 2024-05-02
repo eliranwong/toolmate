@@ -129,7 +129,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     @check_ollama_errors
-    def getResponseDict(messages: list, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None):
+    def getDictionaryOutput(messages: list, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None):
         #pprint.pprint(messages)
         try:
             completion = ollama.chat(
@@ -197,10 +197,10 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     @check_ollama_errors
-    def getSingleFunctionCallResponse(messages: list, function_name: str, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, **kwargs):
+    def getSingleFunctionCallResponse(messages: list, function_name: str, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None):
         tool_schema = config.toolFunctionSchemas[function_name]["parameters"]
         user_request = messages[-1]["content"]
-        func_arguments = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages, temperature=temperature, num_ctx=num_ctx, num_batch=num_batch, num_predict=num_predict, **kwargs)
+        func_arguments = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages, temperature=temperature, num_ctx=num_ctx, num_batch=num_batch, num_predict=num_predict)
         function_call_response = executeToolFunction(func_arguments=func_arguments, function_name=function_name)
         function_call_message_mini = {
             "role": "assistant",
@@ -344,11 +344,11 @@ Remember, response in JSON with the filled template ONLY.""",
             },
         ]
 
-        output = CallOllama.getResponseDict(messages_for_screening, temperature=0.0, num_predict=20)
+        output = CallOllama.getDictionaryOutput(messages_for_screening, temperature=0.0, num_predict=20)
         return True if "yes" in str(output).lower() else False
 
     @staticmethod
-    def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, **kwargs) -> dict:
+    def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None) -> dict:
         """
         Extract action parameters
         """
@@ -413,7 +413,7 @@ Remember, response in JSON with the filled template ONLY.""",
             },
         ]
 
-        parameters = CallOllama.getResponseDict(messages, temperature=temperature, num_ctx=num_ctx, num_batch=num_batch, num_predict=num_predict, **kwargs)
+        parameters = CallOllama.getDictionaryOutput(messages, temperature=temperature, num_ctx=num_ctx, num_batch=num_batch, num_predict=num_predict)
         if code:
             parameters["code"] = code
 

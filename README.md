@@ -183,10 +183,6 @@ Most current features follow https://github.com/eliranwong/letmedoit/wiki
 
 Particularly, plugin structure follows https://github.com/eliranwong/letmedoit/wiki/Plugins-%E2%80%90-Overview
 
-# TODO
-
-https://github.com/eliranwong/freegenius/issues/4
-
 # Examples (selective only):
 
 FreeGenius AI Plugins allow you to acheive variety of tasks with simple words:

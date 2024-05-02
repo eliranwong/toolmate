@@ -122,7 +122,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
         )
 
     @staticmethod
-    def getResponseDict(history: list, schema: dict, userMessage: str, **kwargs) -> dict:
+    def getDictionaryOutput(history: list, schema: dict, userMessage: str, **kwargs) -> dict:
         name, description, parameters = schema["name"], schema["description"], schema["parameters"]
         chat = config.geminipro_model.start_chat(history=history)
         # declare a function
@@ -323,7 +323,7 @@ Your response:
 
         history, *_ = toGeminiMessages(messages=messages)
 
-        output = CallGemini.getResponseDict(history, schema=schema, userMessage=userMessage)
+        output = CallGemini.getDictionaryOutput(history, schema=schema, userMessage=userMessage)
         chatOnly = True if "yes" in str(output).lower() else False
         print3(f"""Tool may {"not " if chatOnly else ""}be required.""")
         print2("```")
@@ -377,7 +377,7 @@ Remember, response with the required python code ONLY, WITHOUT extra notes or ex
 
 When necessary, generate content based on your knowledge."""
 
-        parameters = CallGemini.getResponseDict(history=history, schema=schema, userMessage=userMessage, **kwargs)
+        parameters = CallGemini.getDictionaryOutput(history=history, schema=schema, userMessage=userMessage, **kwargs)
         # fix linebreak
         if code and "code" in parameters:
             parameters["code"] = codecs.decode(parameters["code"], "unicode_escape")

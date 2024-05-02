@@ -340,7 +340,7 @@ class CallChatGPT:
 
     @staticmethod
     @check_openai_errors
-    def getResponseDict(messages: list, schema: dict, **kwargs) -> dict:
+    def getDictionaryOutput(messages: list, schema: dict, **kwargs) -> dict:
         completion = config.oai_client.chat.completions.create(
             model=config.chatGPTApiModel,
             messages=messages,
@@ -407,7 +407,7 @@ class CallChatGPT:
                 print1("extracting parameters ...")
             try:
                 #tool_parameters = CallChatGPT.extractToolParameters(schema=tool_schema, ongoingMessages=messages)
-                tool_parameters = CallChatGPT.getResponseDict(messages=messages, schema=tool_schema)
+                tool_parameters = CallChatGPT.getDictionaryOutput(messages=messages, schema=tool_schema)
                 if not tool_parameters:
                     if config.developer:
                         print1("Failed to extract parameters!")
@@ -481,7 +481,7 @@ class CallChatGPT:
                 "required": ["code"],
             },
         }
-        output = CallChatGPT.getResponseDict(messages, schema=schema)
+        output = CallChatGPT.getDictionaryOutput(messages, schema=schema)
         chatOnly = True if "yes" in str(output).lower() else False
         print3(f"""Tool may {"not " if chatOnly else ""}be required.""")
         print2("```")
@@ -492,7 +492,7 @@ class CallChatGPT:
         """
         Extract action parameters
         """
-        parameters = CallChatGPT.getResponseDict(messages=ongoingMessages, schema=schema, **kwargs)
+        parameters = CallChatGPT.getDictionaryOutput(messages=ongoingMessages, schema=schema, **kwargs)
         if config.developer:
             print2("```parameters")
             pprint.pprint(parameters)

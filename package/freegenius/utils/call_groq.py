@@ -1,12 +1,12 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution
 from freegenius import config
-from freegenius import print1, print2, print3, selectTool, check_llm_errors, getGroqClient
+from freegenius import print1, print2, print3, selectTool, check_llm_errors, getGroqClient, toParameterSchema, extractPythonCode
 import re, traceback, pprint, copy, textwrap, json, pygments
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit import prompt
-from groq import Groq
+from typing import Optional
 
 class CallGroq:
 
@@ -83,7 +83,7 @@ class CallGroq:
 
     @staticmethod
     @check_llm_errors
-    def getSingleChatResponse(userInput, messages=[], temperature=None):
+    def getSingleChatResponse(userInput, messages=[], temperature: Optional[float]=None, max_tokens: Optional[int]=None):
         """
         non-streaming single call
         """
@@ -94,7 +94,9 @@ class CallGroq:
                 messages=messages,
                 n=1,
                 temperature=temperature if temperature is not None else config.llmTemperature,
-                max_tokens=config.groqApi_max_tokens,
+                max_tokens=max_tokens if max_tokens is not None else config.groqApi_max_tokens,
+                stream=False,
+                **config.groqApi_main_model_additional_chat_options,
             )
             return completion.choices[0].message.content
         except:
@@ -191,18 +193,18 @@ class CallGroq:
 
     @staticmethod
     @check_llm_errors
-    def getSingleFunctionCallResponse(messages: list[dict], function_name: str, temperature=None, **kwargs):
+    def getSingleFunctionCallResponse(messages: list[dict], function_name: str, temperature: Optional[float]=None, max_tokens: Optional[int]=None):
         functionSignatures = [config.toolFunctionSchemas[function_name]]
         completion = getGroqClient().chat.completions.create(
             model=config.groqApi_main_model,
             messages=messages,
             n=1,
             temperature=temperature if temperature is not None else config.llmTemperature,
-            max_tokens=config.groqApi_max_tokens,
+            max_tokens=max_tokens if max_tokens is not None else config.groqApi_max_tokens,
             tools=CallGroq.convertFunctionSignaturesIntoTools(functionSignatures),
             tool_choice={"type": "function", "function": {"name": function_name}},
             stream=False,
-            **kwargs,
+            **config.groqApi_main_model_additional_chat_options,
         )
         function_call_message = completion.choices[0].message
         tool_call = function_call_message.tool_calls[0]
@@ -220,30 +222,30 @@ class CallGroq:
 
     @staticmethod
     @check_llm_errors
-    def regularCall(messages: dict, **kwargs):
+    def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None):
         return getGroqClient().chat.completions.create(
             model=config.groqApi_main_model,
             messages=messages,
             n=1,
-            temperature=config.llmTemperature,
-            max_tokens=config.groqApi_max_tokens,
+            temperature=temperature if temperature is not None else config.llmTemperature,
+            max_tokens=max_tokens if max_tokens is not None else config.groqApi_max_tokens,
             stream=True,
-            **kwargs,
+            **config.groqApi_main_model_additional_chat_options,
         )
 
     @staticmethod
     @check_llm_errors
-    def getResponseDict(messages: list, schema: dict, **kwargs) -> dict:
+    def getDictionaryOutput(messages: list, schema: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None) -> dict:
         completion = getGroqClient().chat.completions.create(
             model=config.groqApi_main_model,
             messages=messages,
             n=1,
-            temperature=config.llmTemperature,
-            max_tokens=config.groqApi_max_tokens,
+            temperature=temperature if temperature is not None else config.llmTemperature,
+            max_tokens=max_tokens if max_tokens is not None else config.groqApi_max_tokens,
             tools=[{"type": "function", "function": schema}],
             tool_choice={"type": "function", "function": {"name": schema["name"]}},
             stream=False,
-            **kwargs,
+            **config.groqApi_main_model_additional_chat_options,
         )
         responseDict = json.loads(completion.choices[0].message.tool_calls[0].function.arguments)
         return responseDict
@@ -299,8 +301,7 @@ class CallGroq:
             if config.developer:
                 print1("extracting parameters ...")
             try:
-                #tool_parameters = CallGroq.extractToolParameters(schema=tool_schema, ongoingMessages=messages)
-                tool_parameters = CallGroq.getResponseDict(messages=messages, schema=tool_schema)
+                tool_parameters = CallGroq.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
                 if not tool_parameters:
                     if config.developer:
                         print1("Failed to extract parameters!")
@@ -365,18 +366,80 @@ Supplementary information:
                 "required": ["code"],
             },
         }
-        output = CallGroq.getResponseDict(messages, schema=schema)
+        output = CallGroq.getDictionaryOutput(messages, schema=schema)
         chatOnly = True if "yes" in str(output).lower() else False
         print3(f"""Tool may {"not " if chatOnly else ""}be required.""")
         print2("```")
         return chatOnly
 
     @staticmethod
-    def extractToolParameters(schema: dict, ongoingMessages: list = [], **kwargs) -> dict:
+    def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, max_tokens: Optional[int]=None) -> dict:
         """
         Extract action parameters
         """
-        parameters = CallGroq.getResponseDict(messages=ongoingMessages, schema=schema, **kwargs)
+        name = schema["name"]
+        description = schema["description"]
+        schema = toParameterSchema(schema)
+        schemaCopy = copy.deepcopy(schema)
+
+        # Generate Code when required
+        if "code" in schema["required"]:
+            del schemaCopy["properties"]["code"]
+            schemaCopy["required"].remove("code")
+            enforceCodeOutput = """ Remember, you should format the requested information, if any, into a string that is easily readable by humans. Use the 'print' function in the final line to display the requested information."""
+            code_instruction = schema["properties"]["code"]["description"] + enforceCodeOutput
+            code_instruction = f"""Generate python code according to the following instruction:
+</instruction>
+{code_instruction}
+</instruction>
+
+Here is my request:
+<request>
+{userInput}
+</request>
+
+Remember, response with the required python code ONLY, WITHOUT extra notes or explanations."""
+
+            code = CallGroq.getSingleChatResponse(code_instruction, ongoingMessages[:-1], temperature, max_tokens).replace(r"\\n", "\n")
+            code = extractPythonCode(code, keepInvalid=True)
+            if len(schema["properties"]) == 1:
+                return {"code": code}
+        else:
+            code = ""
+
+        codeContext = f"""
+
+Find required code below:
+{code}""" if code else ""
+
+        messages = ongoingMessages[:-2] + [
+            {
+                "role": "system",
+                "content": f"""You are a JSON builder expert that outputs in JSON.""",
+            },
+            {
+                "role": "user",
+                "content": f"""Response in JSON based on the following content:
+
+<content>
+{userInput}{codeContext}
+</content>
+
+Generate content to fill up the value of each required key in the JSON, if information is not provided.
+
+Remember, output in JSON.""",
+            },
+        ]
+
+        fullSchema = {
+            "name": name,
+            "description": description,
+            "parameters": schemaCopy,
+        }
+        parameters = CallGroq.getDictionaryOutput(messages, fullSchema, temperature, max_tokens)
+        if code:
+            parameters["code"] = code
+
         if config.developer:
             print2("```parameters")
             pprint.pprint(parameters)

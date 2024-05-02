@@ -64,7 +64,7 @@ class Plugins:
     @staticmethod
     def addFunctionCall(signature: str, method: Callable[[dict], str], deviceInfo=False):
         name = signature["name"]
-        if not name in config.toolFunctionSchemas: # prvent duplicaiton
+        if not name in config.toolFunctionSchemas: # prevent duplicaiton
             config.toolFunctionSchemas[name] = {key: value for key, value in signature.items() if not key in ("intent", "examples")}
             config.toolFunctionMethods[name] = method
             ToolStore.add_tool(signature)

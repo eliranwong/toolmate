@@ -54,7 +54,7 @@ functionSignature = {
         "properties": {
             "code": {
                 "type": "string",
-                "description": "Improved version of python code that resolved the traceback error. Return the original code instead only if traceback shows an import error.",
+                "description": "Generate an improved version of python code that resolved the traceback error. Return the original code only if traceback shows an import error.",
             },
             "missing_module": {
                 "type": "string",

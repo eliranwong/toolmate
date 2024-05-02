@@ -19,7 +19,6 @@ class GroqChatbot:
 
     def __init__(self, name="Groq Chatbot", temperature=config.llmTemperature, max_output_tokens=config.groqApi_max_tokens):
         self.name, self.temperature, self.max_output_tokens = name, temperature, max_output_tokens
-        self.client = getGroqClient()
         self.messages = self.resetMessages()
         if hasattr(config, "currentMessages") and config.currentMessages:
             self.messages += config.currentMessages[:-1]
@@ -73,13 +72,14 @@ class GroqChatbot:
                 config.pagerContent = ""
 
                 try:
-                    completion = self.client.chat.completions.create(
+                    completion = getGroqClient().chat.completions.create(
                         model=config.groqApi_chat_model if config.useAdditionalChatModel else config.groqApi_main_model,
                         messages=self.messages,
                         temperature=self.temperature,
                         max_tokens=config.groqApi_max_tokens,
                         n=1,
                         stream=True,
+                        **config.groqApi_chat_model_additional_chat_options,
                     )
 
                     # Create a new thread for the streaming task

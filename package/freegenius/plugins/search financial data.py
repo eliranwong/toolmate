@@ -31,7 +31,7 @@ functionSignature = {
         "properties": {
             "code": {
                 "type": "string",
-                "description": "Python code that integrates package yfinance to resolve my request. Integrate package matplotlib to visualize data, if applicable.",
+                "description": "Generate python code that integrates package yfinance to resolve my request. Integrate package matplotlib to visualize data, if applicable.",
             },
         },
         "required": ["code"],

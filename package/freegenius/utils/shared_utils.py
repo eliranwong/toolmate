@@ -396,6 +396,8 @@ def selectTool(search_result, closest_distance) -> Optional[int]:
         for index, item in enumerate(search_result["metadatas"][0]):
             tool_options.append(str(index))
             tool_descriptions.append(item["name"].replace("_", " "))
+        tool_options.append(str(len(search_result["metadatas"][0])))
+        tool_descriptions.append("more ...")
         stopSpinning()
         tool = TerminalModeDialogs(None).getValidOptions(
             title="Tool Selection",
@@ -407,6 +409,22 @@ def selectTool(search_result, closest_distance) -> Optional[int]:
         if tool:
             return int(tool)
     return None
+
+def selectEnabledTool() -> Optional[str]:
+    tool_options = []
+    tool_descriptions = []
+    for name in config.toolFunctionSchemas:
+        tool_options.append(name)
+        tool_descriptions.append(name.replace("_", " "))
+    stopSpinning()
+    tool = TerminalModeDialogs(None).getValidOptions(
+        title="Tool Selection",
+        text="Select a tool:",
+        options=tool_options,
+        descriptions=tool_descriptions,
+        default=tool_options[0],
+    )
+    return tool
 
 # connectivity
 

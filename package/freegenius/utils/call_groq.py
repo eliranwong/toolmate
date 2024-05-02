@@ -1,12 +1,16 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution
 from freegenius import config
-from freegenius import print1, print2, print3, selectTool, check_llm_errors, getGroqClient, toParameterSchema, extractPythonCode
+from freegenius import print1, print2, print3, selectTool, check_llm_errors, getGroqClient, toParameterSchema, extractPythonCode, selectEnabledTool
 import re, traceback, pprint, copy, textwrap, json, pygments
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit import prompt
 from typing import Optional
+from pydantic import BaseModel
+
+class Screening(BaseModel):
+    answer: str
 
 class CallGroq:
 
@@ -251,13 +255,12 @@ class CallGroq:
         return responseDict
 
     # Auto Function Call equivalence
-
     @staticmethod
     def runGeniusCall(messages: dict, noFunctionCall: bool = False):
         user_request = messages[-1]["content"]
         if config.intent_screening and config.tool_dependence > 0.0:
             # 1. Intent Screening
-            noFunctionCall = True if noFunctionCall else CallGroq.isChatOnly(messages=messages)
+            noFunctionCall = True if noFunctionCall else CallGroq.isChatOnly(user_request=user_request)
         if noFunctionCall or config.tool_dependence <= 0.0:
             return CallGroq.regularCall(messages)
         else:
@@ -287,12 +290,17 @@ class CallGroq:
                 selected_index = selectTool(search_result, closest_distance)
                 if selected_index is None:
                     return CallGroq.regularCall(messages)
+                elif selected_index >= len(search_result["metadatas"][0]):
+                    tool_name = selectEnabledTool()
+                    if tool_name is None:
+                        return CallGroq.regularCall(messages)
                 else:
                     semantic_distance = search_result["distances"][0][selected_index]
                     metadatas = search_result["metadatas"][0][selected_index]
-
-                tool_name = metadatas["name"]
+                    tool_name = metadatas["name"]
+                
                 tool_schema = config.toolFunctionSchemas[tool_name]
+
                 if config.developer:
                     print3(f"Selected: {tool_name} ({semantic_distance})")
             if tool_name == "chat":
@@ -344,33 +352,48 @@ Supplementary information:
                     return None
 
     @staticmethod
-    def isChatOnly(messages: dict) -> bool:
+    def isChatOnly(user_request: str) -> bool:
         print2("```screening")
-        properties = {
-            "answer": {
-                "type": "string",
-                "description": """Evaluate my request to determine if you are able to resolve my request as a text-based AI:
+        try:
+            chat_completion = getGroqClient().chat.completions.create(
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a text-based language model that evaluate the nature of my request and tell me whether you can resolve it with full confidence. Output your answer in JSON. Your answer can only be either 'yes' or 'no'.\n"
+                        f" The JSON object must use the schema: {json.dumps(Screening.model_json_schema(), indent=2)}",
+                    },
+                    {
+                        "role": "user",
+                        "content": f"""Answer either 'yes' or 'no' in JSON format, in response to my request:
+<request>
+{user_request}
+</request>
+
+Question: Tell me honesly whether you are able to resolve the above request?
 - Answer 'no' if you are asked to execute a computing task or an online search.
 - Answer 'no' if you are asked for updates / news / real-time information.
 - Answer 'yes' if the request is a greeting or translation.
-- Answer 'yes' only if you have full information to give a direct response.""",
-                "enum": ['yes', 'no'],
-            },
-        }
-        schema = {
-            "name": "screen_user_request",
-            "description": f'''Estimate user request''',
-            "parameters": {
-                "type": "object",
-                "properties": properties,
-                "required": ["code"],
-            },
-        }
-        output = CallGroq.getDictionaryOutput(messages, schema=schema)
-        chatOnly = True if "yes" in str(output).lower() else False
-        print3(f"""Tool may {"not " if chatOnly else ""}be required.""")
+- Answer 'yes' only if you have full information to give a direct response.
+
+Remember, answer either 'yes' or 'no' in JSON, without extra information.""",
+                    },
+                ],
+                model=config.groqApi_main_model,
+                temperature=0,
+                max_tokens=20,
+                stream=False,
+                response_format={"type": "json_object"},
+            )
+            answer = Screening.model_validate_json(chat_completion.choices[0].message.content)
+        except:
+            # in case JSON output is failed
+            print3("Error: Unable to complete screening!")
+            answer = "no"
+        #print(answer) # check
+        answer = True if "yes" in str(answer).lower() else False
+        print3(f"""Comment: Tool may {"not " if answer else ""}be required.""")
         print2("```")
-        return chatOnly
+        return answer
 
     @staticmethod
     def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, max_tokens: Optional[int]=None) -> dict:

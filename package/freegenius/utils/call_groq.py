@@ -292,6 +292,7 @@ class CallGroq:
                     return CallGroq.regularCall(messages)
                 elif selected_index >= len(search_result["metadatas"][0]):
                     tool_name = selectEnabledTool()
+                    semantic_distance = None
                     if tool_name is None:
                         return CallGroq.regularCall(messages)
                 else:
@@ -302,7 +303,8 @@ class CallGroq:
                 tool_schema = config.toolFunctionSchemas[tool_name]
 
                 if config.developer:
-                    print3(f"Selected: {tool_name} ({semantic_distance})")
+                    semantic_distance = "" if semantic_distance is None else f" ({semantic_distance})"
+                    print3(f"Selected: {tool_name}{semantic_distance}")
             if tool_name == "chat":
                 return CallGroq.regularCall(messages)
             # 3. Parameter Extraction

@@ -1,5 +1,5 @@
 from freegenius import getDeviceInfo, showErrors, get_or_create_collection, query_vectors, toGeminiMessages, executeToolFunction, extractPythonCode
-from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, isValidPythodCode, downloadStableDiffusionFiles
+from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, isValidPythodCode, downloadStableDiffusionFiles, selectEnabledTool
 from freegenius import config
 from prompt_toolkit import prompt
 import traceback, os, json, pprint, copy, datetime, codecs
@@ -236,14 +236,20 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                 selected_index = selectTool(search_result, closest_distance)
                 if selected_index is None:
                     return CallGemini.regularCall(messages)
+                elif selected_index >= len(search_result["metadatas"][0]):
+                    tool_name = selectEnabledTool()
+                    semantic_distance = None
+                    if tool_name is None:
+                        return CallGemini.regularCall(messages)
                 else:
                     semantic_distance = search_result["distances"][0][selected_index]
                     metadatas = search_result["metadatas"][0][selected_index]
+                    tool_name = metadatas["name"]
 
-                tool_name = metadatas["name"]
                 tool_schema = config.toolFunctionSchemas[tool_name]
                 if config.developer:
-                    print3(f"Selected: {tool_name} ({semantic_distance})")            
+                    semantic_distance = "" if semantic_distance is None else f" ({semantic_distance})"
+                    print3(f"Selected: {tool_name}{semantic_distance}")            
             if tool_name == "chat":
                 return CallGemini.regularCall(messages)
             elif tool_name in config.deviceInfoPlugins:

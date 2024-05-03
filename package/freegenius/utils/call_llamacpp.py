@@ -1,5 +1,5 @@
 from freegenius import config, showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
-from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, downloadStableDiffusionFiles, isToolRequired, encode_image
+from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, downloadStableDiffusionFiles, isToolRequired, encode_image, selectEnabledTool
 from typing import Optional
 from llama_cpp import Llama
 from llama_cpp.llama_chat_format import Llava15ChatHandler
@@ -334,13 +334,20 @@ Remember, output the new copy of python code ONLY, without additional notes or e
                 selected_index = selectTool(search_result, closest_distance)
                 if selected_index is None:
                     return CallLlamaCpp.regularCall(messages)
+                elif selected_index >= len(search_result["metadatas"][0]):
+                    tool_name = selectEnabledTool()
+                    semantic_distance = None
+                    if tool_name is None:
+                        return CallLlamaCpp.regularCall(messages)
                 else:
                     semantic_distance = search_result["distances"][0][selected_index]
                     metadatas = search_result["metadatas"][0][selected_index]
+                    tool_name = metadatas["name"]
 
-                tool_name, tool_schema = metadatas["name"], json.loads(metadatas["parameters"])
+                tool_schema = json.loads(metadatas["parameters"])
                 if config.developer:
-                    print3(f"Selected: {tool_name} ({semantic_distance})")
+                    semantic_distance = "" if semantic_distance is None else f" ({semantic_distance})"
+                    print3(f"Selected: {tool_name}{semantic_distance}")
             if tool_name == "chat":
                 return CallLlamaCpp.regularCall(messages)
             elif tool_name in config.deviceInfoPlugins:

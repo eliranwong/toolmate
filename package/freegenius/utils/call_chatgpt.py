@@ -1,6 +1,6 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution
 from freegenius import config
-from freegenius import print1, print2, print3, getDynamicTokens, selectTool
+from freegenius import print1, print2, print3, getDynamicTokens, selectTool, selectEnabledTool
 import re, traceback, openai, pprint, copy, textwrap, json, pygments
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit import print_formatted_text, HTML
@@ -392,14 +392,20 @@ class CallChatGPT:
                 selected_index = selectTool(search_result, closest_distance)
                 if selected_index is None:
                     return CallChatGPT.regularCall(messages)
+                elif selected_index >= len(search_result["metadatas"][0]):
+                    tool_name = selectEnabledTool()
+                    semantic_distance = None
+                    if tool_name is None:
+                        return CallChatGPT.regularCall(messages)
                 else:
                     semantic_distance = search_result["distances"][0][selected_index]
                     metadatas = search_result["metadatas"][0][selected_index]
+                    tool_name = metadatas["name"]
 
-                tool_name = metadatas["name"]
                 tool_schema = config.toolFunctionSchemas[tool_name]
                 if config.developer:
-                    print3(f"Selected: {tool_name} ({semantic_distance})")
+                    semantic_distance = "" if semantic_distance is None else f" ({semantic_distance})"
+                    print3(f"Selected: {tool_name}{semantic_distance}")
             if tool_name == "chat":
                 return CallChatGPT.regularCall(messages)
             # 3. Parameter Extraction

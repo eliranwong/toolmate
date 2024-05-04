@@ -383,6 +383,9 @@ def textTool(tool="", content=""):
             os.system(f"pkill {command}")
     return ""
 
+def getHideOutputSuffix():
+    return f" > {'nul' if config.thisPlatform == 'Windows' else '/dev/null'} 2>&1"
+
 # tool selection
 
 def selectTool(search_result, closest_distance) -> Optional[int]:

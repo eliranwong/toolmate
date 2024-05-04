@@ -1,4 +1,4 @@
-from freegenius import config
+from freegenius import config, getHideOutputSuffix
 import os, sys, re, platform, subprocess, shutil
 
 class VlcUtil:
@@ -35,7 +35,7 @@ class VlcUtil:
     @staticmethod
     def openVlcPlayer():
         def run(command):
-            os.system("{0}{1} > /dev/null 2>&1 &".format("nohup " if shutil.which("nohup") else "", command))
+            os.system("{0}{1}{2} &".format("nohup " if shutil.which("nohup") else "", command, getHideOutputSuffix()))
         VlcUtil.closeVlcPlayer()
         try:
             if VlcUtil.windowsVlc:
@@ -78,13 +78,13 @@ class VlcUtil:
             vlcSpeed = config.vlcSpeed
         # vlc on macOS
         if VlcUtil.macVlc:
-            command = f'''{VlcUtil.macVlc} --intf rc --play-and-exit --rate {vlcSpeed} "{filePath}" &> /dev/null'''
+            command = f'''{VlcUtil.macVlc} --intf rc --play-and-exit --rate {vlcSpeed} "{filePath}"{getHideOutputSuffix()}'''
         # vlc on windows
         elif VlcUtil.windowsVlc:
             command = f'''"{VlcUtil.windowsVlc}" --intf dummy --play-and-exit --rate {vlcSpeed} "{filePath}"'''
         # vlc on other platforms
         elif shutil.which("cvlc"):
-            command = f'''cvlc --play-and-exit --rate {vlcSpeed} "{filePath}" &> /dev/null'''
+            command = f'''cvlc --play-and-exit --rate {vlcSpeed} "{filePath}"{getHideOutputSuffix()}'''
         # use .communicate() to wait for the playback to be completed as .wait() or checking pid existence does not work
         subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 
@@ -94,13 +94,13 @@ class VlcUtil:
     def playMediaFileVlcGui(filePath, vlcSpeed):
         # vlc on macOS
         if VlcUtil.macVlc:
-            command = f'''{VlcUtil.macVlc} --play-and-exit --rate {vlcSpeed} "{filePath}" &> /dev/null'''
+            command = f'''{VlcUtil.macVlc} --play-and-exit --rate {vlcSpeed} "{filePath}"{getHideOutputSuffix()}'''
         # vlc on windows
         elif VlcUtil.windowsVlc:
             command = f'''"{VlcUtil.windowsVlc}" --play-and-exit --rate {vlcSpeed} "{filePath}"'''
         # vlc on other platforms
         elif shutil.which("vlc"):
-            command = f'''vlc --play-and-exit --rate {vlcSpeed} "{filePath}" &> /dev/null'''
+            command = f'''vlc --play-and-exit --rate {vlcSpeed} "{filePath}"{getHideOutputSuffix()}'''
         # use .communicate() to wait for the playback to be completed as .wait() or checking pid existence does not work
         subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 

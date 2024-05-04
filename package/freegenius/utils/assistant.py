@@ -119,9 +119,6 @@ class FreeGenius:
         chat_history = os.path.join(config.localStorage, "history", "chats")
         self.terminal_chat_session = PromptSession(history=FileHistory(chat_history))
 
-        # check if tts is ready
-        self.isTtsAvailable()
-
         self.actions = {
             ".new": (f"start a new chat {str(config.hotkey_new)}", None),
             ".save": ("save content", lambda: self.saveChat(config.currentMessages)),
@@ -212,6 +209,23 @@ class FreeGenius:
             config.voiceTypingLanguage = "en-US" if config.voiceTypingPlatform in ("google", "googlecloud") else "english"
         if config.voiceTypingPlatform in ("google", "googlecloud") and config.voiceTypingLanguage in languages:
             config.voiceTypingLanguage = googleSpeeckToTextLanguages[config.voiceTypingLanguage]
+
+    # Piper-tts Voice
+    def setPiperVoice(self):
+        # create model directory if it does not exist
+        model_dir = os.path.join(config.localStorage, "LLMs", "piper")
+        Path(model_dir).mkdir(parents=True, exist_ok=True)
+        # record in history for easy retrieval by moving arrows upwards / downwards
+        piperVoice_history = os.path.join(config.localStorage, "history", "piperVoice")
+        piperVoice_session = PromptSession(history=FileHistory(piperVoice_history))
+        completer = FuzzyCompleter(WordCompleter(TtsLanguages.piper, ignore_case=True))
+        print1("Please specify a Piper voice model:")
+        print3("Details: https://github.com/rhasspy/piper/blob/master/VOICES.md")
+        if not config.piper_model in TtsLanguages.piper:
+            config.piper_model = "en_US-lessac-medium"
+        option = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.piper_model, promptSession=piperVoice_session, completer=completer)
+        if option and not option in (config.exit_entry, config.cancel_entry):
+            config.piper_model = option
 
     # ElevenLabs Text-to-Speech Voice
     def setElevenlabsVoice(self):
@@ -1368,16 +1382,16 @@ class FreeGenius:
         return config.tts
 
     def toggleinputaudio(self):
-        if self.isTtsAvailable:
-            config.ttsInput = not config.ttsInput
-            config.saveConfig()
-            print3(f"Input Audio: '{'enabled' if config.ttsInput else 'disabled'}'!")
+        #if self.isTtsAvailable:
+        config.ttsInput = not config.ttsInput
+        config.saveConfig()
+        print3(f"Input Audio: '{'enabled' if config.ttsInput else 'disabled'}'!")
 
     def toggleresponseaudio(self):
-        if self.isTtsAvailable:
-            config.ttsOutput = not config.ttsOutput
-            config.saveConfig()
-            print3(f"Response Audio: '{'enabled' if config.ttsOutput else 'disabled'}'!")
+        #if self.isTtsAvailable:
+        config.ttsOutput = not config.ttsOutput
+        config.saveConfig()
+        print3(f"Response Audio: '{'enabled' if config.ttsOutput else 'disabled'}'!")
 
     def defineTtsCommand(self):
         print1("Define custom text-to-speech command below:")
@@ -1443,9 +1457,14 @@ class FreeGenius:
                 config.usePygame = True
 
     def setTextToSpeechConfig(self):
+        options = ["google", "googlecloud", "elevenlabs", "custom"]
+        descriptions = ["Google Text-to-Speech (Generic)", "Google Text-to-Speech (API)", "ElevenLabs (API)", "Custom Text-to-Speech Command [advanced]"]
+        if config.thisPlatform == "Linux" and shutil.which("piper"):
+            options.insert(0, "piper")
+            descriptions.insert(0, "Piper (Offline)")
         ttsPlatform = self.dialogs.getValidOptions(
-            options=("google", "googlecloud", "elevenlabs", "custom"),
-            descriptions=("Google Text-to-Speech (Generic)", "Google Text-to-Speech (API)", "ElevenLabs (API)", "Custom Text-to-Speech Command [advanced]"),
+            options=options,
+            descriptions=descriptions,
             title="Text-to-Speech Configurations",
             text="Select a text-to-speech platform:",
             default=config.ttsPlatform,
@@ -1466,6 +1485,10 @@ class FreeGenius:
         elif config.ttsPlatform == "googlecloud":
             self.setGcttsLanguage()
             self.setGcttsSpeed()
+            self.setAudioPlaybackTool()
+            self.setVlcSpeed()
+        if config.ttsPlatform == "piper":
+            self.setPiperVoice()
             self.setAudioPlaybackTool()
             self.setVlcSpeed()
         elif config.ttsPlatform == "elevenlabs":

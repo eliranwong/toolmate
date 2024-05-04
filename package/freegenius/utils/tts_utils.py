@@ -1,5 +1,6 @@
-from freegenius import config
-import os, traceback, subprocess, re, sounddevice, soundfile
+from freegenius import config, getHideOutputSuffix
+import os, traceback, subprocess, re, sounddevice, soundfile, pydoc, shutil
+from pathlib import Path
 from gtts import gTTS
 from elevenlabs.client import ElevenLabs
 from elevenlabs import play
@@ -67,7 +68,13 @@ class TTSUtil:
                         voice=config.elevenlabsVoice,
                         model="eleven_multilingual_v2"
                     )
-                    play(audio)
+                    play(audio) # elevanlabs play function
+                elif config.ttsPlatform == "piper":
+                    audioFile = os.path.join(config.freeGeniusAIFolder, "temp", "piper.wav")
+                    model_dir = os.path.join(config.localStorage, "LLMs", "piper")
+                    cmd = f'''{shutil.which("piper")} --model {config.piper_model} --download-dir "{model_dir}" --output_file "{audioFile}"{getHideOutputSuffix()}'''
+                    pydoc.pipepager(content, cmd=cmd)
+                    TTSUtil.playAudioFile(audioFile)
                 else:
                     if not config.ttsPlatform == "google":
                         config.ttsPlatform == "google"

@@ -134,6 +134,7 @@ defaultSettings = (
     ('rag_retrieverSettings', {'search_kwargs': {'k': 5}}),
     ('chatRecordClosestMatches', 5),
     ('runPythonScriptGlobally', False),
+    ('piper_model', "en_US-lessac-medium"),
     ('groqApi_key', ''),
     ('groqApi_main_model', 'mixtral-8x7b-32768'),
     ('groqApi_main_model_additional_chat_options', {}),

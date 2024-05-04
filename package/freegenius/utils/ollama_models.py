@@ -1,6 +1,10 @@
 ollama_models = (
+    "moondream",
+    "moondream:1.8b",
     "dolphin-llama3",
     "dolphin-llama3:8b",
+    "llama3-gradient",
+    "llama3-gradient:8b",
     "llama3",
     "llama3:8b",
     "llama3:8b-text",

@@ -1,6 +1,6 @@
 from freegenius import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather
 from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits
-from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK
+from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels
 from freegenius.utils.call_llm import CallLLM
 from freegenius.utils.tool_plugins import ToolStore
 import openai, threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy
@@ -1033,6 +1033,7 @@ class FreeGenius:
                 if shutil.which("ollama"):
                     try:
                         Downloader.downloadOllamaModel(model, True)
+                        exportOllamaModels([model.replace(":latest", "")])
                         if feature == "default":
                             config.ollamaMainModel = model
                         elif feature == "chat":
@@ -1045,9 +1046,9 @@ class FreeGenius:
 
     def setLlmModel_llamacpp(self, feature="default"):
         library = self.dialogs.getValidOptions(
-            options=("Ollama Library", "Huggingface Hub", "Custom GGUF"),
+            options=("Downloaded GGUF Files", "Ollama Library", "Custom"),
             title="Model Library",
-            default="Ollama Library" if shutil.which("ollama") else "Huggingface Hub",
+            default="Downloaded GGUF Files",
             text="Select a model library:",
         )
         if library:
@@ -1064,6 +1065,7 @@ class FreeGenius:
                         if shutil.which("ollama"):
                             try:
                                 Downloader.downloadOllamaModel(model, True)
+                                exportOllamaModels([model.replace(":latest", "")])
                                 # refresh download list
                                 downloadedOllamaModels = getDownloadedOllamaModels()
                                 if feature == "default":
@@ -1079,16 +1081,16 @@ class FreeGenius:
                         config.llamacppMainModel_ollama_tag = model
                     elif feature == "chat":
                         config.llamacppChatModel_ollama_tag = model
-            elif library == "Huggingface Hub":
+            elif library == "Downloaded GGUF Files":
                 downloadedGgufModels = getDownloadedGgufModels()
                 if not downloadedGgufModels:
                     self.setCustomHuggingfaceModel(feature=feature)
                 else:
                     model = self.dialogs.getValidOptions(
                         options=list(downloadedGgufModels.keys()) + ["Others ..."],
-                        title="Huggingface Hub Model",
-                        default="" if ... else "",
-                        text="Select a huggingface model:",
+                        title=library,
+                        #default="" if ... else "",
+                        text="Select a GGUF model:",
                     )
                     if model:
                         if model == "Others ...":
@@ -1097,7 +1099,7 @@ class FreeGenius:
                             config.llamacppMainModel_model_path = downloadedGgufModels[model]
                         elif feature == "chat":
                             config.llamacppChatModel_model_path = downloadedGgufModels[model]
-            elif library == "Custom GGUF":
+            elif library == "Custom":
                 self.setCustomModelPath(feature=feature)
 
     def setCustomModelPath(self, feature="default"):

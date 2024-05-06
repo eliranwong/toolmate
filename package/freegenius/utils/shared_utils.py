@@ -341,6 +341,18 @@ def getDownloadedOllamaModels() -> dict:
                                 pass
     return models
 
+def exportOllamaModels(selection: list=[]) -> None:
+    llm_directory = os.path.join(config.localStorage, "LLMs", "gguf")
+    Path(llm_directory).mkdir(parents=True, exist_ok=True)
+    models = getDownloadedOllamaModels()
+    for model, originalpath in models.items():
+        filename = model.replace(":", "_")
+        exportpath = os.path.join(llm_directory, f"{filename}.gguf")
+        if not os.path.isfile(exportpath) and not model.endswith(":latest") and ((not selection) or (model in selection)):
+            print3(f"Model: {model}")
+            shutil.copy2(originalpath, exportpath)
+            print3(f"Exported: {exportpath}")
+
 def getDownloadedGgufModels() -> dict:
     llm_directory = os.path.join(config.localStorage, "LLMs", "gguf")
     models = {}

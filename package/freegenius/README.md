@@ -131,6 +131,12 @@ To run:
 
 > freegenius
 
+## GPU Acceleration
+
+[AMD GPUs](https://github.com/eliranwong/freegenius/wiki/FreeGenius-with-AMD-GPU-Acceleration)
+
+[Nvidia GPUs](https://github.com/eliranwong/freegenius/wiki/FreeGenius-with-Nvidia-GPU-Acceleration)
+
 ## What to Expect During the Initial Launch?
 
 https://github.com/eliranwong/freegenius/wiki/Initial-Launch

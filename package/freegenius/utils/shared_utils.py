@@ -205,7 +205,7 @@ def downloadStableDiffusionFiles():
             repo_id="runwayml/stable-diffusion-v1-5",
             filename=filename,
             local_dir=llm_directory,
-            local_dir_use_symlinks=False,
+            #local_dir_use_symlinks=False,
         )
         stableDiffusion_model_path = os.path.join(llm_directory, filename)
         if os.path.isfile(stableDiffusion_model_path):
@@ -221,7 +221,7 @@ def downloadStableDiffusionFiles():
             repo_id="latent-consistency/lcm-lora-sdv1-5",
             filename=filename,
             local_dir=llm_directory,
-            local_dir_use_symlinks=False,
+            #local_dir_use_symlinks=False,
         )
         stableDiffusion_model_path = os.path.join(llm_directory, filename)
 

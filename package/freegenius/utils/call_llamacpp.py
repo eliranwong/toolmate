@@ -25,7 +25,7 @@ class CallLlamaCpp:
                     repo_id=config.llamacppMainModel_repo_id,
                     filename=config.llamacppMainModel_filename,
                     local_dir=llm_directory,
-                    local_dir_use_symlinks=False,
+                    #local_dir_use_symlinks=False,
                 )
             config.llamacppMainModel = Llama(
                 model_path=config.llamacppMainModel_model_path,
@@ -48,7 +48,7 @@ class CallLlamaCpp:
                     repo_id=config.llamacppChatModel_repo_id,
                     filename=config.llamacppChatModel_filename,
                     local_dir=llm_directory,
-                    local_dir_use_symlinks=False,
+                    #local_dir_use_symlinks=False,
                 )
 
         # check vision model
@@ -91,7 +91,7 @@ class CallLlamaCpp:
                 repo_id="mys/ggml_llava-v1.5-7b",
                 filename=filename,
                 local_dir=llm_directory,
-                local_dir_use_symlinks=False,
+                #local_dir_use_symlinks=False,
             )
 
         filename = "mmproj-model-f16.gguf"
@@ -105,7 +105,7 @@ class CallLlamaCpp:
                 repo_id="mys/ggml_llava-v1.5-7b",
                 filename=filename,
                 local_dir=llm_directory,
-                local_dir_use_symlinks=False,
+                #local_dir_use_symlinks=False,
             )
 
         # download stable diffusion files

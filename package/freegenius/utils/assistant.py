@@ -1033,7 +1033,6 @@ class FreeGenius:
                 if shutil.which("ollama"):
                     try:
                         Downloader.downloadOllamaModel(model, True)
-                        exportOllamaModels([model.replace(":latest", "")])
                         if feature == "default":
                             config.ollamaMainModel = model
                         elif feature == "chat":
@@ -1065,13 +1064,20 @@ class FreeGenius:
                         if shutil.which("ollama"):
                             try:
                                 Downloader.downloadOllamaModel(model, True)
-                                exportOllamaModels([model.replace(":latest", "")])
+                                model_name = model.replace(":latest", "")
+                                try:
+                                    exportOllamaModels([model_name])
+                                    llm_directory = os.path.join(config.localStorage, "LLMs", "gguf")
+                                    model_path = os.path.join(llm_directory, f"{model_name}.gguf")
+                                except:
+                                    downloadedOllamaModels = getDownloadedOllamaModels()
+                                    model_path = downloadedOllamaModels[model]
                                 # refresh download list
-                                downloadedOllamaModels = getDownloadedOllamaModels()
+                                
                                 if feature == "default":
-                                    config.llamacppMainModel_model_path = downloadedOllamaModels[model]
+                                    config.llamacppMainModel_model_path = model_path
                                 elif feature == "chat":
-                                    config.llamacppChatModel_model_path = downloadedOllamaModels[model]
+                                    config.llamacppChatModel_model_path = model_path
                             except:
                                 print2(f"Failed to download '{model}'! Please make sure you enter a valid model name or tag.")
                         else:

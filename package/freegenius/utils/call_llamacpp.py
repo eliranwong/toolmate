@@ -27,6 +27,7 @@ class CallLlamaCpp:
                     local_dir=llm_directory,
                     #local_dir_use_symlinks=False,
                 )
+            config.llamacppMainModel = None
             config.llamacppMainModel = Llama(
                 model_path=config.llamacppMainModel_model_path,
                 chat_format="chatml",

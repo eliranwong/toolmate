@@ -921,7 +921,6 @@ class FreeGenius:
             config.llmInterface = llmInterface
             if not config.llmInterface == "llamacpp" and hasattr(config, "llamacppMainModel"):
                 config.llamacppMainModel = None
-            CallLLM.checkCompletion()
 
     def setLlmModel(self):
         def askAdditionalChatModel() -> bool:
@@ -997,6 +996,7 @@ class FreeGenius:
             print2("LLM Interface changed! Starting a new chat session ...")
             config.defaultEntry = ".new"
             config.accept_default = True
+        CallLLM.checkCompletion()
 
     def selectOllamaModel(self, message="Select a model from Ollama Library:", feature="default") -> str:
         # history session

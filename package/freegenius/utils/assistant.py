@@ -1527,7 +1527,7 @@ class FreeGenius:
                 "ggml-small.en.bin",
                 "ggml-base.en-q5_1.bin",
                 "ggml-base.en.bin",
-                "ggml-tiny.en-q8_0.bin"
+                "ggml-tiny.en-q8_0.bin",
                 "ggml-tiny.en-q5_1.bin",
                 "ggml-tiny.en.bin",
             ]

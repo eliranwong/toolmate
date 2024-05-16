@@ -14,6 +14,9 @@ class CallLlamaCpp:
     @staticmethod
     def checkCompletion():
 
+        llm_directory = os.path.join(config.localStorage, "LLMs", "gguf")
+        Path(llm_directory).mkdir(parents=True, exist_ok=True)
+
         def loadMainModel():
             llamacppMainModel_model_path = os.path.join(llm_directory, config.llamacppMainModel_filename)
             if not config.llamacppMainModel_model_path or not os.path.isfile(config.llamacppMainModel_model_path):
@@ -51,11 +54,6 @@ class CallLlamaCpp:
                     local_dir=llm_directory,
                     #local_dir_use_symlinks=False,
                 )
-
-        # check vision model
-        # https://llama-cpp-python.readthedocs.io/en/latest/server/
-        llm_directory = os.path.join(config.localStorage, "LLMs", "gguf")
-        Path(llm_directory).mkdir(parents=True, exist_ok=True)
 
         # Download main and code models
         try:

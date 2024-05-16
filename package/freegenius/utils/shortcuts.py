@@ -37,9 +37,9 @@ def createShortcuts():
                 except:
                     pass
         # system tray shortcut
-        shortcutBat1 = os.path.join(config.freeGeniusAIFolder, f"{appName}Tray.bat")
-        desktopShortcut1a = os.path.join(os.path.expanduser('~'), 'Desktop', f"{appName}Tray.bat")
-        desktopShortcut1b = os.path.join(os.path.expanduser('~'), 'OneDrive', 'Desktop', f"{appName}Tray.bat")
+        shortcutBat1 = os.path.join(config.freeGeniusAIFolder, f"{appName}Hub.bat")
+        desktopShortcut1a = os.path.join(os.path.expanduser('~'), 'Desktop', f"{appName}Hub.bat")
+        desktopShortcut1b = os.path.join(os.path.expanduser('~'), 'OneDrive', 'Desktop', f"{appName}Hub.bat")
         shortcutCommand1 = f'''powershell.exe -NoExit -Command "{sys.executable} '{systemtrayFile}'"'''
         # Create .bat for application shortcuts
         if not os.path.exists(shortcutBat1):
@@ -69,7 +69,7 @@ def createShortcuts():
                 shutil.copy(shortcut_file, desktopPath) # overwrites older version
                 print("Copied to Desktop!")
             # system tray shortcut
-            shortcut_file = os.path.join(config.freeGeniusAIFolder, f"{appName}Tray.command")
+            shortcut_file = os.path.join(config.freeGeniusAIFolder, f"{appName}Hub.command")
             if not os.path.isfile(shortcut_file):
                 print("creating system tray shortcut ...")
                 with open(shortcut_file, "w") as f:
@@ -133,9 +133,9 @@ Type=Application
 Path={config.freeGeniusAIFolder}
 Exec={sys.executable} {systemtrayFile}
 Icon={iconPath}
-Name={config.freeGeniusAIName} Tray
+Name={config.freeGeniusAIName} Hub
 """
-        linuxDesktopFile = os.path.join(config.freeGeniusAIFolder, f"{appName}Tray.desktop")
+        linuxDesktopFile = os.path.join(config.freeGeniusAIFolder, f"{appName}Hub.desktop")
         if not os.path.exists(linuxDesktopFile):
             print("creating system tray shortcut ...")
             # Create .desktop shortcut

@@ -1,6 +1,6 @@
-import os, textwrap
+import os, textwrap, subprocess
 from freegenius import config
-from freegenius import print2, print3
+from freegenius import print2, print3, getCpuThreads
 
 from prompt_toolkit import prompt
 from prompt_toolkit.filters import Condition
@@ -90,6 +90,24 @@ class SinglePrompt:
                         return ""
                     except sr.RequestError as e:
                         return "[Error]"
+                elif config.voiceTypingPlatform == "whispercpp":
+                    #from speech_recognition.audio import AudioData
+                    #assert isinstance(audio, AudioData), "Data must be audio data"
+                    wav_bytes_data = audio.get_wav_data(
+                        convert_rate=16000,  # audio samples must be 8kHz or 16 kHz
+                        convert_width=2  # audio samples should be 16-bit
+                    )
+                    wav_file = os.path.join(config.freeGeniusAIFolder, "temp", "voice.wav")
+                    with open(wav_file, "wb") as fileObj:
+                        fileObj.write(wav_bytes_data)
+                    # Example of cli: ./main -np -nt -l auto -t 12 -m ggml-large-v3-q5_0.bin -f ~/Desktop/voice.wav
+                    # *.bin model files available at: https://huggingface.co/ggerganov/whisper.cpp/tree/main
+                    if not os.path.isfile(config.whispercpp_main) or not os.path.isfile(config.whispercpp_model):
+                        return "[Error]"
+                    cli = f'''"{config.whispercpp_main}" -np -nt -l {'en' if config.voiceTypingLanguage in ('english', 'en') else 'auto'} -t {getCpuThreads()} -m "{config.whispercpp_model}" -f "{wav_file}"'''
+                    process = subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    stdout, stderr = process.communicate()
+                    return "[Error]" if stderr and not stdout else stdout.decode("utf-8").strip()
 
             if config.pyaudioInstalled:
                 buffer = event.app.current_buffer

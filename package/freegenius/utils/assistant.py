@@ -1,9 +1,10 @@
-from freegenius import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather
+from freegenius import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput
 from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits
 from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels
 from freegenius.utils.call_llm import CallLLM
 from freegenius.utils.tool_plugins import ToolStore
 import openai, threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy
+from huggingface_hub import hf_hub_download
 from pathlib import Path
 from freegenius.utils.download import Downloader
 from freegenius.utils.ollama_models import ollama_models
@@ -382,17 +383,9 @@ class FreeGenius:
             config.saveConfig()
             print1("Plugin selection updated!")
 
-    def getCliOutput(self, cli):
-        try:
-            process = subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            stdout, *_ = process.communicate()
-            return stdout.decode("utf-8")
-        except:
-            return ""
-
     def fingerprint(self):
         try:
-            output = json.loads(self.getCliOutput("termux-fingerprint"))
+            output = json.loads(getCliOutput("termux-fingerprint"))
             return True if output["auth_result"] == "AUTH_RESULT_SUCCESS" else False
         except:
             return False
@@ -1513,10 +1506,86 @@ class FreeGenius:
         # save configs
         config.saveConfig()
 
+    def getWhispercppModel(self):
+        llm_directory = os.path.join(config.localStorage, "LLMs", "whisper")
+        Path(llm_directory).mkdir(parents=True, exist_ok=True)
+
+        # models that support non-English languages
+        models = [
+            "ggml-large-v3-q5_0.bin",
+            "ggml-large-v3.bin",
+            "ggml-large-v2-q5_0.bin",
+            "ggml-large-v2.bin",
+            "ggml-large-v1.bin",
+        ]
+        if config.voiceTypingLanguage in ('english', 'en'):
+            # English-only models
+            english_models = [
+                "ggml-medium.en-q5_0.bin",
+                "ggml-medium.en.bin",
+                "ggml-small.en-q5_1.bin",
+                "ggml-small.en.bin",
+                "ggml-base.en-q5_1.bin",
+                "ggml-base.en.bin",
+                "ggml-tiny.en-q8_0.bin"
+                "ggml-tiny.en-q5_1.bin",
+                "ggml-tiny.en.bin",
+            ]
+            models = models + english_models
+
+        whispercpp_model = self.dialogs.getValidOptions(
+            options=models,
+            title="Whisper Models",
+            text="Select a whisper model:",
+            default=os.path.basename(config.whispercpp_model),
+        )
+
+        if not whispercpp_model:
+            whispercpp_model = models[0]
+
+        if whispercpp_model:
+            print3(f"Whisper model: {whispercpp_model}")
+            whispercpp_model_path = os.path.join(llm_directory, whispercpp_model)
+            if os.path.isfile(whispercpp_model_path):
+                return whispercpp_model_path
+            else:
+                try:
+                    hf_hub_download(
+                        repo_id="ggerganov/whisper.cpp",
+                        filename=whispercpp_model,
+                        local_dir=llm_directory,
+                    )
+                    return whispercpp_model_path
+                except:
+                    print3(f"Failed to download: {whispercpp_model}")
+                    return ""
+        return ""
+
+    def setWhispercppMain(self):
+        try:
+            whispercpp_main = self.getPath.getFilePath(
+                check_isfile=True,
+                empty_to_cancel=True,
+                list_content_on_directory_change=True,
+                keep_startup_directory=True,
+                message=f"{self.divider}\nEnter the path of the whisper.cpp main file:",
+                default=config.whispercpp_main,
+            )
+        except:
+            print2(f"Given path not accessible!")
+            whispercpp_main = ""
+        if whispercpp_main:
+            whispercpp_main = os.path.expanduser(whispercpp_main)
+            if os.path.isfile(whispercpp_main):
+                config.whispercpp_main = whispercpp_main
+                print3(f"Whisper.cpp main file: {whispercpp_main}")
+            else:
+                print2("Given path invalid!")
+
     def setVoiceTypingConfig(self):
         voiceTypingPlatform = self.dialogs.getValidOptions(
-            options=("google", "googlecloud", "whisper"),
-            descriptions=("Google Speech-to-Text (Generic) [online]", "Google Speech-to-Text (API) [online]", "OpenAI Whisper [offline; slower with non-English voices]"),
+            options=("google", "googlecloud", "whisper", "whispercpp"),
+            descriptions=("Google Speech-to-Text (Generic) [online]", "Google Speech-to-Text (API) [online]", "OpenAI Whisper [offline; slower with non-English voices]", "Whisper.cpp [offline; installed separately]"),
             title="Voice Typing Configurations",
             text="Select a voice typing platform:",
             default=config.voiceTypingPlatform,
@@ -1532,10 +1601,24 @@ class FreeGenius:
                 print3("Read: https://github.com/openai/whisper#setup")
                 print3("Voice typing platform changed to: Google Speech-to-Text (Generic)")
                 config.voiceTypingPlatform = "google"
+            elif voiceTypingPlatform == "whispercpp":
+                # check cli main path
+                self.setWhispercppMain()
+                if os.path.isfile(config.whispercpp_main):
+                    config.voiceTypingPlatform = "whispercpp"
+                else:
+                    config.voiceTypingPlatform = "google"
             else:
                 config.voiceTypingPlatform = voiceTypingPlatform
         # language
         self.setSpeechToTextLanguage()
+        # whisper.cpp models
+        if config.voiceTypingPlatform == "whispercpp":
+            whispercpp_model = self.getWhispercppModel()
+            if whispercpp_model:
+                config.whispercpp_model = whispercpp_model
+            else:
+                config.voiceTypingPlatform = "google"
         # configure config.voiceTypingAdjustAmbientNoise
         voiceTypingAdjustAmbientNoise = self.dialogs.getValidOptions(
             options=("Yes", "No"),

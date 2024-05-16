@@ -62,3 +62,4 @@ stable-diffusion-cpp-python
 pytz
 geopy
 cmake
+psutil

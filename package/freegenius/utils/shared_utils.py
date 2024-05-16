@@ -1,7 +1,7 @@
 from freegenius import config
 from freegenius.utils.terminal_mode_dialogs import TerminalModeDialogs
 import sys, os, geocoder, platform, socket, geocoder, datetime, requests, netifaces, getpass, pendulum, pkg_resources, webbrowser, unicodedata
-import traceback, uuid, re, textwrap, signal, wcwidth, shutil, threading, time, tiktoken, subprocess, json, base64, html2text, pydoc, codecs
+import traceback, uuid, re, textwrap, signal, wcwidth, shutil, threading, time, tiktoken, subprocess, json, base64, html2text, pydoc, codecs, psutil
 from packaging import version
 from chromadb.utils import embedding_functions
 from pygments.styles import get_style_by_name
@@ -378,6 +378,12 @@ def convert_html_to_markdown(html_string):
     return markdown_string
 
 # system command
+
+def getCpuThreads():
+    if config.cpu_threads and isinstance(config.cpu_threads, int):
+        return config.cpu_threads
+    physical_cpu_core = psutil.cpu_count(logical=False)
+    return physical_cpu_core if physical_cpu_core and physical_cpu_core > 1 else 1
 
 def getCliOutput(cli):
     try:

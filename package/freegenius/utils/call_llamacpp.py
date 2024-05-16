@@ -1,4 +1,4 @@
-from freegenius import config, showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema
+from freegenius import config, showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema, getCpuThreads
 from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, downloadStableDiffusionFiles, isToolRequired, encode_image, selectEnabledTool
 from typing import Optional
 from llama_cpp import Llama
@@ -31,12 +31,15 @@ class CallLlamaCpp:
                     #local_dir_use_symlinks=False,
                 )
             config.llamacppMainModel = None
+            cpuThreads = getCpuThreads()
             config.llamacppMainModel = Llama(
                 model_path=config.llamacppMainModel_model_path,
                 chat_format="chatml",
                 n_ctx=config.llamacppMainModel_n_ctx,
                 n_batch=config.llamacppMainModel_n_batch,
                 verbose=config.llamacppMainModel_verbose,
+                n_threads=cpuThreads,
+                n_threads_batch=cpuThreads,
                 n_gpu_layers=config.llamacppMainModel_n_gpu_layers,
                 **config.llamacppMainModel_additional_model_options,
             )
@@ -189,6 +192,7 @@ Remember, output the new copy of python code ONLY, without additional notes or e
     @staticmethod
     def img_to_txt(file_path: str, query: str="Describe this image in detail please.", temperature: Optional[float]=None, max_tokens: Optional[int]=None, messages: Optional[list]=None):
         chat_handler = Llava15ChatHandler(clip_model_path=config.llamacppVisionModel_clip_model_path)
+        cpuThreads = getCpuThreads()
         llm = Llama(
             model_path=config.llamacppVisionModel_model_path,
             chat_handler=chat_handler,
@@ -196,6 +200,8 @@ Remember, output the new copy of python code ONLY, without additional notes or e
             n_ctx=config.llamacppVisionModel_n_ctx, # n_ctx should be increased to accomodate the image embedding
             n_batch=config.llamacppVisionModel_n_batch,
             verbose=config.llamacppVisionModel_verbose,
+            n_threads=cpuThreads,
+            n_threads_batch=cpuThreads,
             n_gpu_layers=config.llamacppVisionModel_n_gpu_layers,
             **config.llamacppVisionModel_additional_model_options,
         )

@@ -105,6 +105,7 @@ ollama_models = (
     "medllama2",
     "yi",
     "yi:6b",
+    "yi:9b",
     "yi:34b",
     "wizardlm-uncensored",
     "everythinglm",

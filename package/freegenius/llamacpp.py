@@ -1,5 +1,5 @@
 from freegenius import config
-from freegenius import print2
+from freegenius import print2, getCpuThreads
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
 from freegenius.utils.call_llamacpp import CallLlamaCpp
@@ -51,12 +51,15 @@ class LlamacppChat:
         self.defaultPrompt = ""
 
     def loadChatModel(self):
+        cpuThreads = getCpuThreads()
         return Llama(
             model_path=config.llamacppChatModel_model_path,
             chat_format="chatml",
             n_ctx=config.llamacppChatModel_n_ctx,
             n_batch=config.llamacppChatModel_n_batch,
             verbose=config.llamacppChatModel_verbose,
+            n_threads=cpuThreads,
+            n_threads_batch=cpuThreads,
             n_gpu_layers=config.llamacppChatModel_n_gpu_layers,
             **config.llamacppChatModel_additional_model_options,
         )

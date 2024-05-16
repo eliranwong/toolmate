@@ -6,7 +6,7 @@ modify the given images according to changes specified by users
 [FUNCTION_CALL]
 """
 
-from freegenius import config, is_valid_image_file, is_valid_image_url, print1, print3, startLlamacppVisionServer, stopLlamacppVisionServer, print2, encode_image, getCliOutput
+from freegenius import config, is_valid_image_file, is_valid_image_url, print1, print3, startLlamacppVisionServer, stopLlamacppVisionServer, print2, encode_image, getCliOutput, getCpuThreads
 import os
 from openai import OpenAI
 from freegenius.utils.call_chatgpt import check_openai_errors
@@ -62,6 +62,7 @@ def modify_images(function_args):
             wtype="default", # Weight type (options: default, f32, f16, q4_0, q4_1, q5_0, q5_1, q8_0)
             # seed=1337, # Uncomment to set a specific seed
             verbose=config.stableDiffusion_verbose,
+            n_threads=getCpuThreads(),
         )
         for imageFile in files:
             width, height = Image.open(imageFile).size

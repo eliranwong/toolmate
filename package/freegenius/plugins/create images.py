@@ -6,7 +6,7 @@ generate images with model "dall-e-3"
 [FUNCTION_CALL]
 """
 
-from freegenius import config, print2, print3, getCurrentDateTime, getCliOutput
+from freegenius import config, print2, print3, getCurrentDateTime, getCliOutput, getCpuThreads
 import os
 from base64 import b64decode
 from freegenius.utils.call_chatgpt import check_openai_errors
@@ -65,6 +65,7 @@ def create_image(function_args):
             wtype="default", # Weight type (options: default, f32, f16, q4_0, q4_1, q5_0, q5_1, q8_0)
             # seed=1337, # Uncomment to set a specific seed
             verbose=config.stableDiffusion_verbose,
+            n_threads=getCpuThreads(),
         )
         stable_diffusion.txt_to_img(
             prompt,

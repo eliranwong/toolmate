@@ -101,6 +101,7 @@ Remarks: Groq cloud currently does not support multimodal models. Other backends
 1. Google Speech-to-Text (Generic)
 2. Google Speech-to-Text (API)
 3. OpenAI Whisper (offline)
+4. OpenAI Whisper via [Whisper.cpp](https://github.com/ggerganov/whisper.cpp) (offline)
 
 ## Speech-to-Text Options
 

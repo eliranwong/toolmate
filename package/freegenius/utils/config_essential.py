@@ -99,6 +99,7 @@ defaultSettings = (
     ('geminipro_max_output_tokens', 8192), # check supported value at https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
     ('whispercpp_main', ''), # whisper.cpp main command file path
     ('whispercpp_model', ''), # whisper.cpp model file path
+    ('whispercpp_additional_options', ''), # whisper.cpp additional options. See https://github.com/ggerganov/whisper.cpp/tree/master/examples/main for all options.
     ('cpu_threads', 0),
     # common configs as in LetMeDoIt AI
     ('translateToLanguage', ''),

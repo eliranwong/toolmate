@@ -104,8 +104,8 @@ class SinglePrompt:
                     # *.bin model files available at: https://huggingface.co/ggerganov/whisper.cpp/tree/main
                     if not os.path.isfile(config.whispercpp_main) or not os.path.isfile(config.whispercpp_model):
                         return "[Error]"
-                    cli = f'''"{config.whispercpp_main}" -np -nt -l {'en' if config.voiceTypingLanguage in ('english', 'en') else 'auto'} -t {getCpuThreads()} -m "{config.whispercpp_model}" -f "{wav_file}"'''
-                    process = subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    cli = f'''"{config.whispercpp_main}" -np -nt -l {'en' if config.voiceTypingLanguage.lower() in ('english', 'en') else 'auto'} -t {getCpuThreads()} -m "{config.whispercpp_model}" -f "{wav_file}" {config.whispercpp_additional_options}'''
+                    process = subprocess.Popen(cli.rstrip(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     stdout, stderr = process.communicate()
                     return "[Error]" if stderr and not stdout else stdout.decode("utf-8").strip()
 

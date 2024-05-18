@@ -247,11 +247,17 @@ def stopAutogenstudioServer():
             os.killpg(os.getpgid(config.autogenstudioServer.pid), signal.SIGTERM)
         config.autogenstudioServer = None
 
+def getLlamacppServerClient(server="main"):
+    return OpenAI(
+        base_url=f"http://localhost:{config.llamacppServerChatModel_server_port if server=='chat' else config.llamacppServerMainModel_server_port}/v1",
+        api_key = "freegenius"
+    )
+
 def startLlamacppServer():
     try:
         if not hasattr(config, "llamacppServer") or config.llamacppServer is None:
             config.llamacppServer = None
-            print2("Running llama.cpp chat server ...")
+            print2("Running llama.cpp main server ...")
             cpuThreads = getCpuThreads()
             cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppMainModel_server_port} --model "{config.llamacppMainModel_model_path}" --verbose {config.llamacppMainModel_verbose} --chat_format chatml --n_ctx {config.llamacppMainModel_n_ctx} --n_gpu_layers {config.llamacppMainModel_n_gpu_layers} --n_batch {config.llamacppMainModel_n_batch} --n_threads {cpuThreads} --n_threads_batch {cpuThreads} {config.llamacppMainModel_additional_server_options}"""
             config.llamacppServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
@@ -266,7 +272,7 @@ def startLlamacppServer():
 def stopLlamacppServer():
     if hasattr(config, "llamacppServer") and config.llamacppServer is not None:
         if isServerAlive("127.0.0.1", config.llamacppMainModel_server_port):
-            print2("Stopping llama.cpp chat server ...")
+            print2("Stopping llama.cpp main server ...")
             os.killpg(os.getpgid(config.llamacppServer.pid), signal.SIGTERM)
         config.llamacppServer = None
 

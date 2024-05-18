@@ -1,5 +1,5 @@
 from freegenius import config
-from freegenius import print2, getCpuThreads
+from freegenius import print2, getLlamacppServerClient
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
 
@@ -9,69 +9,30 @@ from prompt_toolkit.history import FileHistory
 from prompt_toolkit.shortcuts import clear
 from pathlib import Path
 import threading, argparse, os, traceback
-from llama_cpp import Llama
 
 
-class LlamacppChat:
+class LlamacppServerChat:
     """
-    A simple Llamacpp chatbot, without function calling.
+    A simple Groq chatbot, without function calling.
     It is created for use with 3rd-party applications.
     """
 
-    def __init__(self, name="", temperature=config.llmTemperature, max_output_tokens=config.llamacppChatModel_max_tokens, model=None):
-        if model is None:
-            # chat model
-            self.model = self.loadChatModel()
-            if not name:
-                if config.llamacppChatModel_model_path and os.path.isfile(config.llamacppChatModel_model_path):
-                    if config.llamacppChatModel_model_path.lower().endswith(".gguf"):
-                        name = os.path.splitext(os.path.basename(config.llamacppChatModel_model_path))[0]
-                    elif config.llamacppChatModel_ollama_tag:
-                        name = config.llamacppChatModel_ollama_tag
-                else:
-                    name = "Llama.cpp chatbot"
-        else:
-            # main model
-            self.model = model
-            if not name:
-                if config.llamacppMainModel_model_path and os.path.isfile(config.llamacppMainModel_model_path):
-                    if config.llamacppMainModel_model_path.lower().endswith(".gguf"):
-                        name = os.path.splitext(os.path.basename(config.llamacppMainModel_model_path))[0]
-                    elif config.llamacppMainModel_ollama_tag:
-                        name = config.llamacppMainModel_ollama_tag
-                else:
-                    name = "Llama.cpp chatbot"
-
+    def __init__(self, name="Groq Chatbot", temperature=config.llmTemperature, max_output_tokens=config.llamacppChatModel_max_tokens):
         self.name, self.temperature, self.max_output_tokens = name, temperature, max_output_tokens
-
         self.messages = self.resetMessages()
         if hasattr(config, "currentMessages") and config.currentMessages:
             self.messages += config.currentMessages[:-1]
         self.defaultPrompt = ""
 
-    def loadChatModel(self):
-        cpuThreads = getCpuThreads()
-        return Llama(
-            model_path=config.llamacppChatModel_model_path,
-            chat_format="chatml",
-            n_ctx=config.llamacppChatModel_n_ctx,
-            n_batch=config.llamacppChatModel_n_batch,
-            verbose=config.llamacppChatModel_verbose,
-            n_threads=cpuThreads,
-            n_threads_batch=cpuThreads,
-            n_gpu_layers=config.llamacppChatModel_n_gpu_layers,
-            **config.llamacppChatModel_additional_model_options,
-        )
-
     def resetMessages(self):
-        return [{"role": "system", "content": config.systemMessage_llamacpp},]
+        return [{"role": "system", "content": config.systemMessage_llamacppserver},]
 
     def run(self, prompt=""):
         if self.defaultPrompt:
             prompt, self.defaultPrompt = self.defaultPrompt, ""
         historyFolder = os.path.join(config.localStorage, "history")
         Path(historyFolder).mkdir(parents=True, exist_ok=True)
-        chat_history = os.path.join(historyFolder, "llamacpp")
+        chat_history = os.path.join(historyFolder, "llamacppserver")
         chat_session = PromptSession(history=FileHistory(chat_history))
 
         promptStyle = Style.from_dict({
@@ -111,17 +72,19 @@ class LlamacppChat:
                 config.pagerContent = ""
 
                 try:
-                    completion = self.model.create_chat_completion(
+                    completion = getLlamacppServerClient("chat" if config.useAdditionalChatModel else "main").chat.completions.create(
+                        model="freegenius",
                         messages=self.messages,
                         temperature=self.temperature,
-                        max_tokens=self.max_output_tokens,
+                        max_tokens=config.llamacppChatModel_max_tokens,
+                        n=1,
                         stream=True,
-                        **config.llamacppChatModel_additional_chat_options,
+                        #**config.groqApi_chat_model_additional_chat_options,
                     )
 
                     # Create a new thread for the streaming task
                     streaming_event = threading.Event()
-                    self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, False))
+                    self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True))
                     # Start the streaming thread
                     self.streaming_thread.start()
 
@@ -145,10 +108,10 @@ class LlamacppChat:
 
 def main():
     # Create the parser
-    parser = argparse.ArgumentParser(description="chatgpt cli options")
+    parser = argparse.ArgumentParser(description="llamacppserver chatbot cli options")
     # Add arguments
     parser.add_argument("default", nargs="?", default=None, help="default entry")
-    parser.add_argument('-o', '--outputtokens', action='store', dest='outputtokens', help=f"specify maximum output tokens with -o flag; default: {config.chatGPTApiMaxTokens}")
+    parser.add_argument('-o', '--outputtokens', action='store', dest='outputtokens', help=f"specify maximum output tokens with -o flag; default: {config.llamacppChatModel_max_tokens}")
     parser.add_argument('-t', '--temperature', action='store', dest='temperature', help=f"specify temperature with -t flag: default: {config.llmTemperature}")
     # Parse arguments
     args = parser.parse_args()
@@ -158,9 +121,9 @@ def main():
         try:
             max_output_tokens = int(args.outputtokens.strip())
         except:
-            max_output_tokens = config.chatGPTApiMaxTokens
+            max_output_tokens = config.llamacppChatModel_max_tokens
     else:
-        max_output_tokens = config.chatGPTApiMaxTokens
+        max_output_tokens = config.llamacppChatModel_max_tokens
     if args.temperature and args.temperature.strip():
         try:
             temperature = float(args.temperature.strip())
@@ -168,7 +131,7 @@ def main():
             temperature = config.llmTemperature
     else:
         temperature = config.llmTemperature
-    LlamacppChat(
+    LlamacppServerChat(
         temperature=temperature,
         max_output_tokens = max_output_tokens,
     ).run(

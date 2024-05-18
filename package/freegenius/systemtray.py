@@ -57,6 +57,7 @@ class SystemTrayIcon(QSystemTrayIcon):
         # submenu - servers
         submenu = QMenu()
         for i in (
+            "mainserver",
             "chatserver",
             "visionserver",
         ):

@@ -34,6 +34,7 @@ from freegenius.utils.sttLanguages import googleSpeeckToTextLanguages, whisperSp
 from freegenius.groqchat import GroqChatbot
 from freegenius.chatgpt import ChatGPT
 from freegenius.llamacpp import LlamacppChat
+from freegenius.llamacppserver import LlamacppServerChat
 from freegenius.ollamachat import OllamaChat
 if not config.isTermux:
     from freegenius.autobuilder import AutoGenBuilder
@@ -1668,7 +1669,7 @@ class FreeGenius:
                 messageLength = len(messagesCopy)
                 for order, i in enumerate(messagesCopy):
                     isLastItem = (order == (messageLength - 1))
-                    if config.llmInterface in ("chatgpt", "letmedoit", "groq") and not isLastItem and i.get("role", "") == "user" and "function_call" in messagesCopy[order+1]:
+                    if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") and not isLastItem and i.get("role", "") == "user" and "function_call" in messagesCopy[order+1]:
                         i["tool"] = messagesCopy[order+1]["function_call"].get("name", "")
                     config.save_chat_record(timestamp, order, i)
 
@@ -2027,7 +2028,7 @@ My writing:
                         # Create a new thread for the streaming task
                         streamingWordWrapper = StreamingWordWrapper()
                         streaming_event = threading.Event()
-                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq") else False))
+                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False))
                         # Start the streaming thread
                         self.streaming_thread.start()
 
@@ -2075,6 +2076,7 @@ My writing:
             ...
         chatbots = {
             "llamacpp": lambda: LlamacppChat(model=None if config.useAdditionalChatModel else config.llamacppMainModel).run(fineTunedUserInput),
+            "llamacppserver": lambda: LlamacppServerChat().run(fineTunedUserInput),
             "ollama": lambda: OllamaChat().run(fineTunedUserInput, model=config.ollamaChatModel if config.useAdditionalChatModel else config.ollamaMainModel),
             "groq": lambda: GroqChatbot().run(fineTunedUserInput),
             "chatgpt": lambda: ChatGPT().run(fineTunedUserInput),

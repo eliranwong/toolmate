@@ -85,7 +85,7 @@ functionSignature = {
                 "description": "The request about fetching data or making changes in the sqlite file, including all available supplementary information in detail, if any.  If there is no specific request apart from connection or query about table schema / information, return 'Describe tables' without extra comment or information.",
             },
         },
-        "required": ["code", "request"],
+        "required": ["path", "request"],
     },
 }
 

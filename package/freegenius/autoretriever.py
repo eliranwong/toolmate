@@ -108,6 +108,16 @@ class AutoGenRetriever:
                     "api_key": "freegenius",
                 }
             ]
+        elif config.llmInterface == "llamacppserver":
+            llm = config.llamacppMainModel_model_path
+            config_list = [
+                {
+                    "model": llm,
+                    "base_url": f"http://localhost:{config.llamacppServerMainModel_server_port}/v1",
+                    "api_type": "open_ai",
+                    "api_key": "freegenius",
+                }
+            ]
         elif config.llmInterface == "groq":
             llm = config.groqApi_main_model
             config_list = [

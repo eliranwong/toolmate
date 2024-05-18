@@ -47,7 +47,7 @@ def modify_images(function_args):
         else:
             os.system(f"{config.open} {imageFile}")
 
-    if config.llmInterface in ("llamacpp", "ollama", "gemini", "groq"):
+    if config.llmInterface in ("llamacpp", "llamacppserver", "ollama", "gemini", "groq"):
         config.stopSpinning()
         promptStyle = Style.from_dict({
             # User input (default text).
@@ -74,7 +74,7 @@ def modify_images(function_args):
             new_height = SinglePrompt.run(style=promptStyle, default=str(height), validator=NumberValidator())
             if new_height and not new_height.strip().lower() == config.exit_entry and int(new_height) > 0:
                 height = int(new_height)
-            image_description = OpenAI(base_url=f"http://localhost:{config.llamacppMainModel_server_port}/v1", api_key="freegenius").chat.completions.create(
+            image_description = OpenAI(base_url=f"http://localhost:{config.llamacppVisionModel_server_port}/v1", api_key="freegenius").chat.completions.create(
                 model="gpt-4-vision-preview",
                 messages=[
                     {

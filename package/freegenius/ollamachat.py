@@ -197,7 +197,10 @@ Here is my request:
         if hasattr(config, "currentMessages"):
             print2(f"Return back to {config.freeGeniusAIName} prompt ...")
 
-# available cli: 'ollamachat', 'mistral', 'llama2', 'llama213b', 'llama270b', 'gemma2b', 'gemma7b', 'llava', 'phi', 'vicuna'
+# available cli: 'ollamachat', 'mistral', 'llama3', 'llama370b', 'gemma2b', 'gemma7b', 'llava', 'phi3', 'vicuna', 'wizardlm2'
+
+def wizardlm2():
+    main("wizardlm2")
 
 def starlinglm():
     main("starling-lm")
@@ -211,14 +214,11 @@ def mistral():
 def mixtral():
     main("mixtral")
 
-def llama2():
-    main("llama2")
+def llama3():
+    main("llama3")
 
-def llama213b():
-    main("llama2:13b")
-
-def llama270b():
-    main("llama2:70b")
+def llama370b():
+    main("llama3:70b")
 
 def codellama():
     main("codellama")
@@ -232,8 +232,8 @@ def gemma7b():
 def llava():
     main("llava")
 
-def phi():
-    main("phi")
+def phi3():
+    main("phi3")
 
 def vicuna():
     main("vicuna")

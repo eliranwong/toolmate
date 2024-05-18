@@ -35,7 +35,7 @@ def create_image(function_args):
     Path(folder).mkdir(parents=True, exist_ok=True)
     imageFile = os.path.join(folder, f"{getCurrentDateTime()}.png")
 
-    if config.llmInterface in ("llamacpp", "ollama", "gemini", "groq"):
+    if config.llmInterface in ("llamacpp", "llamacppserver", "ollama", "gemini", "groq"):
         config.stopSpinning()
 
         # customize width and height

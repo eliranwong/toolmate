@@ -76,6 +76,15 @@ Below is my message:
                     "api_key": "freegenius",
                 }
             ]
+        elif config.llmInterface == "llamacppserver":
+            config_list = [
+                {
+                    "model": config.llamacppMainModel_model_path,
+                    "base_url": f"http://localhost:{config.llamacppServerMainModel_server_port}/v1",
+                    "api_type": "open_ai",
+                    "api_key": "freegenius",
+                }
+            ]
         elif config.llmInterface == "groq":
             config_list = [
                 {

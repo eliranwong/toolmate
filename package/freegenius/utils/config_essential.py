@@ -26,7 +26,7 @@ if config.isTermux:
 
 defaultSettings = (
     # unique configs in FreeGenius AI
-    ('llmInterface', "llamacpp"), # "llamacpp", "ollama", "gemini", "chatgpt", "letmedoit", "groq"
+    ('llmInterface', "llamacpp"), # "llamacpp", "llamacppserver", "ollama", "gemini", "chatgpt", "letmedoit", "groq"
     ('intent_screening', False), # set True to increase both reliability and waiting time
     ('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools
     ('tool_auto_selection_threshold', 0.5), # range: 0.0 - 1.0; tool auto selection is implemented when the closest tool match has a semantic distance lower than its value; manual selection from top matched tools is implemented when the closest distance fall between its value and tool_dependence
@@ -64,8 +64,11 @@ defaultSettings = (
     ('llamacppMainModel_verbose', False),
     ('llamacppChatModel_verbose', False),
     ('llamacppVisionModel_verbose', False),
+    ('llamacppServerMainModel_server_port', 8000),
+    ('llamacppServerChatModel_server_port', 8001),
     ('llamacppMainModel_server_port', 8000),
-    ('llamacppVisionModel_server_port', 8001),
+    ('llamacppChatModel_server_port', 8001),
+    ('llamacppVisionModel_server_port', 8002),
     ('llamacppVisionModel_model_path', ''), # specify file path of llama.cpp model for vision
     ('llamacppVisionModel_clip_model_path', ''), # specify file path of llama.cpp clip model for vision
     ('llamacppVisionModel_additional_server_options', ''),
@@ -76,6 +79,7 @@ defaultSettings = (
     ('llamacppVisionModel_n_batch', 512),
     ('llamacppVisionModel_n_ctx', 0),
     ('llamacppMainModel_additional_server_options', ''),
+    ('llamacppChatModel_additional_server_options', ''),
     ('llamacppMainModel_additional_model_options', {}),
     ('llamacppMainModel_additional_chat_options', {}),
     ('llamacppChatModel_additional_model_options', {}),
@@ -111,6 +115,7 @@ defaultSettings = (
     ('systemMessage_letmedoit', ''), # letmedoit system message
     ('systemMessage_groq', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone groq chatbot
     ('systemMessage_llamacpp', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone llamacpp chatbot
+    ('systemMessage_llamacppserver', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone llamacppserver chatbot
     ('systemMessage_chatgpt', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone chatgpt chatbot
     ('systemMessage_geminipro', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone geminipro chatbot
     ('systemMessage_palm2', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone palm2 chatbot

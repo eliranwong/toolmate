@@ -13,11 +13,11 @@ import threading, argparse, os, traceback
 
 class LlamacppServerChat:
     """
-    A simple Groq chatbot, without function calling.
+    A simple Llama.cpp server chatbot, without function calling.
     It is created for use with 3rd-party applications.
     """
 
-    def __init__(self, name="Groq Chatbot", temperature=config.llmTemperature, max_output_tokens=config.llamacppChatModel_max_tokens):
+    def __init__(self, name="Llama.cpp server Chatbot", temperature=config.llmTemperature, max_output_tokens=config.llamacppChatModel_max_tokens):
         self.name, self.temperature, self.max_output_tokens = name, temperature, max_output_tokens
         self.messages = self.resetMessages()
         if hasattr(config, "currentMessages") and config.currentMessages:

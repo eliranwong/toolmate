@@ -1,7 +1,7 @@
 import os
 thisFile = os.path.realpath(__file__)
 packageFolder = os.path.dirname(thisFile)
-package = os.path.basename(packageFolder)
+#package = os.path.basename(packageFolder)
 if os.getcwd() != packageFolder:
     os.chdir(packageFolder)
 
@@ -16,8 +16,8 @@ ToolStore.setupToolStoreClient()
 os.environ["TOKENIZERS_PARALLELISM"] = config.tokenizers_parallelism
 
 import sys, platform, shutil, webbrowser
-from freegenius import startAutogenstudioServer
-from freegenius.gui.chatgui import ChatGui
+from freegenius import startAutogenstudioServer, runFreeGeniusCommand
+#from freegenius.gui.chatgui import ChatGui
 from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication
 from PySide6.QtGui import QIcon, QAction, QGuiApplication
 from pathlib import Path
@@ -26,13 +26,13 @@ from functools import partial
 
 freeGeniusAIFile = os.path.realpath(__file__)
 freeGeniusAIFolder = os.path.dirname(freeGeniusAIFile)
-with open(os.path.join(freeGeniusAIFolder, "package_name.txt"), "r", encoding="utf-8") as fileObj:
-    package = fileObj.read()
+#with open(os.path.join(freeGeniusAIFolder, "package_name.txt"), "r", encoding="utf-8") as fileObj:
+#    package = fileObj.read()
 iconFile = os.path.join(freeGeniusAIFolder, "icons", "ai.png")
 thisOS = platform.system()
 
 
-class SystemTrayIcon(QSystemTrayIcon):
+class FreeGeniusHub(QSystemTrayIcon):
 
     def __init__(self, icon, parent=None):
         super().__init__(icon, parent)
@@ -48,21 +48,28 @@ class SystemTrayIcon(QSystemTrayIcon):
         #    self.menu.addAction(chatgui)
         #    self.menu.addSeparator()
 
-        for i in (package, "letmedoit"):
+        for i in ("freegenius", "letmedoit"):
             action = QAction(i, self)
-            action.triggered.connect(partial(self.runFreeGeniusCommand, i))
+            action.triggered.connect(partial(runFreeGeniusCommand, i))
             self.menu.addAction(action)
         self.menu.addSeparator()
 
         # submenu - servers
         submenu = QMenu()
-        for i in (
-            "mainserver",
+        servers = [
+            "toolserver",
             "chatserver",
             "visionserver",
-        ):
+        ]
+        if config.customToolServer_command:
+            servers.append("customtoolserver")
+        if config.customChatServer_command:
+            servers.append("customchatserver")
+        if config.customVisionServer_command:
+            servers.append("customvisionserver")
+        for i in servers:
             action = QAction(i, self)
-            action.triggered.connect(partial(self.runFreeGeniusCommand, i))
+            action.triggered.connect(partial(runFreeGeniusCommand, i))
             submenu.addAction(action)
 
         menuAction = QAction("Servers", self)
@@ -73,6 +80,7 @@ class SystemTrayIcon(QSystemTrayIcon):
         submenu = QMenu()
         for i in (
             "llamacpp",
+            "llamacppserver",
             "ollamachat",
             "groqchat",
             "chatgpt",
@@ -82,7 +90,7 @@ class SystemTrayIcon(QSystemTrayIcon):
             "codey",
         ):
             action = QAction(i[:-4] if i.endswith("chat") else i, self)
-            action.triggered.connect(partial(self.runFreeGeniusCommand, i))
+            action.triggered.connect(partial(runFreeGeniusCommand, i))
             submenu.addAction(action)
 
         menuAction = QAction("Chatbots", self)
@@ -93,7 +101,7 @@ class SystemTrayIcon(QSystemTrayIcon):
         submenu = QMenu()
         for i in ("autoassist", "autoretriever", "autobuilder"):
             action = QAction(i, self)
-            action.triggered.connect(partial(self.runFreeGeniusCommand, i))
+            action.triggered.connect(partial(runFreeGeniusCommand, i))
             submenu.addAction(action)
 
         # autogenstudio
@@ -113,7 +121,7 @@ class SystemTrayIcon(QSystemTrayIcon):
             "commandprompt",
         ):
             action = QAction(i, self)
-            action.triggered.connect(partial(self.runFreeGeniusCommand, i))
+            action.triggered.connect(partial(runFreeGeniusCommand, i))
             submenu.addAction(action)
 
         menuAction = QAction("Utilities", self)
@@ -128,7 +136,7 @@ class SystemTrayIcon(QSystemTrayIcon):
                     self.menu.addSeparator()
                 else:
                     action = QAction("ollama" if i == "ollamachat" else i, self)
-                    action.triggered.connect(partial(self.runFreeGeniusCommand, i))
+                    action.triggered.connect(partial(runFreeGeniusCommand, i))
                     submenu.addAction(action)
 
         menuAction = QAction("Custom", self)
@@ -155,69 +163,16 @@ class SystemTrayIcon(QSystemTrayIcon):
 
     def showGui(self):
         # to work with mutliple virtual desktops
-        self.chatGui.hide()
-        self.chatGui.show()
-
-    def runFreeGeniusCommand(self, command):
-        def createShortcutFile(filePath, content):
-            with open(filePath, "w", encoding="utf-8") as fileObj:
-                fileObj.write(content)
-
-        shortcut_dir = os.path.join(freeGeniusAIFolder, "shortcuts")
-        Path(shortcut_dir).mkdir(parents=True, exist_ok=True)
-
-        # The following line does not work on Windows
-        commandPath = os.path.join(os.path.dirname(sys.executable), command)
-
-        if thisOS == "Windows":
-            opencommand = "start"
-            filePath = os.path.join(shortcut_dir, f"{command}.bat")
-            if not os.path.isfile(filePath):
-                filenames = {
-                    package: "main.py",
-                    "etextedit": "eTextEdit.py",
-                }
-                systemTrayFile = os.path.join(freeGeniusAIFolder, filenames.get(command, f"{command}.py"))
-                content = f'''powershell.exe -NoExit -Command "{sys.executable} '{systemTrayFile}'"'''
-                createShortcutFile(filePath, content)
-        elif thisOS == "Darwin":
-            opencommand = "open"
-            filePath = os.path.join(shortcut_dir, f"{command}.command")
-            if not os.path.isfile(filePath):
-                content = f"""#!/bin/bash
-cd {freeGeniusAIFolder}
-{commandPath}"""
-                createShortcutFile(filePath, content)
-                os.chmod(filePath, 0o755)
-        elif thisOS == "Linux":
-            opencommand = ""
-            for i in ("gio launch", "dex", "exo-open", "xdg-open"):
-                # Remarks:
-                # 'exo-open' comes with 'exo-utils'
-                # 'gio' comes with 'glib2'
-                if shutil.which(i.split(" ", 1)[0]):
-                    opencommand = i
-                    break
-            filePath = os.path.join(shortcut_dir, f"{command}.desktop")
-            if not os.path.isfile(filePath):
-                content = f"""[Desktop Entry]
-Version=1.0
-Type=Application
-Terminal=true
-Path={freeGeniusAIFolder}
-Exec={commandPath}
-Icon={iconFile}
-Name={command}"""
-                createShortcutFile(filePath, content)
-        if opencommand:
-            os.system(f"{opencommand} {filePath}")
+        #self.chatGui.hide()
+        #self.chatGui.show()
+        ...
 
 def main():
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
 
     icon = QIcon(iconFile)
-    trayIcon = SystemTrayIcon(icon)
+    trayIcon = FreeGeniusHub(icon)
     trayIcon.show()
 
     sys.exit(app.exec())

@@ -113,7 +113,7 @@ class AutoGenRetriever:
             config_list = [
                 {
                     "model": llm,
-                    "base_url": f"http://localhost:{config.llamacppServerMainModel_server_port}/v1",
+                    "base_url": f"http://localhost:{config.customToolServer_port}/v1",
                     "api_type": "open_ai",
                     "api_key": "freegenius",
                 }

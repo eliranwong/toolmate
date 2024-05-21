@@ -21,3 +21,30 @@ def vision():
         return None
     cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppVisionModel_server_port} --model "{config.llamacppVisionModel_model_path}" --clip_model_path {config.llamacppVisionModel_clip_model_path} --verbose True --chat_format llava-1-5 --n_ctx {config.llamacppVisionModel_n_ctx} --n_gpu_layers {config.llamacppVisionModel_n_gpu_layers} --n_batch {config.llamacppVisionModel_n_batch} {config.llamacppVisionModel_additional_server_options}"""
     os.system(cmd)
+
+def custommain():
+    if config.customToolServer_command:
+        if isServerAlive(config.customToolServer_ip, config.customToolServer_port):
+            print2(f"A service is already running at 127.0.0.1:{config.customToolServer_port}!")
+            return None
+        os.system(config.customToolServer_command)
+    else:
+        main()
+
+def customchat():
+    if config.customChatServer_command:
+        if isServerAlive(config.customChatServer_ip, config.customChatServer_port):
+            print2(f"A service is already running at 127.0.0.1:{config.customChatServer_port}!")
+            return None
+        os.system(config.customChatServer_command)
+    else:
+        chat()
+
+def customvision():
+    if config.customVisionServer_command:
+        if isServerAlive(config.customVisionServer_ip, config.customVisionServer_port):
+            print2(f"A service is already running at 127.0.0.1:{config.customVisionServer_port}!")
+            return None
+        os.system(config.customVisionServer_command)
+    else:
+        vision()

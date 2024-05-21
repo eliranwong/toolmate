@@ -249,7 +249,7 @@ def stopAutogenstudioServer():
 
 def getLlamacppServerClient(server="main"):
     return OpenAI(
-        base_url=f"http://localhost:{config.llamacppServerChatModel_server_port if server=='chat' else config.llamacppServerMainModel_server_port}/v1",
+        base_url=f"http://localhost:{config.customChatServer_port if server=='chat' else config.customToolServer_port}/v1",
         api_key = "freegenius"
     )
 
@@ -257,7 +257,7 @@ def startLlamacppServer():
     try:
         if not hasattr(config, "llamacppServer") or config.llamacppServer is None:
             config.llamacppServer = None
-            print2("Running llama.cpp main server ...")
+            print2("Running llama.cpp tool server ...")
             cpuThreads = getCpuThreads()
             cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppMainModel_server_port} --model "{config.llamacppMainModel_model_path}" --verbose {config.llamacppMainModel_verbose} --chat_format chatml --n_ctx {config.llamacppMainModel_n_ctx} --n_gpu_layers {config.llamacppMainModel_n_gpu_layers} --n_batch {config.llamacppMainModel_n_batch} --n_threads {cpuThreads} --n_threads_batch {cpuThreads} {config.llamacppMainModel_additional_server_options}"""
             config.llamacppServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
@@ -272,9 +272,32 @@ def startLlamacppServer():
 def stopLlamacppServer():
     if hasattr(config, "llamacppServer") and config.llamacppServer is not None:
         if isServerAlive("127.0.0.1", config.llamacppMainModel_server_port):
-            print2("Stopping llama.cpp main server ...")
+            print2("Stopping llama.cpp tool server ...")
             os.killpg(os.getpgid(config.llamacppServer.pid), signal.SIGTERM)
         config.llamacppServer = None
+
+def startLlamacppChatServer():
+    try:
+        if not hasattr(config, "llamacppChatServer") or config.llamacppChatServer is None:
+            config.llamacppChatServer = None
+            print2("Running llama.cpp chat server ...")
+            cpuThreads = getCpuThreads()
+            cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppChatModel_server_port} --model "{config.llamacppChatModel_model_path}" --verbose {config.llamacppChatModel_verbose} --chat_format chatml --n_ctx {config.llamacppChatModel_n_ctx} --n_gpu_layers {config.llamacppChatModel_n_gpu_layers} --n_batch {config.llamacppChatModel_n_batch} --n_threads {cpuThreads} --n_threads_batch {cpuThreads} {config.llamacppChatModel_additional_server_options}"""
+            config.llamacppChatServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+            while not isServerAlive("127.0.0.1", config.llamacppChatModel_server_port):
+                # wait til the server is up
+                ...
+    except:
+        print2(f'''Failed to run llama.cpp server at "localhost:{config.llamacppChatModel_server_port}"!''')
+        config.llamacppChatServer = None
+    webbrowser.open(f"http://127.0.0.1:{config.llamacppChatModel_server_port}/docs")
+
+def stopLlamacppChatServer():
+    if hasattr(config, "llamacppChatServer") and config.llamacppChatServer is not None:
+        if isServerAlive("127.0.0.1", config.llamacppChatModel_server_port):
+            print2("Stopping llama.cpp chat server ...")
+            os.killpg(os.getpgid(config.llamacppChatServer.pid), signal.SIGTERM)
+        config.llamacppChatServer = None
 
 def startLlamacppVisionServer():
     try:
@@ -411,6 +434,62 @@ def textTool(tool="", content=""):
 
 def getHideOutputSuffix():
     return f" > {'nul' if config.thisPlatform == 'Windows' else '/dev/null'} 2>&1"
+
+def runFreeGeniusCommand(command):
+    def createShortcutFile(filePath, content):
+        with open(filePath, "w", encoding="utf-8") as fileObj:
+            fileObj.write(content)
+
+    iconFile = os.path.join(config.freeGeniusAIFolder, "icons", "ai.png")
+
+    shortcut_dir = os.path.join(config.freeGeniusAIFolder, "shortcuts")
+    Path(shortcut_dir).mkdir(parents=True, exist_ok=True)
+
+    # The following line does not work on Windows
+    commandPath = os.path.join(os.path.dirname(sys.executable), command)
+
+    if config.thisPlatform == "Windows":
+        opencommand = "start"
+        filePath = os.path.join(shortcut_dir, f"{command}.bat")
+        if not os.path.isfile(filePath):
+            filenames = {
+                "freegenius": "main.py",
+                "etextedit": "eTextEdit.py",
+            }
+            systemTrayFile = os.path.join(config.freeGeniusAIFolder, filenames.get(command, f"{command}.py"))
+            content = f'''powershell.exe -NoExit -Command "{sys.executable} '{systemTrayFile}'"'''
+            createShortcutFile(filePath, content)
+    elif config.thisPlatform == "Darwin":
+        opencommand = "open"
+        filePath = os.path.join(shortcut_dir, f"{command}.command")
+        if not os.path.isfile(filePath):
+            content = f"""#!/bin/bash
+cd {config.freeGeniusAIFolder}
+{commandPath}"""
+            createShortcutFile(filePath, content)
+            os.chmod(filePath, 0o755)
+    elif config.thisPlatform == "Linux":
+        opencommand = ""
+        for i in ("gio launch", "dex", "exo-open", "xdg-open"):
+            # Remarks:
+            # 'exo-open' comes with 'exo-utils'
+            # 'gio' comes with 'glib2'
+            if shutil.which(i.split(" ", 1)[0]):
+                opencommand = i
+                break
+        filePath = os.path.join(shortcut_dir, f"{command}.desktop")
+        if not os.path.isfile(filePath):
+            content = f"""[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=true
+Path={config.freeGeniusAIFolder}
+Exec={commandPath}
+Icon={iconFile}
+Name={command}"""
+            createShortcutFile(filePath, content)
+    if opencommand:
+        os.system(f"{opencommand} {filePath}")
 
 # tool selection
 
@@ -1002,6 +1081,7 @@ City: {g.city}"""
 # token limit
 # reference: https://platform.openai.com/docs/models/gpt-4
 tokenLimits = {
+    "gpt-4o": 128000,
     "gpt-4-turbo": 128000, # Returns a maximum of 4,096 output tokens.
     "gpt-4-turbo-preview": 128000, # Returns a maximum of 4,096 output tokens.
     "gpt-4-0125-preview": 128000, # Returns a maximum of 4,096 output tokens.
@@ -1052,6 +1132,7 @@ def count_tokens_from_messages(messages, model=""):
         print("Warning: model not found. Using cl100k_base encoding.")
         encoding = tiktoken.get_encoding("cl100k_base")
     if model in {
+            "gpt-4o",
             "gpt-3.5-turbo",
             "gpt-3.5-turbo-0125",
             "gpt-3.5-turbo-1106",

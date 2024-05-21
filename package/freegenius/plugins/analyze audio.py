@@ -44,10 +44,10 @@ def analyze_audio(function_args):
                     )
                 transcript = f"The transcript of the audio is: {transcript}"
                 if config.llmInterface == "letmedoit" and config.developer:
-                    config.print2(config.divider)
-                    config.print3(transcript)
-                    config.print2(config.divider)
-                    config.print2("Answer to your enquiry:")
+                    print2(config.divider)
+                    print3(transcript)
+                    print2(config.divider)
+                    print2("Answer to your enquiry:")
                 return transcript
             except:
                 showErrors()

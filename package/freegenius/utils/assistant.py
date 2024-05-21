@@ -1,6 +1,6 @@
 from freegenius import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput
 from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits
-from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels
+from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runFreeGeniusCommand
 from freegenius.utils.call_llm import CallLLM
 from freegenius.utils.tool_plugins import ToolStore
 import openai, threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy
@@ -116,7 +116,11 @@ class FreeGenius:
 
         # initial completion check at startup
         if config.initialCompletionCheck:
-            CallLLM.checkCompletion()
+            if config.llmInterface == "llamacppserver":
+                runFreeGeniusCommand("customtoolserver")
+                runFreeGeniusCommand("customchatserver")
+            else:
+                CallLLM.checkCompletion()
 
         chat_history = os.path.join(config.localStorage, "history", "chats")
         self.terminal_chat_session = PromptSession(history=FileHistory(chat_history))
@@ -898,6 +902,7 @@ class FreeGenius:
         print1(instruction)
         options = {
             "llamacpp": "Llama.cpp",
+            "llamacppserver": "Llama.cpp server [advanced]",
             "ollama": "Ollama",
             "groq": "Groq [FREE online service]",
             "gemini": "Google Gemini [Paid online service]",
@@ -970,6 +975,13 @@ class FreeGenius:
             if askAdditionalChatModel():
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_llamacpp("chat")
+        elif config.llmInterface == "llamacppserver":
+            print2("# Main Model - for both task execution and conversation")
+            self.setLlmModel_llamacppserver()
+            askIntentScreening()
+            if askAdditionalChatModel():
+                print2("# Chat Model - for conversation only")
+                self.setLlmModel_llamacppserver("chat")
         elif config.llmInterface == "groq":
             print2("# Main Model - for both task execution and conversation")
             self.setLlmModel_groq()
@@ -1036,6 +1048,42 @@ class FreeGenius:
                 else:
                     print("Ollama not found! Install Ollama first to use Ollama model library!")
                     print("To install Ollama, visit https://ollama.com")
+
+    def setLlmModel_llamacppserver(self, feature="default"):
+        def getIp(feature=feature):
+            ip = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.customChatServer_ip if feature=="chat" else config.customToolServer_ip)
+            if ip and not ip.strip().lower() == config.exit_entry:
+                if feature=="chat":
+                    config.customChatServer_ip = ip
+                else:
+                    config.customToolServer_ip = ip
+        def getPort(feature=feature):
+            port = self.prompts.simplePrompt(numberOnly=True, style=self.prompts.promptStyle2, default=str(config.customChatServer_port) if feature=="chat" else str(config.customToolServer_port))
+            if port and not port.strip().lower() == config.exit_entry:
+                port = int(port)
+                if feature=="chat":
+                    config.customChatServer_port = port
+                else:
+                    config.customToolServer_port = port
+        def getCommand(feature=feature):
+            command = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.customChatServer_command if feature=="chat" else config.customToolServer_command)
+            if command and not command.strip().lower() == config.exit_entry:
+                if feature=="chat":
+                    config.customChatServer_command = command
+                else:
+                    config.customToolServer_command = command
+                return command
+            return None
+        server = 'chat' if feature=='chat' else 'tool'
+        print2(f"Enter custom {server} server command line below:")
+        print1("(or leave it blank to use built-in llama.cpp server)")
+        if getCommand():
+            print2(f"Enter custom {server} server IP address below:")
+            getIp()
+            print2(f"Enter custom {server} server port below:")
+            getPort()
+        # try to start server
+        runFreeGeniusCommand("customchatserver" if feature=="chat" else "customtoolserver")
 
     def setLlmModel_llamacpp(self, feature="default"):
         library = self.dialogs.getValidOptions(
@@ -1303,6 +1351,7 @@ class FreeGenius:
         functionTokens = count_tokens_from_functions(config.toolFunctionSchemas.values())
         maxToken = contextWindowLimit - functionTokens - config.chatGPTApiMinTokens
         if maxToken > 4096 and config.chatGPTApiModel in (
+            "gpt-4o",
             "gpt-4-turbo",
             "gpt-4-turbo-preview",
             "gpt-4-0125-preview",

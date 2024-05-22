@@ -23,27 +23,33 @@ def vision():
     os.system(cmd)
 
 def custommain():
-    if config.customToolServer_command:
+    if not config.customToolServer_ip.lower() in ("localhost", "127.0.0.1"):
+        return None
+    elif config.customToolServer_command:
         if isServerAlive(config.customToolServer_ip, config.customToolServer_port):
-            print2(f"A service is already running at 127.0.0.1:{config.customToolServer_port}!")
+            print2(f"A service is already running at {config.customToolServer_ip}:{config.customToolServer_port}!")
             return None
         os.system(config.customToolServer_command)
     else:
         main()
 
 def customchat():
-    if config.customChatServer_command:
+    if not config.customChatServer_ip.lower() in ("localhost", "127.0.0.1"):
+        return None
+    elif config.customChatServer_command:
         if isServerAlive(config.customChatServer_ip, config.customChatServer_port):
-            print2(f"A service is already running at 127.0.0.1:{config.customChatServer_port}!")
+            print2(f"A service is already running at {config.customChatServer_ip}:{config.customChatServer_port}!")
             return None
         os.system(config.customChatServer_command)
     else:
         chat()
 
 def customvision():
-    if config.customVisionServer_command:
+    if not config.customVisionServer_ip.lower() in ("localhost", "127.0.0.1"):
+        return None
+    elif config.customVisionServer_command:
         if isServerAlive(config.customVisionServer_ip, config.customVisionServer_port):
-            print2(f"A service is already running at 127.0.0.1:{config.customVisionServer_port}!")
+            print2(f"A service is already running at {config.customVisionServer_ip}:{config.customVisionServer_port}!")
             return None
         os.system(config.customVisionServer_command)
     else:

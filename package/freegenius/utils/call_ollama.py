@@ -1,6 +1,6 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema, selectEnabledTool
 from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, isValidPythodCode, downloadStableDiffusionFiles, isToolRequired
-from freegenius import config
+from freegenius import config, getOllamaServerClient
 import shutil, re, traceback, json, ollama, pprint, copy, datetime
 from typing import Optional
 from freegenius.utils.download import Downloader
@@ -113,7 +113,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     @staticmethod
     @check_ollama_errors
     def regularCall(messages: dict, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None):
-        return ollama.chat(
+        return getOllamaServerClient().chat(
             keep_alive=config.ollamaMainModel_keep_alive,
             model=config.ollamaMainModel,
             messages=messages,
@@ -132,7 +132,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     def getDictionaryOutput(messages: list, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None):
         #pprint.pprint(messages)
         try:
-            completion = ollama.chat(
+            completion = getOllamaServerClient().chat(
                 keep_alive=config.ollamaMainModel_keep_alive,
                 model=config.ollamaMainModel,
                 messages=messages,
@@ -163,7 +163,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
         if userInput:
             messages.append({"role": "user", "content" : userInput})
         try:
-            completion = ollama.chat(
+            completion = getOllamaServerClient().chat(
                 keep_alive=config.ollamaMainModel_keep_alive,
                 model=model if model is not None else config.ollamaMainModel,
                 messages=messages,

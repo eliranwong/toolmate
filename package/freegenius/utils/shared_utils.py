@@ -20,6 +20,8 @@ from guidance import select, gen
 from typing import Union
 from transformers import pipeline
 from groq import Groq
+from ollama import Client
+
 
 # non-Android only
 if not config.isTermux:
@@ -167,7 +169,7 @@ Action: {select(tool_names, name="tool")}"""
     
     return lm.get("tool")
 
-# local llm
+# llm
 
 def getGroqApi_key():
     '''
@@ -247,9 +249,12 @@ def stopAutogenstudioServer():
             os.killpg(os.getpgid(config.autogenstudioServer.pid), signal.SIGTERM)
         config.autogenstudioServer = None
 
+def getOllamaServerClient(server="main"):
+    return Client(host=f"http://{config.ollamaChatServer_ip if server=='chat' else config.ollamaToolServer_ip}:{config.ollamaChatServer_port if server=='chat' else config.ollamaToolServer_port}")
+
 def getLlamacppServerClient(server="main"):
     return OpenAI(
-        base_url=f"http://localhost:{config.customChatServer_port if server=='chat' else config.customToolServer_port}/v1",
+        base_url=f"{config.customChatServer_ip if server=='chat' else config.customToolServer_ip}:{config.customChatServer_port if server=='chat' else config.customToolServer_port}/v1",
         api_key = "freegenius"
     )
 
@@ -459,7 +464,7 @@ def runFreeGeniusCommand(command):
             systemTrayFile = os.path.join(config.freeGeniusAIFolder, filenames.get(command, f"{command}.py"))
             content = f'''powershell.exe -NoExit -Command "{sys.executable} '{systemTrayFile}'"'''
             createShortcutFile(filePath, content)
-    elif config.thisPlatform == "Darwin":
+    elif config.thisPlatform == "macOS":
         opencommand = "open"
         filePath = os.path.join(shortcut_dir, f"{command}.command")
         if not os.path.isfile(filePath):

@@ -48,6 +48,12 @@ defaultSettings = (
     ('stableDiffusion_output_width', 512),
     ('stableDiffusion_output_height', 512),
     ('autogenstudio_server_port', 8081),
+    ('ollamaToolServer_ip', "127.0.0.1"),
+    ('ollamaChatServer_ip', "127.0.0.1"),
+    ('ollamaVisionServer_ip', "127.0.0.1"),
+    ('ollamaToolServer_port', 11434),
+    ('ollamaChatServer_port', 11434),
+    ('ollamaVisionServer_port', 11434),
     ('ollamaVisionModel', 'llava'), # ollama model used for vision
     ('ollamaMainModel', 'codellama:7b-instruct'), # ollama model used for both task execution and conversation
     ('ollamaMainModel_additional_options', {}),

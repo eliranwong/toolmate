@@ -1,7 +1,7 @@
 import ollama, os, argparse, threading, shutil, json
 from ollama import Options, pull
 from freegenius.utils.download import Downloader
-from freegenius import config, is_valid_image_file
+from freegenius import config, is_valid_image_file, getOllamaServerClient
 from freegenius import print2, print3
 from freegenius.utils.ollama_models import ollama_models
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
@@ -71,7 +71,7 @@ To generate a JSON that contains two keys, "image_filepath_list" and "query", ba
 
 Here is my request:
 """
-            completion = ollama.chat(
+            completion = getOllamaServerClient().chat(
                 model="gemma:2b",
                 messages=[
                     {
@@ -161,7 +161,7 @@ Here is my request:
                 else:
                     messages.append({'role': 'user', 'content': prompt})
                 try:
-                    completion = ollama.chat(
+                    completion = getOllamaServerClient().chat(
                         model=model,
                         messages=messages,
                         stream=True,

@@ -1076,12 +1076,11 @@ class FreeGenius:
             return None
         server = 'chat' if feature=='chat' else 'tool'
         print2(f"Enter custom {server} server command line below:")
-        print1("(or leave it blank to use built-in llama.cpp server)")
-        if getCommand():
-            print2(f"Enter custom {server} server IP address below:")
-            getIp()
-            print2(f"Enter custom {server} server port below:")
-            getPort()
+        print1("(or leave it blank to use built-in or remote llama.cpp server)")
+        print2(f"Enter custom {server} server IP address below:")
+        getIp()
+        print2(f"Enter custom {server} server port below:")
+        getPort()
         # try to start server
         runFreeGeniusCommand("customchatserver" if feature=="chat" else "customtoolserver")
 

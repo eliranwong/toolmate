@@ -16,7 +16,7 @@ ToolStore.setupToolStoreClient()
 os.environ["TOKENIZERS_PARALLELISM"] = config.tokenizers_parallelism
 
 import sys, platform, shutil, webbrowser
-from freegenius import startAutogenstudioServer, runFreeGeniusCommand
+from freegenius import startAutogenstudioServer, runFreeGeniusCommand, isServerAlive
 #from freegenius.gui.chatgui import ChatGui
 from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication
 from PySide6.QtGui import QIcon, QAction, QGuiApplication
@@ -115,6 +115,12 @@ class FreeGeniusHub(QSystemTrayIcon):
 
         # submenu - utilities
         submenu = QMenu()
+
+        if isServerAlive("127.0.0.1", 3000):
+            action = QAction("Perplexica", self)
+            action.triggered.connect(self.launchPerplexica)
+            submenu.addAction(action)
+
         for i in (
             "rag",
             "etextedit",
@@ -160,6 +166,9 @@ class FreeGeniusHub(QSystemTrayIcon):
     def exit(self):
         self.setVisible(False)
         QGuiApplication.instance().quit()
+
+    def launchPerplexica(self):
+        webbrowser.open("http://localhost:3000")
 
     def showGui(self):
         # to work with mutliple virtual desktops

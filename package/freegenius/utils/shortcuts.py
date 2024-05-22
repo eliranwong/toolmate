@@ -159,7 +159,7 @@ Name={config.freeGeniusAIName} Hub
                 pass
 
     # create utilities
-    createUtilities()
+    #createUtilities()
     #createAppAlias()
 
 def createUtilities():

@@ -15,8 +15,8 @@ config.divider = "--------------------"
 ToolStore.setupToolStoreClient()
 os.environ["TOKENIZERS_PARALLELISM"] = config.tokenizers_parallelism
 
-import sys, platform, webbrowser
-from freegenius import startAutogenstudioServer, runFreeGeniusCommand, isServerAlive
+import sys, platform, webbrowser, shutil
+from freegenius import startAutogenstudioServer, runFreeGeniusCommand, isServerAlive, print2
 #from freegenius.gui.chatgui import ChatGui
 from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication, QMessageBox
 from PySide6.QtGui import QIcon, QAction, QGuiApplication
@@ -167,10 +167,30 @@ class FreeGeniusHub(QSystemTrayIcon):
         QGuiApplication.instance().quit()
 
     def launchPerplexica(self):
-        if isServerAlive(config.perplexica_ip, config.perplexica_port):
+        if config.perplexica_directory and not os.path.isdir(config.perplexica_directory):
+            config.perplexica_directory = ""
+            config.saveConfig()
+        if shutil.which("git") and shutil.which("docker"):
+            perplexica_directory = os.path.join(config.localStorage, "Perplexica")
+            print2("Setting up 'Perplexica' ...")
+            try:
+                os.chdir(config.localStorage)
+                os.system(f"{shutil.which('git')} clone https://github.com/ItzCrazyKns/Perplexica.git")
+                os.chdir(perplexica_directory)
+                os.system(f"{shutil.which('docker')} compose up -d")
+                config.perplexica_directory = perplexica_directory
+                config.saveConfig()
+            except:
+                print2("Failed setting up Perplexica! Read: https://github.com/ItzCrazyKns/Perplexica for manual setup.")
+        if config.perplexica_directory:
+            if not isServerAlive(config.perplexica_ip, config.perplexica_port):
+                os.chdir(config.perplexica_directory)
+                os.system(f"{shutil.which('docker')} compose up -d")
+            while not isServerAlive(config.perplexica_ip, config.perplexica_port):
+                ...
             webbrowser.open(f"http://{config.perplexica_ip}:{config.perplexica_port}")
         else:
-            QMessageBox.information(self, "FreeGenius AI", "Perplexica is not running!")
+            QMessageBox.information(self.menu, "FreeGenius AI", "Perplexica is not installed!")
 
     def showGui(self):
         # to work with mutliple virtual desktops

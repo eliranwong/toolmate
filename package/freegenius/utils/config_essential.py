@@ -48,6 +48,7 @@ defaultSettings = (
     ('stableDiffusion_output_width', 512),
     ('stableDiffusion_output_height', 512),
     ('autogenstudio_server_port', 8081),
+    ('perplexica_directory', ""),
     ('perplexica_ip', "127.0.0.1"),
     ('perplexica_port', 3000),
     ('ollamaToolServer_ip', "127.0.0.1"),

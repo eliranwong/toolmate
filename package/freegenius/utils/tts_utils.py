@@ -72,7 +72,12 @@ class TTSUtil:
                 elif config.ttsPlatform == "piper":
                     audioFile = os.path.join(config.freeGeniusAIFolder, "temp", "piper.wav")
                     model_dir = os.path.join(config.localStorage, "LLMs", "piper")
-                    cmd = f'''{shutil.which("piper")} --model {config.piper_model} --download-dir "{model_dir}" --output_file "{audioFile}"{getHideOutputSuffix()}'''
+                    model_path = f"""{os.path.join(model_dir, config.piper_model)}.onnx"""
+                    model_config_path = f"""{model_path}.json"""
+                    if os.path.isfile(model_path):
+                        cmd = f'''"{shutil.which("piper")}" --model "{model_path}" --config "{model_config_path}" --output_file "{audioFile}"{getHideOutputSuffix()}'''
+                    else:
+                        cmd = f'''"{shutil.which("piper")}" --model {config.piper_model} --download-dir "{model_dir}" --output_file "{audioFile}"{getHideOutputSuffix()}'''
                     pydoc.pipepager(content, cmd=cmd)
                     TTSUtil.playAudioFile(audioFile)
                 else:

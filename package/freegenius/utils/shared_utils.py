@@ -254,7 +254,7 @@ def getOllamaServerClient(server="main"):
 
 def getLlamacppServerClient(server="main"):
     return OpenAI(
-        base_url=f"{config.customChatServer_ip if server=='chat' else config.customToolServer_ip}:{config.customChatServer_port if server=='chat' else config.customToolServer_port}/v1",
+        base_url=f"http://{config.customChatServer_ip if server=='chat' else config.customToolServer_ip}:{config.customChatServer_port if server=='chat' else config.customToolServer_port}/v1",
         api_key = "freegenius"
     )
 
@@ -1360,6 +1360,18 @@ def installPipPackage(module, update=True):
         return False
 
 # config
+
+def toggleinputaudio():
+    #if self.isTtsAvailable:
+    config.ttsInput = not config.ttsInput
+    config.saveConfig()
+    print3(f"Input Audio: '{'enabled' if config.ttsInput else 'disabled'}'!")
+
+def toggleoutputaudio():
+    #if self.isTtsAvailable:
+    config.ttsOutput = not config.ttsOutput
+    config.saveConfig()
+    print3(f"Output Audio: '{'enabled' if config.ttsOutput else 'disabled'}'!")
 
 def setToolDependence(entry: Any) -> bool:
     """

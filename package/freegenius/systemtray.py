@@ -15,10 +15,10 @@ config.divider = "--------------------"
 ToolStore.setupToolStoreClient()
 os.environ["TOKENIZERS_PARALLELISM"] = config.tokenizers_parallelism
 
-import sys, platform, shutil, webbrowser
+import sys, platform, webbrowser
 from freegenius import startAutogenstudioServer, runFreeGeniusCommand, isServerAlive
 #from freegenius.gui.chatgui import ChatGui
-from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication
+from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication, QMessageBox
 from PySide6.QtGui import QIcon, QAction, QGuiApplication
 from pathlib import Path
 from functools import partial
@@ -116,10 +116,9 @@ class FreeGeniusHub(QSystemTrayIcon):
         # submenu - utilities
         submenu = QMenu()
 
-        if isServerAlive("127.0.0.1", 3000):
-            action = QAction("Perplexica", self)
-            action.triggered.connect(self.launchPerplexica)
-            submenu.addAction(action)
+        action = QAction("perplexica", self)
+        action.triggered.connect(self.launchPerplexica)
+        submenu.addAction(action)
 
         for i in (
             "rag",
@@ -168,7 +167,10 @@ class FreeGeniusHub(QSystemTrayIcon):
         QGuiApplication.instance().quit()
 
     def launchPerplexica(self):
-        webbrowser.open("http://localhost:3000")
+        if isServerAlive(config.perplexica_ip, config.perplexica_port):
+            webbrowser.open(f"http://{config.perplexica_ip}:{config.perplexica_port}")
+        else:
+            QMessageBox.information(self, "FreeGenius AI", "Perplexica is not running!")
 
     def showGui(self):
         # to work with mutliple virtual desktops

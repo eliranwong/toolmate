@@ -31,7 +31,7 @@ if os.path.isdir(storageDir):
         
         # delete old shortcut files so that newer versions of shortcuts can be created
         appName = config.freeGeniusAIName.split()[0]
-        shortcutFiles = (f"{appName}.bat", f"{appName}.command", f"{appName}.desktop", f"{appName}Tray.bat", f"{appName}Tray.command", f"{appName}Tray.desktop")
+        shortcutFiles = (f"{appName}.bat", f"{appName}.command", f"{appName}.desktop", f"{appName}Hub.bat", f"{appName}Hub.command", f"{appName}Hub.desktop")
         for shortcutFile in shortcutFiles:
             shortcut = os.path.join(config.freeGeniusAIFolder, shortcutFile)
             if os.path.isfile(shortcut):

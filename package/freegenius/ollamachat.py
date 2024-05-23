@@ -2,10 +2,12 @@ import ollama, os, argparse, threading, shutil, json
 from ollama import Options, pull
 from freegenius.utils.download import Downloader
 from freegenius import config, is_valid_image_file, getOllamaServerClient
-from freegenius import print2, print3
+from freegenius import print2, print3, toggleinputaudio, toggleoutputaudio
 from freegenius.utils.ollama_models import ollama_models
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
+from freegenius.utils.tool_plugins import Plugins
+
 from prompt_toolkit.styles import Style
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
@@ -54,6 +56,29 @@ class OllamaChat:
                 bars[digest].update(completed - bars[digest].n)
 
             current_digest = digest
+
+    def resetMessages(self):
+        return [{"role": "system", "content": config.systemMessage_ollama}]
+
+    def setSystemMessage(self):
+        # completer
+        Plugins.runPlugins()
+        completer = FuzzyCompleter(WordCompleter(list(config.predefinedContexts.values()), ignore_case=True))
+        # history
+        historyFolder = os.path.join(config.localStorage, "history")
+        Path(historyFolder).mkdir(parents=True, exist_ok=True)
+        system_message_history = os.path.join(historyFolder, "system_message")
+        system_message_session = PromptSession(history=FileHistory(system_message_history))
+        # prompt
+        print2("Change system message below:")
+        prompt = SinglePrompt.run(style=promptStyle, promptSession=system_message_session, default=config.systemMessage_ollama, completer=completer)
+        if prompt and not prompt == config.exit_entry:
+            config.systemMessage_ollama = prompt
+            config.saveConfig()
+            print2("System message changed!")
+            clear()
+            self.messages = self.resetMessages()
+            print("New chat started!")
 
     def run(self, prompt="", model="mistral") -> None:        
         def extractImages(content) -> list:
@@ -121,11 +146,13 @@ Here is my request:
         print2(f"\n{model.capitalize()} loaded!")
 
         # history
-        messages = []
         if hasattr(config, "currentMessages"):
+            messages = []
             for i in config.currentMessages[:-1]:
                 if "role" in i and i["role"] in ("system", "user", "assistant") and "content" in i and i.get("content"):
                     messages.append(i)
+        else:
+            messages = self.resetMessages()
 
         # bottom toolbar
         if hasattr(config, "currentMessages"):
@@ -136,17 +163,24 @@ Here is my request:
         print(f"(To exit, enter '{config.exit_entry}')\n")
 
         while True:
+            completer = None if hasattr(config, "currentMessages") else FuzzyCompleter(WordCompleter([".new", ".systemmessage", ".toggleinputaudio", ".toggleoutputaudio", config.exit_entry], ignore_case=True))
             if not prompt:
-                prompt = SinglePrompt.run(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar)
+                prompt = SinglePrompt.run(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar, completer=completer)
                 if prompt and not prompt in (".new", config.exit_entry) and hasattr(config, "currentMessages"):
                     config.currentMessages.append({"content": prompt, "role": "user"})
             else:
-                prompt = SinglePrompt.run(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar, default=prompt, accept_default=True)
+                prompt = SinglePrompt.run(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar, default=prompt, accept_default=True, completer=completer)
             if prompt == config.exit_entry:
                 break
-            elif prompt == ".new" and not hasattr(config, "currentMessages"):
+            elif not hasattr(config, "currentMessages") and prompt.lower() == ".toggleinputaudio":
+                toggleinputaudio()
+            elif not hasattr(config, "currentMessages") and prompt.lower() == ".toggleoutputaudio":
+                toggleoutputaudio()
+            elif not hasattr(config, "currentMessages") and prompt.lower() == ".systemmessage":
+                self.setSystemMessage()
+            elif not hasattr(config, "currentMessages") and prompt.lower() == ".new":
                 clear()
-                messages = []
+                messages = self.resetMessages()
                 print("New chat started!")
             elif prompt := prompt.strip():
                 streamingWordWrapper = StreamingWordWrapper()

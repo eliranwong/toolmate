@@ -1,8 +1,10 @@
 from freegenius import config
-from freegenius import print2, getLlamacppServerClient
+from freegenius import print2, getLlamacppServerClient, toggleinputaudio, toggleoutputaudio
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
+from freegenius.utils.tool_plugins import Plugins
 
+from prompt_toolkit.completion import WordCompleter, FuzzyCompleter
 from prompt_toolkit.styles import Style
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
@@ -23,9 +25,35 @@ class LlamacppServerChat:
         if hasattr(config, "currentMessages") and config.currentMessages:
             self.messages += config.currentMessages[:-1]
         self.defaultPrompt = ""
+        self.promptStyle = Style.from_dict({
+            # User input (default text).
+            "": config.terminalCommandEntryColor2,
+            # Prompt.
+            "indicator": config.terminalPromptIndicatorColor2,
+        })
 
     def resetMessages(self):
         return [{"role": "system", "content": config.systemMessage_llamacppserver},]
+
+    def setSystemMessage(self):
+        # completer
+        Plugins.runPlugins()
+        completer = FuzzyCompleter(WordCompleter(list(config.predefinedContexts.values()), ignore_case=True))
+        # history
+        historyFolder = os.path.join(config.localStorage, "history")
+        Path(historyFolder).mkdir(parents=True, exist_ok=True)
+        system_message_history = os.path.join(historyFolder, "system_message")
+        system_message_session = PromptSession(history=FileHistory(system_message_history))
+        # prompt
+        print2("Change system message below:")
+        prompt = SinglePrompt.run(style=self.promptStyle, promptSession=system_message_session, default=config.systemMessage_llamacppserver, completer=completer)
+        if prompt and not prompt == config.exit_entry:
+            config.systemMessage_llamacppserver = prompt
+            config.saveConfig()
+            print2("System message changed!")
+            clear()
+            self.messages = self.resetMessages()
+            print("New chat started!")
 
     def run(self, prompt=""):
         if self.defaultPrompt:
@@ -35,13 +63,6 @@ class LlamacppServerChat:
         chat_history = os.path.join(historyFolder, "llamacppserver")
         chat_session = PromptSession(history=FileHistory(chat_history))
 
-        promptStyle = Style.from_dict({
-            # User input (default text).
-            "": config.terminalCommandEntryColor2,
-            # Prompt.
-            "indicator": config.terminalPromptIndicatorColor2,
-        })
-
         print2(f"\n{self.name} loaded!")
         if hasattr(config, "currentMessages"):
             bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
@@ -50,20 +71,27 @@ class LlamacppServerChat:
             print("(To start a new chart, enter '.new')")
         print(f"(To exit, enter '{config.exit_entry}')\n")
         while True:
+            completer = None if hasattr(config, "currentMessages") else FuzzyCompleter(WordCompleter([".new", ".systemmessage", ".toggleinputaudio", ".toggleoutputaudio", config.exit_entry], ignore_case=True))
             if not prompt:
-                prompt = SinglePrompt.run(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar)
+                prompt = SinglePrompt.run(style=self.promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar, completer=completer)
                 userMessage = {"role": "user", "content": prompt}
                 self.messages.append(userMessage)
                 if prompt and not prompt in (".new", config.exit_entry) and hasattr(config, "currentMessages"):
                     config.currentMessages.append(userMessage)
             else:
-                prompt = SinglePrompt.run(style=promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar, default=prompt, accept_default=True)
+                prompt = SinglePrompt.run(style=self.promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar, default=prompt, accept_default=True, completer=completer)
                 userMessage = {"role": "user", "content": prompt}
                 self.messages.append(userMessage)
                 config.currentMessages.append(userMessage)
             if prompt == config.exit_entry:
                 break
-            elif prompt == ".new" and not hasattr(config, "currentMessages"):
+            elif not hasattr(config, "currentMessages") and prompt.lower() == ".toggleinputaudio":
+                toggleinputaudio()
+            elif not hasattr(config, "currentMessages") and prompt.lower() == ".toggleoutputaudio":
+                toggleoutputaudio()
+            elif not hasattr(config, "currentMessages") and prompt.lower() == ".systemmessage":
+                self.setSystemMessage()
+            elif not hasattr(config, "currentMessages") and prompt.lower() == ".new":
                 clear()
                 self.messages = self.resetMessages()
                 print("New chat started!")

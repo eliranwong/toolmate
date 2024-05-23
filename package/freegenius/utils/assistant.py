@@ -1,5 +1,5 @@
 from freegenius import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput
-from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits
+from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits, toggleinputaudio, toggleoutputaudio
 from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runFreeGeniusCommand
 from freegenius.utils.call_llm import CallLLM
 from freegenius.utils.tool_plugins import ToolStore
@@ -54,6 +54,7 @@ class FreeGenius:
         Plugins.runPlugins()
 
     def setup(self):
+        config.currentMessages = []
         # set up tool store client
         ToolStore.setupToolStoreClient()
 
@@ -170,8 +171,8 @@ class FreeGenius:
             ".toggletextbrightness": (f"swap text brightness {str(config.hotkey_swap_text_brightness)}", swapTerminalColors),
             ".togglewordwrap": (f"toggle word wrap {str(config.hotkey_toggle_word_wrap)}", self.toggleWordWrap),
             ".toggleimprovedwriting": (f"toggle improved writing {str(config.hotkey_toggle_writing_improvement)}", self.toggleImprovedWriting),
-            ".toggleinputaudio": (f"toggle input audio {str(config.hotkey_toggle_input_audio)}", self.toggleinputaudio),
-            ".toggleresponseaudio": (f"toggle response audio {str(config.hotkey_toggle_response_audio)}", self.toggleresponseaudio),
+            ".toggleinputaudio": (f"toggle input audio {str(config.hotkey_toggle_input_audio)}", toggleinputaudio),
+            ".toggleoutputaudio": (f"toggle output audio {str(config.hotkey_toggle_response_audio)}", toggleoutputaudio),
             ".code": (f"extract the python code from the last response", self.extractPythonCodeFromLastResponse),
             ".run": (f"run the python code in the last response", self.runPythonCodeInLastResponse),
             ".editresponse": (f"edit the last response {str(config.hotkey_edit_last_response)}", self.editLastResponse),
@@ -1430,18 +1431,6 @@ class FreeGenius:
         else:
             config.tts = True
         return config.tts
-
-    def toggleinputaudio(self):
-        #if self.isTtsAvailable:
-        config.ttsInput = not config.ttsInput
-        config.saveConfig()
-        print3(f"Input Audio: '{'enabled' if config.ttsInput else 'disabled'}'!")
-
-    def toggleresponseaudio(self):
-        #if self.isTtsAvailable:
-        config.ttsOutput = not config.ttsOutput
-        config.saveConfig()
-        print3(f"Response Audio: '{'enabled' if config.ttsOutput else 'disabled'}'!")
 
     def defineTtsCommand(self):
         print1("Define custom text-to-speech command below:")

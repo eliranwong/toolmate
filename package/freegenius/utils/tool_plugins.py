@@ -63,13 +63,14 @@ class Plugins:
     # integrate function call plugin
     @staticmethod
     def addFunctionCall(signature: str, method: Callable[[dict], str], deviceInfo=False):
-        name = signature["name"]
-        if not name in config.toolFunctionSchemas: # prevent duplicaiton
-            config.toolFunctionSchemas[name] = {key: value for key, value in signature.items() if not key in ("intent", "examples")}
-            config.toolFunctionMethods[name] = method
-            ToolStore.add_tool(signature)
-            if deviceInfo:
-                config.deviceInfoPlugins.append(name)
+        if hasattr(config, "currentMessages"):
+            name = signature["name"]
+            if not name in config.toolFunctionSchemas: # prevent duplicaiton
+                config.toolFunctionSchemas[name] = {key: value for key, value in signature.items() if not key in ("intent", "examples")}
+                config.toolFunctionMethods[name] = method
+                ToolStore.add_tool(signature)
+                if deviceInfo:
+                    config.deviceInfoPlugins.append(name)
 
 class ToolStore:
 

@@ -48,6 +48,8 @@ defaultSettings = (
     ('stableDiffusion_output_width', 512),
     ('stableDiffusion_output_height', 512),
     ('autogenstudio_server_port', 8081),
+    ('perplexica_ip', "127.0.0.1"),
+    ('perplexica_port', 3000),
     ('ollamaToolServer_ip', "127.0.0.1"),
     ('ollamaChatServer_ip', "127.0.0.1"),
     ('ollamaVisionServer_ip', "127.0.0.1"),
@@ -126,6 +128,7 @@ defaultSettings = (
     ('max_group_chat_round', 12), # AutoGen group chat maximum round
     ('env_QT_QPA_PLATFORM_PLUGIN_PATH', ''), # e.g. # deal with error: qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "~/apps/letmedoit/lib/python3.10/site-packages/cv2/qt/plugins" even though it was found.
     ('systemMessage_letmedoit', ''), # letmedoit system message
+    ('systemMessage_ollama', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone ollama chatbot
     ('systemMessage_groq', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone groq chatbot
     ('systemMessage_llamacpp', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone llamacpp chatbot
     ('systemMessage_llamacppserver', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone llamacppserver chatbot

@@ -5,14 +5,16 @@ from vertexai.generative_models._generative_models import (
     HarmCategory,
     HarmBlockThreshold,
 )
-from freegenius import config, showErrors, is_valid_image_file, is_valid_image_url, wrapText, print2, print3, is_valid_url
+from freegenius import config, showErrors, is_valid_image_file, is_valid_image_url, wrapText, print2, print3, is_valid_url, toggleinputaudio, toggleoutputaudio
 from freegenius.utils.single_prompt import SinglePrompt
+from freegenius.utils.tool_plugins import Plugins
 
 import http.client
 import typing
 import urllib.request
 from vertexai.generative_models import Image
 from prompt_toolkit.styles import Style
+from prompt_toolkit.completion import WordCompleter, FuzzyCompleter
 
 
 # Install google-cloud-aiplatform FIRST!
@@ -43,6 +45,12 @@ class GeminiProVision:
             HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
             HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
         }
+        self.promptStyle = Style.from_dict({
+            # User input (default text).
+            "": config.terminalCommandEntryColor2,
+            # Prompt.
+            "indicator": config.terminalPromptIndicatorColor2,
+        })
 
     def refinePath(self, img_path):
         img_path = img_path.strip()
@@ -53,18 +61,11 @@ class GeminiProVision:
         return os.path.expanduser(img_path)
 
     def run(self, query="", files=[]):
-        promptStyle = Style.from_dict({
-            # User input (default text).
-            "": config.terminalCommandEntryColor2,
-            # Prompt.
-            "indicator": config.terminalPromptIndicatorColor2,
-        })
-
         print2("\nGemini Pro Vision loaded!")
         print(f"""[press '{str(config.hotkey_exit).replace("'", "")[1:-1]}' to exit]""")
         if not files:
             print2("Enter image path below (file / folder):")
-            files = SinglePrompt.run(style=promptStyle)
+            files = SinglePrompt.run(style=self.promptStyle)
         if files:
             # handle path dragged to terminal
             files = self.refinePath(files)
@@ -74,7 +75,7 @@ class GeminiProVision:
             files = [files]
             if not query:
                 print2("Enter your query below:")
-                query = SinglePrompt.run(style=promptStyle)
+                query = SinglePrompt.run(style=self.promptStyle)
             if query and not query == config.exit_entry:
                 try:
                     function_args = {

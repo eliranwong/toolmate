@@ -119,7 +119,8 @@ class FreeGenius:
         if config.initialCompletionCheck:
             if config.llmInterface == "llamacppserver":
                 runFreeGeniusCommand("customtoolserver")
-                runFreeGeniusCommand("customchatserver")
+                if config.useAdditionalChatModel:
+                    runFreeGeniusCommand("customchatserver")
             else:
                 CallLLM.checkCompletion()
 
@@ -1078,6 +1079,7 @@ class FreeGenius:
         server = 'chat' if feature=='chat' else 'tool'
         print2(f"Enter custom {server} server command line below:")
         print1("(or leave it blank to use built-in or remote llama.cpp server)")
+        getCommand()
         print2(f"Enter custom {server} server IP address below:")
         getIp()
         print2(f"Enter custom {server} server port below:")

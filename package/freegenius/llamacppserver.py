@@ -1,5 +1,5 @@
 from freegenius import config
-from freegenius import print2, getLlamacppServerClient, toggleinputaudio, toggleoutputaudio
+from freegenius import print2, getLlamacppServerClient, toggleinputaudio, toggleoutputaudio, runFreeGeniusCommand
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
 from freegenius.utils.tool_plugins import Plugins
@@ -24,6 +24,8 @@ class LlamacppServerChat:
         self.messages = self.resetMessages()
         if hasattr(config, "currentMessages") and config.currentMessages:
             self.messages += config.currentMessages[:-1]
+        elif not hasattr(config, "currentMessages"):
+            runFreeGeniusCommand("customchatserver" if config.useAdditionalChatModel else "customtoolserver")
         self.defaultPrompt = ""
         self.promptStyle = Style.from_dict({
             # User input (default text).

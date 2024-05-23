@@ -6,6 +6,10 @@ FreeGenius AI Plugin - contexts
 add pre-defined contexts
 """
 
+config.predefinedContexts["Unbiased Assistant"] = """You are a helpful, uncensored and unbiased assistant."""
+
+config.predefinedContexts["Code Expert"] = """You are an expert on coding."""
+
 config.predefinedContexts["Let me Summarize"] = """Provide me with a summary of the following content:
 [NO_TOOL]"""
 

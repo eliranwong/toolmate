@@ -75,11 +75,23 @@ class TTSUtil:
                     model_path = f"""{os.path.join(model_dir, config.piper_model)}.onnx"""
                     model_config_path = f"""{model_path}.json"""
                     if os.path.isfile(model_path):
-                        cmd = f'''"{shutil.which("piper")}" --model "{model_path}" --config "{model_config_path}" --output_file "{audioFile}"{getHideOutputSuffix()}'''
+                        if shutil.which("cvlc"):
+                            cmd = f'''"{shutil.which("piper")}" --model "{model_path}" --config "{model_config_path}" --output-raw | cvlc --play-and-exit --rate {config.vlcSpeed} --demux=rawaud --rawaud-channels=1 --rawaud-samplerate=22050 -{getHideOutputSuffix()}'''
+                        elif shutil.which("aplay"):
+                            cmd = f'''"{shutil.which("piper")}" --model "{model_path}" --config "{model_config_path}" --output-raw | aplay -r 22050 -f S16_LE -t raw -{getHideOutputSuffix()}'''
+                        else:
+                            cmd = f'''"{shutil.which("piper")}" --model "{model_path}" --config "{model_config_path}" --output_file "{audioFile}"{getHideOutputSuffix()}'''
                     else:
-                        cmd = f'''"{shutil.which("piper")}" --model {config.piper_model} --download-dir "{model_dir}" --output_file "{audioFile}"{getHideOutputSuffix()}'''
+                        print("[Downloading voice ...] ")
+                        if shutil.which("cvlc"):
+                            cmd = f'''"{shutil.which("piper")}" --model {config.piper_model} --download-dir "{model_dir}" --data-dir "{model_dir}" --output-raw | cvlc --play-and-exit --rate {config.vlcSpeed} --demux=rawaud --rawaud-channels=1 --rawaud-samplerate=22050 -{getHideOutputSuffix()}'''
+                        elif shutil.which("aplay"):
+                            cmd = f'''"{shutil.which("piper")}" --model {config.piper_model} --download-dir "{model_dir}" --data-dir "{model_dir}" --output-raw | aplay -r 22050 -f S16_LE -t raw -{getHideOutputSuffix()}'''
+                        else:
+                            cmd = f'''"{shutil.which("piper")}" --model {config.piper_model} --download-dir "{model_dir}" --data-dir "{model_dir}" --output_file "{audioFile}"{getHideOutputSuffix()}'''
                     pydoc.pipepager(content, cmd=cmd)
-                    TTSUtil.playAudioFile(audioFile)
+                    if not shutil.which("cvlc") and not shutil.which("aplay"):
+                        TTSUtil.playAudioFile(audioFile)
                 else:
                     if not config.ttsPlatform == "google":
                         config.ttsPlatform == "google"

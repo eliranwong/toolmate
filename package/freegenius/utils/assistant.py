@@ -234,6 +234,7 @@ class FreeGenius:
         option = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.piper_model, promptSession=piperVoice_session, completer=completer)
         if option and not option in (config.exit_entry, config.cancel_entry):
             config.piper_model = option
+            TTSUtil.play("Testing")
 
     # ElevenLabs Text-to-Speech Voice
     def setElevenlabsVoice(self):

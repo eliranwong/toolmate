@@ -218,6 +218,53 @@ class FreeGenius:
         if config.voiceTypingPlatform in ("google", "googlecloud") and config.voiceTypingLanguage in languages:
             config.voiceTypingLanguage = googleSpeeckToTextLanguages[config.voiceTypingLanguage]
 
+    # Windows built-in tts voice via wsay command
+    def setWsayVoice(self):
+        print2("Available voices:")
+        os.system("wsay --list_voices")
+        print2("Use the number provided by '--list_voices' to select a voice:")
+        option = self.prompts.simplePrompt(numberOnly=True, style=self.prompts.promptStyle2, default=config.wsay_voice)
+        if option and not option in (config.exit_entry, config.cancel_entry):
+            config.wsay_voice = option
+            TTSUtil.play("Testing")
+
+    def setWsaySpeed(self):
+        print2("Specify the voice speed:")
+        print1("(from 0 to 100; 50 is the default speed)")
+        option = self.prompts.simplePrompt(numberOnly=True, style=self.prompts.promptStyle2, default=config.wsay_speed)
+        if option and not option in (config.exit_entry, config.cancel_entry):
+            config.wsay_speed = option
+            TTSUtil.play("Testing")
+
+    # macOS built-in tts voice
+    def setSayVoice(self):
+        ps = subprocess.Popen('say -v "?"', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, *_ = ps.communicate()
+        voices = stdout.decode("utf-8").strip()
+        voices = re.sub(" [ ]+?([^ ])", r" \1", voices)
+        voices = re.sub(" [ ]*?#.*?$", "", voices, flags=re.M)
+        voices = re.sub(" ([A-Za-z_]+?)$", r" [\1]", voices, flags=re.M)
+        voices = voices.split("\n")
+        voice_history = os.path.join(config.localStorage, "history", "sayVoice")
+        voice_session = PromptSession(history=FileHistory(voice_history))
+        completer = FuzzyCompleter(WordCompleter(voices, ignore_case=True))
+        print2("Please specify a voice:")
+        print1("(leave it blank to use the default voice)")
+        if not config.say_voice in voices:
+            config.say_voice = ""
+        option = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.say_voice, promptSession=voice_session, completer=completer)
+        if option and not option in (config.exit_entry, config.cancel_entry):
+            config.say_voice = re.sub(" \[[^\]]*?\]$", "", option)
+            TTSUtil.play("Testing")
+
+    def setSaySpeed(self):
+        print2("Specify the voice speed:")
+        print1("(from 100 to 300; 200 is the default speed)")
+        option = self.prompts.simplePrompt(numberOnly=True, style=self.prompts.promptStyle2, default=config.say_speed)
+        if option and not option in (config.exit_entry, config.cancel_entry):
+            config.say_speed = option
+            TTSUtil.play("Testing")
+
     # Piper-tts Voice
     def setPiperVoice(self):
         # create model directory if it does not exist
@@ -227,13 +274,13 @@ class FreeGenius:
         piperVoice_history = os.path.join(config.localStorage, "history", "piperVoice")
         piperVoice_session = PromptSession(history=FileHistory(piperVoice_history))
         completer = FuzzyCompleter(WordCompleter(TtsLanguages.piper, ignore_case=True))
-        print1("Please specify a Piper voice model:")
+        print2("Please specify a Piper voice model:")
         print3("Details: https://github.com/rhasspy/piper/blob/master/VOICES.md")
-        if not config.piper_model in TtsLanguages.piper:
-            config.piper_model = "en_US-lessac-medium"
-        option = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.piper_model, promptSession=piperVoice_session, completer=completer)
+        if not config.piper_voice in TtsLanguages.piper:
+            config.piper_voice = "en_US-lessac-medium"
+        option = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.piper_voice, promptSession=piperVoice_session, completer=completer)
         if option and not option in (config.exit_entry, config.cancel_entry):
-            config.piper_model = option
+            config.piper_voice = option
             TTSUtil.play("Testing")
 
     # ElevenLabs Text-to-Speech Voice
@@ -1501,9 +1548,15 @@ class FreeGenius:
     def setTextToSpeechConfig(self):
         options = ["google", "googlecloud", "elevenlabs", "custom"]
         descriptions = ["Google Text-to-Speech (Generic)", "Google Text-to-Speech (API)", "ElevenLabs (API)", "Custom Text-to-Speech Command [advanced]"]
-        if config.thisPlatform == "Linux" and shutil.which("piper"):
+        if config.thisPlatform == "Linux":
             options.insert(0, "piper")
-            descriptions.insert(0, "Piper (Offline)")
+            descriptions.insert(0, "Piper (Offline; Linux Only)")
+        elif config.thisPlatform == "macOS":
+            options.insert(0, "say")
+            descriptions.insert(0, "Say (Offline; macOS Only)")
+        elif config.thisPlatform == "Windows":
+            options.insert(0, "wsay")
+            descriptions.insert(0, "Wsay (Offline; Windows Only)")
         ttsPlatform = self.dialogs.getValidOptions(
             options=options,
             descriptions=descriptions,
@@ -1529,10 +1582,24 @@ class FreeGenius:
             self.setGcttsSpeed()
             self.setAudioPlaybackTool()
             self.setVlcSpeed()
-        if config.ttsPlatform == "piper":
-            self.setPiperVoice()
-            self.setAudioPlaybackTool()
-            self.setVlcSpeed()
+        elif config.ttsPlatform == "piper":
+            if shutil.which("piper"):
+                self.setPiperVoice()
+                self.setAudioPlaybackTool()
+                self.setVlcSpeed()
+            else:
+                print2("Command 'piper' not found!")
+                print3("Read: https://github.com/eliranwong/freegenius/wiki/Offline-TTS-%E2%80%90-Linux")
+        elif config.ttsPlatform == "say":
+            self.setSayVoice()
+            self.setSaySpeed()
+        elif config.ttsPlatform == "wsay":
+            if shutil.which("wsay"):
+                self.setWsayVoice()
+                self.setWsaySpeed()
+            else:
+                print2("Command 'wsay' not found!")
+                print3("Read: https://github.com/eliranwong/freegenius/wiki/Offline-TTS-%E2%80%90-Windows")
         elif config.ttsPlatform == "elevenlabs":
             if not config.elevenlabsApi:
                 self.changeElevenlabsApi()

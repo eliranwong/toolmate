@@ -105,7 +105,7 @@ Remarks: Groq cloud currently does not support multimodal models. Other backends
 
 ## Text-to-Option Options
 
-1. [Offline TTS](https://github.com/eliranwong/freegenius/wiki/Offline-TTS) - [Windows - wsay](https://github.com/eliranwong/freegenius/wiki/Offline-TTS-%E2%80%90-Windows); [macOS - say](https://github.com/eliranwong/freegenius/wiki/Offline-TTS-%E2%80%90-macOS); [Linux - piper](https://github.com/eliranwong/freegenius/wiki/Offline-TTS-%E2%80%90-Linux)
+1. [Offline TTS](https://github.com/eliranwong/freegenius/wiki/Offline-Text%E2%80%90to%E2%80%90Speech) - [Windows - wsay](https://github.com/eliranwong/freegenius/wiki/Offline-TTS-%E2%80%90-Windows); [macOS - say](https://github.com/eliranwong/freegenius/wiki/Offline-TTS-%E2%80%90-macOS); [Linux - piper](https://github.com/eliranwong/freegenius/wiki/Offline-TTS-%E2%80%90-Linux)
 2. Google Text-to-Speech (Generic)
 3. Google Text-to-Speech (API)
 4. Elevenlabs (API)

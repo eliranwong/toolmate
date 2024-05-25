@@ -169,14 +169,14 @@ class StreamingWordWrapper:
     def readAnswer(self, answer):
         # read the chunk when there is a punctuation
         #if answer in string.punctuation and config.tempChunk:
-        if re.search(config.tts_readWhenStreamContains, answer) and config.tempChunk:
+        if re.search(config.tts_readWhenChunkContains, answer) and config.tempChunk:
             # read words when there a punctuation
             chunk = config.tempChunk + answer
             # reset config.tempChunk
             config.tempChunk = ""
             # play with tts
             if config.ttsOutput:
-                TTSUtil.play(chunk)
+                TTSUtil.play(re.sub(config.tts_doNotPronunce, "", chunk))
         else:
             # append to a chunk for reading
             config.tempChunk += answer

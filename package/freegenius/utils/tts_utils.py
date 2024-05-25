@@ -24,7 +24,7 @@ class TTSUtil:
 
     @staticmethod
     def play(content, language=""):
-        if config.tts:
+        if config.tts and content.strip():
             try:
                 # official google-cloud-texttospeech
                 if config.ttsPlatform == "googlecloud" and os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Text-to-Speech" in config.enabledGoogleAPIs:

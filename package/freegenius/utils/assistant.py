@@ -249,6 +249,7 @@ class FreeGenius:
         voice_session = PromptSession(history=FileHistory(voice_history))
         completer = FuzzyCompleter(WordCompleter(voices, ignore_case=True))
         print2("Please specify a voice:")
+        print3("Read: https://github.com/eliranwong/freegenius/wiki/Offline-TTS-%E2%80%90-macOS#download-more-voices")
         print1("(leave it blank to use the default voice)")
         if not config.say_voice in voices:
             config.say_voice = ""

@@ -170,18 +170,21 @@ class FreeGeniusHub(QSystemTrayIcon):
         if config.perplexica_directory and not os.path.isdir(config.perplexica_directory):
             config.perplexica_directory = ""
             config.saveConfig()
-        if shutil.which("git") and shutil.which("docker"):
-            perplexica_directory = os.path.join(config.localStorage, "Perplexica")
-            print2("Setting up 'Perplexica' ...")
-            try:
+        if not config.perplexica_directory:
+            if shutil.which("git") and shutil.which("docker") and thisOS == "Linux":
                 os.chdir(config.localStorage)
-                os.system(f"{shutil.which('git')} clone https://github.com/ItzCrazyKns/Perplexica.git")
-                os.chdir(perplexica_directory)
-                os.system(f"{shutil.which('docker')} compose up -d")
-                config.perplexica_directory = perplexica_directory
-                config.saveConfig()
-            except:
-                print2("Failed setting up Perplexica! Read: https://github.com/ItzCrazyKns/Perplexica for manual setup.")
+                perplexica_directory = os.path.join(config.localStorage, "Perplexica")
+                print2("Setting up 'Perplexica' ...")
+                try:
+                    os.system(f"{shutil.which('git')} clone https://github.com/ItzCrazyKns/Perplexica.git")
+                    os.chdir(perplexica_directory)
+                    os.system(f"{shutil.which('docker')} compose up -d")
+                    config.perplexica_directory = perplexica_directory
+                    config.saveConfig()
+                    os.chdir(config.localStorage)
+                except:
+                    print2("Failed setting up Perplexica! Read: https://github.com/eliranwong/freegenius/wiki/%23-Perplexica-Integration for manual setup.")
+                    webbrowser.open("https://github.com/eliranwong/freegenius/wiki/%23-Perplexica-Integration")
         if config.perplexica_directory:
             if not isServerAlive(config.perplexica_ip, config.perplexica_port):
                 os.chdir(config.perplexica_directory)

@@ -16,12 +16,14 @@ ToolStore.setupToolStoreClient()
 os.environ["TOKENIZERS_PARALLELISM"] = config.tokenizers_parallelism
 
 import sys, platform, webbrowser, shutil
-from freegenius import startAutogenstudioServer, runFreeGeniusCommand, isServerAlive, print2
+from freegenius import startAutogenstudioServer, runFreeGeniusCommand, isServerAlive, print2, getCliOutput
 #from freegenius.gui.chatgui import ChatGui
 from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication, QMessageBox
 from PySide6.QtGui import QIcon, QAction, QGuiApplication
 from pathlib import Path
 from functools import partial
+from prompt_toolkit.clipboard.pyperclip import PyperclipClipboard
+from freegenius.utils.tts_utils import TTSUtil
 
 
 freeGeniusAIFile = os.path.realpath(__file__)
@@ -40,6 +42,7 @@ class FreeGeniusHub(QSystemTrayIcon):
         # pre-load the main gui
         #self.chatGui = ChatGui()
 
+        self.clipboard = PyperclipClipboard()
         self.menu = QMenu(parent)
 
         #if config.developer:
@@ -113,12 +116,30 @@ class FreeGeniusHub(QSystemTrayIcon):
         menuAction.setMenu(submenu)
         self.menu.addAction(menuAction)
 
-        # submenu - utilities
+        # submenu - researches
         submenu = QMenu()
 
         action = QAction("perplexica", self)
         action.triggered.connect(self.launchPerplexica)
         submenu.addAction(action)
+
+        menuAction = QAction("Researches", self)
+        menuAction.setMenu(submenu)
+        self.menu.addAction(menuAction)
+
+        # submenu - clipboard
+        submenu = QMenu()
+
+        action = QAction("read", self)
+        action.triggered.connect(self.readClipboard)
+        submenu.addAction(action)
+
+        menuAction = QAction("Clipboard", self)
+        menuAction.setMenu(submenu)
+        self.menu.addAction(menuAction)
+
+        # submenu - utilities
+        submenu = QMenu()
 
         for i in (
             "rag",
@@ -166,6 +187,13 @@ class FreeGeniusHub(QSystemTrayIcon):
         self.setVisible(False)
         QGuiApplication.instance().quit()
 
+    def readClipboard(self):
+        if config.terminalEnableTermuxAPI:
+            clipboardText = getCliOutput("termux-clipboard-get")
+        else:
+            clipboardText = self.clipboard.get_data().text
+        TTSUtil.play(clipboardText)
+
     def launchPerplexica(self):
         if config.perplexica_directory and not os.path.isdir(config.perplexica_directory):
             config.perplexica_directory = ""
@@ -193,7 +221,7 @@ class FreeGeniusHub(QSystemTrayIcon):
                 ...
             webbrowser.open(f"http://{config.perplexica_ip}:{config.perplexica_port}")
         else:
-            QMessageBox.information(self.menu, "FreeGenius AI", "Perplexica is not installed!")
+            QMessageBox.information(self.menu, "FreeGenius AI", "Perplexica not found!")
 
     def showGui(self):
         # to work with mutliple virtual desktops

@@ -2,7 +2,7 @@ import ollama, os, argparse, threading, shutil, json
 from ollama import Options, pull
 from freegenius.utils.download import Downloader
 from freegenius import config, is_valid_image_file, getOllamaServerClient
-from freegenius import print2, print3, toggleinputaudio, toggleoutputaudio
+from freegenius import print1, print2, print3, toggleinputaudio, toggleoutputaudio
 from freegenius.utils.ollama_models import ollama_models
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
@@ -144,6 +144,9 @@ Here is my request:
         chat_session = PromptSession(history=FileHistory(chat_history))
 
         print2(f"\n{model.capitalize()} loaded!")
+        print2("```system message")
+        print1(config.systemMessage_ollama)
+        print2("```")
 
         # history
         if hasattr(config, "currentMessages"):

@@ -1,5 +1,5 @@
 from freegenius import config, count_tokens_from_messages
-from freegenius import print2, tokenLimits, toggleinputaudio, toggleoutputaudio
+from freegenius import print1, print2, print3, tokenLimits, toggleinputaudio, toggleoutputaudio
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
 from freegenius.utils.tool_plugins import Plugins
@@ -83,6 +83,9 @@ class ChatGPT:
         })
 
         print2(f"\n{self.name} loaded!")
+        print2("```system message")
+        print1(config.systemMessage_chatgpt)
+        print2("```")
         if hasattr(config, "currentMessages"):
             bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
         else:

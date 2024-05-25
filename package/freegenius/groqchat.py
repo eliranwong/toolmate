@@ -1,5 +1,5 @@
 from freegenius import config
-from freegenius import print2, getGroqClient, toggleinputaudio, toggleoutputaudio
+from freegenius import print1, print2, print3, getGroqClient, toggleinputaudio, toggleoutputaudio
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
 from freegenius.utils.tool_plugins import Plugins
@@ -64,6 +64,9 @@ class GroqChatbot:
         chat_session = PromptSession(history=FileHistory(chat_history))
 
         print2(f"\n{self.name} loaded!")
+        print2("```system message")
+        print1(config.systemMessage_groq)
+        print2("```")
         if hasattr(config, "currentMessages"):
             bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
         else:

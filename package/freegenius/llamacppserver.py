@@ -1,5 +1,5 @@
 from freegenius import config
-from freegenius import print2, getLlamacppServerClient, toggleinputaudio, toggleoutputaudio, runFreeGeniusCommand
+from freegenius import print1, print2, print3, getLlamacppServerClient, toggleinputaudio, toggleoutputaudio, runFreeGeniusCommand
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
 from freegenius.utils.tool_plugins import Plugins
@@ -66,6 +66,9 @@ class LlamacppServerChat:
         chat_session = PromptSession(history=FileHistory(chat_history))
 
         print2(f"\n{self.name} loaded!")
+        print2("```system message")
+        print1(config.systemMessage_llamacppserver)
+        print2("```")
         if hasattr(config, "currentMessages"):
             bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
         else:

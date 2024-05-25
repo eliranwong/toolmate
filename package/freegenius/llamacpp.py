@@ -1,5 +1,5 @@
 from freegenius import config
-from freegenius import print2, getCpuThreads, toggleinputaudio, toggleoutputaudio
+from freegenius import print1, print2, print3, getCpuThreads, toggleinputaudio, toggleoutputaudio
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
 from freegenius.utils.tool_plugins import Plugins
@@ -45,7 +45,6 @@ class LlamacppChat:
                     name = "Llama.cpp chatbot"
 
         self.name, self.temperature, self.max_output_tokens = name, temperature, max_output_tokens
-
         self.messages = self.resetMessages()
         if hasattr(config, "currentMessages") and config.currentMessages:
             self.messages += config.currentMessages[:-1]
@@ -110,6 +109,9 @@ class LlamacppChat:
         })
 
         print2(f"\n{self.name} loaded!")
+        print2("```system message")
+        print1(config.systemMessage_llamacpp)
+        print2("```")
         if hasattr(config, "currentMessages"):
             bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
         else:

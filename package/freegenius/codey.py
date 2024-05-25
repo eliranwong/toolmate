@@ -1,7 +1,7 @@
 import vertexai, os, traceback, argparse
 from vertexai.language_models import CodeChatModel, ChatMessage
 from freegenius import config, getPygmentsStyle, startSpinning, stopSpinning
-from freegenius import print2, toggleinputaudio, toggleoutputaudio
+from freegenius import print1, print2, print3, toggleinputaudio, toggleoutputaudio
 from freegenius.utils.single_prompt import SinglePrompt
 from freegenius.utils.tool_plugins import Plugins
 import pygments
@@ -92,6 +92,9 @@ class Codey:
             message_history=history,
         )
         print2(f"\n{self.name} loaded!")
+        print2("```system message")
+        print1(config.systemMessage_codey)
+        print2("```")
         if hasattr(config, "currentMessages"):
             bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
         else:

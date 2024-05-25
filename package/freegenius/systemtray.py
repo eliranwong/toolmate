@@ -117,6 +117,7 @@ class FreeGeniusHub(QSystemTrayIcon):
         self.menu.addAction(menuAction)
 
         # submenu - researches
+        '''
         submenu = QMenu()
 
         action = QAction("perplexica", self)
@@ -126,6 +127,7 @@ class FreeGeniusHub(QSystemTrayIcon):
         menuAction = QAction("Researches", self)
         menuAction.setMenu(submenu)
         self.menu.addAction(menuAction)
+        '''
 
         # submenu - clipboard
         submenu = QMenu()
@@ -134,12 +136,28 @@ class FreeGeniusHub(QSystemTrayIcon):
         action.triggered.connect(self.readClipboard)
         submenu.addAction(action)
 
+        action = QAction("summarize", self)
+        action.triggered.connect(lambda: runFreeGeniusCommand("freegenius -p true -u false -n true -i false -c 'Let me Summarize'"))
+        submenu.addAction(action)
+
+        action = QAction("explain", self)
+        action.triggered.connect(lambda: runFreeGeniusCommand("freegenius -p true -u false -n true -i false -c 'Let me Explain'"))
+        submenu.addAction(action)
+
+        action = QAction("translate", self)
+        action.triggered.connect(lambda: runFreeGeniusCommand("freegenius -p true -u false -n true -i false -c 'Let me Translate'"))
+        submenu.addAction(action)
+
         menuAction = QAction("Clipboard", self)
         menuAction.setMenu(submenu)
         self.menu.addAction(menuAction)
 
         # submenu - utilities
         submenu = QMenu()
+
+        action = QAction("perplexica", self)
+        action.triggered.connect(self.launchPerplexica)
+        submenu.addAction(action)
 
         for i in (
             "rag",

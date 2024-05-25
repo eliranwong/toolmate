@@ -6,6 +6,7 @@ from pathlib import Path
 from freegenius import updateApp, configFile
 from freegenius.utils.assistant import FreeGenius
 from prompt_toolkit.shortcuts import set_title, clear_title
+from prompt_toolkit.clipboard.pyperclip import PyperclipClipboard
 
 def set_log_file_max_lines(log_file, max_lines):
     if os.path.isfile(log_file):
@@ -40,6 +41,7 @@ def main(tempInterface=""):
     parser.add_argument('-i', '--ip', action='store', dest='ip', help="set 'true' to include or 'false' to exclude ip information in system message with -i flag")
     parser.add_argument('-l', '--load', action='store', dest='load', help="load file that contains saved chat records with -l flag; accepts either a chat ID or a file path; required plugin 'search chat records'")
     parser.add_argument('-n', '--nocheck', action='store', dest='nocheck', help="set 'true' to bypass completion check at startup with -n flag")
+    parser.add_argument('-p', '--paste', action='store', dest='paste', help="set 'true' to paste and run clipboard text as input with -p flag")
     parser.add_argument('-r', '--run', action='store', dest='run', help="run default entry with -r flag; accepts a string; ignored when -l/rf/f flag is used")
     parser.add_argument('-rf', '--runfile', action='store', dest='runfile', help="read file text as default entry and run with -rf flag; accepts a file path; ignored when -l flag is used")
     parser.add_argument('-u', '--update', action='store', dest='update', help="set 'true' to force or 'false' to bypass automatic update with -u flag")
@@ -79,6 +81,9 @@ def main(tempInterface=""):
     if args.load:
         load = args.load.strip()
         config.defaultEntry = f"Load chat records with this ID: {load}"
+        config.accept_default = True
+    elif args.paste and args.paste.lower() == "true":
+        config.defaultEntry = PyperclipClipboard().get_data().text
         config.accept_default = True
     elif args.runfile or args.file:
         try:

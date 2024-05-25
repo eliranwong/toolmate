@@ -494,7 +494,7 @@ Icon={iconFile}
 Name={command}"""
             createShortcutFile(filePath, content)
     if opencommand:
-        os.system(f"{opencommand} {filePath}")
+        os.system(f'''{opencommand} "{filePath}"''')
 
 # tool selection
 

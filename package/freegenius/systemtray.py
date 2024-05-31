@@ -213,13 +213,17 @@ class FreeGeniusHub(QSystemTrayIcon):
         TTSUtil.play(clipboardText)
 
     def launchPerplexica(self):
+        current_dir = os.getcwd()
         if config.perplexica_directory and not os.path.isdir(config.perplexica_directory):
             config.perplexica_directory = ""
             config.saveConfig()
         if not config.perplexica_directory:
-            if shutil.which("git") and shutil.which("docker") and thisOS == "Linux":
+            perplexica_directory = os.path.join(config.localStorage, "Perplexica")
+            if os.path.isdir(perplexica_directory):
+                config.perplexica_directory = perplexica_directory
+                config.saveConfig()
+            elif shutil.which("git") and shutil.which("docker") and thisOS == "Linux":
                 os.chdir(config.localStorage)
-                perplexica_directory = os.path.join(config.localStorage, "Perplexica")
                 print2("Setting up 'Perplexica' ...")
                 try:
                     os.system(f"{shutil.which('git')} clone https://github.com/ItzCrazyKns/Perplexica.git")
@@ -227,7 +231,6 @@ class FreeGeniusHub(QSystemTrayIcon):
                     os.system(f"{shutil.which('docker')} compose up -d")
                     config.perplexica_directory = perplexica_directory
                     config.saveConfig()
-                    os.chdir(config.localStorage)
                 except:
                     print2("Failed setting up Perplexica! Read: https://github.com/eliranwong/freegenius/wiki/%23-Perplexica-Integration for manual setup.")
                     webbrowser.open("https://github.com/eliranwong/freegenius/wiki/%23-Perplexica-Integration")
@@ -240,6 +243,7 @@ class FreeGeniusHub(QSystemTrayIcon):
             webbrowser.open(f"http://{config.perplexica_ip}:{config.perplexica_port}")
         else:
             QMessageBox.information(self.menu, "FreeGenius AI", "Perplexica not found!")
+        os.chdir(current_dir)
 
     def showGui(self):
         # to work with mutliple virtual desktops

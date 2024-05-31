@@ -479,13 +479,16 @@ class FreeGenius:
             print()
             apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.groqApi_key, is_password=True)
             if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
-                config.groqApi_key = apikey
+                try:
+                    if isinstance(eval(apikey), list):
+                        config.groqApi_key = eval(apikey)
+                except:
+                    config.groqApi_key = apikey
                 CallLLM.checkCompletion()
             else:
                 config.groqApi_key = "freegenius"
             config.saveConfig()
             print2("Configurations updated!")
-            setChatGPTAPIkey()
 
     def changeOpenweathermapApi(self):
         if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
@@ -1420,6 +1423,8 @@ class FreeGenius:
             default = config.llamacppMainModel_max_tokens
         elif config.llmInterface == "ollama":
             default = config.ollamaMainModel_num_predict
+        elif config.llmInterface == "groq":
+            default = config.groqApi_max_tokens
         maxtokens = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(default))
         if maxtokens and not maxtokens.strip().lower() == config.exit_entry and int(maxtokens) > 0:
             maxtokens = int(maxtokens)
@@ -1429,8 +1434,10 @@ class FreeGenius:
                 config.llamacppMainModel_max_tokens = maxtokens
             elif config.llmInterface == "ollama":
                 config.ollamaMainModel_num_predict = maxtokens
+            elif config.llmInterface == "groq":
+                config.groqApi_max_tokens = maxtokens
             config.saveConfig()
-            print3(f"Maximum output tokens: {config.chatGPTApiMinTokens}")
+            print3(f"Maximum output tokens: {maxtokens}")
 
     def setMaxTokens(self):
         # non-chatgpt settings

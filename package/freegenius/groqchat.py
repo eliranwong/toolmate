@@ -1,5 +1,5 @@
 from freegenius import config
-from freegenius import print1, print2, print3, getGroqClient, toggleinputaudio, toggleoutputaudio
+from freegenius import print1, print2, getGroqClient, toggleinputaudio, toggleoutputaudio
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 from freegenius.utils.single_prompt import SinglePrompt
 from freegenius.utils.tool_plugins import Plugins

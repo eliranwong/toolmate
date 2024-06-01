@@ -42,7 +42,7 @@ def main(tempInterface=""):
     parser.add_argument('-n', '--nocheck', action='store', dest='nocheck', help="set 'true' to bypass completion check at startup with -n flag")
     parser.add_argument('-p', '--paste', action='store', dest='paste', help="set 'true' to paste clipboard text as default entry with -p flag")
     parser.add_argument('-r', '--run', action='store', dest='run', help="run default entry with -r flag; accepts a string; ignored when -l/rf/f flag is used")
-    parser.add_argument('-rp', '--runpaste', action='store', dest='paste', help="set 'true' to paste and run clipboard text as default entry with -rp flag")
+    parser.add_argument('-rp', '--runpaste', action='store', dest='runpaste', help="set 'true' to paste and run clipboard text as default entry with -rp flag")
     parser.add_argument('-rf', '--runfile', action='store', dest='runfile', help="read file text as default entry and run with -rf flag; accepts a file path; ignored when -l flag is used")
     parser.add_argument('-u', '--update', action='store', dest='update', help="set 'true' to force or 'false' to bypass automatic update with -u flag")
     parser.add_argument('-t', '--temp', action='store', dest='temp', help="set temporary llm interface with -t flag; llamacpp/ollama/gemini/chatgpt/letmedoit; all changes in configs are temporary")

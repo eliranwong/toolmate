@@ -63,7 +63,7 @@ from prompt_toolkit.widgets import (
     TextArea,
     Checkbox,
 )
-from freegenius import voiceTyping
+from freegenius import config, voiceTyping
 from freegenius.utils.tts_utils import TTSUtil
 
 class ApplicationState:
@@ -571,7 +571,7 @@ def do_speak(event=None):
     buffer = event.app.current_buffer if event is not None else text_field.buffer
     selectedText = buffer.copy_selection().text
     content = selectedText if selectedText else buffer.text
-    TTSUtil.play(content)
+    TTSUtil.play(re.sub(config.tts_doNotReadPattern, "", content))
 
 def do_find_replace():
     async def coroutine():
@@ -950,7 +950,7 @@ def main():
         if not sys.stdin.isatty():
             input_text = sys.stdin.read()
         if args.paste and args.paste.lower() == "true":
-            clipboardText = pyperclip.paste(text=True)
+            clipboardText = pyperclip.paste()
             input_text = f"{input_text}\n\n{clipboardText}" if input_text else clipboardText
 
         try:

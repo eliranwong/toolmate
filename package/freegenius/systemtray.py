@@ -1,4 +1,4 @@
-import os
+import os, re
 thisFile = os.path.realpath(__file__)
 packageFolder = os.path.dirname(thisFile)
 #package = os.path.basename(packageFolder)
@@ -218,7 +218,7 @@ class FreeGeniusHub(QSystemTrayIcon):
             clipboardText = getCliOutput("termux-clipboard-get")
         else:
             clipboardText = self.clipboard.get_data().text
-        TTSUtil.play(clipboardText)
+        TTSUtil.play(re.sub(config.tts_doNotReadPattern, "", clipboardText))
 
     def launchPerplexica(self):
         current_dir = os.getcwd()

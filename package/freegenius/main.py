@@ -83,10 +83,10 @@ def main(tempInterface=""):
         config.defaultEntry = f"Load chat records with this ID: {load}"
         config.accept_default = True
     elif args.runpaste and args.runpaste.lower() == "true":
-        config.defaultEntry = pyperclip.paste(text=True)
+        config.defaultEntry = pyperclip.paste()
         config.accept_default = True
     elif args.paste and args.paste.lower() == "true":
-        config.defaultEntry = pyperclip.paste(text=True)
+        config.defaultEntry = pyperclip.paste()
     elif args.runfile or args.file:
         try:
             filename = args.runfile if args.runfile else args.file

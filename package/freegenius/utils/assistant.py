@@ -1591,6 +1591,11 @@ class FreeGenius:
             self.setAudioPlaybackTool()
             self.setVlcSpeed()
         elif config.ttsPlatform == "piper":
+            if not shutil.which("piper"):
+                try:
+                    installPipPackage("piper-tts")
+                except:
+                    pass
             if shutil.which("piper"):
                 self.setPiperVoice()
                 self.setAudioPlaybackTool()

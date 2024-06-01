@@ -213,8 +213,8 @@ defaultSettings = (
     ('ttsPlatform', "google"), # "google", "googlecloud", "elevenlabs", "custom"
     ('ttsInput', False),
     ('ttsOutput', False),
-    ('tts_readWhenChunkContains', "[\*\.\?!,:;”。，：；？！」]"), # regex pattern containing characters that LetMeDoIt AI starts reading text chunk when config.ttsOutput is set to True and the pattern is matched.  
-    ('tts_doNotPronunce', "[\*]"), # regex pattern contains characters that are not pronunced
+    ('tts_startReadPattern', "[*.?!,:;”。，：；？！」]"), # regex pattern containing characters that LetMeDoIt AI starts reading text chunk when config.ttsOutput is set to True and the pattern is matched.  
+    ('tts_doNotReadPattern', "[*]"), # regex pattern contains characters that are not pronunced
     ('vlcSpeed', 1.0),
     ('gcttsLang', "en-US"), # https://cloud.google.com/text-to-speech/docs/voices
     ('gcttsSpeed', 1.0),

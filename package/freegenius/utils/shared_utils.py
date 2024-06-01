@@ -464,6 +464,7 @@ def exportOllamaModels(selection: list=[]) -> None:
 
 def getDownloadedGgufModels() -> dict:
     llm_directory = os.path.join(config.localStorage, "LLMs", "gguf")
+    Path(llm_directory).mkdir(parents=True, exist_ok=True)
     models = {}
     for f in getFilenamesWithoutExtension(llm_directory, "gguf"):
         models[f] = os.path.join(llm_directory, f"{f}.gguf")

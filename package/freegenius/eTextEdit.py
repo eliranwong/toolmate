@@ -13,14 +13,17 @@ Modified and Enhanced by Eliran Wong:
 * added key bindings
 * added handling of unasaved changes
 * added dark theme and lexer style
-* support stdin, e.g. echo "Hello world!" | python3 eTextEdit.py
-* support file argument, e.g. python3 eTextEdit.py <filename>
-* support plugins (forthcoming)
+* support stdin, e.g. echo "Hello world!" | etextedit
+* support file argument, e.g. etextedit <filename>
+* support startup with clipboard text content, e.g. etextedit -p true
+* support printing
 
 eTextEdit repository:
 https://github.com/eliranwong/eTextEdit
+
+Remarks: This is a modified edition of etextedit that work with FreeGenius AI
 """
-import datetime, sys, os, re, webbrowser, shutil, wcwidth
+import datetime, sys, os, re, webbrowser, shutil, wcwidth, argparse, pyperclip, platform
 from asyncio import Future, ensure_future
 from prompt_toolkit.clipboard.pyperclip import PyperclipClipboard
 from prompt_toolkit.input import create_input
@@ -60,6 +63,8 @@ from prompt_toolkit.widgets import (
     TextArea,
     Checkbox,
 )
+from freegenius import voiceTyping
+from freegenius.utils.tts_utils import TTSUtil
 
 class ApplicationState:
     """
@@ -459,6 +464,9 @@ def _(event):
         search_toolbar.search_buffer.text = previous_search_text
         search_toolbar.search_buffer.cursor_position = len(previous_search_text)
     do_find()
+@bindings.add("c-b")
+def _(_):
+    do_find_reverse()
 @bindings.add("c-r")
 def _(_):
     do_find_replace()
@@ -476,6 +484,9 @@ def _(_):
 @bindings.add("c-w")
 def _(_):
     do_save_as_file()
+@bindings.add("c-p")
+def _(_):
+    do_print()
 
 # edit
 @bindings.add("c-i")
@@ -551,6 +562,17 @@ def confirm_open_file():
 
     ensure_future(coroutine())
 
+def do_listen(event=None):
+    buffer = event.app.current_buffer if event is not None else text_field.buffer
+    content = voiceTyping()
+    buffer.insert_text(content)
+
+def do_speak(event=None):
+    buffer = event.app.current_buffer if event is not None else text_field.buffer
+    selectedText = buffer.copy_selection().text
+    content = selectedText if selectedText else buffer.text
+    TTSUtil.play(content)
+
 def do_find_replace():
     async def coroutine():
         search_replace_dialog = SearchReplaceDialog(
@@ -586,8 +608,10 @@ def do_about():
 * added key bindings
 * added handling of unasaved changes
 * added dark theme and lexer style
-* support stdin, e.g. echo "Hello world!" | python3 eTextEdit.py
-* support file argument, e.g. python3 eTextEdit.py <filename>
+* support stdin, e.g. echo "Hello world!" | etextedit
+* support file argument, e.g. etextedit <filename>
+* support startup with clipboard text content, e.g. etextedit -p true
+* support printing
 * support plugins (forthcoming)"""
     show_message("About", f"Text Editor\nOriginally created by Jonathan Slenders\nEnhanced by Eliran Wong:{enhancedFeatures}")
 
@@ -707,6 +731,18 @@ def do_delete(event=None):
     if not data.text and buffer.cursor_position < len(buffer.text):
         buffer.delete(1)
 
+def do_print():
+    if content := text_field.text:
+        thisFile = os.path.realpath(__file__)
+        packageFolder = os.path.dirname(thisFile)
+        tempFile = os.path.join(packageFolder, "temp", "etextedit.txt")
+        with open(tempFile, "w", encoding="utf-8") as fileObj:
+            fileObj.write(content)
+        if platform.system() == "Windows":
+            os.system(f'''notepad /p "{tempFile}"''')
+        else:
+            os.system(f'''lp "{tempFile}"''')
+
 def do_find():
     start_search(text_field.control)
 
@@ -763,6 +799,8 @@ root_container = MenuContainer(
                 MenuItem("[S] Save", handler=do_save_file),
                 MenuItem("[W] Save as", handler=do_save_as_file),
                 MenuItem("-", disabled=True),
+                MenuItem("[P] Print", handler=do_print),
+                MenuItem("-", disabled=True),
                 MenuItem("[Q] Exit", handler=do_exit),
             ],
         ),
@@ -780,13 +818,21 @@ root_container = MenuContainer(
                 MenuItem("[D] Delete", handler=do_delete),
                 MenuItem("-", disabled=True),
                 MenuItem("[F] Find", handler=do_find),
-                MenuItem("[R] Find & Replace", handler=do_find_reverse),
+                MenuItem("[B] Find Backward", handler=do_find_reverse),
+                MenuItem("[R] Find & Replace", handler=do_find_replace),
                 #MenuItem("Find next", handler=do_find_next),
                 #MenuItem("Replace"),
                 MenuItem("[L] Go To Line", handler=do_go_to),
                 MenuItem("-", disabled=True),
                 MenuItem("[I] Spaces", handler=do_add_spaces),
                 MenuItem("Time / Date", handler=do_time_date),
+            ],
+        ),
+        MenuItem(
+            "Tool",
+            children=[
+                MenuItem("Speech to Text", handler=do_listen),
+                MenuItem("Text to Speech", handler=do_speak),
             ],
         ),
         MenuItem(
@@ -880,18 +926,42 @@ def launch(input_text=None, filename=None):
 
 def main():
     if len(sys.argv) > 1:
-        #filename = sys.argv[1] if len(sys.argv) == 2 else " ".join(sys.argv[1:])
-        # take the first argument as filename
-        filename = sys.argv[1]
+
+        # Create the parser
+        parser = argparse.ArgumentParser(description="LetMeDoIt AI cli options")
+        # Add arguments
+        parser.add_argument("default", nargs="?", default=None, help="File path")
+        parser.add_argument('-p', '--paste', action='store', dest='paste', help="Set 'true' to paste clipboard text as initial text with -p flag")
+        # Parse arguments
+        args = parser.parse_args()
+
+        if args.default:
+            try:
+                # create file if it does not exist
+                if not os.path.isfile(filename):
+                    open(args.default, "a", encoding="utf-8").close()
+                filename = args.default
+            except:
+                filename = ""
+        else:
+            filename = ""
+        
+        input_text = ""
+        if not sys.stdin.isatty():
+            input_text = sys.stdin.read()
+        if args.paste and args.paste.lower() == "true":
+            clipboardText = pyperclip.paste(text=True)
+            input_text = f"{input_text}\n\n{clipboardText}" if input_text else clipboardText
+
         try:
-            # create file if it does not exist
-            if not os.path.isfile(filename):
-                open(filename, "a", encoding="utf-8").close()
-            if not sys.stdin.isatty():
-                input_text = sys.stdin.read()
+            if filename and input_text:
                 text = launch(input_text=input_text, filename=filename)
-            else:
+            elif filename:
                 text = launch(filename=filename)
+            elif input_text:
+                text = launch(input_text=input_text)
+            else:
+                text = launch()
         except:
             text = launch()
     elif not sys.stdin.isatty():

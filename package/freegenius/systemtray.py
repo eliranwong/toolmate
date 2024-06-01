@@ -136,16 +136,24 @@ class FreeGeniusHub(QSystemTrayIcon):
         action.triggered.connect(self.readClipboard)
         submenu.addAction(action)
 
+        action = QAction("prompt", self)
+        action.triggered.connect(lambda: runFreeGeniusCommand("freegenius -p true -u false -n true -i false"))
+        submenu.addAction(action)
+
         action = QAction("summarize", self)
-        action.triggered.connect(lambda: runFreeGeniusCommand("freegenius -p true -u false -n true -i false -c 'Let me Summarize'"))
+        action.triggered.connect(lambda: runFreeGeniusCommand("freegenius -rp true -u false -n true -i false -c 'Let me Summarize'"))
         submenu.addAction(action)
 
         action = QAction("explain", self)
-        action.triggered.connect(lambda: runFreeGeniusCommand("freegenius -p true -u false -n true -i false -c 'Let me Explain'"))
+        action.triggered.connect(lambda: runFreeGeniusCommand("freegenius -rp true -u false -n true -i false -c 'Let me Explain'"))
         submenu.addAction(action)
 
         action = QAction("translate", self)
-        action.triggered.connect(lambda: runFreeGeniusCommand("freegenius -p true -u false -n true -i false -c 'Let me Translate'"))
+        action.triggered.connect(lambda: runFreeGeniusCommand("freegenius -rp true -u false -n true -i false -c 'Let me Translate'"))
+        submenu.addAction(action)
+
+        action = QAction("edit", self)
+        action.triggered.connect(lambda: runFreeGeniusCommand("etextedit -p true"))
         submenu.addAction(action)
 
         menuAction = QAction("Clipboard", self)

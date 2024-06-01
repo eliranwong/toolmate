@@ -26,6 +26,9 @@ if config.isTermux:
 
 defaultSettings = (
     # unique configs in FreeGenius AI
+    ('appName', ''),
+    ('text2art_font1', 'cybermedum'),
+    ('text2art_font2', 'white_bubble'),
     ('llmInterface', "llamacpp"), # "llamacpp", "llamacppserver", "ollama", "gemini", "chatgpt", "letmedoit", "groq"
     ('intent_screening', False), # set True to increase both reliability and waiting time
     ('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools

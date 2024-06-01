@@ -1881,14 +1881,14 @@ class FreeGenius:
         return directoryList
 
     def showLogo(self):
-        appName = config.freeGeniusAIName.split()[0].upper()
+        appName = config.appName if config.appName else config.freeGeniusAIName.split()[0].upper()
         terminal_width = shutil.get_terminal_size().columns
         try:
             from art import text2art
             if terminal_width >= 32:
-                logo = text2art(appName, font="cybermedum")
+                logo = text2art(appName, font=config.text2art_font1)
             elif terminal_width >= 20:
-                logo = text2art(" ".join(appName) + " ", font="white_bubble")
+                logo = text2art(" ".join(appName) + " ", font=config.text2art_font2)
             else:
                 logo = config.freeGeniusAIName
             logo = logo[:-1] # remove the linebreak at the end

@@ -475,9 +475,9 @@ class FreeGenius:
         if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
             print3("# Groq Cloud API Key: allows access to Groq Cloud hosted LLMs")
             print1("To set up Groq Cloud API Key, read:\nhttps://github.com/eliranwong/freegenius/wiki/Set-up-a-Groq-Cloud-API-Key\n")
-            print1("Enter your Groq Cloud API Key [optional]:")
+            print1("Enter a single or a list of multiple Groq Cloud API Key(s) [optional]:")
             print()
-            apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.groqApi_key, is_password=True)
+            apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=str(config.groqApi_key), is_password=True)
             if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
                 try:
                     if isinstance(eval(apikey), list):

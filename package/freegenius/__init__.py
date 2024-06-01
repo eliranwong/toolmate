@@ -68,15 +68,18 @@ except:
 thisPlatform = platform.system()
 config.thisPlatform = "macOS" if thisPlatform == "Darwin" else thisPlatform
 if config.terminalEnableTermuxAPI:
+    checkPath()
     config.open = "termux-share"
     config.thisDistro = ""
 elif thisPlatform == "Linux":
+    checkPath()
     config.open = "xdg-open"
     try:
         config.thisDistro = subprocess.check_output('lsb_release -i -s', shell=True).decode('utf-8')
     except:
         config.thisDistro = ""
 elif thisPlatform == "Darwin":
+    checkPath()
     config.open = "open"
     config.thisDistro = ""
 elif thisPlatform == "Windows":

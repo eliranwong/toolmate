@@ -415,6 +415,15 @@ def convert_html_to_markdown(html_string):
 
 # system command
 
+def checkPath():
+    currentPath = os.getenv('PATH')
+    shimsPath = os.path.expanduser("~/.pyenv/shims/")
+    envPath = os.path.dirname(sys.executable)
+    if os.path.isdir(shimsPath) and not shimsPath in currentPath:
+        os.environ["PATH"] = f"{shimsPath}:{os.environ['PATH']}"
+    if os.path.isdir(envPath) and not envPath in currentPath:
+        os.environ["PATH"] = f"{envPath}:{os.environ['PATH']}"
+
 def getCpuThreads():
     if config.cpu_threads and isinstance(config.cpu_threads, int):
         return config.cpu_threads

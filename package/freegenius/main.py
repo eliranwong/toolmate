@@ -35,6 +35,7 @@ def main(tempInterface=""):
     parser = argparse.ArgumentParser(description="LetMeDoIt AI cli options")
     # Add arguments
     parser.add_argument("default", nargs="?", default=None, help="default entry; accepts a string; ignored when -l/rp/p/rf/f/r flag is used")
+    parser.add_argument('-b', '--backend', action='store', dest='backend', help="set llm interface with -b flag; options: llamacpp/llamacppserver/ollama/groq/gemini/chatgpt/letmedoit")
     parser.add_argument('-c', '--context', action='store', dest='context', help="specify pre-defined context with -r flag; accepts a string")
     parser.add_argument('-f', '--file', action='store', dest='file', help="read file text as default entry with -f flag; accepts a file path; ignored when -l/rf flag is used")
     parser.add_argument('-i', '--ip', action='store', dest='ip', help="set 'true' to include or 'false' to exclude ip information in system message with -i flag")
@@ -44,17 +45,19 @@ def main(tempInterface=""):
     parser.add_argument('-r', '--run', action='store', dest='run', help="run default entry with -r flag; accepts a string; ignored when -l/rf/f flag is used")
     parser.add_argument('-rp', '--runpaste', action='store', dest='runpaste', help="set 'true' to paste and run clipboard text as default entry with -rp flag")
     parser.add_argument('-rf', '--runfile', action='store', dest='runfile', help="read file text as default entry and run with -rf flag; accepts a file path; ignored when -l flag is used")
-    parser.add_argument('-u', '--update', action='store', dest='update', help="set 'true' to force or 'false' to bypass automatic update with -u flag")
-    parser.add_argument('-t', '--temp', action='store', dest='temp', help="set temporary llm interface with -t flag; llamacpp/ollama/gemini/chatgpt/letmedoit; all changes in configs are temporary")
+    parser.add_argument('-u', '--update', action='store', dest='update', help="set 'true' to force or 'false' to interfacebypass automatic update with -u flag")
+    parser.add_argument('-t', '--temp', action='store', dest='temp', help="set temporary llm interface with -t flag; options: llamacpp/llamacppserver/ollama/groq/gemini/chatgpt/letmedoit; all changes in configs are temporary")
     # Parse arguments
     args = parser.parse_args()
     # Check what kind of arguments were provided and perform actions accordingly
 
     # update to the latest version
     config.tempInterface = tempInterface
-    if args.temp:
-        if args.temp.lower() in ("llamacpp", "ollama", "gemini", "chatgpt", "letmedoit"):
-            config.tempInterface = args.temp.lower()
+    backends = ("llamacpp", "llamacppserver", "ollama", "groq", "gemini", "chatgpt", "letmedoit")
+    if args.backend:
+        config.llmInterface = args.temp.lower()
+    elif args.temp and args.temp.lower() in backends:
+        config.tempInterface = args.temp.lower()
     if config.tempInterface:
         config.llmInterface = config.tempInterface
 

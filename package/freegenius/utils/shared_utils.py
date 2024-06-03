@@ -533,27 +533,25 @@ def runFreeGeniusCommand(command):
     shortcut_dir = os.path.join(config.freeGeniusAIFolder, "shortcuts")
     Path(shortcut_dir).mkdir(parents=True, exist_ok=True)
 
-    # The following line does not work on Windows
-    commandPath = os.path.join(os.path.dirname(sys.executable), command)
+    args = command.split()
+    firstArg = args[0]
+    fullCommand = shutil.which(firstArg) + f" {' '.join(args[1:])}" if args[1:] else ""
 
     if config.thisPlatform == "Windows":
-        opencommand = "start"
+        envCommandPath = os.path.join(os.path.dirname(sys.executable), f"{firstArg}.exe")
+        opencommand = ""
         filePath = os.path.join(shortcut_dir, f"{command}.bat")
         if not os.path.isfile(filePath):
-            filenames = {
-                "freegenius": "main.py",
-                "etextedit": "eTextEdit.py",
-            }
-            systemTrayFile = os.path.join(config.freeGeniusAIFolder, filenames.get(command, f"{command}.py"))
-            content = f'''powershell.exe -NoExit -Command "{sys.executable} '{systemTrayFile}'"'''
+            # use 'powershell.exe -NoExit -Command' or 'cmd.exe /c' to launch console
+            content = f'''powershell.exe -NoExit -Command "{envCommandPath if os.path.isfile(envCommandPath) else fullCommand}"'''
             createShortcutFile(filePath, content)
+        os.startfile(f'''"{filePath}"''')
     elif config.thisPlatform == "macOS":
         opencommand = "open"
         filePath = os.path.join(shortcut_dir, f"{command}.command")
         if not os.path.isfile(filePath):
             content = f"""#!/bin/bash
-cd {config.freeGeniusAIFolder}
-{commandPath}"""
+{fullCommand}"""
             createShortcutFile(filePath, content)
             os.chmod(filePath, 0o755)
     elif config.thisPlatform == "Linux":
@@ -572,7 +570,7 @@ Version=1.0
 Type=Application
 Terminal=true
 Path={config.freeGeniusAIFolder}
-Exec={commandPath}
+Exec={fullCommand}
 Icon={iconFile}
 Name={command}"""
             createShortcutFile(filePath, content)
@@ -1069,6 +1067,11 @@ def getWebText(url):
         return soup.get_text()
     except:
         return ""
+
+def downloadFile(url, localpath, timeout=60):
+    response = requests.get(url, timeout=timeout)
+    with open(localpath, 'wb') as fileObj:
+        fileObj.write(response.content)
 
 def downloadWebContent(url, timeout=60, folder="", ignoreKind=False):
     print2("Downloading web content ...")

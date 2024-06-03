@@ -73,17 +73,17 @@ class Prompts:
                     buffer.cursor_position = buffer.cursor_position + buffer.document.get_end_of_line_position()
             else:
                 run_in_terminal(lambda: print2("Install PyAudio first to enable voice entry!"))
-        @this_key_bindings.add(*config.hotkey_voice_entry_config)
+        @this_key_bindings.add(*config.hotkey_voice_recognition_config)
         def _(event):
             buffer = event.app.current_buffer
             config.defaultEntry = buffer.text
-            buffer.text = ".voicetypingconfig"
+            buffer.text = ".voicerecognition"
             buffer.validate_and_handle()
-        @this_key_bindings.add(*config.hotkey_text_to_speech_config)
+        @this_key_bindings.add(*config.hotkey_voice_generation_config)
         def _(event):
             buffer = event.app.current_buffer
             config.defaultEntry = buffer.text
-            buffer.text = ".texttospeechconfig"
+            buffer.text = ".voicegeneration"
             buffer.validate_and_handle()
         @this_key_bindings.add(*config.hotkey_select_plugins)
         def _(event):
@@ -271,7 +271,7 @@ Available tokens: {estimatedAvailableTokens}
             str(config.hotkey_launch_pager_view): "launch pager view",
             str(config.hotkey_display_key_combo): "show key bindings",
             str(config.hotkey_voice_entry): "activate voice typing",
-            str(config.hotkey_voice_entry_config): "change voice typing configs",
+            str(config.hotkey_voice_recognition_config): "change voice typing configs",
             str(config.hotkey_toggle_input_audio): "toggle input audio",
             str(config.hotkey_toggle_response_audio): "toggle response audio",
             str(config.hotkey_toggle_multiline_entry): "toggle multi-line entry",

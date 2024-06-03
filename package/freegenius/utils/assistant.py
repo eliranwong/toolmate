@@ -1,5 +1,5 @@
 from freegenius import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput
-from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits, toggleinputaudio, toggleoutputaudio
+from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile
 from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runFreeGeniusCommand
 from freegenius.utils.call_llm import CallLLM
 from freegenius.utils.tool_plugins import ToolStore
@@ -159,8 +159,8 @@ class FreeGenius:
             ".systemmessage": ("change custom system message", self.setCustomSystemMessage),
             ".ipinfo": ("change ip information integration", self.setIncludeIpInSystemMessage),
             ".storagedirectory": ("change storage directory", self.setStorageDirectory),
-            ".voicetypingconfig": ("change voice typing config", self.setVoiceTypingConfig),
-            ".texttospeechconfig": ("change text-to-speech config", self.setTextToSpeechConfig),
+            ".voicerecognition": ("change voice recognition", self.setSpeechToTextConfig),
+            ".voicegeneration": ("change voice generation", self.setTextToSpeechConfig),
             ".googleapiservice": ("change Google API service", self.selectGoogleAPIs),
             ".autobuilderconfig": ("change auto builder config", self.setAutoGenBuilderConfig),
             ".customtexteditor": ("change custom text editor", self.setCustomTextEditor),
@@ -191,7 +191,7 @@ class FreeGenius:
             config.actionHelp += f"{key}: {value[0]}\n"
         config.actionHelp += "\n## Read more at:\nhttps://github.com/eliranwong/letmedoit/wiki/Action-Menu"
 
-    # Voice Typing Language
+    # Speech-to-Text Language
     def setSpeechToTextLanguage(self):
         # record in history for easy retrieval by moving arrows upwards / downwards
         voice_typing_language_history = os.path.join(config.localStorage, "history", "voice_typing_language")
@@ -209,7 +209,7 @@ class FreeGenius:
             default = "English (United States)" if config.voiceTypingPlatform in ("google", "googlecloud") else "english"
         # completer
         completer = FuzzyCompleter(WordCompleter(languages, ignore_case=True))
-        print1("Please specify the voice typing language:")
+        print1("Please specify the Speech-to-Text language:")
         language = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=default, promptSession=voice_typing_language_session, completer=completer)
         if language and not language in (config.exit_entry, config.cancel_entry):
             config.voiceTypingLanguage = language
@@ -398,7 +398,7 @@ class FreeGenius:
         if "Speech-to-Text" in config.enabledGoogleAPIs:
             if not config.voiceTypingPlatform == "googlecloud":
                 config.voiceTypingPlatform = "googlecloud"
-                print3("Voice typing platform changed to: Google Text-to-Speech (API)")
+                print3("Speech-to-Text platform changed to: Google Text-to-Speech (API)")
             self.setSpeechToTextLanguage()
         if "Text-to-Speech" in config.enabledGoogleAPIs:
             if not config.ttsPlatform == "googlecloud":
@@ -510,7 +510,7 @@ class FreeGenius:
         if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
             print3("# ElevenLabs API Key: allows access to voice generation feature offered by ElevenLabs")
             print1("To set up ElevenLabs API Key, read:\nhttps://elevenlabs.io/docs/api-reference/text-to-speech#authentication\n")
-            print1("Enter your ElevenLabs API Key:")
+            print1("Enter your ElevenLabs API Key [optional]:")
             print()
             apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.elevenlabsApi, is_password=True)
             if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
@@ -1568,7 +1568,7 @@ class FreeGenius:
         ttsPlatform = self.dialogs.getValidOptions(
             options=options,
             descriptions=descriptions,
-            title="Text-to-Speech Configurations",
+            title="Voice Generation Configurations",
             text="Select a text-to-speech platform:",
             default=config.ttsPlatform,
         )
@@ -1607,7 +1607,14 @@ class FreeGenius:
             self.setSayVoice()
             self.setSaySpeed()
         elif config.ttsPlatform == "wsay":
-            if shutil.which("wsay"):
+            homeWsay = os.path.join(config.localStorage, "wsay.exe")
+            isWsayFound = (shutil.which("wsay") or os.path.isfile(homeWsay))
+            if not isWsayFound:
+                print2("Downloading 'wsay.exe' ...")
+                downloadFile("https://github.com/p-groarke/wsay/releases/download/1.6.2/wsay.exe", homeWsay)
+                isWsayFound = (shutil.which("wsay") or os.path.isfile(homeWsay))
+                print3(f"Saved in: {homeWsay}")
+            if isWsayFound:
                 self.setWsayVoice()
                 self.setWsaySpeed()
             else:
@@ -1703,24 +1710,24 @@ class FreeGenius:
             else:
                 print2("Given path invalid!")
 
-    def setVoiceTypingConfig(self):
+    def setSpeechToTextConfig(self):
         voiceTypingPlatform = self.dialogs.getValidOptions(
             options=("google", "googlecloud", "whisper", "whispercpp"),
             descriptions=("Google Speech-to-Text (Generic) [online]", "Google Speech-to-Text (API) [online]", "OpenAI Whisper [offline; slower with non-English voices]", "Whisper.cpp [offline; installed separately]"),
-            title="Voice Typing Configurations",
-            text="Select a voice typing platform:",
+            title="Voice Recognition Configurations",
+            text="Select a speech-to-text platform:",
             default=config.voiceTypingPlatform,
         )
         if voiceTypingPlatform:
             if voiceTypingPlatform == "googlecloud" and not (os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Speech-to-Text" in config.enabledGoogleAPIs):
                 print2("Google Cloud Speech-to-Text feature is not enabled!")
                 print3("Read: https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup")
-                print3("Voice typing platform changed to: Google Speech-to-Text (Generic)")
+                print3("Speech-to-Text platform changed to: Google Speech-to-Text (Generic)")
                 config.voiceTypingPlatform = "google"
             elif voiceTypingPlatform == "whisper" and not isCommandInstalled("ffmpeg"):
                 print2("Install 'ffmpeg' first to use offline openai whisper model!")
                 print3("Read: https://github.com/openai/whisper#setup")
-                print3("Voice typing platform changed to: Google Speech-to-Text (Generic)")
+                print3("Speech-to-Text platform changed to: Google Speech-to-Text (Generic)")
                 config.voiceTypingPlatform = "google"
             elif voiceTypingPlatform == "whispercpp":
                 # check cli main path
@@ -1770,8 +1777,8 @@ class FreeGenius:
             config.voiceTypingAutoComplete = True if voiceTypingAutoComplete == "Yes" else False
         # notify
         print("")
-        print3(f"Voice Typing Model: {config.voiceTypingPlatform}")
-        print3(f"Voice Typing Language: {config.voiceTypingLanguage}")
+        print3(f"Speech-to-Text Model: {config.voiceTypingPlatform}")
+        print3(f"Speech-to-Text Language: {config.voiceTypingLanguage}")
         print3(f"Ambient Noise Adjustment: {config.voiceTypingAdjustAmbientNoise}")
         print3(f"Audio Notification: {config.voiceTypingNotification}")
         print3(f"Auto Completion: {config.voiceTypingAutoComplete}")

@@ -76,7 +76,8 @@ class TTSUtil:
                     pydoc.pipepager(content, cmd=cmd)
                 elif config.ttsPlatform == "wsay":
                     additional_options = f" {config.wsay_additional_options.strip()}" if config.wsay_additional_options.strip() else ""
-                    cmd = f"wsay --voice {config.wsay_voice} --speed {config.wsay_speed}{additional_options}"
+                    homeWsay = os.path.join(config.localStorage, "wsay.exe")
+                    cmd = f'''"{homeWsay if os.path.isfile(homeWsay) else 'wsay'}" --voice {config.wsay_voice} --speed {config.wsay_speed}{additional_options}'''
                     pydoc.pipepager(content, cmd=cmd)
                 elif config.ttsPlatform == "piper":
                     audioFile = os.path.join(config.freeGeniusAIFolder, "temp", "piper.wav")

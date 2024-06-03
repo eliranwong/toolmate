@@ -535,7 +535,8 @@ def runFreeGeniusCommand(command):
 
     args = command.split()
     firstArg = args[0]
-    fullCommand = shutil.which(firstArg) + f" {' '.join(args[1:])}" if args[1:] else ""
+    fullCommand = shutil.which(firstArg)
+    fullCommand += f" {' '.join(args[1:])}" if args[1:] else ""
 
     if config.thisPlatform == "Windows":
         envCommandPath = os.path.join(os.path.dirname(sys.executable), f"{firstArg}.exe")

@@ -55,7 +55,7 @@ def main(tempInterface=""):
     config.tempInterface = tempInterface
     backends = ("llamacpp", "llamacppserver", "ollama", "groq", "gemini", "chatgpt", "letmedoit")
     if args.backend:
-        config.llmInterface = args.temp.lower()
+        config.llmInterface = args.backend.lower()
     elif args.temp and args.temp.lower() in backends:
         config.tempInterface = args.temp.lower()
     if config.tempInterface:

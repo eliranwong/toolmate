@@ -6,7 +6,7 @@ modify the given images according to changes specified by users
 [FUNCTION_CALL]
 """
 
-from freegenius import config, is_valid_image_file, is_valid_image_url, print1, print3, startLlamacppVisionServer, stopLlamacppVisionServer, print2, encode_image, getCliOutput, getCpuThreads
+from freegenius import config, is_valid_image_file, is_valid_image_url, print1, print3, startLlamacppVisionServer, stopLlamacppVisionServer, print2, encode_image, getCliOutput, getCpuThreads, runFreeGeniusCommand, getLlamacppServerClient
 import os
 from openai import OpenAI
 from freegenius.utils.call_chatgpt import check_openai_errors
@@ -55,7 +55,8 @@ def modify_images(function_args):
             # Prompt.
             "indicator": config.terminalPromptIndicatorColor2,
         })
-        startLlamacppVisionServer()
+        runFreeGeniusCommand("customvisionserver") if config.llmInterface=="llamacppserver" else startLlamacppVisionServer()
+        client = getLlamacppServerClient("vision") if config.llmInterface=="llamacppserver" else OpenAI(base_url=f"http://localhost:{config.llamacppVisionModel_server_port}/v1", api_key="freegenius")
         stable_diffusion = StableDiffusion(
             model_path=config.stableDiffusion_model_path,
             lora_model_dir=os.path.join(config.localStorage, "LLMs", "stable_diffusion", "lora"),
@@ -74,7 +75,7 @@ def modify_images(function_args):
             new_height = SinglePrompt.run(style=promptStyle, default=str(height), validator=NumberValidator())
             if new_height and not new_height.strip().lower() == config.exit_entry and int(new_height) > 0:
                 height = int(new_height)
-            image_description = OpenAI(base_url=f"http://localhost:{config.llamacppVisionModel_server_port}/v1", api_key="freegenius").chat.completions.create(
+            image_description = client.chat.completions.create(
                 model="gpt-4-vision-preview",
                 messages=[
                     {

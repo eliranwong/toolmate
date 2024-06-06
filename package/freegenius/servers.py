@@ -24,6 +24,7 @@ def vision():
 
 def custommain():
     if not config.customToolServer_ip.lower() in ("localhost", "127.0.0.1"):
+        # a remote server
         return None
     elif config.customToolServer_command:
         if isServerAlive(config.customToolServer_ip, config.customToolServer_port):

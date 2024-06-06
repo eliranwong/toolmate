@@ -1030,12 +1030,14 @@ class FreeGenius:
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_llamacpp("chat")
         elif config.llmInterface == "llamacppserver":
-            print2("# Main Model - for both task execution and conversation")
+            print2("# Main Server - for both task execution and conversation")
             self.setLlmModel_llamacppserver()
             askIntentScreening()
             if askAdditionalChatModel():
-                print2("# Chat Model - for conversation only")
+                print2("# Chat Server - for conversation only")
                 self.setLlmModel_llamacppserver("chat")
+            print2("# Vision Server - for vision only")
+            self.setLlmModel_llamacppserver("vision")
         elif config.llmInterface == "groq":
             print2("# Main Model - for both task execution and conversation")
             self.setLlmModel_groq()
@@ -1103,41 +1105,82 @@ class FreeGenius:
                     print("Ollama not found! Install Ollama first to use Ollama model library!")
                     print("To install Ollama, visit https://ollama.com")
 
-    def setLlmModel_llamacppserver(self, feature="default"):
-        def getIp(feature=feature):
-            ip = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.customChatServer_ip if feature=="chat" else config.customToolServer_ip)
+    def setLlmModel_llamacppserver(self, server="tool"):
+        def setTimeout(server=server):
+            current_timeout = {
+                "tool": config.customToolServer_timeout,
+                "chat": config.customChatServer_timeout,
+                "vision": config.customVisionServer_timeout,
+            }
+            timeout = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(current_timeout[server]))
+            if timeout and not timeout.strip().lower() == config.exit_entry:
+                timeout = int(timeout)
+                if server=="chat":
+                    config.customChatServer_timeout = timeout
+                elif server=="vision":
+                    config.customVisionServer_timeout = timeout
+                else:
+                    config.customToolServer_timeout = timeout
+                config.saveConfig()
+                print3(f"Custom {server} server timeout: {timeout}")
+        def setIp(server=server):
+            ips = {
+                "tool": config.customToolServer_ip,
+                "chat": config.customChatServer_ip,
+                "vision": config.customVisionServer_ip,
+            }
+            ip = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=ips[server])
             if ip and not ip.strip().lower() == config.exit_entry:
-                if feature=="chat":
+                if server=="chat":
                     config.customChatServer_ip = ip
+                elif server=="vision":
+                    config.customVisionServer_ip = ip
                 else:
                     config.customToolServer_ip = ip
-        def getPort(feature=feature):
-            port = self.prompts.simplePrompt(numberOnly=True, style=self.prompts.promptStyle2, default=str(config.customChatServer_port) if feature=="chat" else str(config.customToolServer_port))
+        def setPort(server=server):
+            ports = {
+                "tool": config.customToolServer_port,
+                "chat": config.customChatServer_port,
+                "vision": config.customVisionServer_port,
+            }
+            port = self.prompts.simplePrompt(numberOnly=True, style=self.prompts.promptStyle2, default=str(ports[server]))
             if port and not port.strip().lower() == config.exit_entry:
                 port = int(port)
-                if feature=="chat":
+                if server=="chat":
                     config.customChatServer_port = port
+                elif server=="vision":
+                    config.customVisionServer_port = port
                 else:
                     config.customToolServer_port = port
-        def getCommand(feature=feature):
-            command = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.customChatServer_command if feature=="chat" else config.customToolServer_command)
+        def setCommand(server=server):
+            commands = {
+                "tool": config.customToolServer_command,
+                "chat": config.customChatServer_command,
+                "vision": config.customVisionServer_command,
+            }
+            command = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=commands[server])
             if command and not command.strip().lower() == config.exit_entry:
-                if feature=="chat":
+                if server=="chat":
                     config.customChatServer_command = command
+                elif server=="vision":
+                    config.customVisionServer_command = command
                 else:
                     config.customToolServer_command = command
                 return command
             return None
-        server = 'chat' if feature=='chat' else 'tool'
-        print2(f"Enter custom {server} server command line below:")
+        print2(f"Enter full custom {server} server command line below:")
         print1("(or leave it blank to use built-in or remote llama.cpp server)")
-        getCommand()
+        command = setCommand()
         print2(f"Enter custom {server} server IP address below:")
-        getIp()
+        setIp()
         print2(f"Enter custom {server} server port below:")
-        getPort()
+        setPort()
+        if command:
+            # timeout option does not apply to built-in server
+            print2(f"Enter custom {server} server read/write timeout in seconds below:")
+            setTimeout()
         # try to start server
-        runFreeGeniusCommand("customchatserver" if feature=="chat" else "customtoolserver")
+        runFreeGeniusCommand(f"custom{server}server")
 
     def setLlmModel_llamacpp(self, feature="default"):
         library = self.dialogs.getValidOptions(

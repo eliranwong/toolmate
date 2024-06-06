@@ -21,7 +21,7 @@ Reference: https://platform.openai.com/docs/guides/vision
 [FUNCTION_CALL]
 """
 
-from freegenius import config, print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url, encode_image
+from freegenius import config, print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url, encode_image, runFreeGeniusCommand, getLlamacppServerClient
 from freegenius.utils.call_chatgpt import check_openai_errors
 import os
 from openai import OpenAI
@@ -78,8 +78,8 @@ def analyze_images(function_args):
             client = OpenAI(base_url=f"http://localhost:{config.llamacppVisionModel_server_port}/v1", api_key="freegenius")
         elif config.llmInterface == "llamacppserver":
             # start llama.cpp vision server
-            startLlamacppVisionServer()
-            client = OpenAI(base_url=f"http://localhost:{config.llamacppVisionModel_server_port}/v1", api_key="freegenius")
+            runFreeGeniusCommand("customvisionserver")
+            client = getLlamacppServerClient("vision")
         elif config.llmInterface in ("ollama", "groq"):
             config.currentMessages[-1] = {'role': 'user', 'content': query, 'images': files}
             answer = CallOllama.getSingleChatResponse("", config.currentMessages, model=config.ollamaVisionModel)

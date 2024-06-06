@@ -39,6 +39,9 @@ class CallLlamaCppServer:
             messages=[{"role": "user", "content" : "hello"}],
             n=1,
             max_tokens=10,
+            stop=config.customToolServer_stop,
+            timeout=config.customToolServer_timeout,
+            **config.customToolServer_additional_options,
         )
 
     @staticmethod
@@ -92,7 +95,9 @@ class CallLlamaCppServer:
                 temperature=temperature if temperature is not None else config.llmTemperature,
                 max_tokens=max_tokens if max_tokens is not None else config.llamacppMainModel_max_tokens,
                 stream=False,
-                #**config.groqApi_main_model_additional_chat_options,
+                stop=config.customToolServer_stop,
+                timeout=config.customToolServer_timeout,
+                **config.customToolServer_additional_options,
             )
             return completion.choices[0].message.content
         except:
@@ -202,7 +207,9 @@ class CallLlamaCppServer:
                 "type": "json_object",
                 "schema": schema,
             },
-            #**config.groqApi_main_model_additional_chat_options,
+            stop=config.customToolServer_stop,
+            timeout=config.customToolServer_timeout,
+            **config.customToolServer_additional_options,
         )
         func_arguments = completion.choices[0].message.content
         function_call_message_mini = {
@@ -226,7 +233,9 @@ class CallLlamaCppServer:
             temperature=temperature if temperature is not None else config.llmTemperature,
             max_tokens=max_tokens if max_tokens is not None else config.llamacppMainModel_max_tokens,
             stream=True,
-            #**config.groqApi_main_model_additional_chat_options,
+            stop=config.customToolServer_stop,
+            timeout=config.customToolServer_timeout,
+            **config.customToolServer_additional_options,
         )
 
     @staticmethod
@@ -244,7 +253,9 @@ class CallLlamaCppServer:
                 "type": "json_object",
                 "schema": schema,
             },
-            #**config.groqApi_main_model_additional_chat_options,
+            stop=config.customToolServer_stop,
+            timeout=config.customToolServer_timeout,
+            **config.customToolServer_additional_options,
         )
         responseDict = json.loads(completion.choices[0].message.content)
         return responseDict
@@ -386,6 +397,9 @@ Remember, answer either 'yes' or 'no' in JSON, without extra information.""",
                         "required": ["answer"],
                     },
                 },
+                stop=config.customToolServer_stop,
+                timeout=config.customToolServer_timeout,
+                **config.customToolServer_additional_options,
             )
             answer = json.loads(chat_completion.choices[0].message.content)["answer"]
         except:

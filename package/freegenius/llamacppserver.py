@@ -112,7 +112,9 @@ class LlamacppServerChat:
                         max_tokens=config.llamacppChatModel_max_tokens,
                         n=1,
                         stream=True,
-                        #**config.groqApi_chat_model_additional_chat_options,
+                        stop=config.customChatServer_stop,
+                        timeout=config.customChatServer_timeout,
+                        **config.customChatServer_additional_options,
                     )
 
                     # Create a new thread for the streaming task

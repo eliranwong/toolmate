@@ -46,7 +46,7 @@ FreeGenius AI supports four interfaces: llamcpp, ollama, gemini, and chatgpt. It
 
 * llamacpp - [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library)
 
-* llamacppserver - [Llama.cpp](https://github.com/ggerganov/llama.cpp) [server](https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library) - This option supports llama.cpp, [compiled from source](https://github.com/ggerganov/llama.cpp#build), with GPU acceleration. Read more at https://github.com/eliranwong/freegenius/wiki/Llama.cpp-Server-for-GPU-Acceleration
+* llamacppserver - [Llama.cpp](https://github.com/ggerganov/llama.cpp) [server](https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library) - This option supports llama.cpp, [compiled from source](https://github.com/ggerganov/llama.cpp#build), with GPU acceleration. Read more at https://github.com/eliranwong/freegenius/wiki/Llama.cpp-Server-with-GPU-Acceleration
 
 * ollama - [Ollama](https://ollama.com/) / [Ollama Hosted models](https://ollama.com/library)
 
@@ -137,9 +137,7 @@ To run:
 
 ## GPU Acceleration
 
-[AMD GPUs](https://github.com/eliranwong/freegenius/wiki/FreeGenius-with-AMD-GPU-Acceleration)
-
-[Nvidia GPUs](https://github.com/eliranwong/freegenius/wiki/FreeGenius-with-Nvidia-GPU-Acceleration)
+Read https://github.com/eliranwong/freegenius/wiki/Speed-Up-with-GPU-Acceleration
 
 ## What to Expect During the Initial Launch?
 

@@ -325,21 +325,32 @@ def stopAutogenstudioServer():
 def getOllamaServerClient(server="main"):
     return Client(host=f"http://{config.ollamaChatServer_ip if server=='chat' else config.ollamaToolServer_ip}:{config.ollamaChatServer_port if server=='chat' else config.ollamaToolServer_port}")
 
-def getLlamacppServerClient(server="main"):
-    ips = {
-        "main": config.customToolServer_ip,
-        "chat": config.customChatServer_ip,
-        "vision": config.customVisionServer_ip,
-    }
-    ports = {
-        "main": config.customToolServer_port,
-        "chat": config.customChatServer_port,
-        "vision": config.customVisionServer_port,
-    }
-    return OpenAI(
-        base_url=f"http://{ips[server]}:{ports[server]}/v1",
-        api_key = "freegenius",
-    )
+def getLlamacppServerClient(server="tool"):
+    def getNewClient():
+        ips = {
+            "tool": config.customToolServer_ip,
+            "chat": config.customChatServer_ip,
+            "vision": config.customVisionServer_ip,
+        }
+        ports = {
+            "tool": config.customToolServer_port,
+            "chat": config.customChatServer_port,
+            "vision": config.customVisionServer_port,
+        }
+        return OpenAI(
+            base_url=f"http://{ips[server]}:{ports[server]}/v1",
+            api_key = "freegenius",
+        )
+    if server == "tool":
+        if (not hasattr(config, "llamacppserver_tool_client")) or (hasattr(config, "llamacppserver_tool_client") and config.llamacppserver_tool_client is None):
+            config.llamacppserver_tool_client = getNewClient()
+        return config.llamacppserver_tool_client
+    elif server == "chat":
+        if (not hasattr(config, "llamacppserver_chat_client")) or (hasattr(config, "llamacppserver_chat_client") and config.llamacppserver_chat_client is None):
+            config.llamacppserver_chat_client = getNewClient()
+        return config.llamacppserver_chat_client
+    else:
+        return getNewClient()
 
 def startLlamacppServer():
     try:

@@ -158,6 +158,12 @@ class StreamingWordWrapper:
                     # speak streaming words
                     self.readAnswer(answer)
             else:
+                if hasattr(config, "llamacppserver_chat_client") and config.llamacppserver_chat_client is not None:
+                    config.llamacppserver_chat_client.close()
+                    config.llamacppserver_chat_client = None
+                elif hasattr(config, "llamacppserver_tool_client") and config.llamacppserver_tool_client is not None:
+                    config.llamacppserver_tool_client.close()
+                    config.llamacppserver_tool_client = None
                 finishOutputs(wrapWords, chat_response)
                 return None
         

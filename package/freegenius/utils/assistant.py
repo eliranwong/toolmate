@@ -1,4 +1,4 @@
-from freegenius import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput
+from freegenius import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, getLlamacppServerClient
 from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile
 from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runFreeGeniusCommand
 from freegenius.utils.call_llm import CallLLM
@@ -1159,7 +1159,8 @@ class FreeGenius:
                 "vision": config.customVisionServer_command,
             }
             command = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=commands[server])
-            if command and not command.strip().lower() == config.exit_entry:
+            if command == "" or (command and not command.strip().lower() == config.exit_entry):
+                # allow empty string to use built-in server
                 if server=="chat":
                     config.customChatServer_command = command
                 elif server=="vision":
@@ -1180,7 +1181,8 @@ class FreeGenius:
             print2(f"Enter custom {server} server read/write timeout in seconds below:")
             setTimeout()
         # try to start server
-        runFreeGeniusCommand(f"custom{server}server")
+        if server in ("tool", "chat"):
+            runFreeGeniusCommand(f"custom{server}server")
 
     def setLlmModel_llamacpp(self, feature="default"):
         library = self.dialogs.getValidOptions(

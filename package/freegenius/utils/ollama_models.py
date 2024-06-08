@@ -1,4 +1,9 @@
 ollama_models = (
+    "qwen2",
+    "qwen2:0.5b",
+    "qwen2:1.5b",
+    "qwen2:7b",
+    "qwen2:72b",
     "deepseek-v2",
     "deepseek-v2:16b",
     "deepseek-v2:236b",

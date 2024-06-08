@@ -105,7 +105,7 @@ class LlamacppServerChat:
                 config.pagerContent = ""
 
                 try:
-                    completion = getLlamacppServerClient("chat" if config.useAdditionalChatModel else "main").chat.completions.create(
+                    completion = getLlamacppServerClient("chat" if config.useAdditionalChatModel else "tool").chat.completions.create(
                         model="freegenius",
                         messages=self.messages,
                         temperature=self.temperature,
@@ -138,6 +138,7 @@ class LlamacppServerChat:
             prompt = ""
 
         print2(f"\n{self.name} closed!")
+        config.llamacppserver_chat_client = None
         if hasattr(config, "currentMessages"):
             print2(f"Return back to {config.freeGeniusAIName} prompt ...")
 

@@ -278,6 +278,8 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "llamacppserver_tool_client",
+    "llamacppserver_chat_client",
     "tempInterface",
     "llamacppServer",
     "llamacppChatServer",

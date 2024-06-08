@@ -83,6 +83,9 @@ def createShortcuts():
 
     # additional shortcuts on Linux
     elif thisOS == "Linux":
+        # overide gfx version, if any; for GPU acceleration with ROCm
+        gfx = os.getenv("HSA_OVERRIDE_GFX_VERSION")
+        prefix = f"env HSA_OVERRIDE_GFX_VERSION={gfx} " if gfx else ""
         def desktopFileContent():
             iconPath = os.path.join(config.freeGeniusAIFolder, "icons", f"{appName}.png")
             if not os.path.isfile(iconPath):
@@ -94,7 +97,7 @@ Version=1.0
 Type=Application
 Terminal=true
 Path={config.freeGeniusAIFolder}
-Exec={sys.executable} {config.freeGeniusAIFile}
+Exec={prefix}{sys.executable} {config.freeGeniusAIFile}
 Icon={iconPath}
 Name={config.freeGeniusAIName}
 """
@@ -131,7 +134,7 @@ Name={config.freeGeniusAIName}
 Version=1.0
 Type=Application
 Path={config.freeGeniusAIFolder}
-Exec={sys.executable} {systemtrayFile}
+Exec={prefix}{sys.executable} {systemtrayFile}
 Icon={iconPath}
 Name={config.freeGeniusAIName} Hub
 """

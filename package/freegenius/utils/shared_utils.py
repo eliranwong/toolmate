@@ -544,6 +544,11 @@ def textTool(tool="", content=""):
 def getHideOutputSuffix():
     return f" > {'nul' if config.thisPlatform == 'Windows' else '/dev/null'} 2>&1"
 
+def getAlias(alias):
+    findAlias = f"/bin/bash -ic 'alias {alias}'"
+    aliasOutput, *_ = subprocess.Popen(findAlias, shell=True, stdout=subprocess.PIPE, text=True).communicate()
+    return re.sub("^.*?=.(.*?).$", r"\1", aliasOutput.strip())
+
 def runFreeGeniusCommand(command):
     def createShortcutFile(filePath, content):
         with open(filePath, "w", encoding="utf-8") as fileObj:
@@ -557,6 +562,10 @@ def runFreeGeniusCommand(command):
     args = command.split()
     firstArg = args[0]
     fullCommand = shutil.which(firstArg)
+    if not fullCommand and config.thisPlatform in ("macOS", "Linux"):
+        fullCommand = getAlias(firstArg)
+    if not fullCommand:
+        return
     fullCommand += f" {' '.join(args[1:])}" if args[1:] else ""
 
     if config.thisPlatform == "Windows":

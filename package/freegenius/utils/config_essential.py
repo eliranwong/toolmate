@@ -157,7 +157,7 @@ defaultSettings = (
     ('mouseSupport', False),
     ('autoUpgrade', True),
     #('chatbot', 'chatgpt'),
-    ('customTrayCommands', ['mistral', 'llama2']),
+    ('customTrayCommands', ['mistral', 'llama3']),
     ('chatGPTApiModel', 'gpt-4o'),
     ('chatGPTApiMaxTokens', 4000),
     ('chatGPTApiMinTokens', 256),

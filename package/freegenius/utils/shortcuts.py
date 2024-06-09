@@ -162,7 +162,7 @@ Name={config.freeGeniusAIName} Hub
                 pass
 
     # create utilities
-    #createUtilities()
+    createUtilities()
     #createAppAlias()
 
 def createUtilities():
@@ -174,7 +174,7 @@ def createUtilities():
         pass
 
     thisOS = platform.system()
-    if thisOS == "Windows":
+    if thisOS == "Windows_": # support Windows later
         work_with_text_script = f'''param (
     [string]$selected_text
 )
@@ -190,9 +190,13 @@ Start-Process "{sys.executable} {config.freeGeniusAIFile} $selected_text"'''
         # 1. Launch "Settings"
         # 2. Go to "Keyboard" > "Keyboard Shortcuts" > "View and Customise Shortcuts" > "Custom Shortcuts"
         # 3. Select "+" to add a custom shortcut and enter the following information, e.g.:
-        # Name: LetMeDoIt AI
-        # Command: /usr/bin/gnome-terminal --command ~/letmedoit/letmedoit.sh
-        # Shortcut: Ctrl + Alt + L
+        """
+        Name: FreeGenius AI
+        Command: /usr/bin/gnome-terminal --command /home/username/freegenius/FreeGenius
+        Shortcut: Ctrl + Alt + L
+        """
+        # Remarks: change ```username``` to your username
+
         # get selected text
         work_with_text_script = f'''#!/usr/bin/env bash
 selected_text=$(echo "$(xsel -o)" | sed 's/"/\"/g')
@@ -279,7 +283,7 @@ echo "$path" > {storage}/selected_files.txt
             scriptFiles.append(work_with_files_script_path)
         for i in scriptFiles:
             os.chmod(i, 0o755)
-    elif thisOS == "Darwin":
+    elif thisOS == "Darwin_": # support macOS later
         file1 = os.path.join(config.freeGeniusAIFolder, "macOS_service/FreeGenius_Text_workflow/Contents/document.wflow")
         file2 = os.path.join(config.freeGeniusAIFolder, "macOS_service/FreeGenius_Files_workflow/Contents/document.wflow")
         file3 = os.path.join(config.freeGeniusAIFolder, "macOS_service/FreeGenius_Explanation_workflow/Contents/document.wflow")

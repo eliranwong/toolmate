@@ -72,7 +72,7 @@ class Prompts:
                 else:
                     buffer.cursor_position = buffer.cursor_position + buffer.document.get_end_of_line_position()
             else:
-                run_in_terminal(lambda: print2("Install PyAudio first to enable voice entry!"))
+                run_in_terminal(lambda: print2("Install PyAudio first to enable voice recognition!"))
         @this_key_bindings.add(*config.hotkey_voice_recognition_config)
         def _(event):
             buffer = event.app.current_buffer

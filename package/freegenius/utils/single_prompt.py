@@ -48,7 +48,7 @@ class SinglePrompt:
                 else:
                     buffer.cursor_position = buffer.cursor_position + buffer.document.get_end_of_line_position()
             else:
-                run_in_terminal(lambda: print2("Install PyAudio first to enable voice entry!"))
+                run_in_terminal(lambda: print2("Install PyAudio first to enable voice recognition!"))
 
         if hasattr(config, "currentMessages"):
             from freegenius.utils.prompt_shared_key_bindings import prompt_shared_key_bindings

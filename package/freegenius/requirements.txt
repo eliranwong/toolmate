@@ -17,7 +17,8 @@ soundfile==0.12.1
 sounddevice==0.4.7
 elevenlabs==1.2.2
 huggingface-hub==0.23.3
-langchain==0.2.3
+langchain==0.2.5
+langchain-community==0.2.5
 langchain-openai==0.1.8
 guidance==0.1.15
 requests

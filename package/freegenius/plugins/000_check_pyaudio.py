@@ -33,5 +33,5 @@ except:
         config.pyaudioInstalled = False
 
 if not config.pyaudioInstalled:
-    print3("Note: 'ffmpeg' is not installed.")
-    print1("It is essential for built-in voice typing feature.")
+    print3("Note: 'pyAudio' is not installed.")
+    print1("It is essential for built-in voice recognition feature.")

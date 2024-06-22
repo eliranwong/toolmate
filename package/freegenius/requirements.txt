@@ -27,7 +27,7 @@ pendulum
 folium
 seaborn[stats]
 sympy
-numpy
+numpy==1.26.4
 prompt_toolkit
 Pygments
 datetime

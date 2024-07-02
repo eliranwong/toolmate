@@ -1,5 +1,11 @@
+llama-cpp-python[server]==0.2.81
+triton==2.3.0
+torch==2.3.0
+torchaudio==2.3.0
+torchvision==0.18.0
+numpy==1.26.4
+protobuf==4.25.3
 cmake==3.29.3
-llama-cpp-python[server]==0.2.77
 ollama==0.2.1
 groq==0.8.0
 openai==1.32.0
@@ -8,9 +14,6 @@ google-cloud-aiplatform==1.54.0
 pyautogen[retrievechat,autobuild]==0.2.28
 transformers==4.41.2
 sentence-transformers==3.0.1
-torch==2.3.0
-torchaudio==2.3.0
-torchvision==0.18.0
 chromadb==0.5.0
 autogenstudio==0.0.56
 soundfile==0.12.1
@@ -27,7 +30,6 @@ pendulum
 folium
 seaborn[stats]
 sympy
-numpy==1.26.4
 prompt_toolkit
 Pygments
 datetime

@@ -1,4 +1,11 @@
 ollama_models = (
+    "gemma2",
+    "gemma2:9b",
+    "gemma2:27b",
+    "gemma2:27b-instruct-fp16",
+    "deepseek-coder-v2",
+    "deepseek-coder-v2:16b",
+    "deepseek-coder-v2:236b",
     "qwen2",
     "qwen2:0.5b",
     "qwen2:1.5b",

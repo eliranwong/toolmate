@@ -12,6 +12,10 @@ https://github.com/eliranwong/freegenius/wiki/Beyond-LetMeDoIt-AI
 
 ![plugins](https://github.com/eliranwong/freegenius/assets/25262722/6bb4b2f6-5684-42c1-95e3-7b12c3a38db6)
 
+# Support GPU Offloading
+
+![llamacpp_with_gpu_offloading_compressed](https://github.com/eliranwong/freegenius/assets/25262722/2d607fc1-e6b5-4c62-be14-325d73866fce)
+
 # Access to Real-time Data
 
 ![realtime_information](https://github.com/eliranwong/freegenius/assets/25262722/d94fd9c3-f242-4c8c-8564-308f866e9adb)

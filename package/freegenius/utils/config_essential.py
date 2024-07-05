@@ -239,7 +239,7 @@ defaultSettings = (
     ("pyaudioInstalled", False),
     ("voiceTypingPlatform", "google"), # "google", "googlecloud", "whisper"
     ("voiceTypingLanguage", "en-US"), # https://cloud.google.com/speech-to-text/docs/speech-to-text-supported-languages
-    ("voiceTypingAdjustAmbientNoise", False),
+    ("voiceTypingAdjustAmbientNoise", True),
     ("voiceTypingNotification", True),
     ("voiceTypingAutoComplete", False),
     ("voiceTypingWhisperEnglishModel", "base"), # "tiny", "base", "small", "medium", "large"; read https://github.com/openai/whisper/tree/main#available-models-and-languages

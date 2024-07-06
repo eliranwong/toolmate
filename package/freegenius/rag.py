@@ -11,8 +11,9 @@ from autogen.retrieve_utils import TEXT_FORMATS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
+# from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 # from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from freegenius.utils.streaming_word_wrapper import StreamingWordWrapper
 
@@ -37,7 +38,8 @@ class RAG:
             i.metadata["source"] = i.metadata["source"][0]
         # https://python.langchain.com/docs/integrations/text_embedding/sentence_transformers
         #embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-        embedding = OpenAIEmbeddings(model=config.embeddingModel) if config.embeddingModel in ("text-embedding-3-large", "text-embedding-3-small", "text-embedding-ada-002") else SentenceTransformerEmbeddings(model_name=config.embeddingModel)
+        #embedding = OpenAIEmbeddings(model=config.embeddingModel) if config.embeddingModel in ("text-embedding-3-large", "text-embedding-3-small", "text-embedding-ada-002") else SentenceTransformerEmbeddings(model_name=config.embeddingModel)
+        embedding = OpenAIEmbeddings(model=config.embeddingModel) if config.embeddingModel in ("text-embedding-3-large", "text-embedding-3-small", "text-embedding-ada-002") else HuggingFaceEmbeddings(model_name=config.embeddingModel)
         # https://python.langchain.com/docs/integrations/vectorstores/chroma
         # https://github.com/langchain-ai/langchain/issues/7804
         vectorstore = Chroma.from_documents(
@@ -59,7 +61,7 @@ class RAG:
         else:
             retriever = vectorstore.as_retriever()
         # retrieve document
-        retrieved_docs = retriever.get_relevant_documents(query)
+        retrieved_docs = retriever.invoke(query)
         if not retrieved_docs:
             return None
         else:
@@ -158,7 +160,7 @@ Please answer my question, based on the context given above."""
 
             # Create a new thread for the streaming task
             streaming_event = threading.Event()
-            self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("chatgpt", "letmedoit") else False))
+            self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False))
             # Start the streaming thread
             self.streaming_thread.start()
 

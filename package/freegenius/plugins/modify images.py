@@ -76,7 +76,7 @@ def modify_images(function_args):
             if new_height and not new_height.strip().lower() == config.exit_entry and int(new_height) > 0:
                 height = int(new_height)
             image_description = client.chat.completions.create(
-                model="gpt-4-vision-preview",
+                model="gpt-4o",
                 messages=[
                     {
                     "role": "user",
@@ -137,7 +137,7 @@ def get_description(filename):
         content.insert(0, {"type": "text", "text": "Describe this image in as much detail as possible, including color patterns, positions and orientations of all objects and backgrounds in the image",})
 
         response = OpenAI().chat.completions.create(
-            model="gpt-4-vision-preview",
+            model="gpt-4o",
             messages=[
                 {
                 "role": "user",

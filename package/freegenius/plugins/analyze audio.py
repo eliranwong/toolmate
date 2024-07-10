@@ -6,10 +6,10 @@ analyze audio file
 [FUNCTION_CALL]
 """
 
-from freegenius import config, showErrors
+from freegenius import config, showErrors, getGroqClient
 from freegenius import print1, print2, print3
 from freegenius.utils.sttLanguages import googleSpeeckToTextLanguages
-import os, whisper, io, shutil
+import os, whisper, io, shutil, subprocess
 import speech_recognition as sr
 from pydub import AudioSegment
 
@@ -51,6 +51,39 @@ def analyze_audio(function_args):
                 return transcript
             except:
                 showErrors()
+            return ""
+
+        elif config.llmInterface == "groq":
+            if shutil.which("ffmpeg"):
+                temp_audio_file = os.path.join(config.freeGeniusAIFolder, "temp", os.path.basename(audio_file))
+                if os.path.isfile(temp_audio_file):
+                    os.remove(temp_audio_file)
+                cli = f'''ffmpeg -i "{audio_file}" -ar 16000 -ac 1 -map 0:a: "{temp_audio_file}"'''
+                run_cli = subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                *_, stderr = run_cli.communicate()
+                if not stderr:
+                    audio_file = temp_audio_file
+            if not check_file_format(audio_file):
+                print3("This feature supports the following input file types only: '.mp3', '.mp4', '.mpeg', '.mpga', '.m4a', '.wav', '.webm'!")
+                return ""
+            elif os.path.getsize(audio_file) / (1024*1024) > 25:
+                print3("Audio files are currently limited to 25 MB!")
+                return ""
+            try:
+                # read https://console.groq.com/docs/speech-text
+                with open(audio_file, "rb") as file:
+                    transcription = getGroqClient().audio.transcriptions.create(
+                        file=(audio_file, file.read()),
+                        model="whisper-large-v3",
+                        #prompt="Specify context or spelling",  # Optional
+                        #response_format="json",  # Optional
+                        language="en",  # Optional
+                        temperature=0.0  # Optional
+                    )
+                    return transcription.text
+            except:
+                showErrors()
+            return ""
 
         elif config.llmInterface == "gemini":
 
@@ -60,8 +93,8 @@ def analyze_audio(function_args):
             # convert mp3
             if audio_file.lower().endswith(".mp3"):
                 sound = AudioSegment.from_mp3(audio_file)
-                tempFile = os.path.join(config.freeGeniusAIFolder, "temp", os.path.basename(audio_file))
-                sound.export(tempFile, format='wav')
+                audio_file = os.path.join(config.freeGeniusAIFolder, "temp", os.path.basename(audio_file))
+                sound.export(audio_file, format='wav')
 
             # open the audio file
             with sr.AudioFile(audio_file) as source:
@@ -89,8 +122,8 @@ def analyze_audio(function_args):
             # convert mp3
             if audio_file.lower().endswith(".mp3"):
                 sound = AudioSegment.from_mp3(audio_file)
-                tempFile = os.path.join(config.freeGeniusAIFolder, "temp", os.path.basename(audio_file))
-                sound.export(tempFile, format='wav')
+                audio_file = os.path.join(config.freeGeniusAIFolder, "temp", os.path.basename(audio_file))
+                sound.export(audio_file, format='wav')
 
             # Instantiates a client
             client = speech.SpeechClient.from_service_account_json(config.google_cloud_credentials)
@@ -126,7 +159,7 @@ def analyze_audio(function_args):
                 print1("Read https://github.com/openai/whisper/tree/main#setup")
                 return ""
             # https://github.com/openai/whisper/tree/main#python-usage
-            # platform: llamacpp or ollama or groq
+            # platform: llamacpp or ollama
             if language.lower() in ("english", "non-english"):
                 model = whisper.load_model(config.voiceTypingWhisperEnglishModel if language.lower() == "english" else "large")
                 result = model.transcribe(audio_file)

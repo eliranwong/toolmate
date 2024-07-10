@@ -15,7 +15,7 @@ Platform: gemini
 Model: Gemini Pro Vision
 
 Platform: chaptgpt, letmedoit
-Model "gpt-4-vision-preview"
+Model "gpt-4o"
 Reference: https://platform.openai.com/docs/guides/vision
 
 [FUNCTION_CALL]
@@ -92,7 +92,7 @@ def analyze_images(function_args):
         content.insert(0, {"type": "text", "text": query,})
 
         response = client.chat.completions.create(
-            model="gpt-4-vision-preview",
+            model="gpt-4o",
             messages=[
                 {
                 "role": "user",

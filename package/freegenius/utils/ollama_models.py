@@ -1,4 +1,10 @@
 ollama_models = (
+    "codegeex4",
+    "codegeex4:9b",
+    "glm4",
+    "glm4:9b",
+    "internlm2",
+    "internlm2:7b",
     "gemma2",
     "gemma2:9b",
     "gemma2:27b",

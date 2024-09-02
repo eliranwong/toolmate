@@ -171,7 +171,7 @@ class FreeGenius:
             ".togglemousesupport": (f"toogle mouse support {str(config.hotkey_toggle_mouse_support)}", self.toggleMouseSupport),
             ".toggletextbrightness": (f"swap text brightness {str(config.hotkey_swap_text_brightness)}", swapTerminalColors),
             ".togglewordwrap": (f"toggle word wrap {str(config.hotkey_toggle_word_wrap)}", self.toggleWordWrap),
-            ".toggleimprovedwriting": (f"toggle improved writing {str(config.hotkey_toggle_writing_improvement)}", self.toggleImprovedWriting),
+            #".toggleimprovedwriting": (f"toggle improved writing {str(config.hotkey_toggle_writing_improvement)}", self.toggleImprovedWriting),
             ".toggleinputaudio": (f"toggle input audio {str(config.hotkey_toggle_input_audio)}", toggleinputaudio),
             ".toggleoutputaudio": (f"toggle output audio {str(config.hotkey_toggle_response_audio)}", toggleoutputaudio),
             ".code": (f"extract the python code from the last response", self.extractPythonCodeFromLastResponse),
@@ -2119,9 +2119,15 @@ class FreeGenius:
                     if userInput and config.ttsInput:
                         TTSUtil.play(userInput)
                     # Feature: improve writing:
-                    specialEntryPattern = "\[TOOL_[^\[\]]*?\]|\[NO_TOOL\]|\[NO_SCREENING\]"
-                    specialEntry = re.search(specialEntryPattern, userInput)
-                    specialEntry = specialEntry.group(0) if specialEntry else ""
+                    #specialEntryPattern = "\[TOOL_[^\[\]]*?\]|\[NO_TOOL\]|\[NO_SCREENING\]"
+                    #specialEntry = re.search(specialEntryPattern, userInput)
+                    #specialEntry = specialEntry.group(0) if specialEntry else ""
+                    toolNames = "|".join(config.toolFunctionMethods.keys())
+                    specialEntryPattern = f"@(none|{toolNames})[ \n]"
+                    specialEntries = re.findall(specialEntryPattern, userInput)
+                    specialEntry = specialEntries[0] if specialEntries else ""
+                    # TODO: remove improved writing feature temporarily, will move to a separate tool, for better tool management
+                    '''
                     userInput = re.sub(specialEntryPattern, "", userInput) # remove special entry temporarily
                     if userInput and config.displayImprovedWriting:
                         userInput = re.sub("\n\[Current time: [^\n]*?$", "", userInput)
@@ -2141,6 +2147,7 @@ My writing:
                                 TTSUtil.play(userInput)
                     if specialEntry:
                         userInput = f"{userInput}{specialEntry}"
+                    '''
                     # refine messages before running completion
                     fineTunedUserInput = self.fineTuneUserInput(userInput)
                     # in case of translation
@@ -2172,14 +2179,21 @@ My writing:
                         fineTunedUserInput = re.sub("\[CHAT\]|\[CHAT_[^\[\]]+?\]", "", fineTunedUserInput)
                         self.launchChatbot(chatbot, fineTunedUserInput)
                         continue
-                    # when user don't want a function call
-                    noFunctionCall = ("[NO_TOOL]" in fineTunedUserInput)
+                    #noFunctionCall = ("[NO_TOOL]" in fineTunedUserInput)
+                    if specialEntry == "none":
+                        # when user don't want a tool
+                        noFunctionCall = True
+                    else:
+                        if specialEntry:
+                            # when user specify a tool
+                            config.selectedTool = specialEntry
+                        noFunctionCall = False
                     # when user want to call a particular function
-                    checkCallSpecificFunction = re.search("\[TOOL_([^\[\]]+?)\]", fineTunedUserInput)
-                    config.selectedTool = checkCallSpecificFunction.group(1) if checkCallSpecificFunction and checkCallSpecificFunction.group(1) in config.toolFunctionMethods else ""
+                    #checkCallSpecificFunction = re.search("\[TOOL_([^\[\]]+?)\]", fineTunedUserInput)
+                    #config.selectedTool = checkCallSpecificFunction.group(1) if checkCallSpecificFunction and checkCallSpecificFunction.group(1) in config.toolFunctionMethods else ""
                     if config.developer and config.selectedTool:
                         #print1(f"calling function '{config.selectedTool}' ...")
-                        print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Calling function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{config.selectedTool}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
+                        print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Calling tool</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{config.selectedTool}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
                     fineTunedUserInput = re.sub(specialEntryPattern, "", fineTunedUserInput)
                     config.currentMessages.append({"role": "user", "content": fineTunedUserInput})
 

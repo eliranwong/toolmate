@@ -54,11 +54,11 @@ class Plugins:
                         config.pluginExcludeList.append(plugin)
         if internetSeraches in config.pluginExcludeList:
             del config.toolFunctionSchemas["integrate_google_searches"]
-        for i in config.toolFunctionMethods:
-            if not i in ("python_qa",):
-                callEntry = f"[TOOL_{i}]"
-                if not callEntry in config.inputSuggestions:
-                    config.inputSuggestions.append(callEntry)
+        #for i in config.toolFunctionMethods:
+        #    if not i in ("python_qa",):
+        #        callEntry = f"[TOOL_{i}]"
+        #        if not callEntry in config.inputSuggestions:
+        #            config.inputSuggestions.append(callEntry)
 
     # integrate function call plugin
     @staticmethod
@@ -71,6 +71,11 @@ class Plugins:
                 ToolStore.add_tool(signature)
                 if deviceInfo:
                     config.deviceInfoPlugins.append(name)
+                # input suggestions
+                if not name in ("python_qa",):
+                    callEntry = f"@{name}"
+                    if not callEntry in config.inputSuggestions:
+                        config.inputSuggestions.append(callEntry)
 
 class ToolStore:
 

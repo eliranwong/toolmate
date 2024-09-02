@@ -4,6 +4,8 @@ FreeGenius AI is an ambitious project sparked by the pioneering work of [LetMeDo
 
 As with [LetMeDoIt AI](https://github.com/eliranwong/letmedoit), FreeGenius AI is designed to be capable of engaging in intuitive conversations, executing codes, providing up-to-date information, and performing a wide range of tasks. It's designed to learn, adapt, and grow with the user, offering personalized experiences and interactions.
 
+Latest changes: https://github.com/eliranwong/freegenius/blob/main/latest_changes.md
+
 ## Beyond LetMeDoIt AI
 
 https://github.com/eliranwong/freegenius/wiki/Beyond-LetMeDoIt-AI
@@ -116,6 +118,47 @@ Remarks: Groq cloud currently does not support multimodal models. Other backends
 3. Google Text-to-Speech (API)
 4. Elevenlabs (API)
 5. Custom system commands
+
+# Quick Tool Calling
+
+Version 0.2.86+ supports use of `@` to call a specific tool:
+
+@integrate_google_searches
+@add_calendar_event
+@analyze_audio
+@analyze_files
+@analyze_images
+@analyze_web_content
+@correct_python
+@chat
+@build_agents
+@create_image
+@create_map
+@create_qrcode
+@create_statistical_graphics
+@datetimes
+@download_web_content
+@edit_text
+@execute_computing_task
+@install_package
+@save_memory
+@retrieve_memory
+@modify_images
+@open_browser
+@pronunce_words
+@remove_image_background
+@search_chats
+@load_chats
+@search_finance
+@search_latest_news
+@search_sqlite
+@search_weather_info
+@send_email
+@send_tweet
+
+To disable tool in for a single turn, use `@none`.
+
+Tips: Enter `@` to get input suggestions of available tools
 
 # Installation
 

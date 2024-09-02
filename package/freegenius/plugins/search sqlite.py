@@ -91,6 +91,5 @@ functionSignature = {
 
 config.addFunctionCall(signature=functionSignature, method=search_sqlite)
 
-config.inputSuggestions.append("""Connect the following SQLite file and tell me about the tables that it contains:
-[TOOL_search_sqlite]
+config.inputSuggestions.append("""@search_sqlite Connect the following SQLite file and tell me about the tables that it contains:
 \n""")

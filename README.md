@@ -14,6 +14,8 @@ https://github.com/eliranwong/freegenius/wiki/Beyond-LetMeDoIt-AI
 
 ![multiple_tools_in_single_prompt](https://github.com/user-attachments/assets/7bdc63cd-beca-44c9-bfb0-27596a5e0632)
 
+Read more at: https://github.com/eliranwong/freegenius/wiki/Multiple-Tools-in-Single-Prompt
+
 # Highly Customizable
 
 ![plugins](https://github.com/eliranwong/freegenius/assets/25262722/6bb4b2f6-5684-42c1-95e3-7b12c3a38db6)

@@ -10,6 +10,10 @@ Latest changes: https://github.com/eliranwong/freegenius/blob/main/latest_change
 
 https://github.com/eliranwong/freegenius/wiki/Beyond-LetMeDoIt-AI
 
+# Running Tools in a Single Prompt
+
+![multiple_tools_in_single_prompt](https://github.com/user-attachments/assets/7bdc63cd-beca-44c9-bfb0-27596a5e0632)
+
 # Highly Customizable
 
 ![plugins](https://github.com/eliranwong/freegenius/assets/25262722/6bb4b2f6-5684-42c1-95e3-7b12c3a38db6)
@@ -138,6 +142,8 @@ Version 0.2.86+ supports use of `@` to call a specific tool:
 @create_statistical_graphics
 @datetimes
 @download_web_content
+@download_youtube_audio
+@download_youtube_video
 @edit_text
 @execute_computing_task
 @install_package
@@ -153,7 +159,8 @@ Version 0.2.86+ supports use of `@` to call a specific tool:
 @search_latest_news
 @search_sqlite
 @search_weather_info
-@send_email
+@send_gamil
+@send_outlook
 @send_tweet
 
 To disable tool in for a single turn, use `@none`.

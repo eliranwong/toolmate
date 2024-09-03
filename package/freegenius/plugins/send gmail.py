@@ -58,8 +58,8 @@ https://outlook.office.com/owa/?path=/mail/action/compose&to=john.doe%40example.
 When you click on this URL, it will open a new window in Outlook web app and fill in the email details for you. You can then send or edit the email as you wish.
 """
 
-def send_email(function_args):
-    email = function_args.get("server", "gmail") # optional
+def send_gmail(function_args):
+    email = "gmail"
     recipient = function_args.get("email", "") # required
     subject = function_args.get("subject", "") # required
     body = function_args.get("body", "") # required
@@ -97,16 +97,11 @@ functionSignature = {
         "write an email",
         "send an email",
     ],
-    "name": "send_email",
+    "name": "send_gmail",
     "description": "send email",
     "parameters": {
         "type": "object",
         "properties": {
-            "server": {
-                "type": "string",
-                "description": "The email server. Return 'gmail' if not given.",
-                "enum": ['gmail', 'outlook'],
-            },
             "email": {
                 "type": "string",
                 "description": "The recipient of the email.",
@@ -124,4 +119,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=send_email)
+config.addFunctionCall(signature=functionSignature, method=send_gmail)

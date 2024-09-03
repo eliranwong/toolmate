@@ -2115,150 +2115,170 @@ class FreeGenius:
                 self.saveChat(config.currentMessages)
                 storagedirectory, config.currentMessages = startChat()
             elif userInput and not userInputLower in featuresLower:
-                try:
-                    if userInput and config.ttsInput:
-                        TTSUtil.play(userInput)
-                    # Feature: improve writing:
-                    #specialEntryPattern = "\[TOOL_[^\[\]]*?\]|\[NO_TOOL\]|\[NO_SCREENING\]"
-                    #specialEntry = re.search(specialEntryPattern, userInput)
-                    #specialEntry = specialEntry.group(0) if specialEntry else ""
-                    toolNames = "|".join(config.toolFunctionMethods.keys())
-                    specialEntryPattern = f"@(none|{toolNames})[ \n]"
-                    specialEntries = re.findall(specialEntryPattern, userInput)
-                    specialEntry = specialEntries[0] if specialEntries else ""
-                    # TODO: remove improved writing feature temporarily, will move to a separate tool, for better tool management
-                    '''
-                    userInput = re.sub(specialEntryPattern, "", userInput) # remove special entry temporarily
-                    if userInput and config.displayImprovedWriting:
-                        userInput = re.sub("\n\[Current time: [^\n]*?$", "", userInput)
-                        if config.isTermux:
-                            day_of_week = ""
-                        else:
-                            day_of_week = f"today is {getDayOfWeek()} and "
-                        improvedVersion = CallLLM.getSingleChatResponse(f"""Improve the following writing, according to {config.improvedWritingSytle}
+
+                # Feature: improve writing:
+                # TODO: remove improved writing feature temporarily, will move to a separate tool, for better tool management
+                '''
+                userInput = re.sub(specialEntryPattern, "", userInput) # remove special entry temporarily
+                if userInput and config.displayImprovedWriting:
+                    userInput = re.sub("\n\[Current time: [^\n]*?$", "", userInput)
+                    if config.isTermux:
+                        day_of_week = ""
+                    else:
+                        day_of_week = f"today is {getDayOfWeek()} and "
+                    improvedVersion = CallLLM.getSingleChatResponse(f"""Improve the following writing, according to {config.improvedWritingSytle}
 In addition, I would like you to help me with converting relative dates and times, if any, into exact dates and times based on the reference that {day_of_week}current datetime is {str(datetime.datetime.now())}.
 Remember, provide me with the improved writing only, enclosed in triple quotes ``` and without any additional information or comments.
 My writing:
 {userInput}""")
-                        if improvedVersion and improvedVersion.startswith("```") and improvedVersion.endswith("```"):
-                            print1(improvedVersion)
-                            userInput = improvedVersion[3:-3]
-                            if config.ttsOutput:
-                                TTSUtil.play(userInput)
-                    if specialEntry:
-                        userInput = f"{userInput}{specialEntry}"
-                    '''
-                    # refine messages before running completion
-                    fineTunedUserInput = self.fineTuneUserInput(userInput)
-                    # in case of translation
-                    if config.predefinedContext == "Let me Translate" and fineTunedUserInput.startswith("Assist me by acting as a translator.\nPlease translate"):
-                        print1("Please specify below the language you would like the content to be translated into:")
-                        language = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.translateToLanguage)
-                        if language and not language.strip().lower() in (config.cancel_entry, config.exit_entry):
-                            fineTunedUserInput = f"{fineTunedUserInput}\n\nPlease translate the content into <language>{language}</language>."
-                            config.translateToLanguage = language
-                        else:
-                            continue
-                    # clear config.predefinedContextTemp if any
-                    if config.predefinedContextTemp:
-                        config.predefinedContext = config.predefinedContextTemp
-                        config.predefinedContextTemp = ""
+                    if improvedVersion and improvedVersion.startswith("```") and improvedVersion.endswith("```"):
+                        print1(improvedVersion)
+                        userInput = improvedVersion[3:-3]
+                        if config.ttsOutput:
+                            TTSUtil.play(userInput)
+                if specialEntry:
+                    userInput = f"{userInput}{specialEntry}"
+                '''
+
+                ''' remove additional chatbot features temporarily for development of multiple actions
+                # if user call a chatbot without function calling
+                if "[CHAT]" in fineTunedUserInput:
+                    chatbot = config.llmInterface
+                elif callChatBot := re.search("\[CHAT_([^\[\]]+?)\]", fineTunedUserInput):
+                    chatbot = callChatBot.group(1).lower() if callChatBot and callChatBot.group(1).lower() in ("chatgpt", "geminipro", "palm2", "codey") else ""
+                else:
+                    chatbot = ""
+                if chatbot:
+                    # call the spcified chatbot to continue the conversation
+                    fineTunedUserInput = re.sub("\[CHAT\]|\[CHAT_[^\[\]]+?\]", "", fineTunedUserInput)
+                    self.launchChatbot(chatbot, fineTunedUserInput)
+                    continue
+                '''
+
+                ''' remove force loading internet searches feature temporarily for development of multiple actions
+                # force loading internet searches
+                # TODO: disable `always` when a tool is called
+                if config.loadingInternetSearches == "always":
+                    try:
+                        config.currentMessages = CallLLM.runSingleFunctionCall(config.currentMessages, "integrate_google_searches")
+                    except:
+                        print1("Unable to load internet resources.")
+                        showErrors()
+                '''
+
+                def runSingleAction(action: str, description: str):
+
+                    # Run TTS to read action content
+                    if description and config.ttsInput:
+                        TTSUtil.play(description)
+
                     # empty config.pagerContent
+                    # TODO: handle pagerContent for multiple actions
                     config.pagerContent = ""
 
-                    # check special entries
-                    # if user call a chatbot without function calling
-                    if "[CHAT]" in fineTunedUserInput:
-                        chatbot = config.llmInterface
-                    elif callChatBot := re.search("\[CHAT_([^\[\]]+?)\]", fineTunedUserInput):
-                        chatbot = callChatBot.group(1).lower() if callChatBot and callChatBot.group(1).lower() in ("chatgpt", "geminipro", "palm2", "codey") else ""
+                    if action == "chat":
+                        # when user don't want a tool, i.e. chat only
+                        doNotUseTool = True
+
+                        # Handle Pre-defined Contexts
+                        # refine messages before running completion, only when tool is not applied
+                        fineTunedUserInput = self.fineTuneUserInput(description)
+                        
+                        ''' remove `translation` feature temporarily, for development of multi-step actions
+                        # in case of translation
+                        if config.predefinedContext == "Let me Translate" and fineTunedUserInput.startswith("Assist me by acting as a translator.\nPlease translate"):
+                            print1("Please specify below the language you would like the content to be translated into:")
+                            language = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.translateToLanguage)
+                            if language and not language.strip().lower() in (config.cancel_entry, config.exit_entry):
+                                fineTunedUserInput = f"{fineTunedUserInput}\n\nPlease translate the content into <language>{language}</language>."
+                                config.translateToLanguage = language
+                            else:
+                                continue
+                        '''
+
+                        # reset `config.predefinedContext` and clear `config.predefinedContextTemp` if any
+                        if config.predefinedContextTemp:
+                            config.predefinedContext = config.predefinedContextTemp
+                            config.predefinedContextTemp = ""
+
+                        config.currentMessages.append({"role": "user", "content": fineTunedUserInput})
+
                     else:
-                        chatbot = ""
-                    if chatbot:
-                        # call the spcified chatbot to continue the conversation
-                        fineTunedUserInput = re.sub("\[CHAT\]|\[CHAT_[^\[\]]+?\]", "", fineTunedUserInput)
-                        self.launchChatbot(chatbot, fineTunedUserInput)
-                        continue
-                    #noFunctionCall = ("[NO_TOOL]" in fineTunedUserInput)
-                    if specialEntry == "none":
-                        # when user don't want a tool
-                        noFunctionCall = True
-                    else:
-                        if specialEntry:
+                        doNotUseTool = False
+
+                        if action:
                             # when user specify a tool
-                            config.selectedTool = specialEntry
-                        noFunctionCall = False
-                    # when user want to call a particular function
-                    #checkCallSpecificFunction = re.search("\[TOOL_([^\[\]]+?)\]", fineTunedUserInput)
-                    #config.selectedTool = checkCallSpecificFunction.group(1) if checkCallSpecificFunction and checkCallSpecificFunction.group(1) in config.toolFunctionMethods else ""
-                    if config.developer and config.selectedTool:
-                        #print1(f"calling function '{config.selectedTool}' ...")
-                        print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Calling tool</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{config.selectedTool}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
-                    fineTunedUserInput = re.sub(specialEntryPattern, "", fineTunedUserInput)
-                    config.currentMessages.append({"role": "user", "content": fineTunedUserInput})
+                            config.selectedTool = action
 
-                    # start spinning
-                    config.stop_event = threading.Event()
-                    config.spinner_thread = threading.Thread(target=spinning_animation, args=(config.stop_event,))
-                    config.spinner_thread.start()
+                            if config.developer:
+                                #print1(f"calling function '{config.selectedTool}' ...")
+                                print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Calling tool</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{config.selectedTool}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
 
-                    # force loading internet searches
-                    if config.loadingInternetSearches == "always":
-                        try:
-                            config.currentMessages = CallLLM.runSingleFunctionCall(config.currentMessages, "integrate_google_searches")
-                        except:
-                            print1("Unable to load internet resources.")
-                            showErrors()
+                        config.currentMessages.append({"role": "user", "content": description})
 
-                    completion = CallLLM.runGeniusCall(config.currentMessages, noFunctionCall)
-                    
-                    # stop spinning
-                    config.runPython = True
-                    stopSpinning()
+                    try:
+                        # start spinning
+                        config.stop_event = threading.Event()
+                        config.spinner_thread = threading.Thread(target=spinning_animation, args=(config.stop_event,))
+                        config.spinner_thread.start()
 
-                    if completion is not None:
-                        # Create a new thread for the streaming task
-                        streamingWordWrapper = StreamingWordWrapper()
-                        streaming_event = threading.Event()
-                        self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False))
-                        # Start the streaming thread
-                        self.streaming_thread.start()
+                        completion = CallLLM.runGeniusCall(config.currentMessages, doNotUseTool)
+                        
+                        # stop spinning
+                        config.runPython = True
+                        stopSpinning()
 
-                        # wait while text output is steaming; capture key combo 'ctrl+q' or 'ctrl+z' to stop the streaming
-                        streamingWordWrapper.keyToStopStreaming(streaming_event)
+                        if completion is not None:
+                            # Create a new thread for the streaming task
+                            streamingWordWrapper = StreamingWordWrapper()
+                            streaming_event = threading.Event()
+                            self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False))
+                            # Start the streaming thread
+                            self.streaming_thread.start()
 
-                        # when streaming is done or when user press "ctrl+q"
-                        self.streaming_thread.join()
+                            # wait while text output is steaming; capture key combo 'ctrl+q' or 'ctrl+z' to stop the streaming
+                            streamingWordWrapper.keyToStopStreaming(streaming_event)
 
-                # error codes: https://platform.openai.com/docs/guides/error-codes/python-library-error-types
-                except openai.APIError as e:
-                    stopSpinning()
-                    #Handle API error here, e.g. retry or log
-                    print1(f"OpenAI API returned an API Error: {e}")
-                except openai.APIConnectionError as e:
-                    stopSpinning()
-                    #Handle connection error here
-                    print1(f"Failed to connect to OpenAI API: {e}")
-                except openai.RateLimitError as e:
-                    stopSpinning()
-                    #Handle rate limit error (we recommend using exponential backoff)
-                    print1(f"OpenAI API request exceeded rate limit: {e}")
-                except:
-                    stopSpinning()
-                    trace = traceback.format_exc()
-                    if "Please reduce the length of the messages or completion" in trace:
-                        print1("Maximum tokens reached!")
-                    elif config.developer:
-                        print1(self.divider)
-                        print1(trace)
-                        print1(self.divider)
+                            # when streaming is done or when user press "ctrl+q"
+                            self.streaming_thread.join()
+
+                    except:
+                        # TODO: handle errors for multiple actions
+                        stopSpinning()
+                        trace = traceback.format_exc()
+                        if "Please reduce the length of the messages or completion" in trace:
+                            print1("Maximum tokens reached!")
+                        elif config.developer:
+                            print1(self.divider)
+                            print1(trace)
+                            print1(self.divider)
+                        else:
+                            print1("Error encountered!")
+
+                        config.defaultEntry = userInput
+                        print1("starting a new chat!")
+                        self.saveChat(config.currentMessages)
+                        storagedirectory, config.currentMessages = startChat()
+
+                toolNames = "|".join(config.toolFunctionMethods.keys())
+                actionPattern = f"@(chat|{toolNames})[ \n]"
+                actions = re.findall(actionPattern, userInput)
+                if not actions:
+                    # pass to screening or tool check operations
+                    runSingleAction("", userInput)
+                else:
+                    separator = "＊@＊@＊"
+                    descriptions = re.sub(actionPattern, separator, userInput).split(separator)
+                    if descriptions[0].strip():
+                        # in case content entered before the first action declared
+                        actions.insert(0, "chat")
                     else:
-                        print1("Error encountered!")
-
-                    config.defaultEntry = userInput
-                    print1("starting a new chat!")
-                    self.saveChat(config.currentMessages)
-                    storagedirectory, config.currentMessages = startChat()
+                        del descriptions[0]
+                    for index, action in enumerate(actions):
+                        description = descriptions[index]
+                        if description.strip():
+                            print3(f"\n@{action}: {description}")
+                            runSingleAction(action, description)
 
     def launchChatbot(self, chatbot, fineTunedUserInput):
         if not chatbot:

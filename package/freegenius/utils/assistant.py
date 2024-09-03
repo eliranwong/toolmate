@@ -160,8 +160,8 @@ class FreeGenius:
             ".systemmessage": ("change custom system message", self.setCustomSystemMessage),
             ".ipinfo": ("change ip information integration", self.setIncludeIpInSystemMessage),
             ".storagedirectory": ("change storage directory", self.setStorageDirectory),
-            ".voicerecognition": ("change voice recognition", self.setSpeechToTextConfig),
-            ".voicegeneration": ("change voice generation", self.setTextToSpeechConfig),
+            ".speechrecognition": ("change sppech recognition", self.setSpeechToTextConfig),
+            ".speechgeneration": ("change sppech generation", self.setTextToSpeechConfig),
             ".googleapiservice": ("change Google API service", self.selectGoogleAPIs),
             ".autobuilderconfig": ("change auto builder config", self.setAutoGenBuilderConfig),
             ".customtexteditor": ("change custom text editor", self.setCustomTextEditor),
@@ -172,7 +172,7 @@ class FreeGenius:
             ".togglemousesupport": (f"toogle mouse support {str(config.hotkey_toggle_mouse_support)}", self.toggleMouseSupport),
             ".toggletextbrightness": (f"swap text brightness {str(config.hotkey_swap_text_brightness)}", swapTerminalColors),
             ".togglewordwrap": (f"toggle word wrap {str(config.hotkey_toggle_word_wrap)}", self.toggleWordWrap),
-            ".toggleinputwriting": (f"toggle input writing {str(config.hotkey_toggle_writing_improvement)}", self.toggleInputWriting),
+            ".toggleinputimprovement": (f"toggle input improvement {str(config.hotkey_toggle_input_improvement)}", self.toggleInputImprovement),
             ".toggleinputaudio": (f"toggle input audio {str(config.hotkey_toggle_input_audio)}", toggleinputaudio),
             ".toggleoutputaudio": (f"toggle output audio {str(config.hotkey_toggle_response_audio)}", toggleoutputaudio),
             ".code": (f"extract the python code from the last response", self.extractPythonCodeFromLastResponse),
@@ -1581,15 +1581,15 @@ class FreeGenius:
         config.saveConfig()
         print3(f"Entry Mouse Support: '{'enabled' if config.mouseSupport else 'disabled'}'!")
 
-    def toggleInputWriting(self):
-        config.improveInputWriting = not config.improveInputWriting
-        if config.improveInputWriting:
+    def toggleInputImprovement(self):
+        config.improveInputEntry = not config.improveInputEntry
+        if config.improveInputEntry:
             print1("Please specify the writing style below:")
             style = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.improvedWritingSytle)
             if style and not style in (config.exit_entry, config.cancel_entry):
                 config.improvedWritingSytle = style
                 config.saveConfig()
-        print3(f"Improve Input Writing: '{'enabled' if config.improveInputWriting else 'disabled'}'!")
+        print3(f"Improve Input Entry: '{'enabled' if config.improveInputEntry else 'disabled'}'!")
 
     def setAudioPlaybackTool(self):
         playback = self.dialogs.getValidOptions(
@@ -1976,7 +1976,7 @@ class FreeGenius:
             if config.max_consecutive_auto_correction > 0:
                 CallLLM.autoCorrectPythonCode(script, trace)
 
-    def improveWriting(writing: str):
+    def improveWriting(self, writing: str):
         # Feature: improve writing:
         if writing:
             writing = re.sub("\n\[Current time: [^\n]*?$", "", writing)
@@ -1989,9 +1989,12 @@ In addition, I would like you to help me with converting relative dates and time
 Remember, provide me with the improved writing only, enclosed in triple quotes ``` and without any additional information or comments.
 My writing:
 {writing}""")
-            if improvedVersion and improvedVersion.startswith("```") and improvedVersion.endswith("```"):
-                print1(improvedVersion)
-                writing = improvedVersion[3:-3]
+            if improvedVersion:
+                writing = improvedVersion[3:-3] if improvedVersion.startswith("```") and improvedVersion.endswith("```") else re.sub("^.*?```(.*?)```.*?$", r"\1", improvedVersion)
+                try:
+                    print2(writing)
+                except:
+                    print(f"```\n{writing}\n```")
         return writing
 
     def startChats(self):
@@ -2166,7 +2169,7 @@ My writing:
                                 showErrors()
 
                     # Improve writing
-                    if config.improveInputWriting:
+                    if config.improveInputEntry:
                         description = self.improveWriting(description)
 
                     # Run TTS to read action content

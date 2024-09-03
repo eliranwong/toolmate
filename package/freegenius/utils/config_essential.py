@@ -217,7 +217,7 @@ defaultSettings = (
     ('defaultBlankEntryAction', ".context"),
     ('storagedirectory', ""),
     ('suggestSystemCommand', True),
-    ('improveInputWriting', False),
+    ('improveInputEntry', False),
     ('improvedWritingSytle', 'standard English'), # e.g. British spoken English
     ('ttsPlatform', "google"), # "google", "googlecloud", "elevenlabs", "custom"
     ('ttsInput', False),
@@ -267,7 +267,7 @@ defaultSettings = (
     ("hotkey_toggle_response_audio", ["c-y"]),
     ("hotkey_toggle_input_audio", ["escape", "y"]),
     ("hotkey_restart_app", ["escape", "r"]),
-    ("hotkey_toggle_writing_improvement", ["escape", "w"]),
+    ("hotkey_toggle_input_improvement", ["escape", "w"]),
     ("hotkey_toggle_word_wrap", ["c-w"]),
     ("hotkey_toggle_mouse_support", ["escape", "m"]),
     ("hotkey_edit_current_entry", ["c-e"]),

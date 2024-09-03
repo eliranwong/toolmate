@@ -129,42 +129,7 @@ Remarks: Groq cloud currently does not support multimodal models. Other backends
 
 Version 0.2.86+ supports use of `@` to call a specific tool:
 
-@integrate_google_searches
-@add_calendar_event
-@analyze_audio
-@analyze_files
-@analyze_images
-@analyze_web_content
-@ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2
-@correct_python
-@chat
-@build_agents
-@create_image
-@create_map
-@create_qrcode
-@create_statistical_graphics
-@datetimes
-@download_web_content
-@download_youtube_audio
-@download_youtube_video
-@edit_text
-@execute_computing_task
-@install_package
-@save_memory
-@retrieve_memory
-@modify_images
-@open_browser
-@pronunce_words
-@remove_image_background
-@search_chats
-@load_chats
-@search_finance
-@search_latest_news
-@search_sqlite
-@search_weather_info
-@send_gamil
-@send_outlook
-@send_tweet
+@integrate_google_searches @add_calendar_event @analyze_audio @analyze_files @analyze_images @analyze_web_content @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @correct_python @chat @build_agents @create_image @create_map @create_qrcode @create_statistical_graphics @datetimes @download_web_content @download_youtube_audio @download_youtube_video @edit_text @execute_computing_task @install_package @save_memory @retrieve_memory @modify_images @open_browser @pronunce_words @remove_image_background @search_chats @load_chats @search_finance @search_latest_news @search_sqlite @search_weather_info @send_gamil @send_outlook @send_tweet
 
 To disable tool in for a single turn, use `@none`.
 

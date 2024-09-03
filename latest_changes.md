@@ -1,3 +1,7 @@
+# Version: 0.2.89
+
+Fixed `improve input entry` feature.
+
 # Version: 0.2.88
 
 1. Added plugins `ask_chatgpt`, `ask_codey`, `ask_gemini`, `ask_groq`, `ask_llama3_1`, `ask_llamacpp`, `ask_llamacppserver`, `ask_ollama`, `ask_palm2` to call different chatbots for collaboration.  For example, with support of running `Multiple Tools in Single Prompt`, you can do something like:

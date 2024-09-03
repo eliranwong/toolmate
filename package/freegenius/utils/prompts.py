@@ -77,13 +77,13 @@ class Prompts:
         def _(event):
             buffer = event.app.current_buffer
             config.defaultEntry = buffer.text
-            buffer.text = ".voicerecognition"
+            buffer.text = ".speechrecognition"
             buffer.validate_and_handle()
         @this_key_bindings.add(*config.hotkey_voice_generation_config)
         def _(event):
             buffer = event.app.current_buffer
             config.defaultEntry = buffer.text
-            buffer.text = ".voicegeneration"
+            buffer.text = ".speechgeneration"
             buffer.validate_and_handle()
         @this_key_bindings.add(*config.hotkey_select_plugins)
         def _(event):
@@ -212,11 +212,11 @@ Available tokens: {estimatedAvailableTokens}
         def _(_):
             print(f"Restarting {config.freeGeniusAIName} ...")
             restartApp()
-        @this_key_bindings.add(*config.hotkey_toggle_writing_improvement)
+        @this_key_bindings.add(*config.hotkey_toggle_input_improvement)
         def _(_):
-            config.improveInputWriting = not config.improveInputWriting
+            config.improveInputEntry = not config.improveInputEntry
             config.saveConfig()
-            run_in_terminal(lambda: print3(f"Improved Writing Display: '{'enabled' if config.improveInputWriting else 'disabled'}'!"))
+            run_in_terminal(lambda: print3(f"Improved Writing Display: '{'enabled' if config.improveInputEntry else 'disabled'}'!"))
         @this_key_bindings.add(*config.hotkey_toggle_word_wrap)
         def _(_):
             config.wrapWords = not config.wrapWords
@@ -282,7 +282,7 @@ Available tokens: {estimatedAvailableTokens}
             str(config.hotkey_insert_filepath): "insert a file or folder path",
             str(config.hotkey_display_device_info): "display device information",
             str(config.hotkey_count_tokens): "count current message tokens",
-            str(config.hotkey_toggle_writing_improvement): "toggle improved writing feature",
+            str(config.hotkey_toggle_input_improvement): "toggle improved writing feature",
             str(config.hotkey_toggle_mouse_support): "toggle mouse support",
             str(config.hotkey_launch_system_prompt): "system command prompt",
             str(config.hotkey_swap_text_brightness): "swap text brightness",

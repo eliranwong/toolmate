@@ -37,6 +37,7 @@ class Plugins:
         execPythonFile(script)
         # always include the following plugins
         requiredPlugins = (
+            "chat",
             "auto correct python code",
             "execute computing tasks",
             "execute termux command",

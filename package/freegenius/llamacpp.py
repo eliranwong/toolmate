@@ -93,7 +93,7 @@ class LlamacppChat:
             self.messages = self.resetMessages()
             print("New chat started!")
 
-    def run(self, prompt=""):
+    def run(self, prompt="", once=False):
         if self.defaultPrompt:
             prompt, self.defaultPrompt = self.defaultPrompt, ""
         historyFolder = os.path.join(config.localStorage, "history")
@@ -175,6 +175,9 @@ class LlamacppChat:
                     print2(traceback.format_exc())
 
             prompt = ""
+
+            if once:
+                break
 
         print2(f"\n{self.name} closed!")
         if hasattr(config, "currentMessages"):

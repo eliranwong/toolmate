@@ -13,7 +13,7 @@ from freegenius.ollamachat import OllamaChat
 def ask_llava(function_args):
     query = function_args.get("query") # required
     config.stopSpinning()
-    OllamaChat().run(query, model="llava")
+    OllamaChat().run(query, model="llava", once=True)
     return ""
 
 functionSignature = {

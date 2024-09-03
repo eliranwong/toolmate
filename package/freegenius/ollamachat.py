@@ -80,7 +80,7 @@ class OllamaChat:
             self.messages = self.resetMessages()
             print("New chat started!")
 
-    def run(self, prompt="", model="mistral") -> None:        
+    def run(self, prompt="", model="mistral", once=False) -> None:        
         def extractImages(content) -> list:
             template = {
                 "image_filepath_list": [],
@@ -229,6 +229,9 @@ Here is my request:
                     print('Error:', e.error)
 
             prompt = ""
+
+            if once:
+                break
 
         print2(f"\n{model.capitalize()} closed!")
         if hasattr(config, "currentMessages"):

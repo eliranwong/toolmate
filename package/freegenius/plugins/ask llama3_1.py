@@ -10,18 +10,18 @@ Ask Llama2 for information
 from freegenius import config
 from freegenius.ollamachat import OllamaChat
 
-def ask_llama2(function_args):
+def ask_llama3_1(function_args):
     query = function_args.get("query") # required
     config.stopSpinning()
-    OllamaChat().run(query, model="llama2", once=True)
+    OllamaChat().run(query, model="llama3.1", once=True)
     return ""
 
 functionSignature = {
     "examples": [
-        "Ask Llama2",
+        "Ask Llama3.1",
     ],
-    "name": "ask_llama2",
-    "description": "Ask Llama2 to chat or provide information",
+    "name": "ask_llama3_1",
+    "description": "Ask Llama3.1 to chat or provide information",
     "parameters": {
         "type": "object",
         "properties": {
@@ -34,5 +34,5 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=ask_llama2)
-config.inputSuggestions.append("Ask Llama2: ")
+config.addFunctionCall(signature=functionSignature, method=ask_llama3_1)
+config.inputSuggestions.append("Ask Llama3.1: ")

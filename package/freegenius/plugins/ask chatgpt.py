@@ -8,21 +8,21 @@ Ask ChatGPT for conversation only; no function calling
 
 
 from freegenius import config
-from freegenius.llamacpp import LlamacppChat
+from freegenius.chatgpt import ChatGPT
 
-def ask_llamacpp(function_args):
+def ask_chatgpt(function_args):
     config.stopSpinning()
     query = function_args.get("query") # required
     config.currentMessages = config.currentMessages[:-1]
-    LlamacppChat().run(query)
+    ChatGPT().run(query, once=True)
     return ""
 
 functionSignature = {
     "examples": [
-        "Ask Llama.cpp",
+        "Ask ChatGPT",
     ],
-    "name": "ask_llamacpp",
-    "description": "Ask Llama.cpp to chat or provide information",
+    "name": "ask_chatgpt",
+    "description": "Ask ChatGPT to chat or provide information",
     "parameters": {
         "type": "object",
         "properties": {
@@ -35,5 +35,5 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=ask_llamacpp)
+config.addFunctionCall(signature=functionSignature, method=ask_chatgpt)
 config.inputSuggestions.append("Ask ChatGPT: ")

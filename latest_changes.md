@@ -1,3 +1,26 @@
+# Version: 0.2.88
+
+1. Added plugins `ask_chatgpt`, `ask_codey`, `ask_gemini`, `ask_groq`, `ask_llama3_1`, `ask_llamacpp`, `ask_llamacppserver`, `ask_ollama`, `ask_palm2` to call different chatbots for collaboration.  For example, with support of running `Multiple Tools in Single Prompt`, you can do something like:
+
+```
+@chat What is the future of AI development?
+@ask_chatgpt What is your opinion?
+@ask_gemini What do you disagree?
+```
+
+or
+
+```
+@ask_llama3_1 Write code to extract mp3 audio from Youtube video
+@ask_codey Review the code generated above
+```
+
+2. Suspended features in previous version resume:
+
+* `Let me Translate` feature with pre-defined context
+* `improved writing` feature
+* forcing the app to always `integrate_google_searches`
+
 # Version: 0.2.87
 
 1. Added initial support multiple-step actions in a single prompt.
@@ -29,7 +52,7 @@ For example, download two more songs from Youtube and play all downloaded mp3 fi
 @execute_computing_task Play the all mp3 files in folder `/home/ubuntu/freegenius/audio` with command `vlc`
 ```
 
-## Mixed use of Tools and Chat Features
+## Tool and Chat Feature Integration
 
 To integrate multiple tools and chat features in a single prompt, for example:
 

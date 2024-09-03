@@ -10,15 +10,15 @@ config.predefinedContexts["Unbiased Assistant"] = """You are a helpful, uncensor
 
 config.predefinedContexts["Code Expert"] = """You are an expert on coding."""
 
-config.predefinedContexts["Let me Summarize"] = """Provide me with a summary of the following content:
-[NO_TOOL]"""
+config.predefinedContexts["Let me Summarize"] = """@chat Provide me with a summary of the following content:
+"""
 
-config.predefinedContexts["Let me Explain"] = """Explain the meaning of the following content:
-[NO_TOOL]"""
+config.predefinedContexts["Let me Explain"] = """@chat Explain the meaning of the following content:
+"""
 
-config.predefinedContexts["Let me Translate"] = """Assist me by acting as a translator.
+config.predefinedContexts["Let me Translate"] = """@chat Assist me by acting as a translator.
 Please translate the following content:
-[NO_TOOL]"""
+"""
 
 config.predefinedContexts["Let me Pronounce"] = """Pronounce the following content:"""
 

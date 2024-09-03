@@ -1,27 +1,28 @@
 """
-FreeGenius AI Plugin - ask gemini pro
+FreeGenius AI Plugin - ask groq
 
-Ask Google Gemini Pro for information
+Ask Groq Model for conversation only; no function calling
 
 [FUNCTION_CALL]
 """
 
 
 from freegenius import config
-from freegenius.geminipro import GeminiPro
+from freegenius.groqchat import GroqChatbot
 
-def ask_gemini_pro(function_args):
+def ask_groq(function_args):
     config.stopSpinning()
     query = function_args.get("query") # required
-    GeminiPro(temperature=config.llmTemperature).run(query)
+    config.currentMessages = config.currentMessages[:-1]
+    GroqChatbot().run(query, once=True)
     return ""
 
 functionSignature = {
     "examples": [
-        "Ask Gemini",
+        "Ask Groq",
     ],
-    "name": "ask_gemini_pro",
-    "description": "Ask Gemini Pro to chat or provide information",
+    "name": "ask_groq",
+    "description": "Ask Groq to chat or provide information",
     "parameters": {
         "type": "object",
         "properties": {
@@ -34,5 +35,5 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=ask_gemini_pro)
-config.inputSuggestions.append("Ask Gemini Pro: ")
+config.addFunctionCall(signature=functionSignature, method=ask_groq)
+config.inputSuggestions.append("Ask Groq: ")

@@ -13,7 +13,7 @@ from freegenius.ollamachat import OllamaChat
 def ask_gemma(function_args):
     query = function_args.get("query") # required
     config.stopSpinning()
-    OllamaChat().run(query, model="gemma:7b")
+    OllamaChat().run(query, model="gemma:7b", once=True)
     return ""
 
 functionSignature = {

@@ -85,5 +85,5 @@ approaches = (
 )
 
 for approach in approaches:
-    config.predefinedContexts[f"Counselling - {approach}"] = f"""I want you to act as a counsellor using {approach}.
-[CHAT]"""
+    config.predefinedContexts[f"Counselling - {approach}"] = f"""@chat I want you to act as a counsellor using {approach}.
+"""

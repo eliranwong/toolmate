@@ -103,7 +103,7 @@ class GeminiProVision:
         query = function_args.get("query") # required
         files = function_args.get("image_filepath") # required
         if not files:
-            self.defaultPrompt = f"{query}\n[NO_TOOL]"
+            self.defaultPrompt = f"@chat {query}"
             return None
         if isinstance(files, str):
             if not files.startswith("["):

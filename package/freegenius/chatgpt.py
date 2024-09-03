@@ -67,7 +67,7 @@ class ChatGPT:
             return availableTokens
         return config.chatGPTApiMinTokens
 
-    def run(self, prompt=""):
+    def run(self, prompt="", once=False):
         if self.defaultPrompt:
             prompt, self.defaultPrompt = self.defaultPrompt, ""
         historyFolder = os.path.join(config.localStorage, "history")
@@ -150,6 +150,9 @@ class ChatGPT:
                     print2(traceback.format_exc())
 
             prompt = ""
+
+            if once:
+                break
 
         print2(f"\n{self.name} closed!")
         if hasattr(config, "currentMessages"):

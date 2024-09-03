@@ -10,7 +10,7 @@ Latest changes: https://github.com/eliranwong/freegenius/blob/main/latest_change
 
 https://github.com/eliranwong/freegenius/wiki/Beyond-LetMeDoIt-AI
 
-# Running Tools in a Single Prompt
+# Multiple Tools in a Single Prompt
 
 ![multiple_tools_in_single_prompt](https://github.com/user-attachments/assets/7bdc63cd-beca-44c9-bfb0-27596a5e0632)
 
@@ -135,6 +135,7 @@ Version 0.2.86+ supports use of `@` to call a specific tool:
 @analyze_files
 @analyze_images
 @analyze_web_content
+@ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2
 @correct_python
 @chat
 @build_agents

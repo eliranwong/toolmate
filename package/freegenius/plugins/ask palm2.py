@@ -13,7 +13,7 @@ from freegenius.palm2 import Palm2
 def ask_palm2(function_args):
     query = function_args.get("query") # required
     config.stopSpinning()
-    Palm2().run(query, temperature=config.llmTemperature)
+    Palm2().run(query, temperature=config.llmTemperature, once=True)
     return ""
 
 functionSignature = {

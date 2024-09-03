@@ -46,7 +46,7 @@ def ask_ollama(function_args):
             return ""
     else:
         model = config.ollamaMainModel
-    OllamaChat().run(query, model=model)
+    OllamaChat().run(query, model=model, once=True)
     return ""
 
 functionSignature = {

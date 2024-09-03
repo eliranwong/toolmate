@@ -76,6 +76,7 @@ class FreeGenius:
         config.toggleMultiline = self.toggleMultiline
         config.getWrappedHTMLText = self.getWrappedHTMLText
         config.fineTuneUserInput = self.fineTuneUserInput
+        config.improveWriting = self.improveWriting
         config.launchPager = self.launchPager
         config.addPagerText = self.addPagerText
         config.changeOpenweathermapApi = self.changeOpenweathermapApi
@@ -171,7 +172,7 @@ class FreeGenius:
             ".togglemousesupport": (f"toogle mouse support {str(config.hotkey_toggle_mouse_support)}", self.toggleMouseSupport),
             ".toggletextbrightness": (f"swap text brightness {str(config.hotkey_swap_text_brightness)}", swapTerminalColors),
             ".togglewordwrap": (f"toggle word wrap {str(config.hotkey_toggle_word_wrap)}", self.toggleWordWrap),
-            #".toggleimprovedwriting": (f"toggle improved writing {str(config.hotkey_toggle_writing_improvement)}", self.toggleImprovedWriting),
+            ".toggleinputwriting": (f"toggle input writing {str(config.hotkey_toggle_writing_improvement)}", self.toggleInputWriting),
             ".toggleinputaudio": (f"toggle input audio {str(config.hotkey_toggle_input_audio)}", toggleinputaudio),
             ".toggleoutputaudio": (f"toggle output audio {str(config.hotkey_toggle_response_audio)}", toggleoutputaudio),
             ".code": (f"extract the python code from the last response", self.extractPythonCodeFromLastResponse),
@@ -584,16 +585,21 @@ class FreeGenius:
         print1(self.divider)
 
     def fineTuneUserInput(self, userInput):
-        # customise chat context
+        # get customised chat context
         context = self.getCurrentContext()
+        # tweaks for `Let me Summarize` and `Let me Translate`
         if is_valid_url(userInput) and config.predefinedContext in ("Let me Summarize", "Let me Explain"):
-            context = context.replace("the following content:\n[NO_TOOL]", "the content in the this web url:\n")
+            context = context.replace("@chat Provide me with a summary of the following content:", "@analyze_web_content Provide me with a summary of the content in the this web url:\n")
         elif is_valid_url(userInput) and config.predefinedContext == "Let me Translate":
             userInput = getWebText(userInput)
+        # apply context
         if context and (not config.conversationStarted or (config.conversationStarted and config.applyPredefinedContextAlways)):
             # context may start with "You will be provided with my input delimited with a pair of XML tags, <input> and </input>. ...
             userInput = re.sub("<content>|<content [^<>]*?>|</content>", "", userInput)
-            userInput = f"{context}\n<content>{userInput}</content>" if userInput.strip() else context
+            if check := userInput.strip():
+                userInput = f"{context}\n{userInput}" if check.startswith("@") else f"{context}\n<content>{userInput}</content>"
+            else:
+                userInput = context
         #userInput = SharedUtil.addTimeStamp(userInput)
         return userInput
 
@@ -1333,7 +1339,7 @@ class FreeGenius:
             options=("chatgpt", "geminipro", "palm2", "codey"),
             title="Chat-only model",
             default=config.chatbot,
-            text="Select default chat-only model:\n(Default model is loaded when you include '[CHAT]' in your input)",
+            text="Select default chat-only model:\n(Default model is loaded when you include '@chat' in your input)",
         )
         if model:
             config.chatbot = model
@@ -1575,15 +1581,15 @@ class FreeGenius:
         config.saveConfig()
         print3(f"Entry Mouse Support: '{'enabled' if config.mouseSupport else 'disabled'}'!")
 
-    def toggleImprovedWriting(self):
-        config.displayImprovedWriting = not config.displayImprovedWriting
-        if config.displayImprovedWriting:
+    def toggleInputWriting(self):
+        config.improveInputWriting = not config.improveInputWriting
+        if config.improveInputWriting:
             print1("Please specify the writing style below:")
             style = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.improvedWritingSytle)
             if style and not style in (config.exit_entry, config.cancel_entry):
                 config.improvedWritingSytle = style
                 config.saveConfig()
-        print3(f"Improved Writing Display: '{'enabled' if config.displayImprovedWriting else 'disabled'}'!")
+        print3(f"Improve Input Writing: '{'enabled' if config.improveInputWriting else 'disabled'}'!")
 
     def setAudioPlaybackTool(self):
         playback = self.dialogs.getValidOptions(
@@ -1970,6 +1976,24 @@ class FreeGenius:
             if config.max_consecutive_auto_correction > 0:
                 CallLLM.autoCorrectPythonCode(script, trace)
 
+    def improveWriting(writing: str):
+        # Feature: improve writing:
+        if writing:
+            writing = re.sub("\n\[Current time: [^\n]*?$", "", writing)
+            if config.isTermux:
+                day_of_week = ""
+            else:
+                day_of_week = f"today is {getDayOfWeek()} and "
+            improvedVersion = CallLLM.getSingleChatResponse(f"""Improve the following writing, according to {config.improvedWritingSytle}
+In addition, I would like you to help me with converting relative dates and times, if any, into exact dates and times based on the reference that {day_of_week}current datetime is {str(datetime.datetime.now())}.
+Remember, provide me with the improved writing only, enclosed in triple quotes ``` and without any additional information or comments.
+My writing:
+{writing}""")
+            if improvedVersion and improvedVersion.startswith("```") and improvedVersion.endswith("```"):
+                print1(improvedVersion)
+                writing = improvedVersion[3:-3]
+        return writing
+
     def startChats(self):
         tokenValidator = TokenValidator()
         def getDynamicToolBar():
@@ -2116,30 +2140,6 @@ class FreeGenius:
                 storagedirectory, config.currentMessages = startChat()
             elif userInput and not userInputLower in featuresLower:
 
-                # Feature: improve writing:
-                # TODO: remove improved writing feature temporarily, will move to a separate tool, for better tool management
-                '''
-                userInput = re.sub(specialEntryPattern, "", userInput) # remove special entry temporarily
-                if userInput and config.displayImprovedWriting:
-                    userInput = re.sub("\n\[Current time: [^\n]*?$", "", userInput)
-                    if config.isTermux:
-                        day_of_week = ""
-                    else:
-                        day_of_week = f"today is {getDayOfWeek()} and "
-                    improvedVersion = CallLLM.getSingleChatResponse(f"""Improve the following writing, according to {config.improvedWritingSytle}
-In addition, I would like you to help me with converting relative dates and times, if any, into exact dates and times based on the reference that {day_of_week}current datetime is {str(datetime.datetime.now())}.
-Remember, provide me with the improved writing only, enclosed in triple quotes ``` and without any additional information or comments.
-My writing:
-{userInput}""")
-                    if improvedVersion and improvedVersion.startswith("```") and improvedVersion.endswith("```"):
-                        print1(improvedVersion)
-                        userInput = improvedVersion[3:-3]
-                        if config.ttsOutput:
-                            TTSUtil.play(userInput)
-                if specialEntry:
-                    userInput = f"{userInput}{specialEntry}"
-                '''
-
                 ''' remove additional chatbot features temporarily for development of multiple actions
                 # if user call a chatbot without function calling
                 if "[CHAT]" in fineTunedUserInput:
@@ -2155,66 +2155,47 @@ My writing:
                     continue
                 '''
 
-                ''' remove force loading internet searches feature temporarily for development of multiple actions
-                # force loading internet searches
-                # TODO: disable `always` when a tool is called
-                if config.loadingInternetSearches == "always":
-                    try:
-                        config.currentMessages = CallLLM.runSingleFunctionCall(config.currentMessages, "integrate_google_searches")
-                    except:
-                        print1("Unable to load internet resources.")
-                        showErrors()
-                '''
-
                 def runSingleAction(action: str, description: str):
 
+                    def forceLoadingInternetSearches():
+                        if config.loadingInternetSearches == "always":
+                            try:
+                                config.currentMessages = CallLLM.runSingleFunctionCall(config.currentMessages, "integrate_google_searches")
+                            except:
+                                print1("Unable to load internet resources.")
+                                showErrors()
+
+                    # Improve writing
+                    if config.improveInputWriting:
+                        description = self.improveWriting(description)
+
                     # Run TTS to read action content
-                    if description and config.ttsInput:
+                    if config.ttsInput:
                         TTSUtil.play(description)
+
+                    # update main message chain
+                    config.currentMessages.append({"role": "user", "content": description})
 
                     # empty config.pagerContent
                     # TODO: handle pagerContent for multiple actions
                     config.pagerContent = ""
 
+                    # check if user specify a tool
                     if action == "chat":
-                        # when user don't want a tool, i.e. chat only
+                        # chat feature only
+                        forceLoadingInternetSearches()
                         doNotUseTool = True
-
-                        # Handle Pre-defined Contexts
-                        # refine messages before running completion, only when tool is not applied
-                        fineTunedUserInput = self.fineTuneUserInput(description)
-                        
-                        ''' remove `translation` feature temporarily, for development of multi-step actions
-                        # in case of translation
-                        if config.predefinedContext == "Let me Translate" and fineTunedUserInput.startswith("Assist me by acting as a translator.\nPlease translate"):
-                            print1("Please specify below the language you would like the content to be translated into:")
-                            language = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.translateToLanguage)
-                            if language and not language.strip().lower() in (config.cancel_entry, config.exit_entry):
-                                fineTunedUserInput = f"{fineTunedUserInput}\n\nPlease translate the content into <language>{language}</language>."
-                                config.translateToLanguage = language
-                            else:
-                                continue
-                        '''
-
-                        # reset `config.predefinedContext` and clear `config.predefinedContextTemp` if any
-                        if config.predefinedContextTemp:
-                            config.predefinedContext = config.predefinedContextTemp
-                            config.predefinedContextTemp = ""
-
-                        config.currentMessages.append({"role": "user", "content": fineTunedUserInput})
-
                     else:
-                        doNotUseTool = False
-
                         if action:
                             # when user specify a tool
                             config.selectedTool = action
-
+                            # notify devloper
                             if config.developer:
-                                #print1(f"calling function '{config.selectedTool}' ...")
                                 print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Calling tool</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{config.selectedTool}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
-
-                        config.currentMessages.append({"role": "user", "content": description})
+                        else:
+                            # no tool is specified
+                            forceLoadingInternetSearches()
+                        doNotUseTool = False
 
                     try:
                         # start spinning
@@ -2243,7 +2224,6 @@ My writing:
                             self.streaming_thread.join()
 
                     except:
-                        # TODO: handle errors for multiple actions
                         stopSpinning()
                         trace = traceback.format_exc()
                         if "Please reduce the length of the messages or completion" in trace:
@@ -2256,19 +2236,42 @@ My writing:
                             print1("Error encountered!")
 
                         config.defaultEntry = userInput
-                        print1("starting a new chat!")
+                        print2("starting a new chat!")
                         self.saveChat(config.currentMessages)
                         storagedirectory, config.currentMessages = startChat()
 
+                # Tweak user inputs with Pre-defined Contexts
+                fineTunedUserInput = self.fineTuneUserInput(userInput)
+                
+                # tweak for `Let me Translate`
+                if config.predefinedContext == "Let me Translate" and fineTunedUserInput.startswith("@chat Assist me by acting as a translator.\nPlease translate"):
+                    print1("Please specify the language you would like the content to be translated into:")
+                    language = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.translateToLanguage)
+                    if language and not language.strip().lower() in (config.cancel_entry, config.exit_entry):
+                        config.translateToLanguage = language
+                    else:
+                        if not config.translateToLanguage:
+                            config.translateToLanguage = "English"
+                        print3(f"Language not specified! The content will be translated into: {config.translateToLanguage}")
+                    fineTunedUserInput = f"{fineTunedUserInput}\n\nPlease translate the content into <language>{config.translateToLanguage}</language>."
+
+                # reset `config.predefinedContext` and clear `config.predefinedContextTemp` if `config.predefinedContextTemp`` is not empty
+                if config.predefinedContextTemp:
+                    config.predefinedContext = config.predefinedContextTemp
+                    config.predefinedContextTemp = ""
+
+                # check for any tool patterns
                 toolNames = "|".join(config.toolFunctionMethods.keys())
-                actionPattern = f"@(chat|{toolNames})[ \n]"
-                actions = re.findall(actionPattern, userInput)
+                actionPattern = f"@({toolNames})[ \n]"
+                actions = re.findall(actionPattern, fineTunedUserInput)
+                
                 if not actions:
-                    # pass to screening or tool check operations
-                    runSingleAction("", userInput)
+                    if fineTunedUserInput.strip():
+                        # pass to built-in screening or tool-check operations
+                        runSingleAction("", fineTunedUserInput)
                 else:
                     separator = "＊@＊@＊"
-                    descriptions = re.sub(actionPattern, separator, userInput).split(separator)
+                    descriptions = re.sub(actionPattern, separator, fineTunedUserInput).split(separator)
                     if descriptions[0].strip():
                         # in case content entered before the first action declared
                         actions.insert(0, "chat")

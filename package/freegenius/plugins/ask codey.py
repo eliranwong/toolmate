@@ -13,7 +13,7 @@ from freegenius.codey import Codey
 def ask_codey(function_args):
     query = function_args.get("query") # required
     config.stopSpinning()
-    Codey().run(query, temperature=config.llmTemperature)
+    Codey().run(query, temperature=config.llmTemperature, once=True)
     return ""
 
 functionSignature = {

@@ -1,28 +1,28 @@
 """
-FreeGenius AI Plugin - ask chatgpt
+FreeGenius AI Plugin - ask llama.cpp server
 
-Ask ChatGPT for conversation only; no function calling
+Ask llama.cpp server Model for conversation only; no function calling
 
 [FUNCTION_CALL]
 """
 
 
 from freegenius import config
-from freegenius.chatgpt import ChatGPT
+from freegenius.llamacppserver import LlamacppServerChat
 
-def ask_chatgpt(function_args):
+def ask_llamacppserver(function_args):
     config.stopSpinning()
     query = function_args.get("query") # required
     config.currentMessages = config.currentMessages[:-1]
-    ChatGPT().run(query)
+    LlamacppServerChat().run(query, once=True)
     return ""
 
 functionSignature = {
     "examples": [
-        "Ask ChatGPT",
+        "Ask Llama.cpp Server",
     ],
-    "name": "ask_chatgpt",
-    "description": "Ask ChatGPT to chat or provide information",
+    "name": "ask_llamacppserver",
+    "description": "Ask Llama.cpp Server to chat or provide information",
     "parameters": {
         "type": "object",
         "properties": {
@@ -35,5 +35,5 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=ask_chatgpt)
-config.inputSuggestions.append("Ask ChatGPT: ")
+config.addFunctionCall(signature=functionSignature, method=ask_llamacppserver)
+config.inputSuggestions.append("Ask Llama.cpp Server: ")

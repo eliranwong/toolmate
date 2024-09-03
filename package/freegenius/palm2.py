@@ -55,7 +55,7 @@ class Palm2:
             config.saveConfig()
             print2("System message changed!")
 
-    def run(self, prompt="", model="chat-bison-32k", temperature=0.0, max_output_tokens=2048):
+    def run(self, prompt="", model="chat-bison-32k", temperature=0.0, max_output_tokens=2048, once=False):
         historyFolder = os.path.join(config.localStorage, "history")
         Path(historyFolder).mkdir(parents=True, exist_ok=True)
         chat_history = os.path.join(historyFolder, self.name.replace(" ", "_"))
@@ -152,6 +152,9 @@ class Palm2:
                     print2(traceback.format_exc())
 
             prompt = ""
+
+            if once:
+                break
 
         print2(f"\n{self.name} closed!")
         if hasattr(config, "currentMessages"):

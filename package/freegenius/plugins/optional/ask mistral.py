@@ -13,7 +13,7 @@ from freegenius.ollamachat import OllamaChat
 def ask_mistral(function_args):
     query = function_args.get("query") # required
     config.stopSpinning()
-    OllamaChat().run(query, model="mistral")
+    OllamaChat().run(query, model="mistral", once=True)
     return ""
 
 functionSignature = {

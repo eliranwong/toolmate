@@ -138,6 +138,7 @@ class Prompts:
                 except:
                     encoding = tiktoken.get_encoding("cl100k_base")
                 currentInput = event.app.current_buffer.text
+                ''' does not apply for multiple tool cases
                 no_function_call_pattern = "\[NO_TOOL\]|\[CHAT\]|\[CHAT_[^\[\]]+?\]"
                 #if "[NO_TOOL]" in currentInput:
                 if re.search(no_function_call_pattern, currentInput):
@@ -146,6 +147,8 @@ class Prompts:
                     currentInput = re.sub(no_function_call_pattern, "", currentInput)
                 else:
                     availableFunctionTokens = count_tokens_from_functions(config.toolFunctionSchemas)
+                '''
+                availableFunctionTokens = count_tokens_from_functions(config.toolFunctionSchemas)
                 currentInputTokens = len(encoding.encode(config.fineTuneUserInput(currentInput)))
                 loadedMessageTokens = count_tokens_from_messages(config.currentMessages)
                 selectedModelLimit = tokenLimits[config.chatGPTApiModel]
@@ -211,9 +214,9 @@ Available tokens: {estimatedAvailableTokens}
             restartApp()
         @this_key_bindings.add(*config.hotkey_toggle_writing_improvement)
         def _(_):
-            config.displayImprovedWriting = not config.displayImprovedWriting
+            config.improveInputWriting = not config.improveInputWriting
             config.saveConfig()
-            run_in_terminal(lambda: print3(f"Improved Writing Display: '{'enabled' if config.displayImprovedWriting else 'disabled'}'!"))
+            run_in_terminal(lambda: print3(f"Improved Writing Display: '{'enabled' if config.improveInputWriting else 'disabled'}'!"))
         @this_key_bindings.add(*config.hotkey_toggle_word_wrap)
         def _(_):
             config.wrapWords = not config.wrapWords

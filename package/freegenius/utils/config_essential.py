@@ -134,7 +134,7 @@ defaultSettings = (
     ('whispercpp_additional_options', ''), # whisper.cpp additional options. See https://github.com/ggerganov/whisper.cpp/tree/master/examples/main for all options.
     ('cpu_threads', 0),
     # common configs as in LetMeDoIt AI
-    ('translateToLanguage', ''),
+    ('translateToLanguage', 'English'),
     ('dynamicTokenCount', False),
     ('use_oai_assistant', False), # support OpenAI Assistants API in AutoGen Agent Builder
     ('max_agents', 5), # maximum number of agents build manager can create.
@@ -217,7 +217,7 @@ defaultSettings = (
     ('defaultBlankEntryAction', ".context"),
     ('storagedirectory', ""),
     ('suggestSystemCommand', True),
-    ('displayImprovedWriting', False),
+    ('improveInputWriting', False),
     ('improvedWritingSytle', 'standard English'), # e.g. British spoken English
     ('ttsPlatform', "google"), # "google", "googlecloud", "elevenlabs", "custom"
     ('ttsInput', False),

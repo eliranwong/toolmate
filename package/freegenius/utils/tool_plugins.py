@@ -74,7 +74,7 @@ class Plugins:
                     config.deviceInfoPlugins.append(name)
                 # input suggestions
                 if not name in ("python_qa",):
-                    callEntry = f"@{name}"
+                    callEntry = f"@{name} "
                     if not callEntry in config.inputSuggestions:
                         config.inputSuggestions.append(callEntry)
 

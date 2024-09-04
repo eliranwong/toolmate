@@ -8,6 +8,8 @@ from freegenius import config
 import sys, os
 
 config.inputSuggestions += [
+        "@command ",
+        "@append_command ",
         #"[CHAT_chatgpt] ",
         #"[CHAT_geminipro] ",
         #"[CHAT_palm2] ",

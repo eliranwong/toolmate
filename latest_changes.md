@@ -1,3 +1,45 @@
+# Version: 0.2.90
+
+1. Added two new tools:
+
+`@command` Execute the given command
+
+`@append_command` Append assistant previous response to the given command and execute.
+
+```
+@command echo "Hello World!"
+@append_command echo
+```
+
+These new tools work with multiple tools in a single prompt.
+
+For an example, to integrate `fabric` with other FreeGenius AI tools, you may do something like this:
+
+```
+@command /home/ubuntu/go/bin/fabric -m gemini-1.5-pro -p write_essay "What is machine learning?"
+@append_command /home/ubuntu/go/bin/fabric -m llama3.1:latest -p extract_wisdom
+@append_command /home/ubuntu/go/bin/fabric -m mistral-large:123b -p summarize
+@ask_gemini Explain it to a five-year kid
+@ask_chatgpt Translate it into Chinese
+```
+
+2. Created two aliases:
+
+`@fabric` -> `@command fabric`
+
+`@append_fabric` -> `@append_command fabric`
+
+The aliases were added in the plugin `fabric.py`
+
+```
+from freegenius import config
+config.aliases["@fabric"] = "@command fabric"
+config.aliases["@append_fabric"] = "@append_command fabric"
+config.inputSuggestions += ["@fabric", "@append_fabric"]
+```
+
+Users may further customise, e.g. changing the fabric path, etc.
+
 # Version: 0.2.89
 
 Fixed `improve input entry` feature.

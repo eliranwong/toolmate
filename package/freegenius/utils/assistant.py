@@ -1,5 +1,5 @@
 from freegenius import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, getLlamacppServerClient
-from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile
+from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getAssistantPreviousResponse
 from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runFreeGeniusCommand
 from freegenius.utils.call_llm import CallLLM
 from freegenius.utils.tool_plugins import ToolStore
@@ -2143,22 +2143,7 @@ My writing:
                 storagedirectory, config.currentMessages = startChat()
             elif userInput and not userInputLower in featuresLower:
 
-                ''' remove additional chatbot features temporarily for development of multiple actions
-                # if user call a chatbot without function calling
-                if "[CHAT]" in fineTunedUserInput:
-                    chatbot = config.llmInterface
-                elif callChatBot := re.search("\[CHAT_([^\[\]]+?)\]", fineTunedUserInput):
-                    chatbot = callChatBot.group(1).lower() if callChatBot and callChatBot.group(1).lower() in ("chatgpt", "geminipro", "palm2", "codey") else ""
-                else:
-                    chatbot = ""
-                if chatbot:
-                    # call the spcified chatbot to continue the conversation
-                    fineTunedUserInput = re.sub("\[CHAT\]|\[CHAT_[^\[\]]+?\]", "", fineTunedUserInput)
-                    self.launchChatbot(chatbot, fineTunedUserInput)
-                    continue
-                '''
-
-                def runSingleAction(action: str, description: str):
+                def runSingleAction(action: str, description: str) -> None:
 
                     def forceLoadingInternetSearches():
                         if config.loadingInternetSearches == "always":
@@ -2177,7 +2162,7 @@ My writing:
                         TTSUtil.play(description)
 
                     # update main message chain
-                    config.currentMessages.append({"role": "user", "content": description})
+                    config.currentMessages.append({"role": "user", "content": f'''Run the following command:\n```command\n{description}\n```''' if action in ("command", "append_command") else description})
 
                     # empty config.pagerContent
                     # TODO: handle pagerContent for multiple actions
@@ -2188,6 +2173,40 @@ My writing:
                         # chat feature only
                         forceLoadingInternetSearches()
                         doNotUseTool = True
+                    elif action == "command":
+                        stdout, stderr = subprocess.Popen(description, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                        if stdout:
+                            print2("\n```output")
+                            print(stdout.strip())
+                            print2("```")
+                            config.currentMessages.append({"role": "assistant", "content": stdout.strip()})
+                        else:
+                            if stderr:
+                                print2("\n```error")
+                                print(stderr.strip())
+                                print2("```")
+                            config.currentMessages = config.currentMessages[:-1]
+                        return None
+                    elif action == "append_command":
+                        previousResponse = getAssistantPreviousResponse()
+                        if previousResponse:
+                            previousResponse = previousResponse.replace('"', '\\"')
+                            stdout, stderr = subprocess.Popen(f'''{description.strip()} "{previousResponse}"''', shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                            if stdout:
+                                print2("\n```output")
+                                print(stdout.strip())
+                                print2("```")
+                                config.currentMessages.append({"role": "assistant", "content": stdout.strip()})
+                            else:
+                                if stderr:
+                                    print2("\n```error")
+                                    print(stderr.strip())
+                                    print2("```")
+                                config.currentMessages = config.currentMessages[:-1]
+                        else:
+                            print2("Assistant previous response not found! Action cancelled!")
+                            config.currentMessages = config.currentMessages[:-1]
+                        return None
                     else:
                         if action:
                             # when user specify a tool
@@ -2265,7 +2284,7 @@ My writing:
 
                 # check for any tool patterns
                 toolNames = "|".join(config.toolFunctionMethods.keys())
-                actionPattern = f"@({toolNames})[ \n]"
+                actionPattern = f"@(command|append_command|{toolNames})[ \n]"
                 actions = re.findall(actionPattern, fineTunedUserInput)
                 
                 if not actions:

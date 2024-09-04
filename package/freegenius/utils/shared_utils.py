@@ -508,6 +508,15 @@ def convert_html_to_markdown(html_string):
     # Return the Markdown string
     return markdown_string
 
+def getAssistantPreviousResponse() -> str:
+    content = ""
+    for i in reversed(config.currentMessages):
+        if i.get("role", "") == "assistant":
+            content = i.get("content", "")
+            if content.strip():
+                break
+    return content.strip()
+
 # system command
 
 def checkPath():

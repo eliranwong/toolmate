@@ -1,3 +1,15 @@
+# Version: 0.2.91
+
+1. Improved plugin `fabric`
+
+2. Added config item `fabricPath`.  Users can customise fabric path by editing its value in `config.py`.
+
+3. Added two new tools:
+
+`@append_prompt` - append assistant previous response to the newly given prompt.
+
+`@improve_writing` - improve writing of the given prompt
+
 # Version: 0.2.90
 
 1. Added two new tools:

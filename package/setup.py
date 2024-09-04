@@ -51,7 +51,7 @@ open(os.path.join(package, "config.py"), "w").close()
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name=package,
-    version="0.2.90",
+    version="0.2.91",
     python_requires=">=3.8, <3.12",
     description=f"{appFullName}, an advanced AI assistant that can talk and take multi-step actions. Supports numerous open-source LLMs via Llama.cpp or Ollama or Groq Cloud API, with optional integration with AutoGen agents, OpenAI API, Google Gemini Pro and unlimited plugins.",
     long_description=long_description,
@@ -177,7 +177,7 @@ setup(
             f"wizardlm2={package}.ollamachat:wizardlm2",
         ],
     },
-    keywords="ai assistant ollama llama llamacpp groq openai chatgpt gemini autogen rag agent stable-diffusion",
+    keywords="ai assistant ollama llama llamacpp groq openai chatgpt gemini autogen rag agent stable-diffusion fabric",
     url="https://letmedoit.ai",
     project_urls={
         "Source": "https://github.com/eliranwong/letmedoit",

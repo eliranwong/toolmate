@@ -10,6 +10,8 @@ import sys, os
 config.inputSuggestions += [
         "@command ",
         "@append_command ",
+        "@append_prompt ",
+        "@improve_writing ",
         #"[CHAT_chatgpt] ",
         #"[CHAT_geminipro] ",
         #"[CHAT_palm2] ",

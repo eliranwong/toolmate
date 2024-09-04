@@ -10,15 +10,21 @@ Latest changes: https://github.com/eliranwong/freegenius/blob/main/latest_change
 
 https://github.com/eliranwong/freegenius/wiki/Beyond-LetMeDoIt-AI
 
-# Multiple Tools in a Single Prompt
+# Distinctive - Multiple Tools in a Single Prompt
 
 ![multiple_tools_in_single_prompt](https://github.com/user-attachments/assets/7bdc63cd-beca-44c9-bfb0-27596a5e0632)
 
 Read more at: https://github.com/eliranwong/freegenius/wiki/Multiple-Tools-in-Single-Prompt
 
-# Highly Customizable
+# Distinctive - Customizable Plugins
 
 ![plugins](https://github.com/eliranwong/freegenius/assets/25262722/6bb4b2f6-5684-42c1-95e3-7b12c3a38db6)
+
+# Distinctive - System Command and Fabric Integration
+
+System Command Integration: https://github.com/eliranwong/freegenius/wiki/System-Command-Integration
+
+Fabric Integration: https://github.com/eliranwong/freegenius/wiki/Fabric-Integration
 
 # Support GPU Offloading
 
@@ -129,7 +135,7 @@ Remarks: Groq cloud currently does not support multimodal models. Other backends
 
 Version 0.2.86+ supports use of `@` to call a specific tool:
 
-@command @append_command @fabric @append_fabric @integrate_google_searches @add_calendar_event @analyze_audio @analyze_files @analyze_images @analyze_web_content @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @correct_python @chat @build_agents @create_image @create_map @create_qrcode @create_statistical_graphics @datetimes @download_web_content @download_youtube_audio @download_youtube_video @edit_text @execute_computing_task @install_package @save_memory @retrieve_memory @modify_images @open_browser @pronunce_words @remove_image_background @search_chats @load_chats @search_finance @search_latest_news @search_sqlite @search_weather_info @send_gamil @send_outlook @send_tweet
+@chat @append_prompt @improve_writing @command @append_command @fabric @append_fabric @integrate_google_searches @add_calendar_event @analyze_audio @analyze_files @analyze_images @analyze_web_content @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @correct_python @build_agents @create_image @create_map @create_qrcode @create_statistical_graphics @datetimes @download_web_content @download_youtube_audio @download_youtube_video @edit_text @execute_computing_task @install_package @save_memory @retrieve_memory @modify_images @open_browser @pronunce_words @remove_image_background @search_chats @load_chats @search_finance @search_latest_news @search_sqlite @search_weather_info @send_gamil @send_outlook @send_tweet
 
 To disable tool in for a single turn, use `@none`.
 
@@ -366,7 +372,6 @@ FreeGenius AI Plugins allow you to acheive variety of tasks with simple words:
 * convert text display, e.g. from simplified Chinese to traditional Chinese, e.g.
 
 > Translate your last response into Chinese
-
 
 ## Fetures with OpenAI API key ONLY
 

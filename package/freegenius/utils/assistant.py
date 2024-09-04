@@ -183,8 +183,9 @@ class FreeGenius:
             ".system": (f"open system command prompt {str(config.hotkey_launch_system_prompt)}", lambda: SystemCommandPrompt().run(allowPathChanges=True)),
             ".content": ("display current directory content", self.getPath.displayDirectoryContent),
             ".keys": (f"display key bindings {str(config.hotkey_display_key_combo)}", config.showKeyBindings),
-            ".help": ("open LetMeDoIt wiki", lambda: openURL('https://github.com/eliranwong/letmedoit/wiki')),
-            ".donate": ("donate and support LetMeDoIt AI", lambda: openURL('https://www.paypal.com/paypalme/letmedoitai')),
+            ".help": ("open LetMeDoIt wiki", lambda: openURL('https://github.com/eliranwong/freegenius/wiki')),
+            ".help2": ("open LetMeDoIt wiki", lambda: openURL('https://github.com/eliranwong/letmedoit/wiki')),
+            ".donate": ("donate and support FreeGenius AI", lambda: openURL('https://www.paypal.com/paypalme/letmedoitai')),
         }
 
         config.actionHelp = f"# Quick Actions\n(entries that start with '.')\n"
@@ -2153,7 +2154,12 @@ My writing:
                                 print1("Unable to load internet resources.")
                                 showErrors()
 
-                    # Improve writing
+                    # append chat
+                    if action == "append_prompt":
+                        description = f'''description\n{getAssistantPreviousResponse()}'''
+                        action = "chat"
+
+                    # Force Improve Writing
                     if config.improveInputEntry:
                         description = self.improveWriting(description)
 
@@ -2162,7 +2168,11 @@ My writing:
                         TTSUtil.play(description)
 
                     # update main message chain
-                    config.currentMessages.append({"role": "user", "content": f'''Run the following command:\n```command\n{description}\n```''' if action in ("command", "append_command") else description})
+                    if action in ("command", "append_command"):
+                        description = f'''Run the following command:\n```command\n{description}\n```'''
+                    elif action == "improve_writing":
+                        description = f'''Improve the following writing:\n```writing\n{description}\n```'''
+                    config.currentMessages.append({"role": "user", "content": description})
 
                     # empty config.pagerContent
                     # TODO: handle pagerContent for multiple actions
@@ -2173,18 +2183,28 @@ My writing:
                         # chat feature only
                         forceLoadingInternetSearches()
                         doNotUseTool = True
+                    elif action == "improve_writing":
+                        improvedWriting = self.improveWriting(description).strip()
+                        if improvedWriting:
+                            print2("\n```improved")
+                            print(improvedWriting)
+                            print2("```\n")
+                            config.currentMessages.append({"role": "assistant", "content": improvedWriting})
+                        else:
+                            config.currentMessages = config.currentMessages[:-1]
+                        return None
                     elif action == "command":
                         stdout, stderr = subprocess.Popen(description, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
                         if stdout:
                             print2("\n```output")
                             print(stdout.strip())
-                            print2("```")
+                            print2("```\n")
                             config.currentMessages.append({"role": "assistant", "content": stdout.strip()})
                         else:
                             if stderr:
                                 print2("\n```error")
                                 print(stderr.strip())
-                                print2("```")
+                                print2("```\n")
                             config.currentMessages = config.currentMessages[:-1]
                         return None
                     elif action == "append_command":
@@ -2195,13 +2215,13 @@ My writing:
                             if stdout:
                                 print2("\n```output")
                                 print(stdout.strip())
-                                print2("```")
+                                print2("```\n")
                                 config.currentMessages.append({"role": "assistant", "content": stdout.strip()})
                             else:
                                 if stderr:
                                     print2("\n```error")
                                     print(stderr.strip())
-                                    print2("```")
+                                    print2("```\n")
                                 config.currentMessages = config.currentMessages[:-1]
                         else:
                             print2("Assistant previous response not found! Action cancelled!")
@@ -2284,7 +2304,7 @@ My writing:
 
                 # check for any tool patterns
                 toolNames = "|".join(config.toolFunctionMethods.keys())
-                actionPattern = f"@(command|append_command|{toolNames})[ \n]"
+                actionPattern = f"@(command|append_command|append_prompt|improve_writing|{toolNames})[ \n]"
                 actions = re.findall(actionPattern, fineTunedUserInput)
                 
                 if not actions:

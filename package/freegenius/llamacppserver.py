@@ -102,7 +102,6 @@ class LlamacppServerChat:
                 print("New chat started!")
             elif prompt := prompt.strip():
                 streamingWordWrapper = StreamingWordWrapper()
-                config.pagerContent = ""
 
                 try:
                     completion = getLlamacppServerClient("chat" if config.useAdditionalChatModel else "tool").chat.completions.create(

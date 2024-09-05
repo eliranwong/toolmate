@@ -1,3 +1,7 @@
+# Version: 0.2.92
+
+Now able to save changes after editing assistant previous response.
+
 # Version: 0.2.91
 
 1. Improved plugin `fabric`

@@ -119,7 +119,6 @@ class ChatGPT:
                 print("New chat started!")
             elif prompt := prompt.strip():
                 streamingWordWrapper = StreamingWordWrapper()
-                config.pagerContent = ""
 
                 try:
                     completion = self.client.chat.completions.create(

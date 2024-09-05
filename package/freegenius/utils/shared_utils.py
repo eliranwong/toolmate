@@ -493,11 +493,33 @@ def getDownloadedGgufModels() -> dict:
 
 # text
 
+def readTextFile(textFile: str) -> str:
+    with open(textFile, 'r', encoding='utf8') as fileObj:
+        content = fileObj.read()
+    return content if content else ""
+
+def writeTextFile(textFile: str, textContent: str) -> None:
+    with open(textFile, "w", encoding="utf-8") as fileObj:
+        fileObj.write(textContent)
+
 def is_CJK(text):
     for char in text:
         if 'CJK' in unicodedata.name(char):
             return True
     return False
+
+def getAssistantPreviousResponse():
+    index = 0
+    content = ""
+    for order, item in enumerate(reversed(config.currentMessages)):
+        if item.get("role", "") == "assistant":
+            content = item.get("content", "").strip()
+            if content:
+                index = (order + 1)*-1
+                break
+    if not content:
+        print2("Previous response not found! Action cancelled!")
+    return (content, index)
 
 # Function to convert HTML to Markdown
 def convert_html_to_markdown(html_string):
@@ -507,15 +529,6 @@ def convert_html_to_markdown(html_string):
     markdown_string = converter.handle(html_string)
     # Return the Markdown string
     return markdown_string
-
-def getAssistantPreviousResponse() -> str:
-    content = ""
-    for i in reversed(config.currentMessages):
-        if i.get("role", "") == "assistant":
-            content = i.get("content", "")
-            if content.strip():
-                break
-    return content.strip()
 
 # system command
 
@@ -884,11 +897,7 @@ def extractPythonCode(content, keepInvalid=False):
     content = re.sub("\n```[^\n]*?$", "", content, flags=re.M)
     content = re.sub("^<[^<>]*?>", "", content)
     content = re.sub("<[^<>]*?>$", "", content)
-    if keepInvalid or isValidPythodCode(content) is not None:
-        config.pagerContent = f'''```python
-{content}```'''
-        return content
-    return ""
+    return content if keepInvalid or isValidPythodCode(content) is not None else ""
 
 def fineTunePythonCode(code):
     # dedent

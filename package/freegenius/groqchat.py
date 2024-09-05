@@ -100,7 +100,6 @@ class GroqChatbot:
                 print("New chat started!")
             elif prompt := prompt.strip():
                 streamingWordWrapper = StreamingWordWrapper()
-                config.pagerContent = ""
 
                 try:
                     completion = getGroqClient().chat.completions.create(

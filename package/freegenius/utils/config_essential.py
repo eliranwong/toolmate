@@ -356,7 +356,6 @@ temporaryConfigs = [
     "getWrappedHTMLText",
     "fineTuneUserInput",
     "launchPager",
-    "addPagerText",
     "isTermux",
 ]
 

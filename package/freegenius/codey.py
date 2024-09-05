@@ -131,13 +131,13 @@ class Codey:
                         prompt, **parameters
                     )
                     stopSpinning()
-                    config.pagerContent = response.text.strip()
+                    chatResponse = response.text.strip()
                     # color response with markdown style
-                    tokens = list(pygments.lex(config.pagerContent, lexer=MarkdownLexer()))
+                    tokens = list(pygments.lex(chatResponse, lexer=MarkdownLexer()))
                     print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
                     # integrate messages into LetMeDoIt messages
-                    if hasattr(config, "currentMessages") and config.pagerContent:
-                        config.currentMessages.append({"role": "assistant", "content": config.pagerContent})
+                    if hasattr(config, "currentMessages") and chatResponse:
+                        config.currentMessages.append({"role": "assistant", "content": chatResponse})
                 except:
                     stopSpinning()
                     print2(traceback.format_exc())

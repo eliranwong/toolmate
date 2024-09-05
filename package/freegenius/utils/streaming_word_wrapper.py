@@ -93,10 +93,9 @@ class StreamingWordWrapper:
                 config.currentMessages.append({"role": "assistant", "content": chat_response})
             # auto pager feature
             if hasattr(config, "pagerView"):
-                config.pagerContent += wrapText(chat_response, terminal_width) if config.wrapWords else chat_response
-                #self.addPagerContent = False
                 if config.pagerView:
-                    config.launchPager(config.pagerContent)
+                    pagerContent = wrapText(chat_response, terminal_width) if config.wrapWords else chat_response
+                    config.launchPager(pagerContent)
             # finishing
             if hasattr(config, "conversationStarted"):
                 config.conversationStarted = True

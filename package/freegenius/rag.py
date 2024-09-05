@@ -153,7 +153,6 @@ Please answer my question, based on the context given above."""
             messages = [{"role": "user", "content" : formatted_prompt}]
 
         streamingWordWrapper = StreamingWordWrapper()
-        config.pagerContent = ""
 
         try:
             completion = CallLLM.regularCall(messages)

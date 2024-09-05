@@ -145,7 +145,6 @@ class LlamacppChat:
                 print("New chat started!")
             elif prompt := prompt.strip():
                 streamingWordWrapper = StreamingWordWrapper()
-                config.pagerContent = ""
 
                 try:
                     completion = self.model.create_chat_completion(

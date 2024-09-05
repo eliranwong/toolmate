@@ -187,7 +187,6 @@ Here is my request:
                 print("New chat started!")
             elif prompt := prompt.strip():
                 streamingWordWrapper = StreamingWordWrapper()
-                config.pagerContent = ""
                 if model.startswith("llava"):
                     images = extractImages(prompt)
                     if images:

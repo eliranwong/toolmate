@@ -132,7 +132,6 @@ class Palm2:
                 print("New chat started!")
             elif prompt := prompt.strip():
                 streamingWordWrapper = StreamingWordWrapper()
-                config.pagerContent = ""
                 try:
                     completion = chat.send_message_streaming(prompt, **parameters)
 

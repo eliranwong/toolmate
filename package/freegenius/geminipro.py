@@ -157,8 +157,6 @@ class GeminiPro:
                 print("New chat started!")
             elif prompt := prompt.strip():
                 streamingWordWrapper = StreamingWordWrapper()
-                config.pagerContent = ""
-                #self.addPagerContent = True
 
                 # declare a function
 #                get_vision_func = generative_models.FunctionDeclaration(

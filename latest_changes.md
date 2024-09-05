@@ -1,3 +1,11 @@
+# Version: 0.2.94
+
+Fixed built-in text editor
+
+# Version: 0.2.93
+
+Fixed startup
+
 # Version: 0.2.92
 
 Now able to save changes after editing assistant previous response.

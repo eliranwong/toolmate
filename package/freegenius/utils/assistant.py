@@ -867,7 +867,7 @@ class FreeGenius:
             # editing
             customTextEditor = config.customTextEditor if config.customTextEditor else f"{sys.executable} {os.path.join(config.freeGeniusAIFolder, 'eTextEdit.py')}"
             os.system(f"{customTextEditor} {tempTextFile}")
-            set_title(config.freeGeniusAIName)editedContent = readTextFile(tempTextFile)
+            set_title(config.freeGeniusAIName)
             # read edited response
             editedContent = readTextFile(tempTextFile)
             # save changes

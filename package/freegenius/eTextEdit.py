@@ -23,6 +23,9 @@ https://github.com/eliranwong/eTextEdit
 
 Remarks: This is a modified edition of etextedit that work with FreeGenius AI
 """
+import os
+startupPath = os.getcwd()
+
 import datetime, sys, os, re, webbrowser, shutil, wcwidth, argparse, pyperclip, platform
 from asyncio import Future, ensure_future
 from prompt_toolkit.clipboard.pyperclip import PyperclipClipboard
@@ -925,6 +928,7 @@ def launch(input_text=None, filename=None):
     return text_field.text
 
 def main():
+    os.chdir(startupPath)
     if len(sys.argv) > 1:
 
         # Create the parser
@@ -936,13 +940,13 @@ def main():
         args = parser.parse_args()
 
         if args.default:
-            try:
-                # create file if it does not exist
-                if not os.path.isfile(filename):
-                    open(args.default, "a", encoding="utf-8").close()
-                filename = args.default
-            except:
-                filename = ""
+            filename = args.default
+            # create file if it does not exist
+            if not os.path.isfile(filename):
+                try:
+                    open(filename, "a", encoding="utf-8").close()
+                except:
+                    filename = ""
         else:
             filename = ""
         

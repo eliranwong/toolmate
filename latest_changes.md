@@ -1,4 +1,8 @@
-# Version: 0.3.02-0.3.03
+# Version: 0.3.05
+
+Fixed tools `@command`, `@append_command`, `@fabric` and `@append_fabric`
+
+# Version: 0.3.02-0.3.04
 
 Added three tools:
 

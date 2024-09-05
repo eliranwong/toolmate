@@ -3,7 +3,7 @@ from freegenius import print1, print2, print3, isCommandInstalled, setChatGPTAPI
 from freegenius import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runFreeGeniusCommand, displayPythonCode
 from freegenius.utils.call_llm import CallLLM
 from freegenius.utils.tool_plugins import ToolStore
-import openai, threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy
+import openai, threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy, pyperclip
 from huggingface_hub import hf_hub_download
 from pathlib import Path
 from freegenius.utils.download import Downloader
@@ -2235,9 +2235,7 @@ My writing:
                         description = self.convertRelativeDateTime(description).strip()
 
                     # update main message chain
-                    if action in ("command", "append_command"):
-                        description = f'''Run the following command:\n```command\n{description}\n```'''
-                    elif action == "extract_python_code":
+                    if action == "extract_python_code":
                         description = f"Extract python code in:\n\n{description}"
                     elif action == "run_python_code":
                         description = f"Run python code in:\n\n{description}"
@@ -2324,6 +2322,8 @@ My writing:
                             print2("\n```output")
                             print(stdout.strip())
                             print2("```\n")
+                            description = f'''Run the following command:\n```command\n{description}\n```'''
+                            config.currentMessages[-1]["content"] = description
                             config.currentMessages.append({"role": "assistant", "content": stdout.strip()})
                         else:
                             if stderr:
@@ -2341,6 +2341,8 @@ My writing:
                                 print2("\n```output")
                                 print(stdout.strip())
                                 print2("```\n")
+                                description = f'''Run the following command:\n```command\n{description}\n```'''
+                                config.currentMessages[-1]["content"] = description
                                 config.currentMessages.append({"role": "assistant", "content": stdout.strip()})
                             else:
                                 if stderr:

@@ -1,3 +1,9 @@
+# Version: 0.2.95
+
+Support tool without given prompt.
+
+Read more at https://github.com/eliranwong/freegenius/wiki/Multiple-Tools-in-One-Go#work-on-generated-response-from-previous-tool
+
 # Version: 0.2.94
 
 Fixed built-in text editor

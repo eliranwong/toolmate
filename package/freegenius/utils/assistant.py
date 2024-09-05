@@ -126,45 +126,49 @@ class FreeGenius:
         self.terminal_chat_session = PromptSession(history=FileHistory(chat_history))
 
         self.actions = {
+            # session
             ".new": (f"start a new chat {str(config.hotkey_new)}", None),
-            ".save": ("save content", lambda: self.saveChat(config.currentMessages)),
-            ".export": (f"export content {str(config.hotkey_export)}", lambda: self.exportChat(config.currentMessages)),
-            ".context": (f"change chat context {str(config.hotkey_select_context)}", None),
-            ".contextintegration": ("change chat context integration", self.setContextIntegration),
-            ".model": ("change large language model", self.setLlmModel),
+            ".save": ("save chat content", lambda: self.saveChat(config.currentMessages)),
+            ".export": (f"export chat content {str(config.hotkey_export)}", lambda: self.exportChat(config.currentMessages)),
+            
+            ".model": ("change AI backends and models", self.setLlmModel),
+            #".embedding": ("change embedding model", self.setEmbeddingModel), # joined ".model"
             #".chatmodel": ("change chat-only model", self.setChatbot),
-            ".embedding": ("change embedding model", self.setEmbeddingModel),
+            ".context": (f"change chat context {str(config.hotkey_select_context)}", None),
+            #".contextintegration": ("change chat context integration", self.setContextIntegration), # joined ".context"
+            ".plugins": ("change plugins", self.selectPlugins),
+            ".tools": ("change tool configurations", self.setToolSelectionConfigs),
+            #".maxautocorrect": ("change maximum consecutive auto-correction", self.setMaxAutoCorrect), # joined ".tools"
+            #".userconfirmation": ("change code confirmation protocol", self.setUserConfirmation), # joined ".tools"
             ".apikeys": ("change API keys", self.changeAPIkeys),
-            #".changeapikey": ("change OpenAI API key", self.changeChatGPTAPIkey),
-            #".openweathermapapi": ("change OpenWeatherMap API key", self.changeOpenweathermapApi),
-            #".elevenlabsapi": ("change ElevenLabs API key", self.changeElevenlabsApi),
-            ".temperature": ("change temperature", self.setTemperature),
+            #".changeapikey": ("change OpenAI API key", self.changeChatGPTAPIkey), # joined ".apikeys"
+            #".openweathermapapi": ("change OpenWeatherMap API key", self.changeOpenweathermapApi), # joined ".apikeys"
+            #".elevenlabsapi": ("change ElevenLabs API key", self.changeElevenlabsApi), # joined ".apikeys"
+            #".googleapiservice": ("change Google API service", self.selectGoogleAPIs), # joined ".apikeys"
+            #".autobuilderconfig": ("change auto builder config", self.setAutoGenBuilderConfig), ".apikeys"
+            #".termuxapi": ("change Termux API integration", self.setTermuxApi), # joined ".apikeys"
+            #".functioncall": ("change function call", self.setFunctionCall),
+            #".functioncallintegration": ("change function call integration", self.setFunctionResponse),
+            
+            # inference
+            ".temperature": ("change output temperature", self.setTemperature),
             ".maxtokens": ("change maximum output tokens", self.setMaxTokens),
             ".mintokens": ("change minimum output tokens", self.setMinTokens),
             ".dynamictokencount": ("change dynamic token count", self.setDynamicTokenCount),
-            ".maxautocorrect": ("change maximum consecutive auto-correction", self.setMaxAutoCorrect),
+            # tweak searches
             ".maxmemorymatches": ("change maximum memory matches", self.setMemoryClosestMatches),
             ".maxchatrecordmatches": ("change maximum chat record matches", self.setChatRecordClosestMatches),
-            ".tools": ("change tool selection configurations", self.setToolSelectionConfigs),
-            ".plugins": ("change plugins", self.selectPlugins),
-            ".functioncall": ("change function call", self.setFunctionCall),
-            ".functioncallintegration": ("change function call integration", self.setFunctionResponse),
+            # tweak input information
+            ".ipinfo": ("change ip information integration", self.setIncludeIpInSystemMessage),
             ".latestSearches": ("change online searches", self.setLatestSearches),
-            ".userconfirmation": ("change code confirmation protocol", self.setUserConfirmation),
+            # tweak output display
             ".codedisplay": ("change code display", self.setCodeDisplay),
             ".pagerview": ("change pager view", self.setPagerView),
-            ".assistantname": ("change assistant name", self.setAssistantName),
-            ".systemmessage": ("change custom system message", self.setCustomSystemMessage),
-            ".ipinfo": ("change ip information integration", self.setIncludeIpInSystemMessage),
-            ".storagedirectory": ("change storage directory", self.setStorageDirectory),
+            # speech
             ".speechrecognition": ("change sppech recognition", self.setSpeechToTextConfig),
             ".speechgeneration": ("change sppech generation", self.setTextToSpeechConfig),
-            ".googleapiservice": ("change Google API service", self.selectGoogleAPIs),
-            ".autobuilderconfig": ("change auto builder config", self.setAutoGenBuilderConfig),
-            ".customtexteditor": ("change custom text editor", self.setCustomTextEditor),
-            ".termuxapi": ("change Termux API integration", self.setTermuxApi),
-            ".autoupgrade": ("change automatic upgrade", self.setAutoUpgrade),
-            ".developer": (f"change developer mode {str(config.hotkey_toggle_developer_mode)}", self.setDeveloperMode),
+            # toggle
+            ".toggledeveloper": (f"toggle developer mode {str(config.hotkey_toggle_developer_mode)}", self.toggleDeveloperMode),
             ".togglemultiline": (f"toggle multi-line input {str(config.hotkey_toggle_multiline_entry)}", self.toggleMultiline),
             ".togglemousesupport": (f"toogle mouse support {str(config.hotkey_toggle_mouse_support)}", self.toggleMouseSupport),
             ".toggletextbrightness": (f"swap text brightness {str(config.hotkey_swap_text_brightness)}", swapTerminalColors),
@@ -172,16 +176,25 @@ class FreeGenius:
             ".toggleinputimprovement": (f"toggle input improvement {str(config.hotkey_toggle_input_improvement)}", self.toggleInputImprovement),
             ".toggleinputaudio": (f"toggle input audio {str(config.hotkey_toggle_input_audio)}", toggleinputaudio),
             ".toggleoutputaudio": (f"toggle output audio {str(config.hotkey_toggle_response_audio)}", toggleoutputaudio),
-            ".code": (f"extract the python code from the last response", self.extractPythonCodeFromLastResponse),
-            ".run": (f"run the python code in the last response", self.runPythonCodeInLastResponse),
+            # editor
+            ".customtexteditor": ("change custom text editor", self.setCustomTextEditor),
             ".editresponse": (f"edit the last response {str(config.hotkey_edit_last_response)}", self.editLastResponse),
             ".editconfigs": ("edit configuration settings", self.editConfigs),
-            ".install": ("install python package", self.installPythonPackage),
+            # app settings
+            ".autoupgrade": ("change automatic upgrade", self.setAutoUpgrade),
+            ".assistantname": ("change assistant name", self.setAssistantName),
+            ".storagedirectory": ("change storage directory", self.setStorageDirectory),
+            ".systemmessage": ("change custom system message", self.setCustomSystemMessage),
+            # miscellaneous
             ".system": (f"open system command prompt {str(config.hotkey_launch_system_prompt)}", lambda: SystemCommandPrompt().run(allowPathChanges=True)),
-            ".content": ("display current directory content", self.getPath.displayDirectoryContent),
+            ".content": ("display current directory content", self.getPath.displayDirectoryContent), # TODO: changed to a tool
+            ".code": (f"extract the python code from the last response", self.extractPythonCodeFromLastResponse), # TODO: changed to a tool
+            ".run": (f"run the python code in the last response", self.runPythonCodeInLastResponse), # TODO: changed to a tool
+            ".install": ("install python package", self.installPythonPackage), # TODO: changed to a tool
+            # help
             ".keys": (f"display key bindings {str(config.hotkey_display_key_combo)}", config.showKeyBindings),
             ".help": ("open LetMeDoIt wiki", lambda: openURL('https://github.com/eliranwong/freegenius/wiki')),
-            ".help2": ("open LetMeDoIt wiki", lambda: openURL('https://github.com/eliranwong/letmedoit/wiki')),
+            ".help2": ("open LetMeDoIt wiki", lambda: openURL('https://github.com/eliranwong/letmedoit/wiki')), # TODO: remove after finishing FreeGenius AI wiki
             ".donate": ("donate and support FreeGenius AI", lambda: openURL('https://www.paypal.com/paypalme/letmedoitai')),
         }
 
@@ -384,7 +397,7 @@ class FreeGenius:
         if os.environ["GOOGLE_APPLICATION_CREDENTIALS"]:
             enabledGoogleAPIs = self.dialogs.getMultipleSelection(
                 title="Google Cloud Service",
-                text="Select to enable Google Cloud Service in LetMeDoIt AI:",
+                text="Select to enable Google Cloud Service:",
                 options=("Vertex AI", "Speech-to-Text", "Text-to-Speech"),
                 default_values=config.enabledGoogleAPIs,
             )
@@ -448,8 +461,12 @@ class FreeGenius:
     def changeAPIkeys(self):
         self.changeGroqApi()
         self.changeChatGPTAPIkey()
+        self.setAutoGenBuilderConfig()
         self.changeOpenweathermapApi()
         self.changeElevenlabsApi()
+        self.selectGoogleAPIs()
+        if config.isTermux:
+            self.setTermuxApi()
 
     def changeChatGPTAPIkey(self):
         if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
@@ -760,7 +777,7 @@ class FreeGenius:
             options=options,
             descriptions=descriptions,
             title="Command Confirmation Protocol",
-            text=f"{config.freeGeniusAIName} is designed to execute commands on your behalf.\nPlease specify when you would prefer\nto receive a confirmation\nbefore commands are executed:\n(Note: Execute commands at your own risk.)",
+            text=f"FreeGenius AI tools can execute commands on your behalf.\nPlease specify when you would prefer\nto receive a confirmation\nbefore executing newly generated commands:\n(Note: Confirm command execution at your own risk.)",
             default=config.confirmExecution,
         )
         if option:
@@ -924,10 +941,16 @@ class FreeGenius:
             print3(f"LLM Temperature: {temperature}")
 
     def setToolSelectionConfigs(self):
-        print2("# Introduction. FreeGenius AI enhances LLM capabilities by offering tools through plugins. When a user makes a request, FreeGenius AI searches for and selects a suitable tool from its tool store. This search involves finding similarities between the user query and the examples provided in the tool plugins. Users have the flexibility to customize the tool selection process by adjusting three key configurations:")
+        self.setUserConfirmation()
+        print2(config.divider)
+        self.setMaxAutoCorrect()
+        print2(config.divider)
+        print2("# Tool Selection Configurations")
+        print2("FreeGenius AI extends LLM capabilities via tool plugins. You can either specify particular tool(s) or rely on FreeGenius AI to choose a tool for you for each request. When you enter a prompt, without specifiying a particular tool, FreeGenius AI searches for suitable tools from its tool store. This search involves finding similarities between the user query and the examples provided in the tool plugins. Users have the flexibility to customize the tool selection process by adjusting the following three key configurations:")
         print2("""1) tool_dependence
 2) tool_auto_selection_threshold
 3) tool_selection_max_choices""")
+        print1("\nWe will guide you step-by-step to configure each of these settings ...\n")
         print2("# Tool Dependence. The value of 'tool_dependence' determines how you want to rely on tools.")
         print1("Acceptable range: 0.0 - 1.0")
         print1("A value of 0.0 indicates that tools are disabled. FreeGenius's responses are totally based on capabilities of the selected LLM.")
@@ -945,6 +968,7 @@ class FreeGenius:
             config.tool_dependence = tool_dependence
             print3(f"Tool Dependence: {tool_dependence}")
         print2("# Tool Auto Selection Threshold. The value of 'tool_auto_selection_threshold' determines the threshold of automatic tool selection.")
+        print3("Remarks: `Tool Auto Selection Threshold` does not apply to running multiple tools for a single request. Read more at https://github.com/eliranwong/freegenius/wiki/Multiple-Tools-in-One-Go")
         print1("Acceptable range: 0.0 - [the value of tool_dependence]")
         print1("A value of 0.0 indicates that automatic tool selection is disabled. Users must manually choose a tool from the most relevant options identified in each tool search.")
         print1("A value that is equal to or larger than the value of 'tool_dependence' indicates that tool selection is always automatic.")
@@ -960,6 +984,7 @@ class FreeGenius:
             config.tool_auto_selection_threshold = tool_auto_selection_threshold
             print3(f"Tool Auto Selection Threshold: {tool_auto_selection_threshold}")
         print2("# Tool Selection Max Choices. The value of 'tool_selection_max_choices' determines the maximum number of available options for manual tool selection.")
+        print3("Remarks: `Tool Selection Max Choices` does not apply to running multiple tools for a single request. Read more at https://github.com/eliranwong/freegenius/wiki/Multiple-Tools-in-One-Go")
         print1("Default value: 4")
         print2("Please enter a number for this value:")
         tool_selection_max_choices = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.tool_selection_max_choices))
@@ -1076,6 +1101,9 @@ class FreeGenius:
             config.defaultEntry = ".new"
             config.accept_default = True
         CallLLM.checkCompletion()
+
+        # change embedding models
+        self.setEmbeddingModel()
 
     def selectOllamaModel(self, message="Select a model from Ollama Library:", feature="default") -> str:
         # history session
@@ -1448,7 +1476,8 @@ class FreeGenius:
             print3(f"Number of memory closest matches: {config.memoryClosestMatches}")
 
     def setMaxAutoCorrect(self):
-        print1(f"The auto-correction feature enables {config.freeGeniusAIName} to automatically fix broken Python code if it was not executed properly.")
+        print2("# Maximum Python Code Auto-correction")
+        print1(f"The auto-correction feature enables {config.freeGeniusAIName} to automatically fix the Python codes that are not executed properly.")
         print1("Please specify maximum number of auto-correction attempts below:")
         print1("(Remarks: Enter '0' if you want to disable auto-correction feature)")
         maxAutoCorrect = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.max_consecutive_auto_correction))
@@ -1591,6 +1620,11 @@ class FreeGenius:
         config.mouseSupport = not config.mouseSupport
         config.saveConfig()
         print3(f"Entry Mouse Support: '{'enabled' if config.mouseSupport else 'disabled'}'!")
+
+    def toggleDeveloperMode(self):
+        config.developer = not config.developer
+        config.saveConfig()
+        print3(f"Developer mode: '{'enabled' if config.developer else 'disabled'}'!")
 
     def toggleInputImprovement(self):
         config.improveInputEntry = not config.improveInputEntry
@@ -2145,6 +2179,7 @@ My writing:
                 pass
             elif userInputLower == ".context":
                 self.changeContext()
+                self.setContextIntegration()
                 if not config.applyPredefinedContextAlways:
                     if config.conversationStarted:
                         self.saveChat(config.currentMessages)
@@ -2310,7 +2345,7 @@ My writing:
                 # check for any tool patterns
                 toolNames = "|".join(config.toolFunctionMethods.keys())
                 actionPattern = f"@(command|append_command|append_prompt|improve_writing|{toolNames})[ \n]"
-                actions = re.findall(actionPattern, fineTunedUserInput)
+                actions = re.findall(actionPattern, f"{fineTunedUserInput} ") # add a space after `fineTunedUserInput` to allow tool entry at the end without a description
                 
                 if not actions:
                     if fineTunedUserInput.strip():
@@ -2318,7 +2353,7 @@ My writing:
                         runSingleAction("", fineTunedUserInput)
                 else:
                     separator = "＊@＊@＊"
-                    descriptions = re.sub(actionPattern, separator, fineTunedUserInput).split(separator)
+                    descriptions = re.sub(actionPattern, separator, f"{fineTunedUserInput} ").split(separator)
                     if descriptions[0].strip():
                         # in case content entered before the first action declared
                         actions.insert(0, "chat")
@@ -2326,6 +2361,9 @@ My writing:
                         del descriptions[0]
                     for index, action in enumerate(actions):
                         description = descriptions[index]
+                        if not description.strip():
+                            # enable tool to work on previous generated response
+                            description = getAssistantPreviousResponse()[0]
                         if description.strip():
                             print3(f"\n@{action}: {description}")
                             runSingleAction(action, description)

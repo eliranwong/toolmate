@@ -133,6 +133,7 @@ class AutoGenBuilder:
         return self.prompts.simplePrompt(style=self.promptStyle)
 
     def promptConfig(self):
+        print2("# AutoGen AutoBuilder Configurations")
         self.print("Enter maximum number of agents:")
         max_agents = self.prompts.simplePrompt(numberOnly=True, style=self.promptStyle, default=str(config.max_agents),)
         if max_agents and int(max_agents) > 1:

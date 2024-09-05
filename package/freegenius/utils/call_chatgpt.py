@@ -189,10 +189,10 @@ def runSingleFunctionCall(messages, function_name):
             {
                 "role": "function",
                 "name": function_name,
-                "content": function_call_response if function_call_response else config.tempContent,
+                "content": function_call_response if function_call_response else config.toolTextOutput,
             }
         )
-        config.tempContent = ""
+        config.toolTextOutput = ""
     except:
         showErrors()
         return messagesCopy
@@ -452,16 +452,16 @@ class CallChatGPT:
                         {
                             "role": "function",
                             "name": tool_name,
-                            "content": tool_response if tool_response else config.tempContent,
+                            "content": tool_response if tool_response else config.toolTextOutput,
                         }
                     )
-                    config.tempContent = ""
+                    config.toolTextOutput = ""
 
                     return CallChatGPT.regularCall(messages)
                 elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
                     # tool function executed without chat extension
-                    config.currentMessages.append({"role": "assistant", "content": config.tempContent if config.tempContent else "Done!"})
-                    config.tempContent = ""
+                    config.currentMessages.append({"role": "assistant", "content": config.toolTextOutput if config.toolTextOutput else "Done!"})
+                    config.toolTextOutput = ""
                     config.conversationStarted = True
                     return None
 
@@ -609,7 +609,7 @@ class CallLetMeDoIt:
                     # "[INVALID]" practically mean that it ignores previously called function and continues chat without function calling
                     if func_response == "[INVALID]":
                         bypassFunctionCall = True
-                    elif func_response or config.tempContent:
+                    elif func_response or config.toolTextOutput:
                         # send the function call info and response to GPT
                         function_call_message = {
                             "role": "assistant",
@@ -628,10 +628,10 @@ class CallLetMeDoIt:
                                 "tool_call_id": func_id,
                                 "role": "function",
                                 "name": func_name,
-                                "content": func_response if func_response else config.tempContent,
+                                "content": func_response if func_response else config.toolTextOutput,
                             }
                         )  # extend conversation with function response
-                        config.tempContent = ""
+                        config.toolTextOutput = ""
                         if func_response:
                             func_responses += f"\n{func_response}\n{config.divider}"
 

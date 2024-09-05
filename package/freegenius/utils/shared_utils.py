@@ -4,7 +4,10 @@ import sys, os, geocoder, platform, socket, geocoder, datetime, requests, netifa
 import traceback, uuid, re, textwrap, signal, wcwidth, shutil, threading, time, tiktoken, subprocess, json, base64, html2text, pydoc, codecs, psutil
 from packaging import version
 from chromadb.utils import embedding_functions
+import pygments
+from pygments.lexers.python import PythonLexer
 from pygments.styles import get_style_by_name
+from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit.styles.pygments import style_from_pygments_cls
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit import prompt
@@ -859,6 +862,12 @@ def toGeminiMessages(messages: dict=[]) -> Optional[list]:
 
 # python code
 
+def displayPythonCode(python_code):
+    print1("```python")
+    tokens = list(pygments.lex(python_code, lexer=PythonLexer()))
+    print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
+    print1("```")
+
 def execPythonFile(script="", content=""):
     if script or content:
         try:
@@ -888,7 +897,7 @@ def extractPythonCode(content, keepInvalid=False):
     content = content.replace("</python>", "")
     content = content.replace("<\/python>", "")
     content = re.sub("^python[ ]*\n", "", content).strip()
-    content = re.sub("^```.*?\n", "", content, flags=re.M).strip()
+    content = re.sub("^[\d\D]*?```.*?\n", "", content, flags=re.M).strip()
     content = re.sub("\n```.*?$", "", content, flags=re.M).strip()
     if code_only := re.search('```python[ ]*\n(.+?)```', content, re.DOTALL):
         content = code_only.group(1).strip()

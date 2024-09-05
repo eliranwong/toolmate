@@ -174,10 +174,10 @@ class CentralWidget(QWidget):
                 function_call_response = {
                     "role": "function",
                     "name": function_name,
-                    "content": response if response else config.tempContent,
+                    "content": response if response else config.toolTextOutput,
                 }
-                # empty tempContent
-                config.tempContent = ""
+                # reset toolTextOutput
+                config.toolTextOutput = ""
 
                 # handle response
                 if not response:

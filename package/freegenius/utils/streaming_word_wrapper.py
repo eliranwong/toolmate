@@ -13,7 +13,7 @@ class StreamingWordWrapper:
 
     def __init__(self):
         self.streaming_finished = False
-        config.tempChunk = ""
+        config.llmTextChunk = ""
 
     def wrapStreamWords(self, answer, terminal_width):
         if " " in answer:
@@ -83,8 +83,8 @@ class StreamingWordWrapper:
 
         def finishOutputs(wrapWords, chat_response, terminal_width=terminal_width):
             config.wrapWords = wrapWords
-            # reset config.tempChunk
-            config.tempChunk = ""
+            # reset config.llmTextChunk
+            config.llmTextChunk = ""
             print("" if config.llmInterface == "llamacpp" else "\n")
             # add chat response to messages
             if chat_response:
@@ -166,22 +166,22 @@ class StreamingWordWrapper:
                 finishOutputs(wrapWords, chat_response)
                 return None
         
-        if config.ttsOutput and config.tempChunk:
-            TTSUtil.play(config.tempChunk)
-            config.tempChunk = ""
+        if config.ttsOutput and config.llmTextChunk:
+            TTSUtil.play(config.llmTextChunk)
+            config.llmTextChunk = ""
         finishOutputs(wrapWords, chat_response)
 
     def readAnswer(self, answer):
         # read the chunk when there is a punctuation
-        #if answer in string.punctuation and config.tempChunk:
-        if re.search(config.tts_startReadPattern, answer) and config.tempChunk:
+        #if answer in string.punctuation and config.llmTextChunk:
+        if re.search(config.tts_startReadPattern, answer) and config.llmTextChunk:
             # read words when there a punctuation
-            chunk = config.tempChunk + answer
-            # reset config.tempChunk
-            config.tempChunk = ""
+            chunk = config.llmTextChunk + answer
+            # reset config.llmTextChunk
+            config.llmTextChunk = ""
             # play with tts
             if config.ttsOutput:
                 TTSUtil.play(re.sub(config.tts_doNotReadPattern, "", chunk))
         else:
             # append to a chunk for reading
-            config.tempChunk += answer
+            config.llmTextChunk += answer

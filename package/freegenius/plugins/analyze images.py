@@ -35,7 +35,7 @@ def analyze_images(function_args):
     if config.llmInterface == "gemini":
         answer = GeminiProVision(temperature=config.llmTemperature).analyze_images(function_args)
         if answer:
-            config.tempContent = answer
+            config.toolTextOutput = answer
             return ""
         else:
             return "[INVALID]"
@@ -83,7 +83,7 @@ def analyze_images(function_args):
         elif config.llmInterface in ("ollama", "groq"):
             config.currentMessages[-1] = {'role': 'user', 'content': query, 'images': files}
             answer = CallOllama.getSingleChatResponse("", config.currentMessages, model=config.ollamaVisionModel)
-            config.tempContent = answer
+            config.toolTextOutput = answer
             print2("```assistant")
             print1(answer)
             print2("```")
@@ -102,7 +102,7 @@ def analyze_images(function_args):
             max_tokens=4096,
         )
         answer = response.choices[0].message.content
-        config.tempContent = answer
+        config.toolTextOutput = answer
 
         # display answer
         print2("```assistant")

@@ -1,3 +1,43 @@
+# Version: 0.3.02-0.3.03
+
+Added three tools:
+
+`convert_relative_datetime` to convert relative dates and times in writing
+
+`add_google_calendar_event` to add google calendar event
+
+`add_outlook_calendar_event` to add outlook calendar event
+
+Removed tool `add_calendar_event`
+
+# Version: 0.2.98-0.3.01
+
+Added two tools:
+
+`copy_to_clipboard` copy text from clipboard
+
+`paste_from_clipboard` paste text from clipboard
+
+# Version: 0.2.98-0.3.00
+
+Removed items `.code` and `.run` from action menu.
+
+Added two tools:
+
+`extract_python_code` extract python code, enclosed by ```
+
+`run_python_code` extract and run python code, enclosed by ```
+
+# Version: 0.2.97
+
+Fixed input suggestion plugin
+
+# Version: 0.2.96
+
+Removed item `.content` from action menu.
+
+Added a tool `list_current_directory_contents` to list current directory contents.
+
 # Version: 0.2.95
 
 Support tool without given prompt.

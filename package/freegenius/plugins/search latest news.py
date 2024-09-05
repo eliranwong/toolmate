@@ -26,12 +26,12 @@ def search_latest_news(function_args: dict) -> str:
             # title
             title = re.sub("<[^<>]*?>", "", entry.title)
             title = f"Title: {title}"
-            config.tempContent += f"{title}\n"
+            config.toolTextOutput += f"{title}\n"
             print3(title)
             # link
             link = re.sub("<[^<>]*?>", "", entry.link)
             link = f"Link: {link}"
-            config.tempContent += f"{link}\n"
+            config.toolTextOutput += f"{link}\n"
             print3(link)
     print2(config.divider)
     return ""

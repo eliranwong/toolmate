@@ -52,11 +52,11 @@ def execute_computing_task(function_args):
         if not confirmation.lower() in ("y", "yes"):
             config.runPython = False
             return "[INVALID]"
-    config.tempContent = PythonUtil.executePythonCode(refinedCode)
+    config.toolTextOutput = PythonUtil.executePythonCode(refinedCode)
     try:
-        pprint.pprint(json.loads(config.tempContent))
+        pprint.pprint(json.loads(config.toolTextOutput))
     except:
-        print(config.tempContent)
+        print(config.toolTextOutput)
     return ""
 
 functionSignature = {

@@ -65,6 +65,7 @@ class GetPath:
                 print("Files:")
                 print(" | ".join(sorted(files)))
             print1(config.divider)
+            return dirs, files
 
         def printFormattedDirsFiles(display_dir_only=display_dir_only):
             # require prompt-toolkit
@@ -75,20 +76,21 @@ class GetPath:
             separator = '</{0}> | <{0}>'.format(self.itemColor)
             print_formatted_text(config.divider)
             if dirs:
-                dirs = "<{0}>{1}</{0}>".format(self.itemColor, separator.join(dirs))
+                dirsColored = "<{0}>{1}</{0}>".format(self.itemColor, separator.join(dirs))
                 print_formatted_text(HTML("<b><{0}>Directories</{0}></b>".format(self.subHeadingColor)))
-                print_formatted_text(HTML(dirs))
+                print_formatted_text(HTML(dirsColored))
             if files and not display_dir_only:
-                files = "<{0}>{1}</{0}>".format(self.itemColor, separator.join(files))
+                filesColored = "<{0}>{1}</{0}>".format(self.itemColor, separator.join(files))
                 print_formatted_text(HTML("<b><{0}>Files</{0}></b>".format(self.subHeadingColor)))
-                print_formatted_text(HTML(files))
+                print_formatted_text(HTML(filesColored))
             print_formatted_text(config.divider)
+            return dirs, files
 
         try:
             # when prompt-toolkit is installed
-            printFormattedDirsFiles(display_dir_only=display_dir_only)
+            return printFormattedDirsFiles(display_dir_only=display_dir_only)
         except:
-            printDirsFiles(display_dir_only=display_dir_only)
+            return printDirsFiles(display_dir_only=display_dir_only)
 
     def confirm_prompt(self, message):
         try:

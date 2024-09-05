@@ -14,11 +14,11 @@ def datetimes(function_args):
     code = function_args.get("code") # required
     #information = PythonUtil.showAndExecutePythonCode(code)
     #return information
-    config.tempContent = PythonUtil.showAndExecutePythonCode(code)
+    config.toolTextOutput = PythonUtil.showAndExecutePythonCode(code)
     try:
-        pprint.pprint(json.loads(config.tempContent))
+        pprint.pprint(json.loads(config.toolTextOutput))
     except:
-        print(config.tempContent)
+        print(config.toolTextOutput)
     return ""
 
 functionSignature = {

@@ -64,8 +64,8 @@ https://outlook.office.com/owa/?path=/calendar/action/compose&rru=addevent
 When you click on this URL, it will open a new window in Outlook web app and fill in the event details for you. You can then save or edit the event as you wish.
 """
 
-def add_calendar_event(function_args):
-    calendar = function_args.get("calendar") # required
+def add_google_calendar_event(function_args):
+    calendar = calendar = "google" # required
     title = function_args.get("title") # required
     description = function_args.get("description") # required
     url = function_args.get("url", "") # optional
@@ -128,16 +128,11 @@ functionSignature = {
         "add a google calendar event",
         "add an outlook calendar event",
     ],
-    "name": "add_calendar_event",
+    "name": "add_google_calendar_event",
     "description": "add calendar event",
     "parameters": {
         "type": "object",
         "properties": {
-            "calendar": {
-                "type": "string",
-                "description": "The calendar application. Return 'google' if not given.",
-                "enum": ['google', 'outlook'],
-            },
             "title": {
                 "type": "string",
                 "description": "The title of the event.",
@@ -163,8 +158,8 @@ functionSignature = {
                 "description": "The location or venue of the event.",
             },
         },
-        "required": ["calendar", "title", "description", "start_time", "end_time"],
+        "required": ["title", "description", "start_time", "end_time"],
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=add_calendar_event, deviceInfo=True)
+config.addFunctionCall(signature=functionSignature, method=add_google_calendar_event, deviceInfo=True)

@@ -278,9 +278,9 @@ Remember, output the new copy of python code ONLY, without additional notes or e
         messagesCopy = copy.deepcopy(messages)
         try:
             _, function_call_response = CallLlamaCpp.getSingleFunctionCallResponse(messages, function_name)
-            function_call_response = function_call_response if function_call_response else config.tempContent
+            function_call_response = function_call_response if function_call_response else config.toolTextOutput
             messages[-1]["content"] += f"""\n\nAvailable information:\n{function_call_response}"""
-            config.tempContent = ""
+            config.toolTextOutput = ""
         except:
             showErrors()
             return messagesCopy
@@ -399,8 +399,8 @@ Supplementary information:
                     return CallLlamaCpp.regularCall(messages)
                 elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
                     # tool function executed without chat extension
-                    config.currentMessages.append({"role": "assistant", "content": config.tempContent if config.tempContent else "Done!"})
-                    config.tempContent = ""
+                    config.currentMessages.append({"role": "assistant", "content": config.toolTextOutput if config.toolTextOutput else "Done!"})
+                    config.toolTextOutput = ""
                     config.conversationStarted = True
                     return None
 

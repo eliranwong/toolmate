@@ -1,3 +1,8 @@
+# Version: 0.3.06
+
+* Improved relative date conversion
+* Updated Ollama model list
+
 # Version: 0.3.05
 
 Fixed tools `@command`, `@append_command`, `@fabric` and `@append_fabric`

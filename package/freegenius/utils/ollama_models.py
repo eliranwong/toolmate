@@ -1,4 +1,13 @@
 ollama_models = (
+    "reflection",
+    "reflection:70b",
+    "yi-coder",
+    "yi-coder:1.5b",
+    "yi-coder:9b",
+    "qwen2-math",
+    "qwen2-math:1.5b",
+    "qwen2-math:7b",
+    "qwen2-math:72b",
     "hermes3",
     "hermes3:8b",
     "hermes3:70b",

@@ -51,7 +51,7 @@ open(os.path.join(package, "config.py"), "w").close()
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name=package,
-    version="0.3.05",
+    version="0.3.06",
     python_requires=">=3.8, <3.12",
     description=f"{appFullName}, an advanced AI assistant that is capable of engaging in conversation and performing multi-step actions. Supports numerous open-source LLMs via Llama.cpp or Ollama or Groq Cloud API, with optional integration with AutoGen agents, OpenAI API, Google Gemini Pro, fabric and unlimited plugins.",
     long_description=long_description,
@@ -68,6 +68,7 @@ setup(
         f"{package}.icons",
         f"{package}.plugins",
         f"{package}.temp",
+        f"{package}.docs",
         f"{package}.utils",
         f"{package}.gui",
         f"{package}.macOS_service",
@@ -104,6 +105,7 @@ setup(
         f"{package}.icons": ["*.*"],
         f"{package}.plugins": ["*.*"],
         f"{package}.temp": ["*.*"],
+        f"{package}.docs": ["*.*"],
         f"{package}.utils": ["*.*"],
         f"{package}.gui": ["*.*"],
         f"{package}.macOS_service": ["*.*"],

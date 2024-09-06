@@ -2039,13 +2039,13 @@ My writing:
         # Feature: improve writing:
         if writing:
             writing = re.sub("\n\[Current time: [^\n]*?$", "", writing)
-            '''if config.isTermux:
+            if config.isTermux:
                 day_of_week = ""
             else:
-                day_of_week = f"today is {getDayOfWeek()} and "'''
+                day_of_week = f" ({getDayOfWeek()})"
             improvedVersion = CallLLM.getSingleChatResponse(f"""# Instructions
 
-* Convert any relative dates and times in `My writing`, into exact dates and times, based on the reference that current datetime is {str(datetime.datetime.now())}.
+* Convert any relative dates and times in `My writing`, into exact dates and times, based on the reference that current datetime is {str(datetime.datetime.now())}{day_of_week}.
 * Provide me with the revised writing only, enclosed in triple quotes ``` and without any additional information or comments.
 * If there is no change, return to my original writing to me, enclosed in triple quotes ``` and without any additional information or comments.
 

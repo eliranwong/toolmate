@@ -93,9 +93,12 @@ def send_gmail(function_args):
 
 functionSignature = {
     "examples": [
-        "draft an email",
-        "write an email",
-        "send an email",
+        "draft an google email",
+        "write an google email",
+        "send an google email",
+        "draft an gmail",
+        "write an gmail",
+        "send an gmail",
     ],
     "name": "send_gmail",
     "description": "send email",

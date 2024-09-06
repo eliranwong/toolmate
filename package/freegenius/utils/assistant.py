@@ -191,8 +191,7 @@ class FreeGenius:
             ".install": ("install python package", self.installPythonPackage), # TODO: changed to a tool
             # help
             ".keys": (f"display key bindings {str(config.hotkey_display_key_combo)}", config.showKeyBindings),
-            ".help": ("open LetMeDoIt wiki", lambda: openURL('https://github.com/eliranwong/freegenius/wiki')),
-            ".help2": ("open LetMeDoIt wiki", lambda: openURL('https://github.com/eliranwong/letmedoit/wiki')), # TODO: remove after finishing FreeGenius AI wiki
+            ".help": ("open documentations", lambda: openURL('https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/000_Home.md')),
             ".donate": ("donate and support FreeGenius AI", lambda: openURL('https://www.paypal.com/paypalme/letmedoitai')),
         }
 

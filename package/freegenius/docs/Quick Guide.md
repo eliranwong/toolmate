@@ -4,12 +4,6 @@
 
 https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/000_Home.md#Installation
 
-# Obtain API Keys
-
-OpenAI API: https://github.com/eliranwong/letmedoit/wiki/ChatGPT-API-Key
-
-Google Vertex AI API: https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup
-
 # Launch FreeGenius AI
 
 Double-click the desktop shortcut created when FreeGenius is first launched.
@@ -24,10 +18,6 @@ When virtual environment is applied, e.g.
 
 > freegenius
 
-# Enter your OpenAI API Key for the First Launch
-
-<img width="857" alt="EnterOpenAI_API_key" src="https://github.com/eliranwong/letmedoit/assets/25262722/5e57ee82-49eb-4ea2-a7f0-87df542fc5a0">
-
 # Prompt Interface
 
 Simply enter your request in the prompt interface.
@@ -36,7 +26,7 @@ Simply enter your request in the prompt interface.
 
 # CLI Options
 
-...
+> freegenius -h
 
 # Quick Actions
 
@@ -62,7 +52,7 @@ To have more control over editing, you can also use our built-in text editor "eT
 
 # Action Menu
 
-https://github.com/eliranwong/letmedoit/wiki/Action-Menu
+https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Action%20Menu.md
 
 # How to Change AI Backends and Models?
 
@@ -72,33 +62,31 @@ https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Chang
 
 https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/000_Home.md#optional-setup
 
-# Run System Command Directly
+# Work with Both Text Generation and Task Execution
 
-To run system command directly via FreeGenius prompts, prefix system commands with "!", e.g.:
+FreeGenius AI has a built-in process to select a tool for each single request, read the following link to tweak related settings.
 
-> !ls
-
-> !pwd
-
-Alternately, use our full-featured integrated system command prompt by pressing "escape+t" or "escape+!" or running:
-
-> .system
-
-![system_command_prompt](https://github.com/eliranwong/letmedoit/assets/25262722/3ddd1987-0304-4ee3-ab06-49ef5d2a65de)
+[Tool Selection Configurations](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Tool%20Selection%20Configurations.md)
 
 # Special Entries
 
-[NO_TOOL] - run without function call even function call is enabled
+Use `@` to specify a tool, to bypass FreeGenius built-in tool-selection process, e.g. 
 
-[TOOL_\<function\>] - call a particular function, e.g.
+```
+@execute_python_code Convert "Hello.docx" into pdf format
+```
 
-> Convert "Hello.docx" into pdf format [CALL_execute_python_code]
+Available tools at the time of timeing are:
 
-Tips: enter "[" to display related input suggestions
+@chat @paste_from_clipboard @improve_writing @convert_relative_datetime @copy_to_clipboard @append_prompt @command @append_command @fabric @append_fabric @list_current_directory_contents @extract_python_code @run_python_code @integrate_google_searches @add_google_calendar_event @add_outlook_calendar_event @analyze_audio @analyze_files @analyze_images @analyze_web_content @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @correct_python @build_agents @create_image @create_map @create_qrcode @create_statistical_graphics @datetimes @download_web_content @download_youtube_audio @download_youtube_video @edit_text @execute_computing_task @install_package @save_memory @retrieve_memory @modify_images @open_browser @pronunce_words @remove_image_background @search_chats @load_chats @search_finance @search_latest_news @search_sqlite @search_weather_info @send_gamil @send_outlook @send_tweet
 
-Shortcut entries that starts with ".", read https://github.com/eliranwong/letmedoit/wiki/Action-Menu#shortcut-entries
+Tips: Enter `@` to get input suggestions of available tools
 
-Tips: enter "." to display related input suggestions
+You can also run multiple tools in a single request, read https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Running%20Multiple%20Tools%20in%20One%20Go.md
+
+Shortcut entries that starts with `.`, read https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Action%20Menu.md
+
+Tips: enter `.` to display related input suggestions
 
 # Developer Mode
 

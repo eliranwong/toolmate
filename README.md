@@ -115,7 +115,7 @@ To start up with a particular backend, you may use parameter `-b`, e.g.:
 
 Read more at https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/000_Home.md#installation
 
-# Guick Guide
+# Quick Guide
 
 https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Quick%20Guide.md
 

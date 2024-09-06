@@ -24,6 +24,8 @@ Simply enter your request in the prompt interface.
 
 <img width="857" alt="prompt" src="https://github.com/eliranwong/letmedoit/assets/25262722/cbf63cf3-29ec-4c75-9c6f-b08f5ea4f5b1">
 
+[Examples](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Examples.md)
+
 # CLI Options
 
 > freegenius -h

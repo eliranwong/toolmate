@@ -1,3 +1,11 @@
+## Download for Offline Use
+
+FreeGenius AI can work with downloaded LLMs without internet. Upon the initial launch of FreeGenius AI, it will automatically download all necessary LLMs for core features and configure them for your convenience.
+
+Additional featured models are automatically downloaded based on specific feature requests. For instance, the Whisper model is automatically downloaded for offline use when users request the transcription of an audio file.
+
+https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Change%20AI%20Backends%20and%20Models.md
+
 # Download LLM in GGUF Format
 
 There are several ways to download.

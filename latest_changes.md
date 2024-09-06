@@ -1,3 +1,7 @@
+# Version: 0.3.07
+
+* Updating documentation ...
+
 # Version: 0.3.06
 
 * Improved relative date conversion

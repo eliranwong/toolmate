@@ -1,0 +1,41 @@
+# Whisper.cpp Integration
+
+FreeGenius integrates [Whisper.cpp](https://github.com/ggerganov/whisper.cpp) for supporting voice entry.
+
+# Set up Whisper.cpp
+
+You need to set up whisper.cpp separately, e.g.:
+
+> cd ~
+
+> git clone https://github.com/ggerganov/whisper.cpp.git
+
+> cd whisper.cpp
+
+> make
+
+In this example, the path of the whisper main file should be:
+
+> ~/whisper.cpp/main
+
+Make a note of this path for further configuration.
+
+For more information, read https://github.com/ggerganov/whisper.cpp
+
+# Set up FreeGenius AI
+
+Enter a blank entry '' in FreeGenius AI prompt and select 'change voice typing config' from the action menu.
+
+Alternately, enter '.voicetypingconfig' directly in FreeGenius AI prompt.
+
+1. Select 'whispercpp'
+
+<img width="842" alt="whispercpp" src="https://github.com/eliranwong/freegenius/assets/25262722/d6574aaa-2f2b-4fb3-b750-219e56cb254b">
+
+2. Enter the path of the whisper main file
+
+3. Select a whisper model
+
+<img width="842" alt="whisper_models" src="https://github.com/eliranwong/freegenius/assets/25262722/5c8d2df2-17c7-4cd5-9de2-25f92194053c">
+
+4. Follow the rest of the dialog

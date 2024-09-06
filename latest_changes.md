@@ -51,7 +51,7 @@ Added a tool `list_current_directory_contents` to list current directory content
 
 Support tool without given prompt.
 
-Read more at https://github.com/eliranwong/freegenius/wiki/Multiple-Tools-in-One-Go#work-on-generated-response-from-previous-tool
+Read more at https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Running%20Multiple%20Tools%20in%20One%20Go.md#work-on-generated-response-from-previous-tool
 
 # Version: 0.2.94
 

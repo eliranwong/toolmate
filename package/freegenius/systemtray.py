@@ -240,8 +240,8 @@ class FreeGeniusHub(QSystemTrayIcon):
                     config.perplexica_directory = perplexica_directory
                     config.saveConfig()
                 except:
-                    print2("Failed setting up Perplexica! Read: https://github.com/eliranwong/freegenius/wiki/%23-Perplexica-Integration for manual setup.")
-                    webbrowser.open("https://github.com/eliranwong/freegenius/wiki/%23-Perplexica-Integration")
+                    print2("Failed setting up Perplexica! Read: https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Perplexica%20Integration.md for manual setup.")
+                    webbrowser.open("https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Perplexica%20Integration.md")
         if config.perplexica_directory:
             if not isServerAlive(config.perplexica_ip, config.perplexica_port):
                 os.chdir(config.perplexica_directory)

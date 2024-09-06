@@ -259,7 +259,7 @@ class FreeGenius:
         voice_session = PromptSession(history=FileHistory(voice_history))
         completer = FuzzyCompleter(WordCompleter(voices, ignore_case=True))
         print2("Please specify a voice:")
-        print3("Read: https://github.com/eliranwong/freegenius/wiki/Offline-TTS-%E2%80%90-macOS#download-more-voices")
+        print3("Read: https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Offline%20TTS%20-%20macOS.md#download-more-voices")
         print1("(leave it blank to use the default voice)")
         if not config.say_voice in voices:
             config.say_voice = ""
@@ -488,7 +488,7 @@ class FreeGenius:
     def changeGroqApi(self):
         if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
             print3("# Groq Cloud API Key: allows access to Groq Cloud hosted LLMs")
-            print1("To set up Groq Cloud API Key, read:\nhttps://github.com/eliranwong/freegenius/wiki/Set-up-a-Groq-Cloud-API-Key\n")
+            print1("To set up Groq Cloud API Key, read:\nhttps://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Groq%20API%20Setup.md\n")
             print1("Enter a single or a list of multiple Groq Cloud API Key(s) [optional]:")
             print()
             apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=str(config.groqApi_key), is_password=True)
@@ -966,7 +966,7 @@ class FreeGenius:
             config.tool_dependence = tool_dependence
             print3(f"Tool Dependence: {tool_dependence}")
         print2("# Tool Auto Selection Threshold. The value of 'tool_auto_selection_threshold' determines the threshold of automatic tool selection.")
-        print3("Remarks: `Tool Auto Selection Threshold` does not apply to running multiple tools for a single request. Read more at https://github.com/eliranwong/freegenius/wiki/Multiple-Tools-in-One-Go")
+        print3("Remarks: `Tool Auto Selection Threshold` does not apply to running multiple tools for a single request. Read more at https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Running%20Multiple%20Tools%20in%20One%20Go.md")
         print1("Acceptable range: 0.0 - [the value of tool_dependence]")
         print1("A value of 0.0 indicates that automatic tool selection is disabled. Users must manually choose a tool from the most relevant options identified in each tool search.")
         print1("A value that is equal to or larger than the value of 'tool_dependence' indicates that tool selection is always automatic.")
@@ -982,7 +982,7 @@ class FreeGenius:
             config.tool_auto_selection_threshold = tool_auto_selection_threshold
             print3(f"Tool Auto Selection Threshold: {tool_auto_selection_threshold}")
         print2("# Tool Selection Max Choices. The value of 'tool_selection_max_choices' determines the maximum number of available options for manual tool selection.")
-        print3("Remarks: `Tool Selection Max Choices` does not apply to running multiple tools for a single request. Read more at https://github.com/eliranwong/freegenius/wiki/Multiple-Tools-in-One-Go")
+        print3("Remarks: `Tool Selection Max Choices` does not apply to running multiple tools for a single request. Read more at https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Running%20Multiple%20Tools%20in%20One%20Go.md")
         print1("Default value: 4")
         print2("Please enter a number for this value:")
         tool_selection_max_choices = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.tool_selection_max_choices))
@@ -1702,7 +1702,7 @@ class FreeGenius:
                 self.setVlcSpeed()
             else:
                 print2("Command 'piper' not found!")
-                print3("Read: https://github.com/eliranwong/freegenius/wiki/Offline-TTS-%E2%80%90-Linux")
+                print3("Read: https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Offline%20TTS%20-%20Linux.md")
         elif config.ttsPlatform == "say":
             self.setSayVoice()
             self.setSaySpeed()
@@ -1719,7 +1719,7 @@ class FreeGenius:
                 self.setWsaySpeed()
             else:
                 print2("Command 'wsay' not found!")
-                print3("Read: https://github.com/eliranwong/freegenius/wiki/Offline-TTS-%E2%80%90-Windows")
+                print3("Read: https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Offline%20TTS%20-%20Windows.md")
         elif config.ttsPlatform == "elevenlabs":
             if not config.elevenlabsApi:
                 self.changeElevenlabsApi()

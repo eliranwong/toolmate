@@ -10,7 +10,7 @@ FreeGenius v0.2.42+ integrates macOS built-in text-to-speech feature.
 
 3. Select a voice
 
-Remarks: Make the selected voice is [downloaded](https://github.com/eliranwong/freegenius/wiki/Offline-TTS-%E2%80%90-macOS#download-more-voices) on your device.
+Remarks: Make the selected voice is [downloaded](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Offline%20TTS%20-%20macOS.md#download-more-voices) on your device.
 
 4. Specify Speed
 

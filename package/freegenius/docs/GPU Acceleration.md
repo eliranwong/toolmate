@@ -16,7 +16,7 @@ https://github.com/eliranwong/MultiAMDGPU_AIDev_Ubuntu#freegenius
 
 For full control, we recommend advanced users to use llama.cpp server
 
-Read https://github.com/eliranwong/freegenius/wiki/Llama.cpp-Server-with-GPU-Acceleration
+Read https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/GPU%20Acceleration%20with%20Llama_cpp%20server.md
 
 # Ollama
 

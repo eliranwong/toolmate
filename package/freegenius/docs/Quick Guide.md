@@ -2,7 +2,7 @@
 
 # Installation
 
-https://github.com/eliranwong/freegenius/wiki/Installation
+https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/000_Home.md#Installation
 
 # Obtain API Keys
 
@@ -64,17 +64,13 @@ To have more control over editing, you can also use our built-in text editor "eT
 
 https://github.com/eliranwong/letmedoit/wiki/Action-Menu
 
-# How to Change LLM Backend?
+# How to Change AI Backends and Models?
 
-https://github.com/eliranwong/freegenius/wiki/Change-LLM-Backend
-
-# How to Change Models?
-
-https://github.com/eliranwong/freegenius/wiki/Change-Model
+https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Change%20AI%20Backends%20and%20Models.md
 
 # How to Set up Google or OpenAI Credentials? [Optional]
 
-https://github.com/eliranwong/freegenius/wiki/Set-up-Optional-Credentials
+https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/000_Home.md#optional-setup
 
 # Run System Command Directly
 

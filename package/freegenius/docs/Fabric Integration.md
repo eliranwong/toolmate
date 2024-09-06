@@ -20,7 +20,7 @@ Assuming `fabric` is installed and the FreeGenius AI tool plugin `fabric` is ena
 @ask_chatgpt Translate it into Chinese
 ```
 
-For using multiple tools in a single prompt, read https://github.com/eliranwong/freegenius/wiki/Multiple-Tools-in-One-Go
+For using multiple tools in a single prompt, read https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Running%20Multiple%20Tools%20in%20One%20Go.md
 
 # Difference from Running Fabric Alone
 
@@ -46,4 +46,4 @@ In plugin `fabric.py`, two aliases are created:
 
 Version 0.2.91 added config item `fabricPath`.  Users can customise fabric path by editing its value in `config.py`.
 
-Read more about system command integration at system command integration at https://github.com/eliranwong/freegenius/wiki/System-Command-Integration
+Read more about system command integration at system command integration at https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/System%20Command%20Integration.md

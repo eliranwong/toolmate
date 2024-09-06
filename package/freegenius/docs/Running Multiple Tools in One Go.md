@@ -146,6 +146,6 @@ For an example, to integrate `fabric` with other FreeGenius AI tools, you may do
 
 # Read More
 
-system command integration at https://github.com/eliranwong/freegenius/wiki/System-Command-Integration
+system command integration at https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/System%20Command%20Integration.md
 
-fabric integration at https://github.com/eliranwong/freegenius/wiki/Fabric-Integration
+fabric integration at https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Fabric%20Integration.md

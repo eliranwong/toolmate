@@ -24,4 +24,4 @@ To run:
 
 Windows may also need to install cmake, rust and Microsoft Visual C++ 14.0 or greater.
 
-For more information, read: https://github.com/eliranwong/freegenius/wiki/Install-a-Supported-Python-Version#on-windows-11-via-utm-on-macos
+For more information, read: https://github.com/eliranwong/letmedoit/wiki/Installation#windows-users

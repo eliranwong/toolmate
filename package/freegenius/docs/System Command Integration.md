@@ -29,4 +29,4 @@ System Command integration in FreeGenius AI allows interaction of any system com
 
 # Fabric Integration
 
-Read more about fabric integration at https://github.com/eliranwong/freegenius/wiki/Fabric-Integration
+Read more about fabric integration at https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Fabric%20Integration.md

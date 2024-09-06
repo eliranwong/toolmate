@@ -8,7 +8,7 @@ Latest changes: https://github.com/eliranwong/freegenius/blob/main/latest_change
 
 ## Beyond LetMeDoIt AI
 
-https://github.com/eliranwong/freegenius/wiki/Beyond-LetMeDoIt-AI
+https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/LetMeDoIt%20Mode.md
 
 # Distinctive - Multiple Tools in One Go
 
@@ -16,7 +16,7 @@ From version 0.2.87+, FreeGenius AI supports use of multiple tools in a single r
 
 ![multiple_tools_in_single_prompt](https://github.com/user-attachments/assets/7bdc63cd-beca-44c9-bfb0-27596a5e0632)
 
-Read more at: https://github.com/eliranwong/freegenius/wiki/Multiple-Tools-in-One-Go
+Read more at: https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Running%20Multiple%20Tools%20in%20One%20Go.md
 
 # Distinctive - Customizable Plugins
 
@@ -24,9 +24,9 @@ Read more at: https://github.com/eliranwong/freegenius/wiki/Multiple-Tools-in-On
 
 # Distinctive - System Command and Fabric Integration
 
-System Command Integration: https://github.com/eliranwong/freegenius/wiki/System-Command-Integration
+System Command Integration: https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/System%20Command%20Integration.md
 
-Fabric Integration: https://github.com/eliranwong/freegenius/wiki/Fabric-Integration
+Fabric Integration: https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Fabric%20Integration.md
 
 # Support GPU Offloading
 
@@ -66,7 +66,7 @@ FreeGenius AI supports four interfaces: llamcpp, ollama, gemini, and chatgpt. It
 
 * llamacpp - [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library)
 
-* llamacppserver - [Llama.cpp](https://github.com/ggerganov/llama.cpp) [server](https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library) - This option supports llama.cpp, [compiled from source](https://github.com/ggerganov/llama.cpp#build), with GPU acceleration. Read more at https://github.com/eliranwong/freegenius/wiki/Llama.cpp-Server-with-GPU-Acceleration
+* llamacppserver - [Llama.cpp](https://github.com/ggerganov/llama.cpp) [server](https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library) - This option supports llama.cpp, [compiled from source](https://github.com/ggerganov/llama.cpp#build), with GPU acceleration. Read more at https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/GPU%20Acceleration%20with%20Llama_cpp%20server.md
 
 * ollama - [Ollama](https://ollama.com/) / [Ollama Hosted models](https://ollama.com/library)
 
@@ -76,7 +76,7 @@ FreeGenius AI supports four interfaces: llamcpp, ollama, gemini, and chatgpt. It
 
 * chatgpt - [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
 
-* letmedoit - [LetMeDoIt mode](https://github.com/eliranwong/freegenius/wiki/LetMeDoIt-Mode) / [ChatGPT models](https://platform.openai.com/docs/models)
+* letmedoit - [LetMeDoIt mode](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/LetMeDoIt%20Mode.md) / [ChatGPT models](https://platform.openai.com/docs/models)
 
 ## Open Source Models on Consumer Hardware
 
@@ -84,7 +84,7 @@ Even on CPU-only devices, FreeGenius AI works well with a wide range of tested L
 
 Note: Ollama hosted models work with both "llamacpp" and "ollama" interfaces.
 
-Read more for chainging models at: https://github.com/eliranwong/freegenius/wiki/Change-Model
+Read more for chainging models at: https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Change%20AI%20Backends%20and%20Models.md
 
 FreeGenius AI also integrates the following models to enhance its abilities.
 
@@ -127,7 +127,7 @@ Remarks: Groq cloud currently does not support multimodal models. Other backends
 
 ## Text-to-Option Options
 
-1. [Offline TTS](https://github.com/eliranwong/freegenius/wiki/Offline-Text%E2%80%90to%E2%80%90Speech) - [Windows - wsay](https://github.com/eliranwong/freegenius/wiki/Offline-TTS-%E2%80%90-Windows); [macOS - say](https://github.com/eliranwong/freegenius/wiki/Offline-TTS-%E2%80%90-macOS); [Linux - piper](https://github.com/eliranwong/freegenius/wiki/Offline-TTS-%E2%80%90-Linux)
+1. [Offline TTS](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/000_Home.md#offline-text-to-speech) - [Windows - wsay](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Offline%20TTS%20-%20Windows.md); [macOS - say](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Offline%20TTS%20-%20macOS.md); [Linux - piper](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Offline%20TTS%20-%20Linux.md)
 2. Google Text-to-Speech (Generic)
 3. Google Text-to-Speech (API)
 4. Elevenlabs (API)
@@ -169,11 +169,11 @@ To run:
 
 ## GPU Acceleration
 
-Read https://github.com/eliranwong/freegenius/wiki/Speed-Up-with-GPU-Acceleration
+Read https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/GPU%20Acceleration.md
 
 ## What to Expect During the Initial Launch?
 
-https://github.com/eliranwong/freegenius/wiki/Initial-Launch
+https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/First%20launch.md
 
 ## Download for Offline Use
 
@@ -181,7 +181,7 @@ FreeGenius AI can work with downloaded LLMs without internet. Upon the initial l
 
 Additional featured models are automatically downloaded based on specific feature requests. For instance, the Whisper model is automatically downloaded for offline use when users request the transcription of an audio file.
 
-https://github.com/eliranwong/freegenius/wiki/Change-Model
+https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Change%20AI%20Backends%20and%20Models.md
 
 ## Install Ollama
 
@@ -189,39 +189,23 @@ This is optional. Install [Ollama](https://ollama.com/) to use [Ollama models](h
 
 # Guick Guide
 
-https://github.com/eliranwong/freegenius/wiki/Quick-Guide
+https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Quick%20Guide.md
 
 # How to Change LLM Platform?
 
-https://github.com/eliranwong/freegenius/wiki/Change-LLM-Platform
+https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Change%20AI%20Backends%20and%20Models.md
 
 # How to Change Models?
 
-https://github.com/eliranwong/freegenius/wiki/Change-Model
-
-# How to Set up Google or OpenAI Credentials?
-
-This is optional. Read https://github.com/eliranwong/freegenius/wiki/Set-up-Optional-Credentials
+https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Change%20AI%20Backends%20and%20Models.md
 
 # Speed Up with GPU Acceleration
 
-https://github.com/eliranwong/freegenius/wiki/Speed-Up-with-GPU-Acceleration
-
-# Function Calling Approach with Any LLM
-
-https://github.com/eliranwong/freegenius/wiki/Function-Calling-Approach-with-Any-LLMs
-
-# Tool Dependence Configurations
-
-https://github.com/eliranwong/freegenius/wiki/Tool-Selection-Configurations
+https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/GPU%20Acceleration.md
 
 # Documentation
 
-In progress at: https://github.com/eliranwong/freegenius/wiki
-
-Most current features follow https://github.com/eliranwong/letmedoit/wiki
-
-Particularly, plugin structure follows https://github.com/eliranwong/letmedoit/wiki/Plugins-%E2%80%90-Overview
+https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/000_Home.md
 
 # Examples (selective only):
 

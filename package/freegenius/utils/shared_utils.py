@@ -280,7 +280,7 @@ def downloadStableDiffusionFiles():
     if not os.path.isfile(config.stableDiffusion_model_path):
         print2("Downloading stable-diffusion model ...")
         hf_hub_download(
-            repo_id="runwayml/stable-diffusion-v1-5",
+            repo_id="Syimbiote/v1-5-pruned-emaonly",
             filename=filename,
             local_dir=llm_directory,
             #local_dir_use_symlinks=False,

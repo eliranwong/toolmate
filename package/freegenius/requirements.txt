@@ -10,7 +10,7 @@ ollama==0.2.1
 groq==0.9.0
 openai==1.35.9
 tiktoken==0.7.0
-google-cloud-aiplatform==1.58.0
+google-cloud-aiplatform==1.65.0
 pyautogen[retrievechat,autobuild]==0.2.31
 autogenstudio==0.1.3
 transformers==4.42.3

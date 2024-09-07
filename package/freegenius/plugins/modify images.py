@@ -6,7 +6,7 @@ modify the given images according to changes specified by users
 [FUNCTION_CALL]
 """
 
-from freegenius import config, is_valid_image_file, is_valid_image_url, print1, print3, startLlamacppVisionServer, stopLlamacppVisionServer, print2, encode_image, getCliOutput, getCpuThreads, runFreeGeniusCommand, getLlamacppServerClient
+from freegenius import config, is_valid_image_file, is_valid_image_url, print1, print3, startLlamacppVisionServer, stopLlamacppVisionServer, print2, encode_image, getCliOutput, getCpuThreads, runFreeGeniusCommand, getLlamacppServerClient, downloadStableDiffusionFiles
 import os
 from openai import OpenAI
 from freegenius.utils.call_chatgpt import check_openai_errors
@@ -57,6 +57,7 @@ def modify_images(function_args):
         })
         runFreeGeniusCommand("customvisionserver") if config.llmInterface=="llamacppserver" else startLlamacppVisionServer()
         client = getLlamacppServerClient("vision") if config.llmInterface=="llamacppserver" else OpenAI(base_url=f"http://localhost:{config.llamacppVisionModel_server_port}/v1", api_key="freegenius")
+        downloadStableDiffusionFiles()
         stable_diffusion = StableDiffusion(
             model_path=config.stableDiffusion_model_path,
             lora_model_dir=os.path.join(config.localStorage, "LLMs", "stable_diffusion", "lora"),

@@ -1,5 +1,5 @@
 from freegenius import config, showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema, getCpuThreads
-from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, downloadStableDiffusionFiles, isToolRequired, encode_image, selectEnabledTool
+from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, isToolRequired, encode_image, selectEnabledTool
 from typing import Optional
 from llama_cpp import Llama
 from llama_cpp.llama_chat_format import Llava15ChatHandler
@@ -109,9 +109,6 @@ class CallLlamaCpp:
                 local_dir=llm_directory,
                 #local_dir_use_symlinks=False,
             )
-
-        # download stable diffusion files
-        downloadStableDiffusionFiles()
         
         config.saveConfig()
 

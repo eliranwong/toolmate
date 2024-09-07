@@ -114,20 +114,21 @@ defaultSettings = (
     ('llamacppChatModel_additional_chat_options', {}),
     ('llamacppMainModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
     ('llamacppMainModel_model_path', ''), # specify file path of llama.cpp model for general purpose
-    ('llamacppMainModel_repo_id', 'TheBloke/CodeLlama-7B-Instruct-GGUF'), # llama.cpp model used for both task execution and conversation, e.g. 'TheBloke/phi-2-GGUF', 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
-    ('llamacppMainModel_filename', 'codellama-7b-instruct.Q4_K_M.gguf'), # llama.cpp model used for both task execution and conversation, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
+    ('llamacppMainModel_repo_id', 'MaziyarPanahi/WizardLM-2-7B-GGUF'), # llama.cpp model used for both task execution and conversation, e.g. 'TheBloke/phi-2-GGUF', 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
+    ('llamacppMainModel_filename', 'WizardLM-2-7B.Q4_K_M.gguf'), # llama.cpp model used for both task execution and conversation, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
     ('llamacppMainModel_n_ctx', 0), # llama.cpp main model context window
     ('llamacppMainModel_max_tokens', 10000), # llama.cpp main model maximum tokens
     ('llamacppMainModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
     ('llamacppMainModel_n_batch', 512), # The batch size to use per eval
     ('llamacppChatModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
     ('llamacppChatModel_model_path', ''), # specify file path of llama.cpp model for chat
-    ('llamacppChatModel_repo_id', 'TheBloke/Mistral-7B-Instruct-v0.2-GGUF'), # llama.cpp model used for chat, e.g. 'TheBloke/CodeLlama-7B-Python-GGUF'
-    ('llamacppChatModel_filename', 'mistral-7b-instruct-v0.2.Q4_K_M.gguf'), # llama.cpp model used for chat, e.g. 'codellama-7b-python.Q4_K_M.gguf'
+    ('llamacppChatModel_repo_id', 'bartowski/Meta-Llama-3.1-8B-Instruct-GGUF'), # llama.cpp model used for chat, e.g. 'TheBloke/CodeLlama-7B-Python-GGUF'
+    ('llamacppChatModel_filename', 'Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf'), # llama.cpp model used for chat, e.g. 'codellama-7b-python.Q4_K_M.gguf'
     ('llamacppChatModel_n_ctx', 0), # llama.cpp chat model context window
     ('llamacppChatModel_max_tokens', 10000), # llama.cpp chat model maximum tokens
     ('llamacppChatModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
     ('llamacppChatModel_n_batch', 512), # The batch size to use per eval
+    ('geminipro_model', "gemini-1.5-pro-001"), # "gemini-1.0-pro-001", "gemini-1.0-pro-002", "gemini-1.5-flash-001", "gemini-1.5-pro-001", read models that support function calling https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling
     ('geminipro_max_output_tokens', 8192), # check supported value at https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
     ('whispercpp_main', ''), # whisper.cpp main command file path
     ('whispercpp_model', ''), # whisper.cpp model file path
@@ -285,7 +286,6 @@ temporaryConfigs = [
     "llamacppChatServer",
     "llamacppVisionServer",
     "autogenstudioServer",
-    "geminipro_model",
     "geminipro_generation_config",
     "geminipro_safety_settings",
     "llamacppMainModel",

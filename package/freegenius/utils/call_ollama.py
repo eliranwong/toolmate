@@ -1,5 +1,5 @@
 from freegenius import showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema, selectEnabledTool
-from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, isValidPythodCode, downloadStableDiffusionFiles, isToolRequired
+from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, isValidPythodCode, isToolRequired
 from freegenius import config, getOllamaServerClient
 import shutil, re, traceback, json, ollama, pprint, copy, datetime
 from typing import Optional
@@ -29,9 +29,6 @@ class CallOllama:
     @staticmethod
     @check_ollama_errors
     def checkCompletion():
-        # download stable diffusion files
-        downloadStableDiffusionFiles() 
-
         if shutil.which("ollama"):
             for i in (config.ollamaMainModel, config.ollamaChatModel, config.ollamaVisionModel):
                 Downloader.downloadOllamaModel(i)

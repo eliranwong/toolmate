@@ -1,5 +1,5 @@
 from freegenius import getDeviceInfo, showErrors, get_or_create_collection, query_vectors, toGeminiMessages, executeToolFunction, extractPythonCode
-from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, isValidPythodCode, downloadStableDiffusionFiles, selectEnabledTool
+from freegenius import print1, print2, print3, selectTool, getPythonFunctionResponse, isValidPythodCode, selectEnabledTool
 from freegenius import config
 from prompt_toolkit import prompt
 import traceback, os, json, pprint, copy, datetime, codecs
@@ -15,26 +15,32 @@ from vertexai.generative_models._generative_models import (
 class CallGemini:
 
     @staticmethod
-    def checkCompletion():
-        # download stable diffusion files
-        downloadStableDiffusionFiles()
+    def getGeminiModel(tool=None):
+        config.geminipro_generation_config=GenerationConfig(
+            temperature=config.llmTemperature, # 0.0-1.0; default 0.9
+            max_output_tokens=config.geminipro_max_output_tokens, # default
+            candidate_count=1,
+        )
+        # the latest package requires tools to be placed in the `GenerativeModel` instead of `send_message`
+        # read https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling#chat-samples
+        return GenerativeModel(
+            model_name=config.geminipro_model,
+            generation_config=config.geminipro_generation_config,
+            tools=[tool],
+        ) if tool else GenerativeModel(config.geminipro_model, generation_config=config.geminipro_generation_config,)
 
+    @staticmethod
+    def checkCompletion():
         if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enabledGoogleAPIs:
-            config.geminipro_model = GenerativeModel("gemini-pro")
+            # initiation
+            vertexai.init()
         else:
             print("Vertex AI is disabled!")
             print("Read https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup for setting up Google API.")
             config.llmInterface = "llamacpp"
             config.saveConfig()
             print("LLM interface changed back to 'llamacpp'")
-        # initiation
-        vertexai.init()
-        
-        config.geminipro_generation_config=GenerationConfig(
-            temperature=config.llmTemperature, # 0.0-1.0; default 0.9
-            max_output_tokens=config.geminipro_max_output_tokens, # default
-            candidate_count=1,
-        )
+
         # Note: BLOCK_NONE is not allowed
         config.geminipro_safety_settings={
             HarmCategory.HARM_CATEGORY_UNSPECIFIED: HarmBlockThreshold.BLOCK_ONLY_HIGH,
@@ -112,7 +118,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     def regularCall(messages: dict, useSystemMessage: bool=True, **kwargs):
         history, systemMessage, lastUserMessage = toGeminiMessages(messages=messages)
         userMessage = f"{systemMessage}\n\nHere is my request:\n{lastUserMessage}" if useSystemMessage and systemMessage else lastUserMessage
-        chat = config.geminipro_model.start_chat(history=history)
+        chat = CallGemini.getGeminiModel().start_chat(history=history)
         return chat.send_message(
             userMessage,
             generation_config=config.geminipro_generation_config,
@@ -124,7 +130,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     @staticmethod
     def getDictionaryOutput(history: list, schema: dict, userMessage: str, **kwargs) -> dict:
         name, description, parameters = schema["name"], schema["description"], schema["parameters"]
-        chat = config.geminipro_model.start_chat(history=history)
+
         # declare a function
         function_declaration = FunctionDeclaration(
             name=name,
@@ -134,12 +140,13 @@ Remember, give me the python code ONLY, without additional notes or explanation.
         tool = Tool(
             function_declarations=[function_declaration],
         )
+
+        chat = CallGemini.getGeminiModel(tool).start_chat(history=history)
+
         try:
             completion = chat.send_message(
                 userMessage,
-                generation_config=config.geminipro_generation_config,
                 safety_settings=config.geminipro_safety_settings,
-                tools=[tool],
                 stream=False,
                 **kwargs,
             )
@@ -156,7 +163,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     def getSingleChatResponse(userInput: str, history: Optional[list]=None, **kwargs) -> str:
         # non-streaming single call
         try:
-            chat = config.geminipro_model.start_chat(history=history)
+            chat = CallGemini.getGeminiModel().start_chat(history=history)
             completion = chat.send_message(
                 userInput,
                 generation_config=config.geminipro_generation_config,

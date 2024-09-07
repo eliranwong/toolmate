@@ -1,3 +1,13 @@
+# Version: 0.3.08
+
+1. Fixed Running function calling with Gemini models
+
+2. Added Gemini model options: "gemini-1.0-pro-001", "gemini-1.0-pro-002", "gemini-1.5-flash-001", "gemini-1.5-pro-001 (Default)"
+
+3. Changed default models for backend `llamacpp`:
+* tool - MaziyarPanahi/WizardLM-2-7B-GGUF/WizardLM-2-7B.Q4_K_M.gguf
+* chat - bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf
+
 # Version: 0.3.07
 
 * Updating documentation ...

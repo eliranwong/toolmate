@@ -6,7 +6,7 @@ generate images with model "dall-e-3"
 [FUNCTION_CALL]
 """
 
-from freegenius import config, print2, print3, getCurrentDateTime, getCliOutput, getCpuThreads
+from freegenius import config, print2, print3, getCurrentDateTime, getCliOutput, getCpuThreads, downloadStableDiffusionFiles
 import os
 from base64 import b64decode
 from freegenius.utils.call_chatgpt import check_openai_errors
@@ -59,6 +59,7 @@ def create_image(function_args):
         if change:
             config.saveConfig()
 
+        downloadStableDiffusionFiles()
         stable_diffusion = StableDiffusion(
             model_path=config.stableDiffusion_model_path,
             lora_model_dir=os.path.join(config.localStorage, "LLMs", "stable_diffusion", "lora"),

@@ -1087,6 +1087,7 @@ class FreeGenius:
         elif config.llmInterface == "gemini":
             print3("Model selected: Google Gemini Pro")
             askIntentScreening()
+            self.setLlmModel_gemini()
         else:
             if config.llmInterface == "chatgpt":
                 # intent screening does not apply to letmedoit mode
@@ -1355,6 +1356,20 @@ class FreeGenius:
             elif feature == "chat":
                 config.groqApi_chat_model = model
             print3(f"Groq model: {model}")
+
+    def setLlmModel_gemini(self):
+        models = ["gemini-1.5-pro-001", "gemini-1.5-flash-001", "gemini-1.0-pro-002", "gemini-1.0-pro-001"]
+        model = self.dialogs.getValidOptions(
+            options=models,
+            title="Gemini Models",
+            default=config.geminipro_model if config.geminipro_model in models else models[0],
+            text="Select a function call model:\n(for both chat and task execution)",
+        )
+        if model:
+            config.geminipro_model = model
+            print3(f"Gemini model: {model}")
+            # set max tokens
+            print3(f"Maximum output tokens: {config.geminipro_max_output_tokens}")
 
     def setLlmModel_chatgpt(self):
         model = self.dialogs.getValidOptions(

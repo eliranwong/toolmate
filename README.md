@@ -28,9 +28,11 @@ https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/LetMe
 
 # Quick Tool Calling
 
-Version 0.2.86+ supports use of `@` to specify a tool:
+Version 0.2.86+ supports use of `@` to specify a tool.  Available tools:
 
 @chat @paste_from_clipboard @improve_writing @convert_relative_datetime @copy_to_clipboard @append_prompt @command @append_command @fabric @append_fabric @list_current_directory_contents @extract_python_code @run_python_code @integrate_google_searches @add_google_calendar_event @add_outlook_calendar_event @analyze_audio @analyze_files @analyze_images @analyze_web_content @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @correct_python @build_agents @create_image @create_map @create_qrcode @create_statistical_graphics @datetimes @download_web_content @download_youtube_audio @download_youtube_video @edit_text @execute_computing_task @install_package @save_memory @retrieve_memory @modify_images @open_browser @pronunce_words @remove_image_background @search_chats @load_chats @search_finance @search_latest_news @search_sqlite @search_weather_info @send_gamil @send_outlook @send_tweet
+
+![tools](https://github.com/user-attachments/assets/d3a301ee-a228-4d0c-882e-0dd06141be2f)
 
 Remarks: 
 

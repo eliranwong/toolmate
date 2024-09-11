@@ -209,12 +209,12 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     # Auto Function Call equivalence
 
     @staticmethod
-    def runGeniusCall(messages: dict, noFunctionCall: bool = False):
+    def runGeniusCall(messages: dict, doNotUseTool: bool = False):
         user_request = messages[-1]["content"]
-        if config.intent_screening and config.tool_dependence > 0.0:
+        if config.enable_tool_selection_agent and config.enable_tool_screening_agent and config.tool_dependence > 0.0:
             # 1. Intent Screening
-            noFunctionCall = True if noFunctionCall else CallGemini.isChatOnly(messages=messages, user_request=user_request)
-        if noFunctionCall or config.tool_dependence <= 0.0:
+            doNotUseTool = True if doNotUseTool else CallGemini.isChatOnly(messages=messages, user_request=user_request)
+        if not config.selectedTool and (doNotUseTool or config.tool_dependence <= 0.0):
             return CallGemini.regularCall(messages)
         else:
             # 2. Tool Selection

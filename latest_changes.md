@@ -1,3 +1,11 @@
+# Version: 0.3.10
+
+* Updated documentation
+
+* Added an option `config.enable_tool_screening_agent` to enable / disable tool-screening agent.
+
+* Added an option `config.enable_tool_selection_agent` to enable / disable tool-selection agent.
+
 # Version: 0.3.09
 
 1. Added Gemini model options: "gemini-1.0-pro-001", "gemini-1.0-pro-002", "gemini-1.5-flash-001", "gemini-1.5-pro-001 (Default)"

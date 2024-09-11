@@ -937,7 +937,46 @@ class FreeGenius:
             config.saveConfig()
             print3(f"LLM Temperature: {temperature}")
 
+    def configureToolSelectionAgent(self) -> bool:
+        options = ("yes", "no")
+        question = "Do you want our built-in tool-selection agent to select tools for your requests?\nRemarks: You can always manually call a tool by entering a tool name prefixed with `@`.\nRead https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Tool%20Selection%20Configurations.md"
+        print1(question)
+        enable_tool_selection_agent = self.dialogs.getValidOptions(
+            options=options,
+            title="Enable Tool Selection Agent",
+            default="yes" if config.enable_tool_selection_agent else "no",
+            text=question,
+        )
+        if enable_tool_selection_agent:
+            if enable_tool_selection_agent == "yes":
+                config.enable_tool_selection_agent = True
+                return True
+            else:
+                config.enable_tool_selection_agent = False
+        return False
+
+    def configureToolScreeningAgent(self) -> bool:
+        options = ("yes", "no")
+        question = "Do you want our built-in tool-screening agent to suggest if a tool is required for your requests?"
+        print1(question)
+        enable_tool_screening_agent = self.dialogs.getValidOptions(
+            options=options,
+            title="Enable Tool Screening Agent",
+            default="yes" if config.enable_tool_screening_agent else "no",
+            text=question,
+        )
+        if enable_tool_screening_agent:
+            if enable_tool_screening_agent == "yes":
+                config.enable_tool_screening_agent = True
+                return True
+            else:
+                config.enable_tool_screening_agent = False
+        return False
+
     def setToolSelectionConfigs(self):
+        self.configureToolSelectionAgent()
+        if config.enable_tool_selection_agent and config.llmInterface in ("ollama", "llamacpp", "llamacppserver", "groq", "gemini", "chatgpt"):
+            self.configureToolScreeningAgent()
         self.setUserConfirmation()
         print2(config.divider)
         self.setMaxAutoCorrect()
@@ -1032,23 +1071,6 @@ class FreeGenius:
                 else:
                     config.useAdditionalChatModel = False
             return False
-        def askIntentScreening() -> bool:
-            options = ("yes", "no")
-            question = "Do you want to check each request to see if a tool is required?"
-            print1(question)
-            intent_screening = self.dialogs.getValidOptions(
-                options=options,
-                title="Intent Screening",
-                default="yes" if config.intent_screening else "no",
-                text=question,
-            )
-            if intent_screening:
-                if intent_screening == "yes":
-                    config.intent_screening = True
-                    return True
-                else:
-                    config.intent_screening = False
-            return False
 
         currentLlmInterface = config.llmInterface
         self.selectLlmPlatform()
@@ -1057,21 +1079,18 @@ class FreeGenius:
         if config.llmInterface == "ollama":
             print2("# Main Model - for both task execution and conversation")
             self.setLlmModel_ollama()
-            askIntentScreening()
             if askAdditionalChatModel():
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_ollama("chat")
         elif config.llmInterface == "llamacpp":
             print2("# Main Model - for both task execution and conversation")
             self.setLlmModel_llamacpp()
-            askIntentScreening()
             if askAdditionalChatModel():
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_llamacpp("chat")
         elif config.llmInterface == "llamacppserver":
             print2("# Main Server - for both task execution and conversation")
             self.setLlmModel_llamacppserver()
-            askIntentScreening()
             if askAdditionalChatModel():
                 print2("# Chat Server - for conversation only")
                 self.setLlmModel_llamacppserver("chat")
@@ -1080,18 +1099,15 @@ class FreeGenius:
         elif config.llmInterface == "groq":
             print2("# Main Model - for both task execution and conversation")
             self.setLlmModel_groq()
-            askIntentScreening()
             if askAdditionalChatModel():
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_groq("chat")
         elif config.llmInterface == "gemini":
             print3("Model selected: Google Gemini Pro")
-            askIntentScreening()
             self.setLlmModel_gemini()
         else:
             if config.llmInterface == "chatgpt":
                 # intent screening does not apply to letmedoit mode
-                askIntentScreening()
             self.setLlmModel_chatgpt()
         config.saveConfig()
         if not config.llmInterface == currentLlmInterface:
@@ -2222,6 +2238,7 @@ My writing:
             elif userInput and not userInputLower in featuresLower:
 
                 def runSingleAction(action: str, description: str) -> None:
+                    config.selectedTool = ""
 
                     def forceLoadingInternetSearches():
                         if config.loadingInternetSearches == "always":
@@ -2372,12 +2389,14 @@ My writing:
                             # when user specify a tool
                             config.selectedTool = action
                             # notify devloper
-                            if config.developer:
-                                print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Calling tool</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{config.selectedTool}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
+                            #if config.developer:
+                            #    print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Calling tool</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{config.selectedTool}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
+                            doNotUseTool = False
                         else:
                             # no tool is specified
+                            config.selectedTool = ""
                             forceLoadingInternetSearches()
-                        doNotUseTool = False
+                            doNotUseTool = False if config.enable_tool_selection_agent else True
 
                     try:
                         # start spinning

@@ -359,12 +359,12 @@ class CallChatGPT:
     # Auto Function Call equivalence
 
     @staticmethod
-    def runGeniusCall(messages: dict, noFunctionCall: bool = False):
+    def runGeniusCall(messages: dict, doNotUseTool: bool = False):
         user_request = messages[-1]["content"]
-        if config.intent_screening and config.tool_dependence > 0.0:
+        if config.enable_tool_selection_agent and config.enable_tool_screening_agent and config.tool_dependence > 0.0:
             # 1. Intent Screening
-            noFunctionCall = True if noFunctionCall else CallChatGPT.isChatOnly(messages=messages)
-        if noFunctionCall or config.tool_dependence <= 0.0:
+            doNotUseTool = True if doNotUseTool else CallChatGPT.isChatOnly(messages=messages)
+        if not config.selectedTool and (doNotUseTool or config.tool_dependence <= 0.0):
             return CallChatGPT.regularCall(messages)
         else:
             # 2. Tool Selection
@@ -539,11 +539,11 @@ class CallLetMeDoIt:
 
     @staticmethod
     @check_openai_errors
-    def runGeniusCall(thisMessage, noFunctionCall=False):
+    def runGeniusCall(thisMessage, doNotUseTool=False):
         functionJustCalled = False
         def runThisCompletion(thisThisMessage):
             nonlocal functionJustCalled
-            if config.toolFunctionSchemas and not functionJustCalled and not noFunctionCall:
+            if config.toolFunctionSchemas and not functionJustCalled and not doNotUseTool:
                 toolFunctionSchemas = [config.toolFunctionSchemas[config.selectedTool]] if config.selectedTool and config.selectedTool in config.toolFunctionSchemas else config.toolFunctionSchemas.values()
                 return config.oai_client.chat.completions.create(
                     model=config.chatGPTApiModel,

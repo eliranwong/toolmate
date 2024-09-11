@@ -1,5 +1,21 @@
 # Tool Selection Configurations
 
+You can always manually call a tool by entering a tool name prefixed with `@`.  You can even call multiple tools in a single request.  Read https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Supported%20Backends%20and%20Models.md
+
+To automate the tool selection process, FreeGenius AI has two agents built-in for such purpose. They are `Tool Screening Agent` and `Tool Selection Agent`.
+
+Remarks: Both `Tool Screening Agent` and `Tool Selection Agent` work only when you do not manually specify a tool in your request. Therefore, even they are enabled, you can still manually use `@` to call a particular tool or multiple tools.
+
+# Tool Screening Agent
+
+`Tool Screening Agent` suggests `Tool Selection Agent` whether a tool is required based on your entry.
+
+You can enable / disable `Tool Screening Agent` in `Tool Selection Configurations` via [Action Menu](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Action%20Menu.md).  However, this option is only applied if `Tool Selection Agent` is enabled. Read more below.
+
+# Tool Selection Agent
+
+You can enable / disable `Tool Selection Agent` in `Tool Selection Configurations` via [Action Menu](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Action%20Menu.md)
+
 ![too_dependence](https://github.com/eliranwong/freegenius/assets/25262722/a637ed22-47d0-474f-bbbb-5dabb1b31e24)
 
 FreeGenius AI enhances LLM capabilities by offering tools through plugins. When a user makes a request, FreeGenius AI searches for and selects a suitable tool from its tool store. This search involves finding similarities between the user query and the examples provided in the tool plugins. Users have the flexibility to customize the tool selection process by adjusting three key configurations:

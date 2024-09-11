@@ -6,6 +6,12 @@ As with [LetMeDoIt AI](https://github.com/eliranwong/letmedoit), FreeGenius AI i
 
 Our recent developments, for example, [the ability to run multiple tools in a single request](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Running%20Multiple%20Tools%20in%20One%20Go.md), demonstrate that FreeGenius AI is far more capable than LetMeDoIt AI, while we still maintain backward compatibility with [LetMeDoIt AI](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/LetMeDoIt%20Mode.md).
 
+FreeGenius AI supports [a wide range of AI backends and models](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Supported%20Backends%20and%20Models.md): Ollama, Llama.cpp, Llama-cpp-python (default), Groq Cloud API, OpenAI API, Google Gemini via Vertex AI. Llama-cpp-python is selected as backend by default, only because it does not require an extra step for setup.
+
+Our recommendations:
+* For backend selection, we consider [Ollama](https://ollama.com/) as the best friendly free `offline` option and [Groq Cloud API](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Groq%20API%20Setup.md) as the best freiendly and free `online` option.
+* With regard to AI models, we have found `wizardlm2` and `mixtral` works well FreeGenius AI, though many other are well-supported.
+
 # Latest changes
 
 https://github.com/eliranwong/freegenius/blob/main/latest_changes.md

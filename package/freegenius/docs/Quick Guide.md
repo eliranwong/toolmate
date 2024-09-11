@@ -66,7 +66,7 @@ https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/000_H
 
 # Work with Both Text Generation and Task Execution
 
-FreeGenius AI has a built-in process to select a tool for each single request, read the following link to tweak related settings.
+FreeGenius AI has a built-in tool-selection agent to select a tool for every single request, read the following link to tweak related settings.
 
 [Tool Selection Configurations](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Tool%20Selection%20Configurations.md)
 

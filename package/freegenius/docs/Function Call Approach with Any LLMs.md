@@ -19,10 +19,10 @@ In essence, no existing solution matches the capabilities of OpenAI's function c
 
 This novel strategy involves breaking down the function calling process into several distinct steps for multiple generations:
 
-1. Intent Screening (optional; config.intent_screening is set to False by default)
-2. Tool Selection (config.tool_dependence is introduced from version 0.0.13; read next section)
-3. Parameter Extraction
-4. Function Execution
+1. Intent Screening via [Tool Screening Agent](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Tool%20Selection%20Configurations.md#tool-screening-agent)
+2. Tool Selection via [Tool Selection Agent](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Tool%20Selection%20Configurations.md#tool-selection-agent)
+3. Retrival of Structured Data
+4. Tool Execution
 5. Chat Extension
 
 This methodology has been found to work effectively with freely available open-source models, even on devices lacking a GPU.

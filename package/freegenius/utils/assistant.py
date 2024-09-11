@@ -975,7 +975,9 @@ class FreeGenius:
 
     def setToolSelectionConfigs(self):
         self.configureToolSelectionAgent()
-        if config.enable_tool_selection_agent and config.llmInterface in ("ollama", "llamacpp", "llamacppserver", "groq", "gemini", "chatgpt"):
+        if not config.enable_tool_selection_agent:
+            return None
+        if config.llmInterface in ("ollama", "llamacpp", "llamacppserver", "groq", "gemini", "chatgpt"):
             self.configureToolScreeningAgent()
         self.setUserConfirmation()
         print2(config.divider)

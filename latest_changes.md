@@ -39,9 +39,9 @@ Added three tools:
 
 `convert_relative_datetime` to convert relative dates and times in writing
 
-`add_google_calendar_event` to add google calendar event
+`add_google_calendar_event` to add Google calendar event
 
-`add_outlook_calendar_event` to add outlook calendar event
+`add_outlook_calendar_event` to add Outlook calendar event
 
 Removed tool `add_calendar_event`
 
@@ -159,10 +159,10 @@ Fixed `improve input entry` feature.
 @ask_gemini What do you disagree?
 ```
 
-or
+Or
 
 ```
-@ask_llama3_1 Write code to extract mp3 audio from Youtube video
+@ask_llama3_1 Write code to extract mp3 audio from YouTube video
 @ask_codey Review the code generated above
 ```
 
@@ -195,12 +195,12 @@ To guide your chosen LLM to provide you with a step-by-step response, for exampl
 
 To guide FreeGenius AI to perform multiple computing tasks in order.
 
-For example, download two more songs from Youtube and play all downloaded mp3 files with VLC player:
+For example, download two more songs from YouTube and play all downloaded mp3 files with VLC player:
 
 ```
 @download_youtube_audio https://youtu.be/KBD18rsVJHk?si=PhfzNCOBIj7o_Bdy 
 @download_youtube_audio https://www.youtube.com/watch?v=gCGs6t3tOCU
-@execute_computing_task Play the all mp3 files in folder `/home/ubuntu/freegenius/audio` with command `vlc`
+@execute_computing_task Play all the mp3 files in folder `/home/ubuntu/freegenius/audio` with command `vlc`
 ```
 
 ## Tool and Chat Feature Integration
@@ -213,7 +213,7 @@ To integrate multiple tools and chat features in a single prompt, for example:
 @send_gmail Email your findings to support@letmedoit.ai in detail
 ```
 
-2. The following features are temporarily suspended to facilitate the developement of the `Multiple Tools` feature:
+2. The following features are temporarily suspended to facilitate the development of the `Multiple Tools` feature:
 * `Let me Translate` feature with pre-defined context
 * `improved writing` feature
 * calling different `chatbots` from the main session
@@ -282,4 +282,4 @@ To disable tool in for a single turn, use `@none`.
 
 Tips: Enter `@` to get input suggestions of available tools
 
-2. Removed the `improved writing` feature temporarily, will be added as a spearate tool next update
+2. Removed the `improved writing` feature temporarily, will be added as a separate tool next update

@@ -1106,8 +1106,6 @@ class FreeGenius:
             print3("Model selected: Google Gemini Pro")
             self.setLlmModel_gemini()
         else:
-            if config.llmInterface == "chatgpt":
-                # intent screening does not apply to letmedoit mode
             self.setLlmModel_chatgpt()
         config.saveConfig()
         if not config.llmInterface == currentLlmInterface:

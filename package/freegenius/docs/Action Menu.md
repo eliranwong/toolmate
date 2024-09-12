@@ -27,10 +27,11 @@ Press 'ctrl+k' and scroll to the bottom for a full list of quick actions, e.g.:
 .save: save chat content
 .export: export chat content ['c-g']
 .model: change AI backends and models
-.context: change chat context ['c-o']
+.apikeys: change API keys
 .plugins: change plugins
 .tools: change tool configurations
-.apikeys: change API keys
+.managerisk: manage code execution risk
+.context: change default context
 .temperature: change output temperature
 .maxtokens: change maximum output tokens
 .mintokens: change minimum output tokens

@@ -113,6 +113,7 @@ class Prompts:
             config.defaultEntry = buffer.text
             buffer.text = ".new"
             buffer.validate_and_handle()
+        '''
         @this_key_bindings.add(*config.hotkey_remove_context_temporarily)
         def _(event):
             buffer = event.app.current_buffer
@@ -121,6 +122,7 @@ class Prompts:
             buffer.text = ".new"
             buffer.validate_and_handle()
             run_in_terminal(lambda: print3("Predefined context temporarily changed to: [none]"))
+        '''
         @this_key_bindings.add(*config.hotkey_export)
         def _(event):
             buffer = event.app.current_buffer
@@ -180,12 +182,14 @@ Available tokens: {estimatedAvailableTokens}
         @this_key_bindings.add(*config.hotkey_toggle_multiline_entry)
         def _(_):
             config.toggleMultiline()
+        '''
         @this_key_bindings.add(*config.hotkey_select_context)
         def _(event):
             buffer = event.app.current_buffer
             config.defaultEntry = buffer.text
             buffer.text = ".context"
             buffer.validate_and_handle()
+        '''
         @this_key_bindings.add("escape", "!")
         @this_key_bindings.add(*config.hotkey_launch_system_prompt)
         def _(event):
@@ -269,8 +273,8 @@ Available tokens: {estimatedAvailableTokens}
             "[c-r]": "reverse-i-search",
             str(config.hotkey_new): "new chat",
             str(config.hotkey_export): "export chat",
-            str(config.hotkey_select_context): "change predefined context",
-            str(config.hotkey_remove_context_temporarily): "remove context temporarily",
+            #str(config.hotkey_select_context): "change predefined context",
+            #str(config.hotkey_remove_context_temporarily): "remove context temporarily",
             str(config.hotkey_launch_pager_view): "launch pager view",
             str(config.hotkey_display_key_combo): "show key bindings",
             str(config.hotkey_voice_entry): "activate voice typing",

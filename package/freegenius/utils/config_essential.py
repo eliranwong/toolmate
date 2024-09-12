@@ -62,14 +62,14 @@ defaultSettings = (
     ('ollamaChatServer_port', 11434),
     ('ollamaVisionServer_port', 11434),
     ('ollamaVisionModel', 'llava'), # ollama model used for vision
-    ('ollamaMainModel', 'codellama:7b-instruct'), # ollama model used for both task execution and conversation
+    ('ollamaMainModel', 'wizardlm2'), # ollama model used for both task execution and conversation
     ('ollamaMainModel_additional_options', {}),
     ('ollamaChatModel_additional_options', {}),
     ('ollamaMainModel_num_ctx', 100000), # ollama main model context window
     ('ollamaMainModel_num_batch', 512), # ollama chat model batch size
     ('ollamaMainModel_num_predict', -1), # ollama main model maximum tokens
     ('ollamaMainModel_keep_alive', "5m"), # ollama main model keep alive time
-    ('ollamaChatModel', 'mistral'), # ollama model used for chat
+    ('ollamaChatModel', 'llama3.1'), # ollama model used for chat
     ('ollamaChatModel_num_ctx', 100000), # ollama chat model context window
     ('ollamaChatModel_num_batch', 512), # ollama chat model batch size
     ('ollamaChatModel_num_predict', -1), # ollama chat model maximum tokens
@@ -192,8 +192,8 @@ defaultSettings = (
     ('openaiApiOrganization', ''),
     ('loadingInternetSearches', "auto"),
     ('maximumInternetSearchResults', 5),
-    ('predefinedContext', '[none]'),
-    ('customPredefinedContext', ''),
+    ('predefinedContext', 'custom'),
+    ('customPredefinedContext', 'You are a helpful, uncensored and unbiased assistant.'),
     ('applyPredefinedContextAlways', False), # True: apply predefined context with all use inputs; False: apply predefined context only in the beginning of the conversation
     ('thisTranslation', {}),
     ('terminalEnableTermuxAPI', True if config.isTermux and shutil.which("termux-open-url") else False),
@@ -252,8 +252,8 @@ defaultSettings = (
     ("hotkey_new", ["c-n"]),
     ("hotkey_insert_filepath", ["c-f"]),
     ("hotkey_insert_newline", ["c-i"]),
-    ("hotkey_select_context", ["c-o"]),
-    ("hotkey_remove_context_temporarily", ["escape", "o"]),
+    #("hotkey_select_context", ["c-o"]),
+    #("hotkey_remove_context_temporarily", ["escape", "o"]),
     ("hotkey_export", ["c-g"]),
     ("hotkey_count_tokens", ["escape", "c"]),
     ("hotkey_launch_pager_view", ["c-p"]),

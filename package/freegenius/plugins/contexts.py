@@ -20,8 +20,8 @@ config.predefinedContexts["Let me Translate"] = """@chat Assist me by acting as 
 Please translate the following content:
 """
 
-config.predefinedContexts["Let me Pronounce"] = """Pronounce the following content:"""
+config.predefinedContexts["Let me Pronounce"] = """@pronunce_words Pronounce the following content:"""
 
-config.predefinedContexts["Let me Download"] = """Download the following web content:"""
+config.predefinedContexts["Let me Download"] = """@download_web_content Download the following web content:"""
 
-config.predefinedContexts["Let me Download Youtube MP3"] = """Download the following Youtube media into mp3 format:"""
+config.predefinedContexts["Let me Download Youtube MP3"] = """@download_youtube_audio Download the following Youtube media into mp3 format:"""

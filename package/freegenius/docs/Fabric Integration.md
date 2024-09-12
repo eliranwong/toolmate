@@ -22,6 +22,12 @@ Assuming `fabric` is installed and the FreeGenius AI tool plugin `fabric` is ena
 
 For using multiple tools in a single prompt, read https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Running%20Multiple%20Tools%20in%20One%20Go.md
 
+# Select from Available Fabric Patterns
+
+Enter `@fabric_pattern`, `@append_fabric_pattern`, `@fabric -p` or `@append_fabric -p` followed by a space in FreeGenius AI prompt, to get a dropdown list of downloaded fabric patterns.
+
+![fabric_pattern](https://github.com/user-attachments/assets/604f4d51-7573-4209-bd9b-3df408581997)
+
 # Difference from Running Fabric Alone
 
 Fabric integration in FreeGenius AI brings `fabric` to interact with other AI tools, supported by FreeGenius AI. Fabric output is directly integrated into the main FreeGenius AI message chain.
@@ -72,3 +78,7 @@ Text output in intermediate steps are not visible. You can, however, visual all 
 3. Auto-save and Searchable
 
 Results generated in FreeGenius AI are auto-saved and searchable.
+
+4. Pattern Clues
+
+FreenGenius AI integrates all fabric patterns in input suggestions, so that users can select a pattern easily.  Take a look at the screenshot above.

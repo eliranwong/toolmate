@@ -14,11 +14,21 @@ class Plugins:
         #config.pluginsWithFunctionCall = []
         config.aliases = {}
         config.predefinedContexts = {
-            "[none]": "",
-            "[custom]": "",
+            "custom": "",
         }
         config.predefinedInstructions = {}
-        config.inputSuggestions = []
+        config.inputSuggestions = [
+            "@command ",
+            "@append_command ",
+            "@append_prompt ",
+            "@improve_writing ",
+            "@convert_relative_datetime ",
+            "@list_current_directory_contents ",
+            "@extract_python_code ",
+            "@run_python_code ",
+            "@copy_to_clipboard",
+            "@paste_from_clipboard",
+        ]
         config.outputTransformers = []
         config.deviceInfoPlugins = []
         config.toolFunctionSchemas = {}

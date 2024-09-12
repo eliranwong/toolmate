@@ -1,3 +1,25 @@
+# Upcoming
+
+Support reflection feature for any LLMs
+
+# Version: 0.3.13
+
+* added item `.read` to Action Menu, to read assistant previous response with text-to-speech utility.
+
+* added option to manage code execution risk, read https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Risk%20Management%20Agent.md
+
+* tool `run_python_code` now works with `config.toolTextOutput` for retrieval of text output.
+
+* tweaked tool `improve_writing`
+
+* changed ollama default models
+
+* support nested input suggestions via plugins
+
+* added fabric patterns to nested input suggestions, read https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Fabric%20Integration.md
+
+* added tool `@context` to work with predefined contexts, read https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Predefined%20Contexts.md
+
 # Version: 0.3.10-0.3.12
 
 * Updated documentation

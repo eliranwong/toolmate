@@ -54,6 +54,10 @@ Our recent developments, for example, [the ability to run multiple tools in a si
 
 [Tool Selection Configurations](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Tool%20Selection%20Configurations.md)
 
+[Risk Management Agent](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Risk%20Management%20Agent.md)
+
+[Predefined Contexts](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Predefined%20Contexts.md)
+
 # Distinctive Features
 
 [Support Wide Range of Backends and Models](https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Supported%20Backends%20and%20Models.md)

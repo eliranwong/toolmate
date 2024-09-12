@@ -8,16 +8,6 @@ from freegenius import config
 import sys, os
 
 config.inputSuggestions += [
-        "@command ",
-        "@append_command ",
-        "@append_prompt ",
-        "@improve_writing ",
-        "@convert_relative_datetime ",
-        "@list_current_directory_contents ",
-        "@extract_python_code ",
-        "@run_python_code ",
-        "@copy_to_clipboard",
-        "@paste_from_clipboard",
         #"[CHAT_chatgpt] ",
         #"[CHAT_geminipro] ",
         #"[CHAT_palm2] ",

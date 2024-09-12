@@ -14,7 +14,7 @@ from freegenius.utils.ollama_models import ollama_models
 #from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
-from prompt_toolkit.completion import WordCompleter, FuzzyCompleter
+from prompt_toolkit.completion import WordCompleter, FuzzyCompleter, NestedCompleter, ThreadedCompleter
 from prompt_toolkit.shortcuts import clear, set_title
 from prompt_toolkit.application import run_in_terminal
 from prompt_toolkit import print_formatted_text, HTML
@@ -73,7 +73,7 @@ class FreeGenius:
         # share the following methods in config so that they are accessible via plugins
         config.toggleMultiline = self.toggleMultiline
         config.getWrappedHTMLText = self.getWrappedHTMLText
-        config.fineTuneUserInput = self.fineTuneUserInput
+        config.addPredefinedContext = self.addPredefinedContext
         config.improveWriting = self.improveWriting
         config.convertRelativeDateTime = self.convertRelativeDateTime
         config.launchPager = self.launchPager
@@ -134,14 +134,17 @@ class FreeGenius:
             
             ".model": ("change AI backends and models", self.setLlmModel),
             #".embedding": ("change embedding model", self.setEmbeddingModel), # joined ".model"
+            ".apikeys": ("change API keys", self.changeAPIkeys),
             #".chatmodel": ("change chat-only model", self.setChatbot),
-            ".context": (f"change chat context {str(config.hotkey_select_context)}", None),
-            #".contextintegration": ("change chat context integration", self.setContextIntegration), # joined ".context"
+
             ".plugins": ("change plugins", self.selectPlugins),
             ".tools": ("change tool configurations", self.setToolSelectionConfigs),
             #".maxautocorrect": ("change maximum consecutive auto-correction", self.setMaxAutoCorrect), # joined ".tools"
-            #".userconfirmation": ("change code confirmation protocol", self.setUserConfirmation), # joined ".tools"
-            ".apikeys": ("change API keys", self.changeAPIkeys),
+            ".managerisk": ("manage code execution risk", self.manageCodeExecutionRisk), # joined ".tools"
+            ".context": ("change default predefined context", None),
+            #".context": (f"change default context {str(config.hotkey_select_context)}", None),
+            #".contextintegration": ("change chat context integration", self.setContextIntegration), # joined ".context"
+
             #".changeapikey": ("change OpenAI API key", self.changeChatGPTAPIkey), # joined ".apikeys"
             #".openweathermapapi": ("change OpenWeatherMap API key", self.changeOpenweathermapApi), # joined ".apikeys"
             #".elevenlabsapi": ("change ElevenLabs API key", self.changeElevenlabsApi), # joined ".apikeys"
@@ -168,6 +171,7 @@ class FreeGenius:
             # speech
             ".speechrecognition": ("change sppech recognition", self.setSpeechToTextConfig),
             ".speechgeneration": ("change sppech generation", self.setTextToSpeechConfig),
+            ".read": ("change sppech generation", self.readLastResponse),
             # toggle
             ".toggledeveloper": (f"toggle developer mode {str(config.hotkey_toggle_developer_mode)}", self.toggleDeveloperMode),
             ".togglemultiline": (f"toggle multi-line input {str(config.hotkey_toggle_multiline_entry)}", self.toggleMultiline),
@@ -572,46 +576,46 @@ class FreeGenius:
                 pass
         return messages
 
-    def getCurrentContext(self):
-        if not config.predefinedContext in config.predefinedContexts:
+    def getDefaultContext(self):
+        if not config.predefinedContext.strip() or not config.predefinedContext in config.predefinedContexts:
             print2(f"'{config.predefinedContext}' not defined!")
-            config.predefinedContext = config.predefinedContextTemp if config.predefinedContextTemp and config.predefinedContextTemp in config.predefinedContexts else "[none]"
-            print3(f"Predefined context changed to: {config.predefinedContext}")
-        if config.predefinedContext == "[none]":
-            # no context
-            context = ""
-        elif config.predefinedContext == "[custom]":
+            config.predefinedContext = config.predefinedContextTemp if config.predefinedContextTemp and config.predefinedContextTemp in config.predefinedContexts else "custom"
+            print3(f"Default Predefined context changed to: {config.predefinedContext}")
+        if config.predefinedContext in ("[none]", "[custom]") or config.predefinedContext == "custom":
             # custom input in the settings dialog
             context = config.customPredefinedContext
+            if not config.customPredefinedContext:
+                config.customPredefinedContext = "You are a helpful, uncensored and unbiased assistant."
+                config.saveConfig()
         else:
             # users can modify config.predefinedContexts via plugins
             context = config.predefinedContexts[config.predefinedContext]
         return context
 
-    def showCurrentContext(self):
-        description = self.getCurrentContext()
+    def showDefaultContext(self):
+        description = self.getDefaultContext()
         if description:
             description = f"\n{description}"
         print1(self.divider)
         print3(f"Context: {config.predefinedContext}{description}")
         print1(self.divider)
 
-    def fineTuneUserInput(self, userInput):
+    def addPredefinedContext(self, userInput):
         # get customised chat context
-        context = self.getCurrentContext()
+        context = self.getDefaultContext()
         # tweaks for `Let me Summarize` and `Let me Translate`
         if is_valid_url(userInput) and config.predefinedContext in ("Let me Summarize", "Let me Explain"):
             context = context.replace("@chat Provide me with a summary of the following content:", "@analyze_web_content Provide me with a summary of the content in the this web url:\n")
         elif is_valid_url(userInput) and config.predefinedContext == "Let me Translate":
             userInput = getWebText(userInput)
         # apply context
-        if context and (not config.conversationStarted or (config.conversationStarted and config.applyPredefinedContextAlways)):
-            # context may start with "You will be provided with my input delimited with a pair of XML tags, <input> and </input>. ...
-            userInput = re.sub("<content>|<content [^<>]*?>|</content>", "", userInput)
-            if check := userInput.strip():
-                userInput = f"{context}\n{userInput}" if check.startswith("@") else f"{context}\n<content>{userInput}</content>"
-            else:
-                userInput = context
+        #if context and (not config.conversationStarted or (config.conversationStarted and config.applyPredefinedContextAlways)):
+        # context may start with "You will be provided with my input delimited with a pair of XML tags, <input> and </input>. ...
+        userInput = re.sub("<content>|<content [^<>]*?>|</content>", "", userInput)
+        if check := userInput.strip():
+            userInput = f"{context}\n{userInput}" if check.startswith("@") else f"{context}\n<content>{userInput}</content>"
+        else:
+            userInput = context
         #userInput = SharedUtil.addTimeStamp(userInput)
         return userInput
 
@@ -760,7 +764,7 @@ class FreeGenius:
             config.saveConfig()
             print3(f"Latest Online Searches: {option}")
 
-    def setUserConfirmation(self):
+    def manageCodeExecutionRisk(self):
         options = ("always", "medium_risk_or_above", "high_risk_only", "none")
         if not config.confirmExecution in options:
             config.confirmExecution = "always"
@@ -773,8 +777,8 @@ class FreeGenius:
         option = self.dialogs.getValidOptions(
             options=options,
             descriptions=descriptions,
-            title="Command Confirmation Protocol",
-            text=f"FreeGenius AI tools can execute commands on your behalf.\nPlease specify when you would prefer\nto receive a confirmation\nbefore executing newly generated commands:\n(Note: Confirm command execution at your own risk.)",
+            title="Generated Code Execution Risk Management",
+            text=f"To fulfill your requests, our built-in tools can generate and execute Python code. To protect you from running generated code that could pose a risk to your system, such as file deletion, FreeGenius AI has a built-in risk management agent. This agent assesses the risk level of generated code and prompts you for confirmation before execution. You can specify the risk threshold below, determining the level at which you will be asked for confirmation. (Note: Confirming code execution is done at your own risk.)",
             default=config.confirmExecution,
         )
         if option:
@@ -872,6 +876,11 @@ class FreeGenius:
         else:
             config.defaultEntry = extractPythonCode(previousResponse, keepInvalid=True)
 
+    def readLastResponse(self):
+        previousResponse, _ = getAssistantPreviousResponse()
+        if previousResponse:
+            TTSUtil.play(re.sub(config.tts_doNotReadPattern, "", previousResponse))
+
     def editLastResponse(self):
         previousResponse, index = getAssistantPreviousResponse()
         if previousResponse:
@@ -939,7 +948,7 @@ class FreeGenius:
 
     def configureToolSelectionAgent(self) -> bool:
         options = ("yes", "no")
-        question = "Do you want our built-in tool-selection agent to select tools for your requests?\nRemarks: You can always manually call a tool by entering a tool name prefixed with `@`.\nRead https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Tool%20Selection%20Configurations.md"
+        question = "Would you like our built-in tool selection agent to choose the appropriate tools for resolving your requests?\nRemarks: You can always manually call a tool by entering a tool name prefixed with `@`.\nRead https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Tool%20Selection%20Configurations.md"
         print1(question)
         enable_tool_selection_agent = self.dialogs.getValidOptions(
             options=options,
@@ -957,7 +966,7 @@ class FreeGenius:
 
     def configureToolScreeningAgent(self) -> bool:
         options = ("yes", "no")
-        question = "Do you want our built-in tool-screening agent to suggest if a tool is required for your requests?"
+        question = "Would you like our built-in tool-screening agent to suggest if a tool is required for your requests?"
         print1(question)
         enable_tool_screening_agent = self.dialogs.getValidOptions(
             options=options,
@@ -979,7 +988,6 @@ class FreeGenius:
             return None
         if config.llmInterface in ("ollama", "llamacpp", "llamacppserver", "groq", "gemini", "chatgpt"):
             self.configureToolScreeningAgent()
-        self.setUserConfirmation()
         print2(config.divider)
         self.setMaxAutoCorrect()
         print2(config.divider)
@@ -1058,7 +1066,7 @@ class FreeGenius:
     def setLlmModel(self):
         def askAdditionalChatModel() -> bool:
             options = ("yes", "no")
-            question = "Do you want an additional model for running chat-only features?"
+            question = "Would you like an additional model for running chat-only features?"
             print1(question)
             useAdditionalChatModel = self.dialogs.getValidOptions(
                 options=options,
@@ -1991,26 +1999,26 @@ class FreeGenius:
             config.defaultEntry = config.predefinedInstructions[instruction]
             config.accept_default = True
 
-    def changeContext(self):
+    def changeDefaultContext(self):
         contexts = list(config.predefinedContexts.keys())
         predefinedContext = self.dialogs.getValidOptions(
             options=contexts,
-            title="Predefined Contexts",
+            title="Default Predefined Contexts",
             default=config.predefinedContext,
-            text="Select a context:",
+            text="Select a predefined context to use `@context` without specifying a context name:",
         )
         if predefinedContext:
             config.predefinedContext = predefinedContext
-            if config.predefinedContext == "[custom]":
+            if config.predefinedContext == "custom":
                 print1("Edit custom context below:")
                 customContext = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.customPredefinedContext)
                 if customContext and not customContext.strip().lower() == config.exit_entry:
                     config.customPredefinedContext = customContext.strip()
         else:
             # a way to quickly clean up context
-            config.predefinedContext = "[none]"
+            config.predefinedContext = "custom"
         config.saveConfig()
-        self.showCurrentContext()
+        self.showDefaultContext()
 
     def getDirectoryList(self):
         directoryList = []
@@ -2098,13 +2106,13 @@ My writing:
             clear()
             print1(self.divider)
             self.showLogo()
-            self.showCurrentContext()
+            #self.showDefaultContext()
             # go to startup directory
             storagedirectory = config.localStorage
             os.chdir(storagedirectory)
             messages = CallLLM.resetMessages()
             #print1(f"startup directory:\n{storagedirectory}")
-            print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Directory:</{config.terminalPromptIndicatorColor2}> {storagedirectory}"))
+            print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Current Directory:</{config.terminalPromptIndicatorColor2}> {storagedirectory}"))
             print1(self.divider)
 
             config.conversationStarted = False
@@ -2113,9 +2121,23 @@ My writing:
         config.multilineInput = False
         featuresLower = list(self.actions.keys()) + ["..."]
         # input suggestions
-        config.inputSuggestions += featuresLower
-        completer = FuzzyCompleter(WordCompleter(config.inputSuggestions, ignore_case=True)) if config.inputSuggestions else None
-        completer_developer = FuzzyCompleter(WordCompleter(config.inputSuggestions[:] + [f"config.{i}" for i in dir(config) if not i.startswith("__")] + self.getDirectoryList(), ignore_case=True))
+        nestedSuggestions = {i: None for i in featuresLower}
+        nestedSuggestions["@context"] = {f"`{i}`":None for i in config.predefinedContexts if not i.startswith("[")}
+        for i in config.inputSuggestions:
+            if isinstance(i, str):
+                nestedSuggestions[i] = None
+            elif isinstance(i, dict):
+                for iKey, iValue in i.items():
+                    nestedSuggestions[iKey] = iValue
+        nestedSuggestions = dict(sorted(nestedSuggestions.items()))
+        # add config items in developer mode
+        nestedSuggestions_developer = copy.deepcopy(nestedSuggestions)
+        for i in dir(config):
+            if not i.startswith("__"):
+                nestedSuggestions_developer[f"config.{i}"] = None
+        # completer
+        completer = FuzzyCompleter(ThreadedCompleter(NestedCompleter.from_nested_dict(nestedSuggestions)))
+        completer_developer = FuzzyCompleter(ThreadedCompleter(NestedCompleter.from_nested_dict(nestedSuggestions_developer)))
         while True:
             # default toolbar text
             config.dynamicToolBarText = f""" {str(config.hotkey_exit).replace("'", "")} exit {str(config.hotkey_display_key_combo).replace("'", "")} shortcuts """
@@ -2226,19 +2248,25 @@ My writing:
             elif userInputLower == config.cancel_entry:
                 pass
             elif userInputLower == ".context":
-                self.changeContext()
+                self.changeDefaultContext()
+                '''
                 self.setContextIntegration()
                 if not config.applyPredefinedContextAlways:
                     if config.conversationStarted:
                         self.saveChat(config.currentMessages)
                     storagedirectory, config.currentMessages = startChat()
+                '''
             elif userInputLower == ".new":
                 self.saveChat(config.currentMessages)
                 storagedirectory, config.currentMessages = startChat()
             elif userInput and not userInputLower in featuresLower:
 
+                toolNames = "|".join(config.toolFunctionMethods.keys())
+                actionPattern = f"@(context|convert_relative_datetime|copy_to_clipboard|paste_from_clipboard|extract_python_code|run_python_code|list_current_directory_contents|command|append_command|append_prompt|improve_writing|{toolNames})[ \n]"
+
                 def runSingleAction(action: str, description: str) -> None:
                     config.selectedTool = ""
+                    config.toolTextOutput = ""
 
                     def forceLoadingInternetSearches():
                         if config.loadingInternetSearches == "always":
@@ -2272,6 +2300,22 @@ My writing:
                         description = f"Run python code in:\n\n{description}"
                     elif action == "list_current_directory_contents":
                         description = f'''List contents in current directory {os.getcwd()}'''
+                    elif action == "context":
+                        contextPattern = "^`([^`]+?)` ([\d\D]*?)$"
+                        searchContext = re.search(contextPattern, description.lstrip())
+                        if searchContext:
+                            contextID = searchContext.group(1)
+                            if contextID and contextID in config.predefinedContexts:
+                                description = searchContext.group(2)
+                                config.predefinedContext = contextID
+                                config.saveConfig()
+                        description = self.addPredefinedContext(description)
+                        # check if the new description call a particular tool
+                        searchTool = re.search(f"^{actionPattern}([\d\D]*?)$", description.lstrip())
+                        if searchTool:
+                            action = searchTool.group(1)
+                            description = searchTool.group(2)
+                    
                     config.currentMessages.append({"role": "user", "content": description})
 
                     # check if user specify a tool
@@ -2310,7 +2354,12 @@ My writing:
                         # execute
                         self.runPythonScript(python_code)
                         # display and update
-                        message = "Done!" if python_code else "Python code not found!"
+                        if not python_code:
+                            message = "Python code not found!"
+                        elif config.toolTextOutput.strip():
+                            message = config.toolTextOutput
+                        else:
+                            message = "Done!"
                         print1(f"\n{message}")
                         config.currentMessages.append({"role": "assistant", "content": message})
                         return None
@@ -2339,10 +2388,7 @@ My writing:
                     elif action == "improve_writing":
                         improvedWriting = self.improveWriting(description).strip()
                         if improvedWriting:
-                            print2("\n```improved")
-                            print(improvedWriting)
-                            print2("```\n")
-                            config.currentMessages[-1]["content"] = "Improve the following writing, according to {config.improvedWritingSytle}:\n\n```" + description + "\n```"
+                            config.currentMessages[-1]["content"] = f"Improve the following writing, according to {config.improvedWritingSytle}:\n\n```" + description + "\n```"
                             config.currentMessages.append({"role": "assistant", "content": improvedWriting})
                         else:
                             config.currentMessages = config.currentMessages[:-1]
@@ -2440,12 +2486,9 @@ My writing:
                         print2("starting a new chat!")
                         self.saveChat(config.currentMessages)
                         storagedirectory, config.currentMessages = startChat()
-
-                # Tweak user inputs with Pre-defined Contexts
-                fineTunedUserInput = self.fineTuneUserInput(userInput)
                 
                 # tweak for `Let me Translate`
-                if config.predefinedContext == "Let me Translate" and fineTunedUserInput.startswith("@chat Assist me by acting as a translator.\nPlease translate"):
+                if config.predefinedContext == "Let me Translate" and userInput.startswith("@chat Assist me by acting as a translator.\nPlease translate"):
                     print1("Please specify the language you would like the content to be translated into:")
                     language = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.translateToLanguage)
                     if language and not language.strip().lower() in (config.cancel_entry, config.exit_entry):
@@ -2454,7 +2497,7 @@ My writing:
                         if not config.translateToLanguage:
                             config.translateToLanguage = "English"
                         print3(f"Language not specified! The content will be translated into: {config.translateToLanguage}")
-                    fineTunedUserInput = f"{fineTunedUserInput}\n\nPlease translate the content into <language>{config.translateToLanguage}</language>."
+                    userInput = f"{userInput}\n\nPlease translate the content into <language>{config.translateToLanguage}</language>."
 
                 # reset `config.predefinedContext` and clear `config.predefinedContextTemp` if `config.predefinedContextTemp`` is not empty
                 if config.predefinedContextTemp:
@@ -2462,17 +2505,15 @@ My writing:
                     config.predefinedContextTemp = ""
 
                 # check for any tool patterns
-                toolNames = "|".join(config.toolFunctionMethods.keys())
-                actionPattern = f"@(convert_relative_datetime|copy_to_clipboard|paste_from_clipboard|extract_python_code|run_python_code|list_current_directory_contents|command|append_command|append_prompt|improve_writing|{toolNames})[ \n]"
-                actions = re.findall(actionPattern, f"{fineTunedUserInput} ") # add a space after `fineTunedUserInput` to allow tool entry at the end without a description
+                actions = re.findall(actionPattern, f"{userInput} ") # add a space after `userInput` to allow tool entry at the end without a description
                 
                 if not actions:
-                    if fineTunedUserInput.strip():
+                    if userInput.strip():
                         # pass to built-in screening or tool-check operations
-                        runSingleAction("", fineTunedUserInput)
+                        runSingleAction("", userInput)
                 else:
                     separator = "＊@＊@＊"
-                    descriptions = re.sub(actionPattern, separator, f"{fineTunedUserInput} ").split(separator)
+                    descriptions = re.sub(actionPattern, separator, f"{userInput} ").split(separator)
                     if descriptions[0].strip():
                         # in case content entered before the first action declared
                         actions.insert(0, "chat")
@@ -2484,26 +2525,30 @@ My writing:
                             # enable tool to work on previous generated response
                             description = getAssistantPreviousResponse()[0]
                         if description.strip():
-                            print3(f'''\n@{action}: {description}''')
+                            message = f'''\n@{action}: {description}'''
+                            try:
+                                print3(message)
+                            except:
+                                print(message)
                             runSingleAction(action, description)
 
-    def launchChatbot(self, chatbot, fineTunedUserInput):
+    def launchChatbot(self, chatbot, userInput):
         if not chatbot:
             chatbot = config.llmInterface
         if config.isTermux:
             #chatbot = "chatgpt"
             ...
         chatbots = {
-            "llamacpp": lambda: LlamacppChat(model=None if config.useAdditionalChatModel else config.llamacppMainModel).run(fineTunedUserInput),
-            "llamacppserver": lambda: LlamacppServerChat().run(fineTunedUserInput),
-            "ollama": lambda: OllamaChat().run(fineTunedUserInput, model=config.ollamaChatModel if config.useAdditionalChatModel else config.ollamaMainModel),
-            "groq": lambda: GroqChatbot().run(fineTunedUserInput),
-            "chatgpt": lambda: ChatGPT().run(fineTunedUserInput),
-            "letmedoit": lambda: ChatGPT().run(fineTunedUserInput),
-            "gemini": lambda: GeminiPro(temperature=config.llmTemperature).run(fineTunedUserInput),
-            "geminipro": lambda: GeminiPro(temperature=config.llmTemperature).run(fineTunedUserInput),
-            "palm2": lambda: Palm2().run(fineTunedUserInput, temperature=config.llmTemperature),
-            "codey": lambda: Codey().run(fineTunedUserInput, temperature=config.llmTemperature),
+            "llamacpp": lambda: LlamacppChat(model=None if config.useAdditionalChatModel else config.llamacppMainModel).run(userInput),
+            "llamacppserver": lambda: LlamacppServerChat().run(userInput),
+            "ollama": lambda: OllamaChat().run(userInput, model=config.ollamaChatModel if config.useAdditionalChatModel else config.ollamaMainModel),
+            "groq": lambda: GroqChatbot().run(userInput),
+            "chatgpt": lambda: ChatGPT().run(userInput),
+            "letmedoit": lambda: ChatGPT().run(userInput),
+            "gemini": lambda: GeminiPro(temperature=config.llmTemperature).run(userInput),
+            "geminipro": lambda: GeminiPro(temperature=config.llmTemperature).run(userInput),
+            "palm2": lambda: Palm2().run(userInput, temperature=config.llmTemperature),
+            "codey": lambda: Codey().run(userInput, temperature=config.llmTemperature),
         }
         if chatbot in chatbots:
             chatbots[chatbot]()

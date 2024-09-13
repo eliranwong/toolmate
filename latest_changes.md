@@ -2,6 +2,14 @@
 
 Support reflection feature for any LLMs
 
+# Version: 0.3.17
+
+* renamed old data directory `freegenius` to `toolmate`, to facilitate migration
+
+# Version: 0.3.16
+
+`FreeGenius AI` has been renamed to `ToolMate AI`.  For the latest developement, read https://github.com/eliranwong/toolmate
+
 # Version: 0.3.14-0.3.15
 
 * removed triton==2.3.0 from requirements.txt, for Windows users, read

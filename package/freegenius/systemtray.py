@@ -259,7 +259,12 @@ class FreeGeniusHub(QSystemTrayIcon):
         #self.chatGui.show()
         ...
 
-def main():
+def main(tempInterface=""):
+    print("Please note that `FreeGenius AI` has been renamed to `ToolMate AI`.  For the latest developement, read https://github.com/eliranwong/toolmate")
+    print("We are launching `ToolMate AI` instead ...")
+    os.system("toolmatehub")
+
+def main_old():
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
 

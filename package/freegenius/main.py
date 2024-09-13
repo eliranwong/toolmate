@@ -29,10 +29,15 @@ def letmedoit():
     main("letmedoit")
 
 def main(tempInterface=""):
+    print("Please note that `FreeGenius AI` has been renamed to `ToolMate AI`.  For the latest developement, read https://github.com/eliranwong/toolmate")
+    print("We are launching `ToolMate AI` instead ...")
+    os.system("toolmate")
+
+def main_old(tempInterface=""):
     print(f"launching {config.freeGeniusAIName} ...")
 
     # Create the parser
-    parser = argparse.ArgumentParser(description="LetMeDoIt AI cli options")
+    parser = argparse.ArgumentParser(description="FreeGenius AI cli options")
     # Add arguments
     parser.add_argument("default", nargs="?", default=None, help="default entry; accepts a string; ignored when -l/rp/p/rf/f/r flag is used")
     parser.add_argument('-b', '--backend', action='store', dest='backend', help="set llm interface with -b flag; options: llamacpp/llamacppserver/ollama/groq/gemini/chatgpt/letmedoit")

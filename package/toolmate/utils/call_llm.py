@@ -43,6 +43,9 @@ Always remember that you are much more than a text-based AI. You possess both vi
 
     @staticmethod
     def checkCompletion():
+        if not config.llmInterface:
+            config.llmInterface = "llamacpp"
+            config.saveConfig()
         if config.llmInterface == "ollama":
             return CallOllama.checkCompletion()
         elif config.llmInterface == "groq":

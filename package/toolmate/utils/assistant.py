@@ -104,6 +104,12 @@ class ToolMate:
             print("Failed saving history!")
         config.saveConfig()
         
+        if not config.llmInterface:
+            self.setLlmModel()
+        if not config.llmInterface:
+            config.llmInterface = "llamacpp"
+            config.saveConfig()
+
         # check availability of api keys
         if not config.groqApi_key:
             self.changeGroqApi()
@@ -1040,7 +1046,7 @@ class ToolMate:
         config.saveConfig()
 
     def selectLlmPlatform(self):
-        instruction = "Select a platform:"
+        instruction = "Select an AI platform:"
         print1(instruction)
         options = {
             "llamacpp": "Llama.cpp",
@@ -1055,7 +1061,7 @@ class ToolMate:
             options=options.keys(),
             descriptions=list(options.values()),
             title="LLM Interface",
-            default=config.llmInterface,
+            default=config.llmInterface if config.llmInterface else "llamacpp",
             text=instruction,
         )
         if llmInterface:
@@ -1087,19 +1093,19 @@ class ToolMate:
 
         print1("Select models ...")
         if config.llmInterface == "ollama":
-            print2("# Main Model - for both task execution and conversation")
+            print2("# Tool Model - for both task execution and conversation")
             self.setLlmModel_ollama()
             if askAdditionalChatModel():
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_ollama("chat")
         elif config.llmInterface == "llamacpp":
-            print2("# Main Model - for both task execution and conversation")
+            print2("# Tool Model - for both task execution and conversation")
             self.setLlmModel_llamacpp()
             if askAdditionalChatModel():
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_llamacpp("chat")
         elif config.llmInterface == "llamacppserver":
-            print2("# Main Server - for both task execution and conversation")
+            print2("# Tool Server - for both task execution and conversation")
             self.setLlmModel_llamacppserver()
             if askAdditionalChatModel():
                 print2("# Chat Server - for conversation only")
@@ -1107,7 +1113,7 @@ class ToolMate:
             print2("# Vision Server - for vision only")
             self.setLlmModel_llamacppserver("vision")
         elif config.llmInterface == "groq":
-            print2("# Main Model - for both task execution and conversation")
+            print2("# Tool Model - for both task execution and conversation")
             self.setLlmModel_groq()
             if askAdditionalChatModel():
                 print2("# Chat Model - for conversation only")

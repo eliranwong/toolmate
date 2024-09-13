@@ -29,7 +29,7 @@ defaultSettings = (
     ('appName', ''),
     ('text2art_font1', 'cybermedum'),
     ('text2art_font2', 'white_bubble'),
-    ('llmInterface', "llamacpp"), # "llamacpp", "llamacppserver", "ollama", "gemini", "chatgpt", "letmedoit", "groq"
+    ('llmInterface', ""), # "llamacpp", "llamacppserver", "ollama", "gemini", "chatgpt", "letmedoit", "groq"
     ('enable_tool_screening_agent', False), # set True to increase both reliability and waiting time
     ('enable_tool_selection_agent', False), 
     ('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools
@@ -65,10 +65,10 @@ defaultSettings = (
     ('ollamaMainModel', 'wizardlm2'), # ollama model used for both task execution and conversation
     ('ollamaMainModel_additional_options', {}),
     ('ollamaChatModel_additional_options', {}),
-    ('ollamaMainModel_num_ctx', 100000), # ollama main model context window
+    ('ollamaMainModel_num_ctx', 100000), # ollama tool model context window
     ('ollamaMainModel_num_batch', 512), # ollama chat model batch size
-    ('ollamaMainModel_num_predict', -1), # ollama main model maximum tokens
-    ('ollamaMainModel_keep_alive', "5m"), # ollama main model keep alive time
+    ('ollamaMainModel_num_predict', -1), # ollama tool model maximum tokens
+    ('ollamaMainModel_keep_alive', "5m"), # ollama tool model keep alive time
     ('ollamaChatModel', 'llama3.1'), # ollama model used for chat
     ('ollamaChatModel_num_ctx', 100000), # ollama chat model context window
     ('ollamaChatModel_num_batch', 512), # ollama chat model batch size
@@ -117,8 +117,8 @@ defaultSettings = (
     ('llamacppMainModel_model_path', ''), # specify file path of llama.cpp model for general purpose
     ('llamacppMainModel_repo_id', 'MaziyarPanahi/WizardLM-2-7B-GGUF'), # llama.cpp model used for both task execution and conversation, e.g. 'TheBloke/phi-2-GGUF', 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
     ('llamacppMainModel_filename', 'WizardLM-2-7B.Q4_K_M.gguf'), # llama.cpp model used for both task execution and conversation, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
-    ('llamacppMainModel_n_ctx', 0), # llama.cpp main model context window
-    ('llamacppMainModel_max_tokens', 10000), # llama.cpp main model maximum tokens
+    ('llamacppMainModel_n_ctx', 0), # llama.cpp tool model context window
+    ('llamacppMainModel_max_tokens', 10000), # llama.cpp tool model maximum tokens
     ('llamacppMainModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
     ('llamacppMainModel_n_batch', 512), # The batch size to use per eval
     ('llamacppChatModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp

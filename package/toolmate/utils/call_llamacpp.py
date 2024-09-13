@@ -23,7 +23,7 @@ class CallLlamaCpp:
                 config.llamacppMainModel_model_path = llamacppMainModel_model_path
             if not os.path.isfile(config.llamacppMainModel_model_path):
                 # download llava clip model
-                print2("Downloading main model ...")
+                print2("Downloading tool model ...")
                 hf_hub_download(
                     repo_id=config.llamacppMainModel_repo_id,
                     filename=config.llamacppMainModel_filename,
@@ -63,11 +63,11 @@ class CallLlamaCpp:
             loadMainModel()
         except:
             # restore default config
-            print2("Errors! Restoring default main model!")
+            print2("Errors! Restoring default tool model!")
             config.llamacppMainModel_ollama_tag = ""
             config.llamacppMainModel_model_path = ""
-            config.llamacppMainModel_repo_id = "TheBloke/CodeLlama-7B-Instruct-GGUF"
-            config.llamacppMainModel_filename = "codellama-7b-instruct.Q4_K_M.gguf"
+            config.llamacppMainModel_repo_id = "MaziyarPanahi/WizardLM-2-7B-GGUF"
+            config.llamacppMainModel_filename = "WizardLM-2-7B.Q4_K_M.gguf"
             loadMainModel()
 
         try:
@@ -77,8 +77,8 @@ class CallLlamaCpp:
             print2("Errors! Restoring default chat model!")
             config.llamacppChatModel_ollama_tag = ""
             config.llamacppChatModel_model_path = ""
-            config.llamacppChatModel_repo_id = "TheBloke/Mistral-7B-Instruct-v0.2-GGUF"
-            config.llamacppChatModel_filename = "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
+            config.llamacppChatModel_repo_id = "bartowski/Meta-Llama-3.1-8B-Instruct-GGUF"
+            config.llamacppChatModel_filename = "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf"
             downloadChatModel()
 
         # Download vision model

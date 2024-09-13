@@ -33,7 +33,7 @@ class LlamacppChat:
                 else:
                     name = "Llama.cpp chatbot"
         else:
-            # main model
+            # tool model
             self.model = model
             if not name:
                 if config.llamacppMainModel_model_path and os.path.isfile(config.llamacppMainModel_model_path):

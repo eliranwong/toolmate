@@ -1,6 +1,12 @@
-# Upcoming
+# Version: 0.3.19
 
-Support reflection feature for any LLMs
+* added tool `@reflection` to mimic the reflection feature performed by the LLM `Reflection:70b`  This tool is created to work with any LLM
+
+# Version: 0.3.18
+
+* updagrade a few dependencies
+
+* downgrade `elevenlabs` version to 1.5.0, to avoid a pydantic warning
 
 # Version: 0.3.17
 

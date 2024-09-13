@@ -20,8 +20,16 @@ To run:
 
 > freegenius
 
-# Notes to Windows users:
+# Notes to Windows Users
 
 Windows may also need to install cmake, rust and Microsoft Visual C++ 14.0 or greater.
 
 For more information, read: https://github.com/eliranwong/letmedoit/wiki/Installation#windows-users
+
+# Notes to ChromeOS Users
+
+Enable Linux container in your Chrome OS first
+
+https://github.com/eliranwong/ChromeOSLinux#turn-on-linux
+
+Use the Linux terminal to install `freegenius`

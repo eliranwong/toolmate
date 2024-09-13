@@ -89,7 +89,7 @@ Fabric Integration: https://github.com/eliranwong/freegenius/blob/main/package/f
 
 # Supported Platforms
 
-Windows, macOS, Linux
+Windows, macOS, Linux, ChromeOS
 
 Upcoming: Android
 

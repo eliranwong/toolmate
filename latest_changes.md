@@ -2,6 +2,12 @@
 
 Support reflection feature for any LLMs
 
+# Version: 0.3.14-0.3.15
+
+* removed triton==2.3.0 from requirements.txt, for Windows users, read
+
+* updated a few package versions
+
 # Version: 0.3.13
 
 * added item `.read` to Action Menu, to read assistant previous response with text-to-speech utility.

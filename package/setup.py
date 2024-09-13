@@ -2,16 +2,6 @@ from setuptools import setup
 from setuptools.command.install import install
 import os, shutil, platform, sys
 
-class PreInstallCommand(install):
-    """Pre-installation for installation mode."""
-    # setting 'CMAKE_ARGS' for installation of 'llama-cpp-python'
-    # read https://github.com/abetlen/llama-cpp-python
-    def run(self):
-        # https://github.com/abetlen/llama-cpp-python#installation-configuration
-        os.system('''$env:CMAKE_ARGS = "-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS"''' if platform.system() == "Windows" else '''CMAKE_ARGS="-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS"''')
-        os.environ['CMAKE_ARGS'] = "-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS"
-        install.run(self)
-
 # package name
 package_name_0 = os.path.join("package_name.txt")
 with open(package_name_0, "r", encoding="utf-8") as fileObj:
@@ -51,15 +41,12 @@ open(os.path.join(package, "config.py"), "w").close()
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name=package,
-    version="0.3.13",
+    version="0.3.15",
     python_requires=">=3.8, <3.12",
     description=f"{appFullName}, an advanced AI assistant that is capable of engaging in conversation and performing multi-step actions. Supports numerous open-source LLMs via Llama.cpp or Ollama or Groq Cloud API, with optional integration with AutoGen agents, OpenAI API, Google Gemini Pro, fabric and unlimited plugins.",
     long_description=long_description,
     author="Eliran Wong",
     author_email="support@letmedoit.ai",
-    cmdclass={
-        'install': PreInstallCommand,
-    },
     packages=[
         package,
         f"{package}.audio",

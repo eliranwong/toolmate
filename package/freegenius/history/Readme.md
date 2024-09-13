@@ -1,1 +1,0 @@
-Input records are saved here.

@@ -1,1 +1,0 @@
-Chat records are saved here.

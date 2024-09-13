@@ -171,9 +171,9 @@ setup(
     keywords="ai assistant ollama llama llamacpp groq openai chatgpt gemini autogen rag agent stable-diffusion fabric",
     url="https://letmedoit.ai",
     project_urls={
-        "Source": "https://github.com/eliranwong/letmedoit",
-        "Tracker": "https://github.com/eliranwong/letmedoit/issues",
-        "Documentation": "https://github.com/eliranwong/letmedoit/wiki",
+        "Source": "https://github.com/eliranwong/toolmate",
+        "Tracker": "https://github.com/eliranwong/toolmate/issues",
+        "Documentation": "https://github.com/eliranwong/toolmate/wiki",
         "Funding": "https://www.paypal.me/letmedoitai",
     },
     classifiers=[

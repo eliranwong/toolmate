@@ -1,1 +1,0 @@
-video files are placed in this directory.

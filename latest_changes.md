@@ -1,8 +1,14 @@
+# Version: 0.3.21
+
+* fixed depencdency versions for installation
+
+* fixed link to Reflection Agents documentation
+
 # Version: 0.3.20
 
 * added tool `@deep_reflection`.
 
-* added documentation on `Reflection Agents` at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Deep%20Agents.md
+* added documentation on `Reflection Agents` at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Reflection%20Agents.md
 
 # Version: 0.3.19
 

@@ -36,7 +36,7 @@ https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/LetMeDoIt
 
 [Running Multiple Tools in One Go](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md)
 
-[Deep Reflection Agents](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Deep%20Agents.md)
+[Deep Reflection Agents](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Reflection%20Agents.md)
 
 [Highly Customisable Plugins](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md#plugins)
 

@@ -2268,7 +2268,7 @@ My writing:
             elif userInput and not userInputLower in featuresLower:
 
                 toolNames = "|".join(config.toolFunctionMethods.keys())
-                actionPattern = f"@(context|convert_relative_datetime|copy_to_clipboard|paste_from_clipboard|extract_python_code|run_python_code|list_current_directory_contents|command|append_command|append_prompt|improve_writing|{toolNames})[ \n]"
+                actionPattern = f"@(deep_reflection|context|convert_relative_datetime|copy_to_clipboard|paste_from_clipboard|extract_python_code|run_python_code|list_current_directory_contents|command|append_command|append_prompt|improve_writing|{toolNames})[ \n]"
 
                 def runSingleAction(action: str, description: str) -> None:
                     config.selectedTool = ""
@@ -2531,12 +2531,31 @@ My writing:
                             # enable tool to work on previous generated response
                             description = getAssistantPreviousResponse()[0]
                         if description.strip():
-                            message = f'''\n@{action}: {description}'''
-                            try:
-                                print3(message)
-                            except:
-                                print(message)
-                            runSingleAction(action, description)
+                            def displayActionMessage(message):
+                                try:
+                                    print3(message)
+                                except:
+                                    print(message)
+                            if action == "deep_reflection":
+                                # think
+                                description = f'''`Think` {description}'''
+                                message = f'''\n@context: {description}\n'''
+                                displayActionMessage(message)
+                                runSingleAction("context", description)
+                                # review
+                                message = '''\n@chat: Review, evaluate, and reflect ...\n'''
+                                displayActionMessage(message)
+                                description = config.predefinedContexts["Review"][6:]
+                                runSingleAction("chat", description)
+                                # refine
+                                message = '''\n@chat: Refine ...\n'''
+                                displayActionMessage(message)
+                                description = config.predefinedContexts["Refine"][21:]
+                                runSingleAction("chat", description)
+                            else:
+                                message = f'''\n@{action}: {description}'''
+                                displayActionMessage(message)
+                                runSingleAction(action, description)
 
     def launchChatbot(self, chatbot, userInput):
         if not chatbot:

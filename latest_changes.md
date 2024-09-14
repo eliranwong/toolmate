@@ -1,3 +1,9 @@
+# Version: 0.3.20
+
+* added tool `@deep_reflection`.
+
+* added documentation on `Reflection Agents` at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Deep%20Agents.md
+
 # Version: 0.3.19
 
 * added tool `@reflection` to mimic the reflection feature performed by the LLM `Reflection:70b`  This tool is created to work with any LLM

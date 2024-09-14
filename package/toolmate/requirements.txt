@@ -1,7 +1,4 @@
 llama-cpp-python[server]==0.2.90
-torch==2.3.0
-torchaudio==2.3.0
-torchvision==0.18.0
 numpy==1.26.4
 protobuf==4.25.3
 cmake==3.30.3

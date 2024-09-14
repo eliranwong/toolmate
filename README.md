@@ -36,6 +36,8 @@ https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/LetMeDoIt
 
 [Running Multiple Tools in One Go](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md)
 
+[Deep Reflection Agents](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Deep%20Agents.md)
+
 [Highly Customisable Plugins](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md#plugins)
 
 [Integration with Popular AI Tools](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md#integration)
@@ -44,7 +46,7 @@ https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/LetMeDoIt
 
 Starting with version 0.2.86+, users can utilize the `@` symbol to designate a specific tool within the application. The `toolmate` package now comes with a suite of pre-built tools:
 
-@chat @context @paste_from_clipboard @improve_writing @convert_relative_datetime @copy_to_clipboard @append_prompt @command @append_command @fabric @fabric_pattern @append_fabric @append_fabric_pattern @list_current_directory_contents @extract_python_code @run_python_code @integrate_google_searches @add_google_calendar_event @add_outlook_calendar_event @analyze_audio @analyze_files @analyze_images @analyze_web_content @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @correct_python @build_agents @create_image @create_map @create_qrcode @create_statistical_graphics @datetimes @download_web_content @download_youtube_audio @download_youtube_video @edit_text @execute_computing_task @install_package @save_memory @reflection @retrieve_memory @modify_images @open_browser @pronunce_words @remove_image_background @search_chats @load_chats @search_finance @search_latest_news @search_sqlite @search_weather_info @send_gamil @send_outlook @send_tweet
+@chat @context @paste_from_clipboard @improve_writing @convert_relative_datetime @copy_to_clipboard @append_prompt @command @append_command @fabric @fabric_pattern @append_fabric @append_fabric_pattern @list_current_directory_contents @extract_python_code @run_python_code @integrate_google_searches @add_google_calendar_event @add_outlook_calendar_event @analyze_audio @analyze_files @analyze_images @analyze_web_content @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @correct_python @build_agents @create_image @create_map @create_qrcode @create_statistical_graphics @datetimes @download_web_content @download_youtube_audio @download_youtube_video @edit_text @execute_computing_task @install_package @save_memory @reflection @deep_reflection @retrieve_memory @modify_images @open_browser @pronunce_words @remove_image_background @search_chats @load_chats @search_finance @search_latest_news @search_sqlite @search_weather_info @send_gamil @send_outlook @send_tweet
 
 For those interested in expanding the capabilities of ToolMate AI, [custom tools can be added to the system via plugins](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Plugins%20-%20How%20to%20Write%20a%20Custom%20Plugin.md).
 

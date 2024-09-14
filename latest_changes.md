@@ -1,3 +1,11 @@
+# Version: 0.3.23
+
+* fixed install on macOS, pysqlite3 failed the installation, as it is required by pyautogen[autobuild]
+
+# Version: 0.3.22
+
+* fixed loading `reflection` plugin
+
 # Version: 0.3.21
 
 * fixed depencdency versions for installation

@@ -8,6 +8,14 @@ ToolMate AI, formerly known as FreeGenius AI, is a cutting-edge AI companion tha
 
 https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/LetMeDoIt%20Mode.md
 
+# Documentation
+
+https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md
+
+# Latest changes
+
+https://github.com/eliranwong/toolmate/blob/main/latest_changes.md
+
 # Supported Platforms
 
 Windows, macOS, Linux, ChromeOS, Android (upcoming)
@@ -22,21 +30,13 @@ Our recommendations:
 
 Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Supported%20Backends%20and%20Models.md
 
-# Latest changes
-
-https://github.com/eliranwong/toolmate/blob/main/latest_changes.md
-
-## Beyond LetMeDoIt AI
-
-https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/LetMeDoIt%20Mode.md
-
 # Distinctive Features
 
+[NEW! Deep Reflection Agents](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Reflection%20Agents.md)
+
+[NEW! Running Multiple Tools in One Go](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md)
+
 [Tool Calling for Any LLMs](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Function%20Call%20Approach%20with%20Any%20LLMs.md)
-
-[Running Multiple Tools in One Go](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md)
-
-[Deep Reflection Agents](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Reflection%20Agents.md)
 
 [Highly Customisable Plugins](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md#plugins)
 

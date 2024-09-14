@@ -138,5 +138,5 @@ Do not include other text on a line containing a tag.
 
 """
 
-config.inputSuggestions.append("@reflection ", "@deep_reflection ")
+config.inputSuggestions += ["@reflection ", "@deep_reflection "]
 config.aliases["@reflection "] = "@context `Reflection` "

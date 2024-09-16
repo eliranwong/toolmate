@@ -844,6 +844,25 @@ def toChatml(messages: dict=[], use_system_message=True) -> str:
             messages_str += roles[role].format(content=content)
     return messages_str.rstrip()
 
+def useChatSystemMessage(messages: dict) -> dict:
+    for i in messages:
+        if i.get("role", "") == "system":
+            if config.llmInterface == "ollama":
+                i["content"] = config.systemMessage_ollama
+            elif config.llmInterface == "groq":
+                i["content"] = config.systemMessage_groq
+            elif config.llmInterface == "llamacppserver":
+                i["content"] = config.systemMessage_llamacppserver
+            elif config.llmInterface == "llamacpp":
+                i["content"] = config.systemMessage_llamacpp
+            elif config.llmInterface == "gemini":
+                i["content"] = config.systemMessage_gemini
+            elif config.llmInterface == "chatgpt":
+                i["content"] = config.systemMessage_chatgpt
+            # assume only one system message in the message chain
+            break
+    return messages
+
 def toGeminiMessages(messages: dict=[]) -> Optional[list]:
     systemMessage = ""
     lastUserMessage = ""

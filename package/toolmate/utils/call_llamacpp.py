@@ -1,4 +1,4 @@
-from toolmate import config, showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema, getCpuThreads
+from toolmate import config, showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema, getCpuThreads, useChatSystemMessage
 from toolmate import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, isToolRequired, encode_image, selectEnabledTool
 from typing import Optional
 from llama_cpp import Llama
@@ -178,8 +178,9 @@ Remember, output the new copy of python code ONLY, without additional notes or e
 
     @staticmethod
     def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None):
+        chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         return config.llamacppMainModel.create_chat_completion(
-            messages=messages,
+            messages=chatMessages,
             temperature=temperature if temperature is not None else config.llmTemperature,
             max_tokens=max_tokens if max_tokens is not None else config.llamacppMainModel_max_tokens,
             stream=True,
@@ -256,9 +257,10 @@ Remember, output the new copy of python code ONLY, without additional notes or e
         # non-streaming single call
         if userInput:
             messages.append({"role": "user", "content" : userInput})
+        chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         try:
             completion = config.llamacppMainModel.create_chat_completion(
-                messages=messages,
+                messages=chatMessages,
                 temperature=temperature if temperature is not None else config.llmTemperature,
                 max_tokens=max_tokens if max_tokens is not None else config.llamacppMainModel_max_tokens,
                 stream=False,

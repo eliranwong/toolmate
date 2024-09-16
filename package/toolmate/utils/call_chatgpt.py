@@ -1,4 +1,4 @@
-from toolmate import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution
+from toolmate import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution, useChatSystemMessage
 from toolmate import config
 from toolmate import print1, print2, print3, getDynamicTokens, selectTool, selectEnabledTool
 import re, traceback, openai, pprint, copy, textwrap, json, pygments
@@ -168,10 +168,11 @@ def getSingleChatResponse(userInput, messages=[], temperature=None):
     non-streaming single call
     """
     messages.append({"role": "user", "content" : userInput})
+    chatMessages = useChatSystemMessage(copy.deepcopy(messages))
     try:
         completion = config.oai_client.chat.completions.create(
             model=config.chatGPTApiModel,
-            messages=messages,
+            messages=chatMessages,
             n=1,
             temperature=temperature if temperature is not None else config.llmTemperature,
             max_tokens=config.chatGPTApiMaxTokens,
@@ -329,9 +330,10 @@ class CallChatGPT:
     @staticmethod
     @check_openai_errors
     def regularCall(messages: dict, **kwargs):
+        chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         return config.oai_client.chat.completions.create(
             model=config.chatGPTApiModel,
-            messages=messages,
+            messages=chatMessages,
             n=1,
             temperature=config.llmTemperature,
             max_tokens=getDynamicTokens(messages),

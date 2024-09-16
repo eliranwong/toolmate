@@ -1,4 +1,4 @@
-from toolmate import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution
+from toolmate import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution, useChatSystemMessage
 from toolmate import config
 from toolmate import print1, print2, print3, selectTool, check_llm_errors, getGroqClient, toParameterSchema, extractPythonCode, selectEnabledTool
 import re, traceback, pprint, copy, textwrap, json, pygments
@@ -92,10 +92,11 @@ class CallGroq:
         non-streaming single call
         """
         messages.append({"role": "user", "content" : userInput})
+        chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         try:
             completion = getGroqClient().chat.completions.create(
                 model=config.groqApi_main_model,
-                messages=messages,
+                messages=chatMessages,
                 n=1,
                 temperature=temperature if temperature is not None else config.llmTemperature,
                 max_tokens=max_tokens if max_tokens is not None else config.groqApi_max_tokens,
@@ -227,9 +228,10 @@ class CallGroq:
     @staticmethod
     @check_llm_errors
     def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None):
+        chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         return getGroqClient().chat.completions.create(
             model=config.groqApi_main_model,
-            messages=messages,
+            messages=chatMessages,
             n=1,
             temperature=temperature if temperature is not None else config.llmTemperature,
             max_tokens=max_tokens if max_tokens is not None else config.groqApi_max_tokens,

@@ -58,7 +58,7 @@ Press 'ctrl+k' and scroll to the bottom for a full list of quick actions, e.g.:
 .autoupgrade: change automatic upgrade
 .assistantname: change assistant name
 .storagedirectory: change storage directory
-.systemmessage: change custom system message
+.systemmessage: change system messages
 .system: open system command prompt ['escape', 't']
 .install: install python package
 .keys: display key bindings ['c-k']

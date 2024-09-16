@@ -1,4 +1,4 @@
-from toolmate import showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema, selectEnabledTool
+from toolmate import showErrors, get_or_create_collection, query_vectors, getDeviceInfo, isValidPythodCode, executeToolFunction, toParameterSchema, selectEnabledTool, useChatSystemMessage
 from toolmate import print1, print2, print3, selectTool, getPythonFunctionResponse, extractPythonCode, isValidPythodCode, isToolRequired
 from toolmate import config, getOllamaServerClient
 import shutil, re, traceback, json, ollama, pprint, copy, datetime
@@ -110,10 +110,11 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     @staticmethod
     @check_ollama_errors
     def regularCall(messages: dict, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None):
+        chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         return getOllamaServerClient().chat(
             keep_alive=config.ollamaMainModel_keep_alive,
             model=config.ollamaMainModel,
-            messages=messages,
+            messages=chatMessages,
             stream=True,
             options=Options(
                 temperature=temperature if temperature is not None else config.llmTemperature,
@@ -159,11 +160,12 @@ Remember, give me the python code ONLY, without additional notes or explanation.
         # non-streaming single call
         if userInput:
             messages.append({"role": "user", "content" : userInput})
+        chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         try:
             completion = getOllamaServerClient().chat(
                 keep_alive=config.ollamaMainModel_keep_alive,
                 model=model if model is not None else config.ollamaMainModel,
-                messages=messages,
+                messages=chatMessages,
                 stream=False,
                 options=Options(
                     temperature=temperature if temperature is not None else config.llmTemperature,

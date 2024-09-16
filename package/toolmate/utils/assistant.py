@@ -195,7 +195,7 @@ class ToolMate:
             ".autoupgrade": ("change automatic upgrade", self.setAutoUpgrade),
             ".assistantname": ("change assistant name", self.setAssistantName),
             ".storagedirectory": ("change storage directory", self.setStorageDirectory),
-            ".systemmessage": ("change custom system message", self.setCustomSystemMessage),
+            ".systemmessage": ("change system messages", self.setCustomSystemMessage),
             # miscellaneous
             ".system": (f"open system command prompt {str(config.hotkey_launch_system_prompt)}", lambda: SystemCommandPrompt().run(allowPathChanges=True)),
             ".install": ("install python package", self.installPythonPackage), # TODO: changed to a tool
@@ -1392,14 +1392,14 @@ class ToolMate:
         model = self.dialogs.getValidOptions(
             options=models,
             title="Gemini Models",
-            default=config.geminipro_model if config.geminipro_model in models else models[0],
+            default=config.gemini_model if config.gemini_model in models else models[0],
             text="Select a function call model:\n(for both chat and task execution)",
         )
         if model:
-            config.geminipro_model = model
+            config.gemini_model = model
             print3(f"Gemini model: {model}")
             # set max tokens
-            print3(f"Maximum output tokens: {config.geminipro_max_output_tokens}")
+            print3(f"Maximum output tokens: {config.gemini_max_output_tokens}")
 
     def setLlmModel_chatgpt(self):
         model = self.dialogs.getValidOptions(
@@ -1477,15 +1477,49 @@ class ToolMate:
             print3(f"You have changed my name to: {config.toolMateAIName}")
 
     def setCustomSystemMessage(self):
-        print1("You can modify the system message to furnish me with details about my capabilities, constraints, or any pertinent context that may inform our interactions. This will guide me in managing and responding to your requests appropriately.")
-        print1("Please note that altering my system message directly affects my functionality. Handle with care.")
-        print1("Enter custom system message below:")
-        print1(f"(Keep it blank to use {config.toolMateAIName} default system message.)")
-        message = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.systemMessage_letmedoit)
+        print3("ToolMate AI utilizes two distinct system messages to manage tool calling and conversation.")
+
+        print2("1. Tool System Message")
+        print1("You can modify the tool system message to furnish ToolMate AI with details about my capabilities, constraints, or any pertinent context that may inform your interactions with ToolMate AI. This will guide ToolMate AI in managing and responding to your requests appropriately.")
+        print1("Please note that altering my tool system message directly affects my functionality. Handle with care.")
+        print1("Enter custom tool system message below:")
+        print1(f"(Keep it blank to use {config.toolMateAIName} default tool system message.)")
+        message = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.systemMessage_tool)
         if message and not message.strip().lower() == config.exit_entry:
-            config.systemMessage_letmedoit = message
+            config.systemMessage_tool = message
             config.saveConfig()
-            print3(f"Custom system message: {config.toolMateAIName}")
+            print3(f"Custom tool system message: {config.toolMateAIName}")
+
+        print2("2. Chat System Message")
+        print1("Enter custom chat system message to guide our chat conversations:")
+        if config.llmInterface == "ollama":
+            systemMessage_chat = config.systemMessage_ollama
+        elif config.llmInterface == "groq":
+            systemMessage_chat = config.systemMessage_groq
+        elif config.llmInterface == "llamacppserver":
+            systemMessage_chat = config.systemMessage_llamacppserver
+        elif config.llmInterface == "llamacpp":
+            systemMessage_chat = config.systemMessage_llamacpp
+        elif config.llmInterface == "gemini":
+            systemMessage_chat = config.systemMessage_gemini
+        elif config.llmInterface == "chatgpt":
+            systemMessage_chat = config.systemMessage_chatgpt
+        message = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=systemMessage_chat)
+        if message and not message.strip().lower() == config.exit_entry:
+            if config.llmInterface == "ollama":
+                config.systemMessage_ollama = message
+            elif config.llmInterface == "groq":
+                config.systemMessage_groq = message
+            elif config.llmInterface == "llamacppserver":
+                config.systemMessage_llamacppserver = message
+            elif config.llmInterface == "llamacpp":
+                config.systemMessage_llamacpp = message
+            elif config.llmInterface == "gemini":
+                config.systemMessage_gemini = message
+            elif config.llmInterface == "chatgpt":
+                config.systemMessage_chatgpt = message
+            config.saveConfig()
+            print3(f"Custom chat system message: {config.toolMateAIName}")
 
     def setCustomTextEditor(self):
         print1("Please specify custom text editor command below:")
@@ -1557,7 +1591,7 @@ class ToolMate:
     def setMaxTokens_non_chatgpt(self):
         print1("Please specify maximum output tokens below:")
         if config.llmInterface == "gemini":
-            default = config.geminipro_max_output_tokens
+            default = config.gemini_max_output_tokens
         elif config.llmInterface == "llamacpp":
             default = config.llamacppMainModel_max_tokens
         elif config.llmInterface == "ollama":
@@ -1568,7 +1602,7 @@ class ToolMate:
         if maxtokens and not maxtokens.strip().lower() == config.exit_entry and int(maxtokens) > 0:
             maxtokens = int(maxtokens)
             if config.llmInterface == "gemini":
-                config.geminipro_max_output_tokens = maxtokens
+                config.gemini_max_output_tokens = maxtokens
             elif config.llmInterface == "llamacpp":
                 config.llamacppMainModel_max_tokens = maxtokens
             elif config.llmInterface == "ollama":
@@ -2128,7 +2162,7 @@ My writing:
         featuresLower = list(self.actions.keys()) + ["..."]
         # input suggestions
         nestedSuggestions = {i: None for i in featuresLower}
-        nestedSuggestions["@context"] = {f"`{i}`":None for i in config.predefinedContexts if not i.startswith("[")}
+        nestedSuggestions["@context"] = {f"`{i}` ":None for i in config.predefinedContexts if not i.startswith("[")}
         for i in config.inputSuggestions:
             if isinstance(i, str):
                 nestedSuggestions[i] = None

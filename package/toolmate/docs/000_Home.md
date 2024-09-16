@@ -134,6 +134,8 @@ Our recent developments, for example, [the ability to run multiple tools in a si
 
 [Customise Assistant Name](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Customise%20Assistant%20Name.md)
 
+[Customise System Messages](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Custom%20System%20Messages.md)
+
 [Tool Selection Configurations](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Selection%20Configurations.md)
 
 [Configure Ollama Server](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Configure%20Ollama%20Server.md)

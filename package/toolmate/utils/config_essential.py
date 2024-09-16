@@ -129,8 +129,8 @@ defaultSettings = (
     ('llamacppChatModel_max_tokens', 10000), # llama.cpp chat model maximum tokens
     ('llamacppChatModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
     ('llamacppChatModel_n_batch', 512), # The batch size to use per eval
-    ('geminipro_model', "gemini-1.5-pro-001"), # "gemini-1.0-pro-001", "gemini-1.0-pro-002", "gemini-1.5-flash-001", "gemini-1.5-pro-001", read models that support function calling https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling
-    ('geminipro_max_output_tokens', 8192), # check supported value at https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
+    ('gemini_model', "gemini-1.5-pro-001"), # "gemini-1.0-pro-001", "gemini-1.0-pro-002", "gemini-1.5-flash-001", "gemini-1.5-pro-001", read models that support function calling https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling
+    ('gemini_max_output_tokens', 8192), # check supported value at https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
     ('whispercpp_main', ''), # whisper.cpp main command file path
     ('whispercpp_model', ''), # whisper.cpp model file path
     ('whispercpp_additional_options', ''), # whisper.cpp additional options. See https://github.com/ggerganov/whisper.cpp/tree/master/examples/main for all options.
@@ -142,13 +142,13 @@ defaultSettings = (
     ('max_agents', 5), # maximum number of agents build manager can create.
     ('max_group_chat_round', 12), # AutoGen group chat maximum round
     ('env_QT_QPA_PLATFORM_PLUGIN_PATH', ''), # e.g. # deal with error: qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "~/apps/letmedoit/lib/python3.10/site-packages/cv2/qt/plugins" even though it was found.
-    ('systemMessage_letmedoit', ''), # letmedoit system message
+    ('systemMessage_tool', ''), # letmedoit system message
     ('systemMessage_ollama', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone ollama chatbot
     ('systemMessage_groq', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone groq chatbot
     ('systemMessage_llamacpp', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone llamacpp chatbot
     ('systemMessage_llamacppserver', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone llamacppserver chatbot
     ('systemMessage_chatgpt', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone chatgpt chatbot
-    ('systemMessage_geminipro', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone geminipro chatbot
+    ('systemMessage_gemini', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone geminipro chatbot
     ('systemMessage_palm2', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone palm2 chatbot
     ('systemMessage_codey', 'You are an expert on coding.'), # system message for standalone codey chatbot
     ('embeddingModel', 'paraphrase-multilingual-mpnet-base-v2'), # reference: https://www.sbert.net/docs/pretrained_models.html
@@ -287,8 +287,8 @@ temporaryConfigs = [
     "llamacppChatServer",
     "llamacppVisionServer",
     "autogenstudioServer",
-    "geminipro_generation_config",
-    "geminipro_safety_settings",
+    "gemini_generation_config",
+    "gemini_safety_settings",
     "llamacppMainModel",
     "llamacppChatModel",
     "new_chat_response",

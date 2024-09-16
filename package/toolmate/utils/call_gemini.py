@@ -1,4 +1,4 @@
-from toolmate import getDeviceInfo, showErrors, get_or_create_collection, query_vectors, toGeminiMessages, executeToolFunction, extractPythonCode
+from toolmate import getDeviceInfo, showErrors, get_or_create_collection, query_vectors, toGeminiMessages, executeToolFunction, extractPythonCode, useChatSystemMessage
 from toolmate import print1, print2, print3, selectTool, getPythonFunctionResponse, isValidPythodCode, selectEnabledTool
 from toolmate import config
 from prompt_toolkit import prompt
@@ -16,18 +16,18 @@ class CallGemini:
 
     @staticmethod
     def getGeminiModel(tool=None):
-        config.geminipro_generation_config=GenerationConfig(
+        config.gemini_generation_config=GenerationConfig(
             temperature=config.llmTemperature, # 0.0-1.0; default 0.9
-            max_output_tokens=config.geminipro_max_output_tokens, # default
+            max_output_tokens=config.gemini_max_output_tokens, # default
             candidate_count=1,
         )
         # the latest package requires tools to be placed in the `GenerativeModel` instead of `send_message`
         # read https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling#chat-samples
         return GenerativeModel(
-            model_name=config.geminipro_model,
-            generation_config=config.geminipro_generation_config,
+            model_name=config.gemini_model,
+            generation_config=config.gemini_generation_config,
             tools=[tool],
-        ) if tool else GenerativeModel(config.geminipro_model, generation_config=config.geminipro_generation_config,)
+        ) if tool else GenerativeModel(config.gemini_model, generation_config=config.gemini_generation_config,)
 
     @staticmethod
     def checkCompletion():
@@ -42,7 +42,7 @@ class CallGemini:
             print("LLM interface changed back to 'llamacpp'")
 
         # Note: BLOCK_NONE is not allowed
-        config.geminipro_safety_settings={
+        config.gemini_safety_settings={
             HarmCategory.HARM_CATEGORY_UNSPECIFIED: HarmBlockThreshold.BLOCK_ONLY_HIGH,
             HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
             HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
@@ -116,13 +116,14 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     def regularCall(messages: dict, useSystemMessage: bool=True, **kwargs):
-        history, systemMessage, lastUserMessage = toGeminiMessages(messages=messages)
-        userMessage = f"{systemMessage}\n\nHere is my request:\n{lastUserMessage}" if useSystemMessage and systemMessage else lastUserMessage
+        history, _, lastUserMessage = toGeminiMessages(messages=messages)
+        #userMessage = f"{systemMessage}\n\nHere is my request:\n{lastUserMessage}" if useSystemMessage and systemMessage else lastUserMessage
+        userMessage = f"{config.systemMessage_gemini}\n\nHere is my request:\n{lastUserMessage}" if useSystemMessage and config.systemMessage_gemini else lastUserMessage
         chat = CallGemini.getGeminiModel().start_chat(history=history)
         return chat.send_message(
             userMessage,
-            generation_config=config.geminipro_generation_config,
-            safety_settings=config.geminipro_safety_settings,
+            generation_config=config.gemini_generation_config,
+            safety_settings=config.gemini_safety_settings,
             stream=True,
             **kwargs,
         )
@@ -146,7 +147,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
         try:
             completion = chat.send_message(
                 userMessage,
-                safety_settings=config.geminipro_safety_settings,
+                safety_settings=config.gemini_safety_settings,
                 stream=False,
                 **kwargs,
             )
@@ -166,8 +167,8 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             chat = CallGemini.getGeminiModel().start_chat(history=history)
             completion = chat.send_message(
                 userInput,
-                generation_config=config.geminipro_generation_config,
-                safety_settings=config.geminipro_safety_settings,
+                generation_config=config.gemini_generation_config,
+                safety_settings=config.gemini_safety_settings,
                 stream=False,
                 **kwargs,
             )

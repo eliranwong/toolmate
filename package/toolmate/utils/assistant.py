@@ -2302,7 +2302,7 @@ My writing:
             elif userInput and not userInputLower in featuresLower:
 
                 toolNames = "|".join(config.toolFunctionMethods.keys())
-                actionPattern = f"@(deep_reflection|context|convert_relative_datetime|copy_to_clipboard|paste_from_clipboard|extract_python_code|run_python_code|list_current_directory_contents|command|append_command|append_prompt|improve_writing|{toolNames})[ \n]"
+                actionPattern = f"@(workflow|deep_reflection|context|convert_relative_datetime|copy_to_clipboard|paste_from_clipboard|extract_python_code|run_python_code|list_current_directory_contents|command|append_command|append_prompt|improve_writing|{toolNames})[ \n]"
 
                 def runSingleAction(action: str, description: str) -> None:
                     config.selectedTool = ""
@@ -2526,7 +2526,61 @@ My writing:
                         print2("starting a new chat!")
                         self.saveChat(config.currentMessages)
                         storagedirectory, config.currentMessages = startChat()
-                
+
+                def checkAndRunActions(content):
+
+                    # check for any tool patterns
+                    actions = re.findall(actionPattern, f"{content} ") # add a space after `content` to allow tool entry at the end without a description
+                    
+                    if not actions:
+                        if content.strip():
+                            # pass to built-in screening or tool-check operations
+                            runSingleAction("", content)
+                    else:
+                        separator = "＊@＊@＊"
+                        descriptions = re.sub(actionPattern, separator, f"{content} ").split(separator)
+                        if descriptions[0].strip():
+                            # in case content entered before the first action declared
+                            actions.insert(0, "chat")
+                        else:
+                            del descriptions[0]
+                        for index, action in enumerate(actions):
+                            description = f"List contents in current directory {os.getcwd()}" if action == "list_current_directory_contents" else descriptions[index]
+                            if not description.strip():
+                                # enable tool to work on previous generated response
+                                description = getAssistantPreviousResponse()[0]
+                            if description.strip():
+                                def displayActionMessage(message):
+                                    try:
+                                        print3(message)
+                                    except:
+                                        print(message)
+                                if action == "deep_reflection":
+                                    # think
+                                    description = f'''`Think` {description}'''
+                                    message = f'''\n@context: {description}\n'''
+                                    displayActionMessage(message)
+                                    runSingleAction("context", description)
+                                    # review
+                                    message = '''\n@chat: Review, evaluate, and reflect ...\n'''
+                                    displayActionMessage(message)
+                                    description = config.predefinedContexts["Review"][6:]
+                                    runSingleAction("chat", description)
+                                    # refine
+                                    message = '''\n@chat: Refine ...\n'''
+                                    displayActionMessage(message)
+                                    description = config.predefinedContexts["Refine"][21:]
+                                    runSingleAction("chat", description)
+                                if action == "workflow":
+                                    workflowFile = description.strip()
+                                    if os.path.isfile(workflowFile):
+                                        workflowContent = readTextFile(workflowFile)
+                                        checkAndRunActions(workflowContent)
+                                else:
+                                    message = f'''\n@{action}: {description}'''
+                                    displayActionMessage(message)
+                                    runSingleAction(action, description)
+
                 # tweak for `Let me Translate`
                 if config.predefinedContext == "Let me Translate" and userInput.startswith("@chat Assist me by acting as a translator.\nPlease translate"):
                     print1("Please specify the language you would like the content to be translated into:")
@@ -2544,52 +2598,7 @@ My writing:
                     config.predefinedContext = config.predefinedContextTemp
                     config.predefinedContextTemp = ""
 
-                # check for any tool patterns
-                actions = re.findall(actionPattern, f"{userInput} ") # add a space after `userInput` to allow tool entry at the end without a description
-                
-                if not actions:
-                    if userInput.strip():
-                        # pass to built-in screening or tool-check operations
-                        runSingleAction("", userInput)
-                else:
-                    separator = "＊@＊@＊"
-                    descriptions = re.sub(actionPattern, separator, f"{userInput} ").split(separator)
-                    if descriptions[0].strip():
-                        # in case content entered before the first action declared
-                        actions.insert(0, "chat")
-                    else:
-                        del descriptions[0]
-                    for index, action in enumerate(actions):
-                        description = f"List contents in current directory {os.getcwd()}" if action == "list_current_directory_contents" else descriptions[index]
-                        if not description.strip():
-                            # enable tool to work on previous generated response
-                            description = getAssistantPreviousResponse()[0]
-                        if description.strip():
-                            def displayActionMessage(message):
-                                try:
-                                    print3(message)
-                                except:
-                                    print(message)
-                            if action == "deep_reflection":
-                                # think
-                                description = f'''`Think` {description}'''
-                                message = f'''\n@context: {description}\n'''
-                                displayActionMessage(message)
-                                runSingleAction("context", description)
-                                # review
-                                message = '''\n@chat: Review, evaluate, and reflect ...\n'''
-                                displayActionMessage(message)
-                                description = config.predefinedContexts["Review"][6:]
-                                runSingleAction("chat", description)
-                                # refine
-                                message = '''\n@chat: Refine ...\n'''
-                                displayActionMessage(message)
-                                description = config.predefinedContexts["Refine"][21:]
-                                runSingleAction("chat", description)
-                            else:
-                                message = f'''\n@{action}: {description}'''
-                                displayActionMessage(message)
-                                runSingleAction(action, description)
+                checkAndRunActions(userInput)
 
     def launchChatbot(self, chatbot, userInput):
         if not chatbot:

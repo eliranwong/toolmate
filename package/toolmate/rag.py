@@ -1,5 +1,5 @@
 import os
-from toolmate import config, print2, print3, getUnstructuredFiles, get_or_create_collection, add_vector, query_vectors
+from toolmate import config, print2, print3, getUnstructuredFiles, get_or_create_collection, add_vector, query_vectors, refinePath
 from toolmate.utils.call_llm import CallLLM
 import os, traceback, re, zipfile, datetime, traceback, threading, shutil, chromadb
 from chromadb.config import Settings
@@ -178,14 +178,6 @@ Please answer my question, based on the context given above."""
         #print(message)
         print_formatted_text(HTML(message))
 
-    def refinePath(self, docs_path):
-        docs_path = docs_path.strip()
-        docs_path = re.sub("^'(.*?)'$", r"\1", docs_path)
-        if "\\ " in docs_path or "\(" in docs_path:
-            docs_path = docs_path.replace("\\ ", " ")
-            docs_path = docs_path.replace("\(", "(")
-        return os.path.expanduser(docs_path)
-
     def run(self):
         promptStyle = Style.from_dict({
             # User input (default text).
@@ -203,7 +195,7 @@ Please answer my question, based on the context given above."""
         docs_path = prompts.simplePrompt(style=promptStyle)
 
         # handle path dragged to terminal
-        docs_path = self.refinePath(docs_path)
+        docs_path = refinePath(docs_path)
 
         if docs_path and os.path.exists(docs_path):
             self.print("Enter your query below:")

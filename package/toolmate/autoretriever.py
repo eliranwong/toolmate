@@ -13,7 +13,7 @@ if not hasattr(config, "max_consecutive_auto_reply"):
 
 from toolmate import print2, print3, tokenLimits
 
-from toolmate import getEmbeddingFunction, startLlamacppServer, stopLlamacppServer, getGroqApi_key
+from toolmate import getEmbeddingFunction, startLlamacppServer, stopLlamacppServer, getGroqApi_key, refinePath
 import autogen, os, json, traceback, chromadb, re, zipfile, datetime, traceback
 from chromadb.config import Settings
 from pathlib import Path
@@ -195,14 +195,6 @@ class AutoGenRetriever:
         #print(message)
         print_formatted_text(HTML(message))
 
-    def refinePath(self, docs_path):
-        docs_path = docs_path.strip()
-        docs_path = re.sub("^'(.*?)'$", r"\1", docs_path)
-        if "\\ " in docs_path or "\(" in docs_path:
-            docs_path = docs_path.replace("\\ ", " ")
-            docs_path = docs_path.replace("\(", "(")
-        return os.path.expanduser(docs_path)
-
     def run(self):
         promptStyle = Style.from_dict({
             # User input (default text).
@@ -230,7 +222,7 @@ class AutoGenRetriever:
         docs_path = prompts.simplePrompt(style=promptStyle)
 
         # handle path dragged to terminal
-        docs_path = self.refinePath(docs_path)
+        docs_path = refinePath(docs_path)
 
         if docs_path and os.path.exists(docs_path):
             self.print("Enter your query below:")

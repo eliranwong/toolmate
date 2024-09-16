@@ -5,7 +5,7 @@ from vertexai.generative_models._generative_models import (
     HarmCategory,
     HarmBlockThreshold,
 )
-from toolmate import config, showErrors, is_valid_image_file, is_valid_image_url, wrapText, print2, print3, is_valid_url, toggleinputaudio, toggleoutputaudio
+from toolmate import config, showErrors, is_valid_image_file, is_valid_image_url, wrapText, print2, print3, is_valid_url, toggleinputaudio, toggleoutputaudio, refinePath
 from toolmate.utils.single_prompt import SinglePrompt
 from toolmate.utils.tool_plugins import Plugins
 
@@ -52,14 +52,6 @@ class GeminiProVision:
             "indicator": config.terminalPromptIndicatorColor2,
         })
 
-    def refinePath(self, img_path):
-        img_path = img_path.strip()
-        img_path = re.sub("^'(.*?)'$", r"\1", img_path)
-        if "\\ " in img_path or "\(" in img_path:
-            img_path = img_path.replace("\\ ", " ")
-            img_path = img_path.replace("\(", "(")
-        return os.path.expanduser(img_path)
-
     def run(self, query="", files=[]):
         print2("\nGemini Pro Vision loaded!")
         print(f"""[press '{str(config.hotkey_exit).replace("'", "")[1:-1]}' to exit]""")
@@ -68,7 +60,7 @@ class GeminiProVision:
             files = SinglePrompt.run(style=self.promptStyle)
         if files:
             # handle path dragged to terminal
-            files = self.refinePath(files)
+            files = refinePath(files)
         if files == config.exit_entry:
             pass
         elif files and os.path.exists(files):

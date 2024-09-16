@@ -496,6 +496,14 @@ def getDownloadedGgufModels() -> dict:
 
 # text
 
+def refinePath(docs_path):
+    docs_path = docs_path.strip()
+    docs_path = re.sub("^'(.*?)'$", r"\1", docs_path)
+    if "\\ " in docs_path or "\(" in docs_path:
+        docs_path = docs_path.replace("\\ ", " ")
+        docs_path = docs_path.replace("\(", "(")
+    return os.path.expanduser(docs_path)
+
 def readTextFile(textFile: str) -> str:
     with open(textFile, 'r', encoding='utf8') as fileObj:
         content = fileObj.read()

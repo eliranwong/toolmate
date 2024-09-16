@@ -1,5 +1,5 @@
-from toolmate import config, isCommandInstalled
-import os, shutil
+from toolmate import config, isCommandInstalled, print2
+import os, shutil, subprocess
 
 # add config item `fabricPath`.  Users can customise fabric path by editing its value in `config.py`.
 whichFabric = shutil.which("fabric")
@@ -20,5 +20,8 @@ if isCommandInstalled(config.fabricPath) or os.path.isfile(config.fabricPath):
     config.inputSuggestions += [{"@fabric_pattern": patterns}, {"@append_fabric_pattern": patterns}]
     patterns = {"-p": patterns}
     config.inputSuggestions += [{"@fabric": patterns}, {"@append_fabric": patterns}]
+
+    config.builtinTools["fabric"] = "execute a fabric command"
+    config.builtinTools["append_fabric"] = "execute a fabric command, appended by the previous text output"
 else:
     print2("`fabric` not found! Read https://github.com/danielmiessler/fabric for installation!")

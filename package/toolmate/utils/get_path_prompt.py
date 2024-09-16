@@ -29,7 +29,7 @@ For example, we integrate this utility into a text editor we developed:
 https://github.com/eliranwong/UniqueBible/blob/main/util/terminal_text_editor.py
 """
 
-from toolmate import config, print1
+from toolmate import config, print1, refinePath
 import platform, os, subprocess
 
 class GetPath:
@@ -216,6 +216,8 @@ class GetPath:
                     # –p: prompt: print the prompt text before requesting the input from the standard input stream without a <newline> character
                     userInput = subprocess.check_output(f'read -e -p "{indicator}" var ; echo $var', shell=True).strip()
                     userInput = userInput.decode("utf-8")
+                
+            userInput = refinePath(userInput)
 
             if userInput and not userInput.startswith("cd ") and create_dirs_if_not_exist and not os.path.isdir(userInput) and not userInput == self.cancel_entry:
                 os.makedirs(userInput, exist_ok=True)

@@ -1,8 +1,8 @@
 from toolmate import config, get_or_create_collection, add_vector, getFilenamesWithoutExtension, execPythonFile
-from toolmate import print2
+from toolmate import print2, print3
 from pathlib import Path
 from chromadb.config import Settings
-import os, shutil, chromadb, json
+import os, shutil, chromadb, json, copy
 from typing import Callable
 
 
@@ -33,6 +33,19 @@ class Plugins:
         config.deviceInfoPlugins = []
         config.toolFunctionSchemas = {}
         config.toolFunctionMethods = {}
+        config.builtinTools = {
+            "context": "load a predefined context",
+            "convert_relative_datetime": "convert relative dates and times",
+            "copy_to_clipboard": "copy text to the system clipboard",
+            "paste_from_clipboard": "retrieve the system clipboard text and paste",
+            "extract_python_code": "extract the python code in the given entry",
+            "run_python_code": "extract and run the python code in the given entry",
+            "list_current_directory_contents": "list current directory contents",
+            "command": "execute a system command",
+            "append_command": "execute a system command, appended by the previous text output",
+            "append_prompt": "append the previous text output to the given entry",
+            "improve_writing": "improve writing according to custom style",
+        }
 
         pluginFolder = os.path.join(config.toolMateAIFolder, "plugins")
         if config.localStorage:
@@ -65,11 +78,10 @@ class Plugins:
                         config.pluginExcludeList.append(plugin)
         if internetSeraches in config.pluginExcludeList:
             del config.toolFunctionSchemas["integrate_google_searches"]
-        #for i in config.toolFunctionMethods:
-        #    if not i in ("python_qa",):
-        #        callEntry = f"[TOOL_{i}]"
-        #        if not callEntry in config.inputSuggestions:
-        #            config.inputSuggestions.append(callEntry)
+
+        # tool pattern
+        toolNames = "|".join(config.toolFunctionMethods.keys())
+        config.toolPattern = f"""@({"|".join(config.builtinTools.keys())}|{toolNames})[ \n]"""
 
     # integrate function call plugin
     @staticmethod
@@ -87,6 +99,16 @@ class Plugins:
                     callEntry = f"@{name} "
                     if not callEntry in config.inputSuggestions:
                         config.inputSuggestions.append(callEntry)
+
+    # display available tools
+    @staticmethod
+    def displayAvailableTools():
+        tools = copy.deepcopy(config.builtinTools)
+        for key, value in config.toolFunctionSchemas.items():
+            tools[key] = value.get("description", "")
+        tools = dict(sorted(tools.items()))
+        for key, value in tools.items():
+            print3(f"@{key}: {value}")
 
 class ToolStore:
 

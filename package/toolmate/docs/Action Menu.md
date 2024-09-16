@@ -23,9 +23,11 @@ For example, entering '.new' to start a new chat, '.exit' to exit the current fe
 Press 'ctrl+k' and scroll to the bottom for a full list of quick actions, e.g.:
 
 ```
-.new: start a new chat ['c-n']
-.save: save chat content
-.export: export chat content ['c-g']
+.new: start a new conversation ['c-n']
+.open: open a saved conversation ['c-o']
+.save: save current conversation
+.saveas: save current conversation as ...
+.export: export current conversation ['c-g']
 .model: change AI backends and models
 .apikeys: change API keys
 .plugins: change plugins
@@ -44,6 +46,7 @@ Press 'ctrl+k' and scroll to the bottom for a full list of quick actions, e.g.:
 .pagerview: change pager view
 .speechrecognition: change sppech recognition
 .speechgeneration: change sppech generation
+.read: read the last response
 .toggledeveloper: toggle developer mode ['escape', 'd']
 .togglemultiline: toggle multi-line input ['escape', 'l']
 .togglemousesupport: toogle mouse support ['escape', 'm']

@@ -252,8 +252,8 @@ defaultSettings = (
     ("hotkey_new", ["c-n"]),
     ("hotkey_insert_filepath", ["c-f"]),
     ("hotkey_insert_newline", ["c-i"]),
-    #("hotkey_select_context", ["c-o"]),
-    #("hotkey_remove_context_temporarily", ["escape", "o"]),
+    ("hotkey_open_chat_records", ["c-o"]),
+    ("hotkey_open_plain_text_file", ["escape", "o"]),
     ("hotkey_export", ["c-g"]),
     ("hotkey_count_tokens", ["escape", "c"]),
     ("hotkey_launch_pager_view", ["c-p"]),
@@ -280,6 +280,8 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "allTools",
+    "toolPattern",
     "llamacppserver_tool_client",
     "llamacppserver_chat_client",
     "tempInterface",

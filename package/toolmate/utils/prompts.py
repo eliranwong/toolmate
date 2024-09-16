@@ -113,16 +113,12 @@ class Prompts:
             config.defaultEntry = buffer.text
             buffer.text = ".new"
             buffer.validate_and_handle()
-        '''
-        @this_key_bindings.add(*config.hotkey_remove_context_temporarily)
+        @this_key_bindings.add(*config.hotkey_open_chat_records)
         def _(event):
             buffer = event.app.current_buffer
-            config.predefinedContextTemp = config.predefinedContext
-            config.predefinedContext = "[none]"
-            buffer.text = ".new"
+            config.defaultEntry = buffer.text
+            buffer.text = ".open"
             buffer.validate_and_handle()
-            run_in_terminal(lambda: print3("Predefined context temporarily changed to: [none]"))
-        '''
         @this_key_bindings.add(*config.hotkey_export)
         def _(event):
             buffer = event.app.current_buffer
@@ -322,7 +318,13 @@ Available tokens: {estimatedAvailableTokens}
             "[c-u]": f"go up '{config.terminalEditorScrollLineCount}' lines (configurable)",
             "[c-j]": f"go down '{config.terminalEditorScrollLineCount}' lines (configurable)",
         }
-        keyHelp = f"{config.divider}\n\n"
+
+        keyHelp = f"{config.divider}\n\n# Tools\n\nEnter `@` to read brief descriptions of all enabled tools.\n"
+        
+        keyHelp += f"\n{config.divider}\n\n"
+        keyHelp += config.actionHelp
+
+        keyHelp += f"\n{config.divider}\n\n"
         keyHelp += "# Key Bindings\n"
         keyHelp += "[BLANK]: launch action menu\n"
         for key, value in bindings.items():
@@ -332,8 +334,7 @@ Available tokens: {estimatedAvailableTokens}
         for key, value in multilineBindings.items():
             key = transformKey(key)
             keyHelp += f"{key} {value}\n"
-        keyHelp += f"\n{config.divider}\n\n"
-        keyHelp += config.actionHelp
+
         keyHelp += f"\n{config.divider}\n"
 
         if isCommandInstalled("less"):

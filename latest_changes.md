@@ -1,3 +1,17 @@
+# Version 0.3.28
+
+* added special entry - Enter `@` to read brief descriptions of all enabled tools.
+
+* fixed fabric plugin
+
+# Version 0.3.27
+
+* fixed chat feature
+
+# Version 0.3.26
+
+* added save as and export features
+
 # Version: 0.3.25
 
 * support workflows, read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Workflows.md
@@ -119,9 +133,9 @@ Removed tool `add_calendar_event`
 
 Added two tools:
 
-`copy_to_clipboard` copy text from clipboard
+`copy_to_clipboard` copy text to the system clipboard
 
-`paste_from_clipboard` paste text from clipboard
+`paste_from_clipboard` paste text from the system clipboard
 
 # Version: 0.2.98-0.3.00
 

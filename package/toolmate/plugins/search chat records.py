@@ -6,12 +6,11 @@ search and open old chat records
 [FUNCTION_CALL]
 """
 
-from toolmate import config, get_or_create_collection, add_vector, query_vectors, showErrors
+from toolmate import config, get_or_create_collection, add_vector, query_vectors, showErrors, displayLoadedMessages
 from toolmate import print1, print2, print3
 from pathlib import Path
 from chromadb.config import Settings
 import os, chromadb, re
-from prompt_toolkit import print_formatted_text, HTML
 
 chat_store = os.path.join(config.localStorage, "chats")
 Path(chat_store).mkdir(parents=True, exist_ok=True)
@@ -93,17 +92,7 @@ def load_chats(function_args):
         if type(currentMessages) == list:
             config.currentMessages = [{"content": i.get("content", ""), "role": "user"} if i.get("role", "") == "user" and config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else i for i in currentMessages] # make sure "tool" is not in user message
             # display loaded messages
-            print("")
-            for index, i in enumerate(config.currentMessages):
-                role = i.get("role", "")
-                content = i.get("content", "")
-                if role and role in ("user", "assistant") and content:
-                    if role == "user":
-                        print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor1}>>>> </{config.terminalPromptIndicatorColor1}><{config.terminalCommandEntryColor1}>{content}</{config.terminalCommandEntryColor1}>"))
-                    else:
-                        print1(content)
-                    if role == 'assistant' and not index == len(config.currentMessages) - 2:
-                        print("")
+            displayLoadedMessages(config.currentMessages)
             return ""
         else:
             print3(f"Failed to load chat records '{timestamp}' due to invalid format!")

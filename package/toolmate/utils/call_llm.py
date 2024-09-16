@@ -1,4 +1,4 @@
-from toolmate import config, getDeviceInfo, toGeminiMessages
+from toolmate import config, getDeviceInfo, toGeminiMessages, useChatSystemMessage
 from toolmate.utils.call_gemini import CallGemini
 from toolmate.utils.call_ollama import CallOllama
 from toolmate.utils.call_llamacpp import CallLlamaCpp

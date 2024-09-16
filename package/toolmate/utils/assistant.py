@@ -1,9 +1,9 @@
-from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, getLlamacppServerClient, refinePath
+from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, refinePath, displayLoadedMessages
 from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText
 from toolmate import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runToolMateCommand, displayPythonCode
 from toolmate.utils.call_llm import CallLLM
 from toolmate.utils.tool_plugins import ToolStore
-import openai, threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy, pyperclip
+import threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy, pyperclip
 from huggingface_hub import hf_hub_download
 from pathlib import Path
 from toolmate.utils.download import Downloader
@@ -134,9 +134,11 @@ class ToolMate:
 
         self.actions = {
             # session
-            ".new": (f"start a new chat {str(config.hotkey_new)}", None),
-            ".save": ("save chat content", lambda: self.saveChat(config.currentMessages)),
-            ".export": (f"export chat content {str(config.hotkey_export)}", lambda: self.exportChat(config.currentMessages)),
+            ".new": (f"start a new conversation {str(config.hotkey_new)}", None),
+            ".open": (f"open a saved conversation {str(config.hotkey_open_chat_records)}", None),
+            ".save": ("save current conversation", lambda: self.saveChat(config.currentMessages)),
+            ".saveas": ("save current conversation as ...", lambda: self.saveAsChat(config.currentMessages)),
+            ".export": (f"export current conversation {str(config.hotkey_export)}", lambda: self.exportChat(config.currentMessages)),
             
             ".model": ("change AI backends and models", self.setLlmModel),
             #".embedding": ("change embedding model", self.setEmbeddingModel), # joined ".model"
@@ -177,7 +179,7 @@ class ToolMate:
             # speech
             ".speechrecognition": ("change sppech recognition", self.setSpeechToTextConfig),
             ".speechgeneration": ("change sppech generation", self.setTextToSpeechConfig),
-            ".read": ("change sppech generation", self.readLastResponse),
+            ".read": ("read the last response", self.readLastResponse),
             # toggle
             ".toggledeveloper": (f"toggle developer mode {str(config.hotkey_toggle_developer_mode)}", self.toggleDeveloperMode),
             ".togglemultiline": (f"toggle multi-line input {str(config.hotkey_toggle_multiline_entry)}", self.toggleMultiline),
@@ -208,7 +210,7 @@ class ToolMate:
         config.actionHelp = f"# Quick Actions\n(entries that start with '.')\n"
         for key, value in self.actions.items():
             config.actionHelp += f"{key}: {value[0]}\n"
-        config.actionHelp += "\n## Read more at:\nhttps://github.com/eliranwong/letmedoit/wiki/Action-Menu"
+        config.actionHelp += "\n"
 
     # Speech-to-Text Language
     def setSpeechToTextLanguage(self):
@@ -1963,6 +1965,42 @@ class ToolMate:
         # save configs
         config.saveConfig()
 
+    def saveAsChat(self, messages):
+
+        filePath = self.getPath.getFilePath(
+            empty_to_cancel=True,
+            list_content_on_directory_change=True,
+            keep_startup_directory=True,
+            message=f"{self.divider}\nEnter a file name or a file path:",
+        )
+        if filePath:
+            try:
+                dirname = os.path.dirname(filePath)
+                if not dirname:
+                    dirname = os.getcwd()
+                Path(dirname).mkdir(parents=True, exist_ok=True)
+                if os.path.isdir(dirname):
+                    if os.path.isfile(filePath):
+                        # overwrite existing file?
+                        options = ("yes", "no")
+                        question = "Given file path exists! Would you like to overwrite it?"
+                        print1(question)
+                        overwrite = self.dialogs.getValidOptions(
+                            options=options,
+                            title="Overwrite?",
+                            default="yes" if config.enable_tool_screening_agent else "no",
+                            text=question,
+                        )
+                        if not overwrite == "yes":
+                            return None
+                    with open(filePath, "w", encoding="utf-8") as fileObj:
+                        fileObj.write(pprint.pformat(messages))
+                    os.system(f"{config.open} {filePath}")
+                    print2("File saved!")
+            except:
+                print2("Failed to save the conversation!\n")
+                showErrors()
+
     def saveChat(self, messages):
         messagesCopy = copy.deepcopy(messages)
 
@@ -1986,7 +2024,7 @@ class ToolMate:
                     with open(chatFile, "w", encoding="utf-8") as fileObj:
                         fileObj.write(pprint.pformat(messagesCopy))
             except:
-                print2("Failed to save chat!\n")
+                print2("Failed to save the conversation!\n")
                 showErrors()
 
     def exportChat(self, messages, openFile=True):
@@ -2015,18 +2053,40 @@ class ToolMate:
             if config.terminalEnableTermuxAPI:
                 pydoc.pipepager(plainText, cmd="termux-share -a send")
             else:
-                try:
-                    folderPath = os.path.join(config.localStorage, "chats", "export")
-                    Path(folderPath).mkdir(parents=True, exist_ok=True)
-                    if os.path.isdir(folderPath):
-                        chatFile = os.path.join(folderPath, f"{timestamp}.txt")
-                        with open(chatFile, "w", encoding="utf-8") as fileObj:
-                            fileObj.write(plainText)
-                        if openFile and os.path.isfile(chatFile):
-                            os.system(f'''{config.open} "{chatFile}"''')
-                except:
-                    print2("Failed to save chat!\n")
-                    showErrors()
+
+                filePath = self.getPath.getFilePath(
+                    empty_to_cancel=True,
+                    list_content_on_directory_change=True,
+                    keep_startup_directory=True,
+                    message=f"{self.divider}\nEnter a file name or a file path:",
+                )
+                if filePath:
+                    try:
+                        dirname = os.path.dirname(filePath)
+                        if not dirname:
+                            dirname = os.getcwd()
+                        Path(dirname).mkdir(parents=True, exist_ok=True)
+                        if os.path.isdir(dirname):
+                            if os.path.isfile(filePath):
+                                # overwrite existing file?
+                                options = ("yes", "no")
+                                question = "Given file path exists! Would you like to overwrite it?"
+                                print1(question)
+                                overwrite = self.dialogs.getValidOptions(
+                                    options=options,
+                                    title="Overwrite?",
+                                    default="yes" if config.enable_tool_screening_agent else "no",
+                                    text=question,
+                                )
+                                if not overwrite == "yes":
+                                    return None
+                            with open(filePath, "w", encoding="utf-8") as fileObj:
+                                fileObj.write(plainText)
+                            os.system(f"{config.open} {filePath}")
+                            print2("File saved!")
+                    except:
+                        print2("Failed to save the conversation!\n")
+                        showErrors()
 
     def runInstruction(self):
         instructions = list(config.predefinedInstructions.keys())
@@ -2252,6 +2312,10 @@ My writing:
                 except:
                     pass
 
+            if userInput == "@":
+                Plugins.displayAvailableTools()
+                continue
+
             # try eval
             if config.developer and not userInput == "...":
                 try:
@@ -2289,20 +2353,27 @@ My writing:
                 pass
             elif userInputLower == ".context":
                 self.changeDefaultContext()
-                '''
-                self.setContextIntegration()
-                if not config.applyPredefinedContextAlways:
-                    if config.conversationStarted:
-                        self.saveChat(config.currentMessages)
-                    storagedirectory, config.currentMessages = startChat()
-                '''
             elif userInputLower == ".new":
                 self.saveChat(config.currentMessages)
                 storagedirectory, config.currentMessages = startChat()
+            elif userInputLower == ".open":
+                try:
+                    filePath = self.getPath.getFilePath(
+                        check_isfile=True,
+                        empty_to_cancel=True,
+                        list_content_on_directory_change=True,
+                        keep_startup_directory=True,
+                        message=f"{self.divider}\nEnter the file path of the chat records that you would like to open:",
+                    )
+                    if filePath and os.path.isfile(filePath):
+                        self.saveChat(config.currentMessages)
+                        currentMessages = eval(readTextFile(filePath))
+                        storagedirectory, config.currentMessages = startChat()
+                        displayLoadedMessages(currentMessages)
+                        config.currentMessages = currentMessages
+                except:
+                    print2(f"Invalid file path of format!")
             elif userInput and not userInputLower in featuresLower:
-
-                toolNames = "|".join(config.toolFunctionMethods.keys())
-                actionPattern = f"@(workflow|deep_reflection|context|convert_relative_datetime|copy_to_clipboard|paste_from_clipboard|extract_python_code|run_python_code|list_current_directory_contents|command|append_command|append_prompt|improve_writing|{toolNames})[ \n]"
 
                 def runSingleAction(action: str, description: str) -> None:
                     config.selectedTool = ""
@@ -2351,7 +2422,7 @@ My writing:
                                 config.saveConfig()
                         description = self.addPredefinedContext(description)
                         # check if the new description call a particular tool
-                        searchTool = re.search(f"^{actionPattern}([\d\D]*?)$", description.lstrip())
+                        searchTool = re.search(f"^{config.toolPattern}([\d\D]*?)$", description.lstrip())
                         if searchTool:
                             action = searchTool.group(1)
                             description = searchTool.group(2)
@@ -2525,12 +2596,12 @@ My writing:
                         config.defaultEntry = userInput
                         print2("starting a new chat!")
                         self.saveChat(config.currentMessages)
-                        storagedirectory, config.currentMessages = startChat()
+                        _, config.currentMessages = startChat()
 
                 def checkAndRunActions(content):
 
                     # check for any tool patterns
-                    actions = re.findall(actionPattern, f"{content} ") # add a space after `content` to allow tool entry at the end without a description
+                    actions = re.findall(config.toolPattern, f"{content} ") # add a space after `content` to allow tool entry at the end without a description
                     
                     if not actions:
                         if content.strip():
@@ -2538,7 +2609,7 @@ My writing:
                             runSingleAction("", content)
                     else:
                         separator = "＊@＊@＊"
-                        descriptions = re.sub(actionPattern, separator, f"{content} ").split(separator)
+                        descriptions = re.sub(config.toolPattern, separator, f"{content} ").split(separator)
                         if descriptions[0].strip():
                             # in case content entered before the first action declared
                             actions.insert(0, "chat")

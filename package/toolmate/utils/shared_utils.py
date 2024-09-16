@@ -496,6 +496,20 @@ def getDownloadedGgufModels() -> dict:
 
 # text
 
+def displayLoadedMessages(messages):
+    # display loaded messages
+    print("")
+    for index, i in enumerate(messages):
+        role = i.get("role", "")
+        content = i.get("content", "")
+        if role and role in ("user", "assistant") and content:
+            if role == "user":
+                print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor1}>>>> </{config.terminalPromptIndicatorColor1}><{config.terminalCommandEntryColor1}>{content}</{config.terminalCommandEntryColor1}>"))
+            else:
+                print1(content)
+            if role == 'assistant' and not index == len(messages) - 2:
+                print("")
+
 def refinePath(docs_path):
     docs_path = docs_path.strip()
     docs_path = re.sub("^'(.*?)'$", r"\1", docs_path)

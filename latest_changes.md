@@ -1,3 +1,7 @@
+# Version: 0.3.25
+
+* support workflows, read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Workflows.md
+
 # Version: 0.3.24
 
 * custom tool system message and chat system message

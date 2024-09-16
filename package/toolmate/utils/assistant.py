@@ -1,4 +1,4 @@
-from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, getLlamacppServerClient
+from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, getLlamacppServerClient, refinePath
 from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText
 from toolmate import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runToolMateCommand, displayPythonCode
 from toolmate.utils.call_llm import CallLLM
@@ -2571,11 +2571,17 @@ My writing:
                                     displayActionMessage(message)
                                     description = config.predefinedContexts["Refine"][21:]
                                     runSingleAction("chat", description)
-                                if action == "workflow":
-                                    workflowFile = description.strip()
+                                elif action == "workflow":
+                                    workflowFile = refinePath(description.strip())
+                                    if not os.path.isfile(workflowFile):
+                                        relativeWorkflowFile = os.path.join(config.localStorage, "workflows", workflowFile)
+                                        if os.path.isfile(relativeWorkflowFile):
+                                            workflowFile = relativeWorkflowFile
                                     if os.path.isfile(workflowFile):
                                         workflowContent = readTextFile(workflowFile)
                                         checkAndRunActions(workflowContent)
+                                    else:
+                                        print2("Workflow file invalid!")
                                 else:
                                     message = f'''\n@{action}: {description}'''
                                     displayActionMessage(message)

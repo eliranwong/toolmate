@@ -415,7 +415,7 @@ class ToolMate:
         else:
             config.enabledGoogleAPIs = ["Vertex AI"]
             print1(f"API key json file '{config.google_cloud_credentials_file}' not found!")
-            print1("Read https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup for setting up Google API.")
+            print1("Read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Google%20Cloud%20Service%20Credential%20Setup.md for setting up Google API.")
         if "Speech-to-Text" in config.enabledGoogleAPIs:
             if not config.voiceTypingPlatform == "googlecloud":
                 config.voiceTypingPlatform = "googlecloud"
@@ -1755,7 +1755,7 @@ class ToolMate:
         if ttsPlatform:
             if ttsPlatform == "googlecloud" and not (os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Text-to-Speech" in config.enabledGoogleAPIs):
                 print2("Google Cloud Text-to-Speech feature is not enabled!")
-                print3("Read: https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup")
+                print3("Read: https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Google%20Cloud%20Service%20Credential%20Setup.md")
                 print3("Text-to-Speech platform changed to: Google Text-to-Speech (Generic)")
                 config.ttsPlatform = "google"
             else:
@@ -1901,7 +1901,7 @@ class ToolMate:
         if voiceTypingPlatform:
             if voiceTypingPlatform == "googlecloud" and not (os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Speech-to-Text" in config.enabledGoogleAPIs):
                 print2("Google Cloud Speech-to-Text feature is not enabled!")
-                print3("Read: https://github.com/eliranwong/letmedoit/wiki/Google-API-Setup")
+                print3("Read: https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Google%20Cloud%20Service%20Credential%20Setup.md")
                 print3("Speech-to-Text platform changed to: Google Speech-to-Text (Generic)")
                 config.voiceTypingPlatform = "google"
             elif voiceTypingPlatform == "whisper" and not isCommandInstalled("ffmpeg"):
@@ -1995,7 +1995,7 @@ class ToolMate:
                             return None
                     with open(filePath, "w", encoding="utf-8") as fileObj:
                         fileObj.write(pprint.pformat(messages))
-                        print3(f"Conversation saved at: {filePath}")
+                        print3(f"Conversation saved: {filePath}")
                     os.system(f"{config.open} {filePath}")
             except:
                 print2("Failed to save the conversation!\n")
@@ -2023,7 +2023,7 @@ class ToolMate:
                     chatFile = os.path.join(folderPath, f"{timestamp}.txt")
                     with open(chatFile, "w", encoding="utf-8") as fileObj:
                         fileObj.write(pprint.pformat(messagesCopy))
-                        print3(f"Conversation saved at: {chatFile}")
+                        print3(f"Conversation saved: {chatFile}")
             except:
                 print2("Failed to save the conversation!\n")
                 showErrors()

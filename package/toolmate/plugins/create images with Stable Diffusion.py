@@ -26,7 +26,12 @@ def create_image_sd(function_args):
         if config.terminalEnableTermuxAPI:
             getCliOutput(f"termux-share {imageFile}")
         else:
-            os.system(f"{config.open} {imageFile}")
+            cli = f"{config.open} {imageFile}"
+            #os.system(cli)
+            subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        message = f"Saved image: {imageFile}"
+        config.toolTextOutput = message
+        print3(message)
 
     prompt = function_args.get("prompt") # required
 

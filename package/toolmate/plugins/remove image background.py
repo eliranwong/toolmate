@@ -38,7 +38,7 @@ def remove_image_background(function_args):
                     print3(f"Reading image file: {input_path}")
                     img = rembg.remove(i.read())
                     o.write(img)
-                    print3(f"File saved at: {output_path}")
+                    print3(f"File saved: {output_path}")
         else:
             print2(f"'{input_path}' is not an image file!")
 
@@ -48,7 +48,7 @@ def remove_image_background2(function_args):
     if information:
         filepath = json.loads(information)["information"]
         if os.path.isfile(filepath):
-            print3(f"File saved at: {filepath}")
+            print3(f"File saved: {filepath}")
             try:
                 os.system(f'''{config.open} "{filepath}"''')
             except:

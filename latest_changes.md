@@ -1,3 +1,9 @@
+# Version 0.3.34
+
+* added tool `@create_image_imagen3` to create images with Google Imagen 3 via Vertex AI.
+
+For set up of Vertex AI Credentials, read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Google%20Cloud%20Service%20Credential%20Setup.md
+
 # Version 0.3.31-0.3.33
 
 * Improved tool descriptions

@@ -23,7 +23,7 @@ def create_qrcode(function_args):
     img.save(filepath)
     
     if os.path.isfile(filepath):
-        print3(f"File saved at: {filepath}")
+        print3(f"File saved: {filepath}")
         try:
             os.system(f'''{config.open} "{filepath}"''')
         except:

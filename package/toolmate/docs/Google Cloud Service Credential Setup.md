@@ -1,6 +1,6 @@
 # Google API Setup
 
-LetMeDoIt integrates the following Google API services:
+ToolMate integrates the following Google API services:
 
 * Vertex AI [Gemini Pro / Gemini Pro Vision / PaLM 2 / Codey]
 * Cloud Speech-to-Text
@@ -16,9 +16,9 @@ Remarks: It works even in EU / UK. At the time of writing, web-based Google AI S
 
 2. Either "Select a project" or create "NEW PROJECT", enter, e.g.:
 
-Project name: letmedoitai
+Project name: toolmateai
 
-![project_name](https://github.com/eliranwong/letmedoit/assets/25262722/c9d99cf2-1e2f-410a-966e-cb62e3bd2867)
+![project_name](https://github.com/eliranwong/ToolMate/assets/25262722/c9d99cf2-1e2f-410a-966e-cb62e3bd2867)
 
 3. Set up billing information
 
@@ -28,15 +28,15 @@ MENU > Billing > Payment method
 
 MENU > MORE PRODUCTS > IAM & ADMIN > Service Accounts
 
-![menu_service_account](https://github.com/eliranwong/letmedoit/assets/25262722/2ad81bb0-53c0-4958-b44c-20b00ab161a9)
+![menu_service_account](https://github.com/eliranwong/ToolMate/assets/25262722/2ad81bb0-53c0-4958-b44c-20b00ab161a9)
 
 Create service account, e.g.:
 
-* Service account name: letmedoitai
+* Service account name: ToolMateai
 
-* Service account ID: letmedoitai
+* Service account ID: ToolMateai
 
-* Service account description: letmedoitai
+* Service account description: toolmateai
 
 Click "CREATE AND CONTINUE"
 
@@ -70,7 +70,7 @@ Select JSON format and automatically download the file
 
 2. Click "ENABLE ALL RECOMMENDATED APIS"
 
-3. Copy the JSON file, downloaded in the previous step, to directory "\~/letmedoit/" and rename it as "credentials_google_cloud.json"
+3. Copy the JSON file, downloaded in the previous step, to directory "\~/toolmate/" and rename it as "credentials_google_cloud.json"
 
 ![gemini_pro_api](https://github.com/eliranwong/letmedoit/assets/25262722/78b2f78c-2823-45ad-9645-d924c07e4ef7)
 
@@ -82,7 +82,7 @@ Select JSON format and automatically download the file
 
 2. Click "ENABLE"
 
-3. Copy the JSON file, downloaded in the previous step, to directory "\~/letmedoit/" and rename it as "credentials_google_cloud.json"
+3. Copy the JSON file, downloaded in the previous step, to directory "\~/toolmate/" and rename it as "credentials_google_cloud.json"
 
 ## Cloud Text-to-speech
 
@@ -90,7 +90,7 @@ Select JSON format and automatically download the file
 
 2. Click "ENABLE"
 
-3. Copy the JSON file, downloaded in the previous step, to directory "\~/letmedoit/" and rename it as "credentials_google_cloud.json"
+3. Copy the JSON file, downloaded in the previous step, to directory "\~/toolmate/" and rename it as "credentials_google_cloud.json"
 
 ![enable_tts](https://github.com/eliranwong/letmedoit/assets/25262722/8c61023f-f774-467a-b5dc-ae1cb92702d4)
 
@@ -98,19 +98,17 @@ Remarks:
 
 * The "~" in the copied path denotes user home directory
 
-* Copy to "\~/myhand/", "\~/taskwiz/", "\~/cybertask/" if you also install packages myhand, taskwiz, cyber task
-
 * In case you install our python package googleaistudio, copied the json file to "\~/googleaistudio/credentials_googleaistudio.json"
 
-# Enable Google API Service in LetMeDoIt
+# Enable Google API Service in ToolMate
 
-You can enable none / some / all supported Google API Service in LetMeDoIt AI.
+You can enable none / some / all supported Google API Service in ToolMate AI.
 
 Select "Change Google API Service" from action menu and select the service that you want from the dialog:
 
 <img width="857" alt="change_google_api_service" src="https://github.com/eliranwong/letmedoit/assets/25262722/7614ec71-d3c1-4010-a55f-a2d3a08b72b8">
 
-# Integration with LetMeDoIt Plugins
+# Integration with ToolMate Plugins
 
 https://github.com/eliranwong/letmedoit/wiki/Integration-with-Google-AI-Tools
 
@@ -139,3 +137,9 @@ Reference: https://cloud.google.com/speech-to-text
 Reference: https://console.cloud.google.com/speech/text-to-speech
 
 Text-to-Speech is priced based on the number of characters sent to the service to be synthesized into audio each month. The first 1 million characters for WaveNet voices are free each month. For Standard (non-WaveNet) voices, the first 4 million characters are free each month. After the free tier has been reached, Text-to-Speech is priced per 1 million characters of text processed.
+
+# Imagen 3
+
+Currently, Google requires users to register for access to Imagen 3, you may sign up with this link:
+
+https://docs.google.com/forms/d/e/1FAIpQLSdMHAK_KJygnvV2Psga7FIzKAhAqIBS_bHYzfgf_Y2h7fsoGA/viewform?pli=1

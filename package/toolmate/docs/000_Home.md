@@ -52,6 +52,8 @@ Our recent developments, for example, [the ability to run multiple tools in a si
 
 [Change AI Backends and Models](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Change%20AI%20Backends%20and%20Models.md)
 
+[Available Tools](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Descriptions.md)
+
 [Tool Selection Configurations](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Selection%20Configurations.md)
 
 [Risk Management Agent](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Risk%20Management%20Agent.md)

@@ -280,7 +280,7 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
-    "allTools",
+    "builtinTools",
     "toolPattern",
     "llamacppserver_tool_client",
     "llamacppserver_chat_client",

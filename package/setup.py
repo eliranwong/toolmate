@@ -43,7 +43,7 @@ open(os.path.join(package, "config.py"), "w").close()
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name=package,
-    version="0.3.33",
+    version="0.3.34",
     python_requires=">=3.8, <3.12",
     description=f"{appFullName} is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. With the ability to perform multi-step actions, users can customize workflows to tackle complex projects with ease.",
     long_description=long_description,
@@ -168,7 +168,7 @@ setup(
             f"wizardlm2={package}.ollamachat:wizardlm2",
         ],
     },
-    keywords="ai assistant ollama llama llamacpp groq openai chatgpt gemini autogen rag agent stable-diffusion fabric",
+    keywords="ai assistant ollama llama llamacpp groq openai chatgpt gemini autogen rag agent stable-diffusion fabric dalle imagen",
     url="https://letmedoit.ai",
     project_urls={
         "Source": "https://github.com/eliranwong/toolmate",

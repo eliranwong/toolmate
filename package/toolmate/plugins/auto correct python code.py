@@ -16,7 +16,7 @@ The default value of config.max_consecutive_auto_correction is 3.
 [FUNCTION_CALL]
 """
 
-def correct_python(function_args):
+def correct_python_code(function_args):
     # get the sql query statement
     issue = function_args.get("issue") # required
     print(f"Issue: {issue}")
@@ -46,8 +46,8 @@ functionSignature = {
         "fix bug",
         "correct code",
     ],
-    "name": "correct_python",
-    "description": "Fix python code if both original code and traceback error are provided",
+    "name": "correct_python_code",
+    "description": "Fix Python code if both the original code and the traceback error are provided",
     "parameters": {
         "type": "object",
         "properties": {
@@ -75,4 +75,4 @@ persistentConfigs = (
 )
 config.setConfig(persistentConfigs)
 
-config.addFunctionCall(signature=functionSignature, method=correct_python)
+config.addFunctionCall(signature=functionSignature, method=correct_python_code)

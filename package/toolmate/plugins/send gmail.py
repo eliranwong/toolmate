@@ -93,15 +93,15 @@ def send_gmail(function_args):
 
 functionSignature = {
     "examples": [
-        "draft an google email",
-        "write an google email",
-        "send an google email",
-        "draft an gmail",
-        "write an gmail",
-        "send an gmail",
+        "draft an Google email",
+        "write an Google email",
+        "send an Google email",
+        "draft an Gmail",
+        "write an Gmail",
+        "send an Gmail",
     ],
     "name": "send_gmail",
-    "description": "send email",
+    "description": "Send Gmail",
     "parameters": {
         "type": "object",
         "properties": {

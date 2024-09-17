@@ -128,7 +128,7 @@ functionSignature = {
         "add an outlook calendar event",
     ],
     "name": "add_outlook_calendar_event",
-    "description": "add calendar event",
+    "description": "Add an Outlook calendar event",
     "parameters": {
         "type": "object",
         "properties": {

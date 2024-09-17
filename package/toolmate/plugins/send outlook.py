@@ -98,7 +98,7 @@ functionSignature = {
         "send an email",
     ],
     "name": "send_outlook",
-    "description": "send email",
+    "description": "Send Outlook email",
     "parameters": {
         "type": "object",
         "properties": {

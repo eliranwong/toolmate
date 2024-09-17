@@ -75,7 +75,7 @@ functionSignature = {
         "download Youtube audio into mp3 format",
     ],
     "name": "download_youtube_audio",
-    "description": "download Youtube video into mp4 file or download audio into mp3 file or download webcontent",
+    "description": "Download Youtube audio into mp3 file",
     "parameters": {
         "type": "object",
         "properties": {

@@ -24,7 +24,7 @@ functionSignature = {
         "install python package",
     ],
     "name": "install_package",
-    "description": f'''Install python package''',
+    "description": f'''Install a python package''',
     "parameters": {
         "type": "object",
         "properties": {

@@ -68,7 +68,7 @@ Please rewrite the code to make it work.
 Remember, give me the python code ONLY, without additional notes or explanation.""" # alternative: Please generate another copy of code that fix the errors.
             messages = [{"role": "user", "content" : userInput}]
             print3(f"Auto-correction attempt: {(i + 1)}")
-            function_call_message, function_call_response = CallGemini.getSingleFunctionCallResponse(messages, "correct_python")
+            function_call_message, function_call_response = CallGemini.getSingleFunctionCallResponse(messages, "correct_python_code")
             arguments = function_call_message["function_call"]["arguments"]
             if not arguments:
                 print2("Generating code ...")
@@ -80,7 +80,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                         "missing": [],
                         "issue": "",
                     }
-                    function_call_response = executeToolFunction(arguments, "correct_python")
+                    function_call_response = executeToolFunction(arguments, "correct_python_code")
                 else:
                     continue
 

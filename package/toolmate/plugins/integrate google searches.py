@@ -39,7 +39,7 @@ functionSignature = {
         "Google search",
     ],
     "name": "integrate_google_searches",
-    "description": "Search internet for real-time information or latest updates when you lack information",
+    "description": "Search internet for real-time information or latest updates when LLM lacks information",
     "parameters": {
         "type": "object",
         "properties": {

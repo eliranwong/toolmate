@@ -73,7 +73,7 @@ functionSignature = {
         "open directory",
     ],
     "name": "execute_computing_task",
-    "description": "execute computing task or gain access to device information",
+    "description": "Execute computing task or gain access to device information",
     "parameters": {
         "type": "object",
         "properties": {

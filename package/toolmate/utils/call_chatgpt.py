@@ -113,7 +113,7 @@ def autoCorrectPythonCode(code, trace):
         userInput = f"Original python code:\n```\n{code}\n```\n\nTraceback:\n```\n{trace}\n```"
         messages = [{"role": "user", "content" : userInput}]
         print3(f"Auto-correction attempt: {(i + 1)}")
-        function_call_message, function_call_response = CallChatGPT.getSingleFunctionCallResponse(messages, "correct_python") if config.llmInterface == "chatgpt" else CallLetMeDoIt.getSingleFunctionCallResponse(messages, "correct_python")
+        function_call_message, function_call_response = CallChatGPT.getSingleFunctionCallResponse(messages, "correct_python_code") if config.llmInterface == "chatgpt" else CallLetMeDoIt.getSingleFunctionCallResponse(messages, "correct_python_code")
         # display response
         print1(config.divider)
         if config.developer:

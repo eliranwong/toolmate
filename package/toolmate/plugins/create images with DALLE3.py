@@ -20,7 +20,7 @@ from toolmate.utils.promptValidator import NumberValidator
 
 
 @check_openai_errors
-def create_image(function_args):
+def create_image_dalle3(function_args):
     def openImageFile(imageFile):
         print3(f"Saved image: {imageFile}")
         if config.terminalEnableTermuxAPI:
@@ -35,7 +35,9 @@ def create_image(function_args):
     Path(folder).mkdir(parents=True, exist_ok=True)
     imageFile = os.path.join(folder, f"{getCurrentDateTime()}.png")
 
-    if config.llmInterface in ("llamacpp", "llamacppserver", "ollama", "gemini", "groq"):
+    llmInterface = "chatgpt"
+
+    if llmInterface in ("llamacpp", "llamacppserver", "ollama", "gemini", "groq"):
         config.stopSpinning()
 
         # customize width and height
@@ -127,8 +129,8 @@ functionSignature = {
         "generate image",
         "create image",
     ],
-    "name": "create_image",
-    "description": "create an image",
+    "name": "create_image_dalle3",
+    "description": "Create an image with DALLE-3",
     "parameters": {
         "type": "object",
         "properties": {
@@ -141,4 +143,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=create_image)
+config.addFunctionCall(signature=functionSignature, method=create_image_dalle3)

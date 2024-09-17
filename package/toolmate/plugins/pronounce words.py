@@ -32,7 +32,7 @@ functionSignature = {
         "read aloud",
     ],
     "name": "pronunce_words",
-    "description": "pronounce words or sentences",
+    "description": "Pronounce words or sentences with text-to-speech utility",
     "parameters": {
         "type": "object",
         "properties": {

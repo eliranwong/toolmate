@@ -16,7 +16,7 @@ For an example:
 
 ```
 @command echo "Machine Learning"
-@append_prompt Describe
+@append_instruction Describe
 ```
 
 2. Run in ToolMate AI prompt:

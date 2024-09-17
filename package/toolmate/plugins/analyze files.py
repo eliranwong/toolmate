@@ -47,7 +47,7 @@ functionSignature = {
         "retrieve file information",
     ],
     "name": "analyze_files",
-    "description": "retrieve information from files",
+    "description": "Retrieve information from files",
     "parameters": {
         "type": "object",
         "properties": {

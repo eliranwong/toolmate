@@ -75,11 +75,9 @@ def download_youtube_video(function_args):
 functionSignature = {
     "examples": [
         "download Youtube video",
-        "download Youtube audio into mp3 format",
-        "download webpage",
     ],
     "name": "download_youtube_video",
-    "description": "download Youtube video into mp4 file or download audio into mp3 file or download webcontent",
+    "description": "Download Youtube video into mp4 file",
     "parameters": {
         "type": "object",
         "properties": {

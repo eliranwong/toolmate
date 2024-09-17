@@ -21,7 +21,7 @@ if isCommandInstalled(config.fabricPath) or os.path.isfile(config.fabricPath):
     patterns = {"-p": patterns}
     config.inputSuggestions += [{"@fabric": patterns}, {"@append_fabric": patterns}]
 
-    config.builtinTools["fabric"] = "execute a fabric command"
-    config.builtinTools["append_fabric"] = "execute a fabric command, appended by the previous text output"
+    config.builtinTools["fabric"] = "Execute a fabric command"
+    config.builtinTools["append_fabric"] = "Execute a fabric command with the previous text output appended to it"
 else:
     print2("`fabric` not found! Read https://github.com/danielmiessler/fabric for installation!")

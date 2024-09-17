@@ -303,6 +303,42 @@ def downloadStableDiffusionFiles():
         )
         stableDiffusion_model_path = os.path.join(llm_directory, filename)
 
+def downloadFlux1Models():
+    # TODO: correct paths
+    # llm directory
+    llm_directory = os.path.join(config.localStorage, "LLMs", "stable_diffusion")
+    Path(llm_directory).mkdir(parents=True, exist_ok=True)
+    filename = "v1-5-pruned-emaonly.safetensors"
+    stableDiffusion_model_path = os.path.join(llm_directory, filename)
+    if not config.stableDiffusion_model_path or not os.path.isfile(config.stableDiffusion_model_path):
+        config.stableDiffusion_model_path = stableDiffusion_model_path
+
+    if not os.path.isfile(config.stableDiffusion_model_path):
+        print2("Downloading stable-diffusion model ...")
+        hf_hub_download(
+            repo_id="Syimbiote/v1-5-pruned-emaonly",
+            filename=filename,
+            local_dir=llm_directory,
+            #local_dir_use_symlinks=False,
+        )
+        stableDiffusion_model_path = os.path.join(llm_directory, filename)
+        if os.path.isfile(stableDiffusion_model_path):
+            config.stableDiffusion_model_path = stableDiffusion_model_path
+            config.saveConfig()
+
+    llm_directory = os.path.join(llm_directory, "lora")
+    filename = "pytorch_lora_weights.safetensors"
+    lora_file = os.path.join(llm_directory, filename)
+    if not os.path.isfile(lora_file):
+        print2("Downloading stable-diffusion LCM-LoRA ...")
+        hf_hub_download(
+            repo_id="latent-consistency/lcm-lora-sdv1-5",
+            filename=filename,
+            local_dir=llm_directory,
+            #local_dir_use_symlinks=False,
+        )
+        stableDiffusion_model_path = os.path.join(llm_directory, filename)
+
 def startAutogenstudioServer():
     try:
         if not hasattr(config, "autogenstudioServer") or config.autogenstudioServer is None:

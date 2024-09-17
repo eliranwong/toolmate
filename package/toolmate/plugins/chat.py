@@ -19,7 +19,7 @@ functionSignature = {
         "In python, how"
     ],
     "name": "chat",
-    "description": f'''chat''',
+    "description": f'''Provide information or answer a question''',
     "parameters": {
         "type": "object",
         "properties": {

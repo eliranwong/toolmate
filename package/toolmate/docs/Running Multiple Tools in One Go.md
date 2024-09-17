@@ -10,11 +10,12 @@ You can place multiple-step actions in a single prompt.  Begin each step or acti
 
 At the time of writing, available tools are:
 
-@chat @context @paste_from_clipboard @improve_writing @convert_relative_datetime @copy_to_clipboard @append_prompt @command @append_command @fabric @fabric_pattern @append_fabric @append_fabric_pattern @list_current_directory_contents @extract_python_code @run_python_code @integrate_google_searches @add_google_calendar_event @add_outlook_calendar_event @analyze_audio @analyze_files @analyze_images @analyze_web_content @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @correct_python @build_agents @create_image @create_map @create_qrcode @create_statistical_graphics @datetimes @download_web_content @download_youtube_audio @download_youtube_video @edit_text @execute_computing_task @install_package @save_memory @reflection @retrieve_memory @modify_images @open_browser @pronunce_words @remove_image_background @search_chats @load_chats @search_finance @search_latest_news @search_sqlite @search_weather_info @send_gamil @send_outlook @send_tweet
+@add_google_calendar_event @add_outlook_calendar_event @analyze_audio @analyze_files @analyze_images_chatgpt @analyze_images_gemini @analyze_images_llamacpp @analyze_images_ollama @analyze_web_content @append_command @append_fabric @append_instruction @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @build_agents @chat @command @context @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_sd @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @execute_computing_task @extract_python_code @fabric @improve_writing @install_package @integrate_google_searches @list_current_directory_contents @load_conversations @modify_images @open_browser @paste_from_clipboard @pronunce_words @recommend_tool @reflection @remove_image_background @retrieve_memory @run_python_code @save_memory @search_conversations @search_finance @search_latest_news @search_sqlite @search_weather_info @send_gmail @send_outlook @send_tweet @workflow
 
 Remarks:
 
-* Enter `@` to get input suggestions of all available tools
+* Enter `@` to read brief descriptions of all available tools
+* Enter `@`, followed by a space character, to get input suggestions of all available tools
 * `@chat` represents the chat tool that retrieves a direct response from the chosen LLM
 * `@command` Execute the given command
 * `@append_command` Append assistant previous response to the given command and execute
@@ -31,11 +32,11 @@ Basically, using multiple tools in a single prompt enables each tool to work as 
 @chat Give me a summary.
 ```
 
-In addition, you may append a prompt description with the previous generated response. Tools, such as `@append_prompt`, `@append_command` and `@append_fabric`, are created for such purpose. In the following example, the words `Machine Learning` generated in the first step complete the second prompt, i.e. `Describe Machine Learning`.
+In addition, you may append a prompt description with the previous generated response. Tools, such as `@append_instruction`, `@append_command` and `@append_fabric`, are created for such purpose. In the following example, the words `Machine Learning` generated in the first step complete the second prompt, i.e. `Describe Machine Learning`.
 
 ```
 @command echo "Machine Learning"
-@append_prompt Describe
+@append_instruction Describe
 ```
 
 Furthermore, you may also specify a tool without giving any description.

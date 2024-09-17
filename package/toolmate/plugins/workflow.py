@@ -13,4 +13,4 @@ workflows = {i: None for i in os.listdir(workflowDir) if os.path.isfile(i) and n
 
 config.inputSuggestions.append({"@workflow": workflows if workflows else None})
 
-config.builtinTools["workflow"] = "execute a workflow"
+config.builtinTools["workflow"] = "Execute a workflow"

@@ -1,3 +1,11 @@
+# Version 0.3.31-0.3.33
+
+* Improved tool descriptions
+
+# Version 0.3.29-0.3.30
+
+* added tool `@recommend_tool` to help users to find an appropriate tool
+
 # Version 0.3.28
 
 * added special entry - Enter `@` to read brief descriptions of all enabled tools.
@@ -183,7 +191,7 @@ Now able to save changes after editing assistant previous response.
 
 3. Added two new tools:
 
-`@append_prompt` - append assistant previous response to the newly given prompt.
+`@append_instruction` - append assistant previous response to the newly given prompt.
 
 `@improve_writing` - improve writing of the given prompt
 
@@ -335,7 +343,7 @@ Currently supported tools:
 @analyze_files
 @analyze_images
 @analyze_web_content
-@correct_python
+@correct_python_code
 @chat
 @build_agents
 @create_image
@@ -353,8 +361,8 @@ Currently supported tools:
 @open_browser
 @pronunce_words
 @remove_image_background
-@search_chats
-@load_chats
+@search_conversations
+@load_conversations
 @search_finance
 @search_latest_news
 @search_sqlite

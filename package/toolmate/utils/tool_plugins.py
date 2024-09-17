@@ -18,9 +18,10 @@ class Plugins:
         }
         config.predefinedInstructions = {}
         config.inputSuggestions = [
+            "@recommend_tool ",
             "@command ",
             "@append_command ",
-            "@append_prompt ",
+            "@append_instruction ",
             "@improve_writing ",
             "@convert_relative_datetime ",
             "@list_current_directory_contents ",
@@ -34,17 +35,18 @@ class Plugins:
         config.toolFunctionSchemas = {}
         config.toolFunctionMethods = {}
         config.builtinTools = {
-            "context": "load a predefined context",
-            "convert_relative_datetime": "convert relative dates and times",
-            "copy_to_clipboard": "copy text to the system clipboard",
-            "paste_from_clipboard": "retrieve the system clipboard text and paste",
-            "extract_python_code": "extract the python code in the given entry",
-            "run_python_code": "extract and run the python code in the given entry",
-            "list_current_directory_contents": "list current directory contents",
-            "command": "execute a system command",
-            "append_command": "execute a system command, appended by the previous text output",
-            "append_prompt": "append the previous text output to the given entry",
-            "improve_writing": "improve writing according to custom style",
+            "recommend_tool": "Recommand an appropriate tool in response to a given request",
+            "context": "Apply a predefined context",
+            "convert_relative_datetime": "Convert relative dates and times in a given instruction to absolute dates and times",
+            "copy_to_clipboard": "Copy a given content to the system clipboard",
+            "paste_from_clipboard": "Retrieve the text content from the system clipboard and paste",
+            "extract_python_code": "Extract the python code in a given content",
+            "run_python_code": "Extract and run the python code in a given content",
+            "list_current_directory_contents": "List the contents in the current directory",
+            "command": "Execute a system command",
+            "append_command": "Execute a system command with the previous text output appended to it",
+            "append_instruction": "Append the previous text output to a given instruction",
+            "improve_writing": "Improve the writing of a given content",
         }
 
         pluginFolder = os.path.join(config.toolMateAIFolder, "plugins")
@@ -103,12 +105,15 @@ class Plugins:
     # display available tools
     @staticmethod
     def displayAvailableTools():
+        config.toolTextOutput = "# Tools\n"
         tools = copy.deepcopy(config.builtinTools)
         for key, value in config.toolFunctionSchemas.items():
             tools[key] = value.get("description", "")
         tools = dict(sorted(tools.items()))
         for key, value in tools.items():
-            print3(f"@{key}: {value}")
+            tool = f"@{key}: {value}"
+            config.toolTextOutput += f"\n{tool}"
+            print3(tool)
 
 class ToolStore:
 

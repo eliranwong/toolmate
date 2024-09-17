@@ -70,6 +70,8 @@ Our recent developments, for example, [the ability to run multiple tools in a si
 
 [Workflows](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Workflows.md)
 
+[Savable, Searchable and Sharable Records](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Chat%20Record%20Management.md)
+
 [Highly Customisable Plugins](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md#plugins)
 
 [Integration with Popular AI Tools](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md#integration)

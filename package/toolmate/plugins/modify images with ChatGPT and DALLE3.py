@@ -47,7 +47,9 @@ def modify_images(function_args):
         else:
             os.system(f"{config.open} {imageFile}")
 
-    if config.llmInterface in ("llamacpp", "llamacppserver", "ollama", "gemini", "groq"):
+    llmInterface = "chatgpt"
+
+    if llmInterface in ("llamacpp", "llamacppserver", "ollama", "gemini", "groq"):
         config.stopSpinning()
         promptStyle = Style.from_dict({
             # User input (default text).
@@ -55,8 +57,8 @@ def modify_images(function_args):
             # Prompt.
             "indicator": config.terminalPromptIndicatorColor2,
         })
-        runToolMateCommand("customvisionserver") if config.llmInterface=="llamacppserver" else startLlamacppVisionServer()
-        client = getLlamacppServerClient("vision") if config.llmInterface=="llamacppserver" else OpenAI(base_url=f"http://localhost:{config.llamacppVisionModel_server_port}/v1", api_key="toolmate")
+        runToolMateCommand("customvisionserver") if llmInterface=="llamacppserver" else startLlamacppVisionServer()
+        client = getLlamacppServerClient("vision") if llmInterface=="llamacppserver" else OpenAI(base_url=f"http://localhost:{config.llamacppVisionModel_server_port}/v1", api_key="toolmate")
         downloadStableDiffusionFiles()
         stable_diffusion = StableDiffusion(
             model_path=config.stableDiffusion_model_path,
@@ -215,7 +217,7 @@ functionSignature = {
         "modify image",
     ],
     "name": "modify_images",
-    "description": "modify images",
+    "description": "Modify images with ChatGPT and DALLE-3",
     "parameters": {
         "type": "object",
         "properties": {

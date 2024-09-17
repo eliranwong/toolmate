@@ -29,17 +29,19 @@ from toolmate.geminiprovision import GeminiProVision
 from toolmate.utils.call_ollama import CallOllama
 
 @check_openai_errors
-def analyze_images(function_args):
+def analyze_images_llamacpp(function_args):
     from toolmate import config
 
-    if config.llmInterface == "gemini":
-        answer = GeminiProVision(temperature=config.llmTemperature).analyze_images(function_args)
+    llmInterface = "llamacpp"
+
+    if llmInterface == "gemini":
+        answer = GeminiProVision(temperature=config.llmTemperature).analyze_images_llamacpp(function_args)
         if answer:
             config.toolTextOutput = answer
             return ""
         else:
             return "[INVALID]"
-    elif config.llmInterface in ("chatgpt", "letmedoit") and not config.openaiApiKey:
+    elif llmInterface in ("chatgpt", "letmedoit") and not config.openaiApiKey:
         return "OpenAI API key not found!"
 
     query = function_args.get("query") # required
@@ -70,17 +72,17 @@ def analyze_images(function_args):
             files.remove(i)
 
     if content:
-        if config.llmInterface in ("chatgpt", "letmedoit"):
+        if llmInterface in ("chatgpt", "letmedoit"):
             client = OpenAI()
-        elif config.llmInterface == "llamacpp":
+        elif llmInterface == "llamacpp":
             # start llama.cpp vision server
             startLlamacppVisionServer()
             client = OpenAI(base_url=f"http://localhost:{config.llamacppVisionModel_server_port}/v1", api_key="toolmate")
-        elif config.llmInterface == "llamacppserver":
+        elif llmInterface == "llamacppserver":
             # start llama.cpp vision server
             runToolMateCommand("customvisionserver")
             client = getLlamacppServerClient("vision")
-        elif config.llmInterface in ("ollama", "groq"):
+        elif llmInterface in ("ollama", "groq"):
             config.currentMessages[-1] = {'role': 'user', 'content': query, 'images': files}
             answer = CallOllama.getSingleChatResponse("", config.currentMessages, model=config.ollamaVisionModel)
             config.toolTextOutput = answer
@@ -110,7 +112,7 @@ def analyze_images(function_args):
         print2("```")
 
         # stop llama.cpp vision server
-        if config.llmInterface == "llamacpp":
+        if llmInterface == "llamacpp":
             stopLlamacppVisionServer()
 
         return ""
@@ -122,8 +124,8 @@ functionSignature = {
         "compare images",
         "analyze image",
     ],
-    "name": "analyze_images",
-    "description": "describe or compare images",
+    "name": "analyze_images_llamacpp",
+    "description": "Describe or compare images with Llama.cpp",
     "parameters": {
         "type": "object",
         "properties": {
@@ -140,6 +142,6 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=analyze_images)
+config.addFunctionCall(signature=functionSignature, method=analyze_images_llamacpp)
 config.inputSuggestions.append("Describe this image in detail: ")
 config.inputSuggestions.append("Extract text from this image: ")

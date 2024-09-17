@@ -202,7 +202,7 @@ class ToolMate:
             ".system": (f"open system command prompt {str(config.hotkey_launch_system_prompt)}", lambda: SystemCommandPrompt().run(allowPathChanges=True)),
             ".install": ("install python package", self.installPythonPackage), # TODO: changed to a tool
             # help
-            ".keys": (f"display key bindings {str(config.hotkey_display_key_combo)}", config.showKeyBindings),
+            ".keys": (f"learn about key entries and bindings {str(config.hotkey_display_key_combo)}", config.showKeyBindings),
             ".help": ("open documentations", lambda: openURL('https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md')),
             ".donate": ("donate and support ToolMate AI", lambda: openURL('https://www.paypal.com/paypalme/letmedoitai')),
         }
@@ -1995,8 +1995,8 @@ class ToolMate:
                             return None
                     with open(filePath, "w", encoding="utf-8") as fileObj:
                         fileObj.write(pprint.pformat(messages))
+                        print3(f"Conversation saved at: {filePath}")
                     os.system(f"{config.open} {filePath}")
-                    print2("File saved!")
             except:
                 print2("Failed to save the conversation!\n")
                 showErrors()
@@ -2023,6 +2023,7 @@ class ToolMate:
                     chatFile = os.path.join(folderPath, f"{timestamp}.txt")
                     with open(chatFile, "w", encoding="utf-8") as fileObj:
                         fileObj.write(pprint.pformat(messagesCopy))
+                        print3(f"Conversation saved at: {chatFile}")
             except:
                 print2("Failed to save the conversation!\n")
                 showErrors()
@@ -2388,7 +2389,7 @@ My writing:
                                 showErrors()
 
                     # append chat
-                    if action == "append_prompt":
+                    if action == "append_instruction":
                         description = f'''description\n{getAssistantPreviousResponse()[0]}'''
                         action = "chat"
 
@@ -2404,14 +2405,8 @@ My writing:
                     if action in ("add_outlook_calendar_event", "add_google_calendar_event"):
                         description = self.convertRelativeDateTime(description).strip()
 
-                    # update main message chain
-                    if action == "extract_python_code":
-                        description = f"Extract python code in:\n\n{description}"
-                    elif action == "run_python_code":
-                        description = f"Run python code in:\n\n{description}"
-                    elif action == "list_current_directory_contents":
-                        description = f'''List contents in current directory {os.getcwd()}'''
-                    elif action == "context":
+                    # handle predefined contexts
+                    if action == "context":
                         contextPattern = "^`([^`]+?)` ([\d\D]*?)$"
                         searchContext = re.search(contextPattern, description.lstrip())
                         if searchContext:
@@ -2433,6 +2428,17 @@ My writing:
                     if action == "chat":
                         # chat feature only
                         forceLoadingInternetSearches()
+                        doNotUseTool = True
+                    elif action == "recommend_tool":
+                        print1("Sure, I will review all currently enabled tools before providing my recommendation.\n")
+                        Plugins.displayAvailableTools()
+                        config.currentMessages[-1]["content"] = f"""Recommend which is the best `Tool` that can resolve `My Requests`. Each tool listed below is prefixed with "@" followed by their descriptions.
+
+{config.toolTextOutput}
+
+# My Request
+
+{description}"""
                         doNotUseTool = True
                     elif action == "copy_to_clipboard":
                         pyperclip.copy(description)
@@ -2457,6 +2463,7 @@ My writing:
                         print("")
                         displayPythonCode(python_code) if python_code else print1(content)
                         # update main message chain
+                        config.currentMessages[-1]["content"] = f"Extract the python code in:\n\n{description}"
                         config.currentMessages.append({"role": "assistant", "content": content})
                         return None
                     elif action == "run_python_code":
@@ -2472,6 +2479,7 @@ My writing:
                         else:
                             message = "Done!"
                         print1(f"\n{message}")
+                        config.currentMessages[-1]["content"] = f"Run the python code in:\n\n{description}"
                         config.currentMessages.append({"role": "assistant", "content": message})
                         return None
                     elif action == "list_current_directory_contents":
@@ -2483,6 +2491,7 @@ My writing:
 # Files
 
 {files if files else "Not found!"}'''
+                        config.currentMessages[-1]["content"] = f'''List contents in current directory {os.getcwd()}'''
                         config.currentMessages.append({"role": "assistant", "content": content})
                         return None
                     elif action == "convert_relative_datetime":

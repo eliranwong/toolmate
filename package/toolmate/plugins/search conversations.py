@@ -33,7 +33,7 @@ def save_chat_record(timestamp, order, record):
         add_vector(collection, content, metadata)
 config.save_chat_record = save_chat_record
 
-def search_chats(function_args):
+def search_conversations(function_args):
     query = function_args.get("query") # required
     print3(f"""Query: {query}""")
     collection = get_or_create_collection(chroma_client, "chats")
@@ -58,7 +58,7 @@ def search_chats(function_args):
         print2(config.divider)
     return ""
 
-def load_chats(function_args):
+def load_conversations(function_args):
 
     def validateChatFile(chatFile):
         chatFile = os.path.expanduser(chatFile)
@@ -107,8 +107,8 @@ functionSignature1 = {
         "search chat records",
         "find in chat history",
     ],
-    "name": "search_chats",
-    "description": """Search chat records""",
+    "name": "search_conversations",
+    "description": """Search chat records or conversations""",
     "parameters": {
         "type": "object",
         "properties": {
@@ -126,8 +126,8 @@ functionSignature2 = {
         "load chat record",
         "open chat history",
     ],
-    "name": "load_chats",
-    "description": """Load or open old saved chat records if chat ID / timestamp / file path is given""",
+    "name": "load_conversations",
+    "description": """Load a saved conversations if chat ID / timestamp / file path is given""",
     "parameters": {
         "type": "object",
         "properties": {
@@ -141,5 +141,5 @@ functionSignature2 = {
 }
 
 config.inputSuggestions += ["Search chat records: ", "Load chat records with this ID: ", "Load chat records in this file: "]
-config.addFunctionCall(signature=functionSignature1, method=search_chats)
-config.addFunctionCall(signature=functionSignature2, method=load_chats)
+config.addFunctionCall(signature=functionSignature1, method=search_conversations)
+config.addFunctionCall(signature=functionSignature2, method=load_conversations)

@@ -128,7 +128,7 @@ functionSignature = {
         "add a google calendar event",
     ],
     "name": "add_google_calendar_event",
-    "description": "add calendar event",
+    "description": "Add a Google calendar event",
     "parameters": {
         "type": "object",
         "properties": {

@@ -28,7 +28,7 @@ if config.openweathermapApi:
             "search weather",
         ],
         "name": "search_weather_info",
-        "description": f'''Answer about weather''',
+        "description": f'''Answer a query about weather''',
         "parameters": {
             "type": "object",
             "properties": {

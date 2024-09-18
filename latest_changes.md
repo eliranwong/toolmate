@@ -1,3 +1,9 @@
+# Version 0.3.35
+
+* added tool `@create_image_flux` to create images with Flux.1.
+
+Running Flux models locally requires GPU support, read [GPU Acceleration](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/GPU%20Acceleration.md)
+
 # Version 0.3.34
 
 * added tool `@create_image_imagen3` to create images with Google Imagen 3 via Vertex AI.

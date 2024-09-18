@@ -134,6 +134,12 @@ To start up with a particular backend, you may use parameter `-b`, e.g.:
 
 Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md#installation
 
+# GPU Acceleration
+
+[GPU Acceleration](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/GPU%20Acceleration.md)
+
+[GPU Acceleration with Llama.cpp Server](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/GPU%20Acceleration%20with%20Llama_cpp%20server.md)
+
 # Quick Guide
 
 https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Quick%20Guide.md

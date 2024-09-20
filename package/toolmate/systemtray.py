@@ -10,21 +10,19 @@ config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else
 config.toolMateAIFolder = packageFolder
 if not hasattr(config, "toolMateAIName") or not config.toolMateAIName:
     config.toolMateAIName = "ToolMate AI"
-from toolmate.utils.tool_plugins import ToolStore
 config.divider = "--------------------"
-ToolStore.setupToolStoreClient()
 os.environ["TOKENIZERS_PARALLELISM"] = config.tokenizers_parallelism
 
 import sys, platform, webbrowser, shutil
 from toolmate import startAutogenstudioServer, runToolMateCommand, isServerAlive, print2, getCliOutput
-#from toolmate.gui.chatgui import ChatGui
+from toolmate.gui.desktop_assistant import DesktopAssistant
 from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication, QMessageBox
 from PySide6.QtGui import QIcon, QAction, QGuiApplication
 from pathlib import Path
 from functools import partial
 from prompt_toolkit.clipboard.pyperclip import PyperclipClipboard
 from toolmate.utils.tts_utils import TTSUtil
-
+from toolmate.utils.assistant import ToolMate
 
 toolMateAIFile = os.path.realpath(__file__)
 toolMateAIFolder = os.path.dirname(toolMateAIFile)
@@ -36,20 +34,29 @@ thisOS = platform.system()
 
 class ToolMateHub(QSystemTrayIcon):
 
+    def showDesktopAssistant(self):
+        # to work with mutliple virtual desktops
+        config.desktopAssistant.hide()
+        config.desktopAssistant.show()
+
     def __init__(self, icon, parent=None):
         super().__init__(icon, parent)
 
-        # pre-load the main gui
-        #self.chatGui = ChatGui()
+        # initial completion check at startup
+        config.initialCompletionCheck = False
+        config.toolmate = ToolMate()
+
+        # pre-load desktop assistant gui
+        config.desktopAssistant = DesktopAssistant()
 
         self.clipboard = PyperclipClipboard()
         self.menu = QMenu(parent)
 
-        #if config.developer:
-        #    chatgui = QAction("Desktop Assistant [experimental]", self)
-        #    chatgui.triggered.connect(self.showGui)
-        #    self.menu.addAction(chatgui)
-        #    self.menu.addSeparator()
+        if config.developer:
+            chatgui = QAction("Desktop Assistant [experimental]", self)
+            chatgui.triggered.connect(self.showDesktopAssistant)
+            self.menu.addAction(chatgui)
+            self.menu.addSeparator()
 
         for i in ("toolmate", "letmedoit"):
             action = QAction(i, self)
@@ -252,12 +259,6 @@ class ToolMateHub(QSystemTrayIcon):
         else:
             QMessageBox.information(self.menu, "ToolMate AI", "Perplexica not found!")
         os.chdir(current_dir)
-
-    def showGui(self):
-        # to work with mutliple virtual desktops
-        #self.chatGui.hide()
-        #self.chatGui.show()
-        ...
 
 def main():
     app = QApplication(sys.argv)

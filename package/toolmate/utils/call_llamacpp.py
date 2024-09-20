@@ -304,12 +304,12 @@ Remember, output the new copy of python code ONLY, without additional notes or e
     # Auto Function call equivalence
 
     @staticmethod
-    def runGeniusCall(messages: dict, doNotUseTool: bool = False):
+    def runGeniusCall(messages: dict, chatOnly: bool = False):
         user_request = messages[-1]["content"]
         if config.enable_tool_selection_agent and config.enable_tool_screening_agent and config.tool_dependence > 0.0:
             # 1. Intent Screening
-            doNotUseTool = True if doNotUseTool else (not isToolRequired(user_request))
-        if not config.selectedTool and (doNotUseTool or config.tool_dependence <= 0.0):
+            chatOnly = True if chatOnly else (not isToolRequired(user_request))
+        if not config.selectedTool and (chatOnly or config.tool_dependence <= 0.0):
             return CallLlamaCpp.regularCall(messages)
         else:
             # 2. Tool Selection

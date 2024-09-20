@@ -4,7 +4,7 @@ This page content is generated on 17Sept2024.  For the latest information, simpl
 
 # Available Tools
 
-@add_google_calendar_event @add_outlook_calendar_event @analyze_audio @analyze_files @analyze_images_chatgpt @analyze_images_gemini @analyze_images_llamacpp @analyze_images_ollama @analyze_web_content @append_command @append_fabric @append_instruction @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @build_agents @chat @command @context @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_sd @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @execute_computing_task @extract_python_code @fabric @improve_writing @install_package @integrate_google_searches @list_current_directory_contents @load_conversations @modify_images @open_browser @paste_from_clipboard @pronunce_words @recommend_tool @reflection @remove_image_background @retrieve_memory @run_python_code @save_memory @search_conversations @search_finance @search_latest_news @search_sqlite @search_weather_info @send_gmail @send_outlook @send_tweet @workflow
+@add_google_calendar_event @add_outlook_calendar_event @analyze_audio @analyze_files @analyze_images_chatgpt @analyze_images_gemini @analyze_images_llamacpp @analyze_images_ollama @analyze_web_content @append_command @append_fabric @append_instruction @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @build_agents @chat @command @context @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_flux @create_image_imagen3 @create_image_sd @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @execute_computing_task @extract_python_code @fabric @improve_writing @install_package @integrate_google_searches @list_current_directory_contents @load_conversations @modify_images @open_browser @paste_from_clipboard @pronunce_words @recommend_tool @reflection @remove_image_background @retrieve_memory @run_python_code @save_memory @search_conversations @search_finance @search_latest_news @search_sqlite @search_weather_info @send_gmail @send_outlook @send_tweet @workflow
 
 # Descriptions
 
@@ -65,6 +65,10 @@ This page content is generated on 17Sept2024.  For the latest information, simpl
 `@correct_python_code` Fix Python code if both the original code and the traceback error are provided
 
 `@create_image_dalle3` Create an image with DALLE-3
+
+`@create_image_flux` Create an image with Flux.1
+
+`@create_image_imagen3` Create an image with Imagen-3
 
 `@create_image_sd` Create an image with Stable Diffusion Models
 

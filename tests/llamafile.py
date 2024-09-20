@@ -4,14 +4,14 @@ class CallLlamaFile:
     # not workable yet; may not support it
 
     @staticmethod
-    def runGeniusCall(messages: dict, doNotUseTool: bool = False):
+    def runGeniusCall(messages: dict, chatOnly: bool = False):
         user_request = messages[-1]["content"]
         if config.enable_tool_selection_agent and config.enable_tool_screening_agent and config.tool_dependence > 0.0:
             # 1. Intent Screening
             if config.developer:
                 print1("screening ...")
-            doNotUseTool = True if doNotUseTool else CallOllama.screen_user_request(messages=messages, user_request=user_request, model=config.ollamaMainModel)
-        if not config.selectedTool and (doNotUseTool or config.tool_dependence <= 0.0):
+            chatOnly = True if chatOnly else CallOllama.screen_user_request(messages=messages, user_request=user_request, model=config.ollamaMainModel)
+        if not config.selectedTool and (chatOnly or config.tool_dependence <= 0.0):
             return CallOllama.regularCall(messages)
         else:
             # 2. Tool Selection

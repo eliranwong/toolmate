@@ -253,6 +253,8 @@ defaultSettings = (
     ("voiceTypingWhisperEnglishModel", "base"), # "tiny", "base", "small", "medium", "large"; read https://github.com/openai/whisper/tree/main#available-models-and-languages
     ("google_cloud_credentials", ""),
     ("enabledGoogleAPIs", ["Vertex AI"]), # "Vertex AI", "Speech-to-Text", "Text-to-Speech"
+    ("desktopAssistantWidth", 500),
+    ("desktopAssistantHeight", 900),
     ("hotkey_exit", ["c-q"]),
     ("hotkey_cancel", ["c-z"]),
     ("hotkey_new", ["c-n"]),
@@ -286,6 +288,8 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "toolmate",
+    "chatGui",
     "builtinTools",
     "toolPattern",
     "llamacppserver_tool_client",

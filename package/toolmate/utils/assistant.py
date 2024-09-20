@@ -4,8 +4,10 @@ from toolmate import installPipPackage, getDownloadedOllamaModels, getDownloaded
 from toolmate.utils.call_llm import CallLLM
 from toolmate.utils.tool_plugins import ToolStore
 import threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy, pyperclip
+from typing import Optional
 from huggingface_hub import hf_hub_download
 from pathlib import Path
+from toolmate.gui.worker import QtResponseStreamer
 from toolmate.utils.download import Downloader
 from toolmate.utils.ollama_models import ollama_models
 #from pygments.lexers.python import PythonLexer
@@ -2199,6 +2201,330 @@ My writing:
                     print(f"```\n{writing}\n```")
         return writing
 
+    def processSingleAction(self, action: str, description: str) -> Optional[bool]:
+        config.selectedTool = ""
+        config.toolTextOutput = ""
+
+        def forceLoadingInternetSearches():
+            if config.loadingInternetSearches == "always":
+                try:
+                    config.currentMessages = CallLLM.runSingleFunctionCall(config.currentMessages, "integrate_google_searches")
+                except:
+                    print1("Unable to load internet resources.")
+                    showErrors()
+
+        # append chat
+        if action == "append_instruction":
+            description = f'''description\n{getAssistantPreviousResponse()[0]}'''
+            action = "chat"
+
+        # Force Improve Writing
+        if config.improveInputEntry:
+            description = self.improveWriting(description)
+
+        # Run TTS to read action content
+        if config.ttsInput:
+            TTSUtil.play(description)
+
+        # Convert datetime
+        if action in ("add_outlook_calendar_event", "add_google_calendar_event"):
+            description = self.convertRelativeDateTime(description).strip()
+
+        # handle predefined contexts
+        if action == "context":
+            contextPattern = "^`([^`]+?)` ([\d\D]*?)$"
+            searchContext = re.search(contextPattern, description.lstrip())
+            if searchContext:
+                contextID = searchContext.group(1)
+                if contextID and contextID in config.predefinedContexts:
+                    description = searchContext.group(2)
+                    config.predefinedContext = contextID
+                    config.saveConfig()
+            description = self.addPredefinedContext(description)
+            # check if the new description call a particular tool
+            searchTool = re.search(f"^{config.toolPattern}([\d\D]*?)$", description.lstrip())
+            if searchTool:
+                action = searchTool.group(1)
+                description = searchTool.group(2)
+        
+        config.currentMessages.append({"role": "user", "content": description})
+
+        # check if user specify a tool
+        if action == "chat":
+            # chat feature only
+            forceLoadingInternetSearches()
+            chatOnly = True
+        elif action == "recommend_tool":
+            print1("Sure, I will review all currently enabled tools before providing my recommendation.\n")
+            Plugins.displayAvailableTools()
+            config.currentMessages[-1]["content"] = f"""Recommend which is the best `Tool` that can resolve `My Requests`. Each tool listed below is prefixed with "@" followed by their descriptions.
+
+{config.toolTextOutput}
+
+# My Request
+
+{description}"""
+            chatOnly = True
+        elif action == "copy_to_clipboard":
+            pyperclip.copy(description)
+            message = "Copied!"
+            print1(message)
+            config.currentMessages[-1]["content"] = "Copy the following text to the system clipboard:\n\n```" + description + "\n```"
+            config.currentMessages.append({"role": "assistant", "content": message})
+            return None
+        elif action == "paste_from_clipboard":
+            clipboardText = pyperclip.paste()
+            print1(f"\n{clipboardText}")
+            config.currentMessages[-1]["content"] = "Retrieve and display the contents of the system clipboard."
+            config.currentMessages.append({"role": "assistant", "content": clipboardText})
+            return None
+        elif action == "extract_python_code":
+            # extract
+            python_code = extractPythonCode(description)
+            content = f'''```python
+{python_code}
+```''' if python_code else "Not found!"
+            # display code
+            print("")
+            displayPythonCode(python_code) if python_code else print1(content)
+            # update main message chain
+            config.currentMessages[-1]["content"] = f"Extract the python code in:\n\n{description}"
+            config.currentMessages.append({"role": "assistant", "content": content})
+            return None
+        elif action == "run_python_code":
+            # extract
+            python_code = extractPythonCode(description)
+            # execute
+            self.runPythonScript(python_code)
+            # display and update
+            if not python_code:
+                message = "Python code not found!"
+            elif config.toolTextOutput.strip():
+                message = config.toolTextOutput
+            else:
+                message = "Done!"
+            print1(f"\n{message}")
+            config.currentMessages[-1]["content"] = f"Run the python code in:\n\n{description}"
+            config.currentMessages.append({"role": "assistant", "content": message})
+            return None
+        elif action == "list_current_directory_contents":
+            dirs, files = self.getPath.displayDirectoryContent()
+            content = f'''# Directories
+
+{dirs if dirs else "Not found!"}
+
+# Files
+
+{files if files else "Not found!"}'''
+            config.currentMessages[-1]["content"] = f'''List contents in current directory {os.getcwd()}'''
+            config.currentMessages.append({"role": "assistant", "content": content})
+            return None
+        elif action == "convert_relative_datetime":
+            improvedWriting = self.convertRelativeDateTime(description).strip()
+            if improvedWriting:
+                print2("\n```improved")
+                print(improvedWriting)
+                print2("```\n")
+                config.currentMessages[-1]["content"] = "Convert any relative dates and times in the following writing:\n\n```" + description + "\n```"
+                config.currentMessages.append({"role": "assistant", "content": improvedWriting})
+            else:
+                config.currentMessages = config.currentMessages[:-1]
+            return None
+        elif action == "improve_writing":
+            improvedWriting = self.improveWriting(description).strip()
+            if improvedWriting:
+                config.currentMessages[-1]["content"] = f"Improve the following writing, according to {config.improvedWritingSytle}:\n\n```" + description + "\n```"
+                config.currentMessages.append({"role": "assistant", "content": improvedWriting})
+            else:
+                config.currentMessages = config.currentMessages[:-1]
+            return None
+        elif action == "command":
+            stdout, stderr = subprocess.Popen(description, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+            if stdout:
+                print2("\n```output")
+                print(stdout.strip())
+                print2("```\n")
+                description = f'''Run the following command:\n```command\n{description}\n```'''
+                config.currentMessages[-1]["content"] = description
+                config.currentMessages.append({"role": "assistant", "content": stdout.strip()})
+            else:
+                if stderr:
+                    print2("\n```error")
+                    print(stderr.strip())
+                    print2("```\n")
+                config.currentMessages = config.currentMessages[:-1]
+            return None
+        elif action == "append_command":
+            previousResponse = getAssistantPreviousResponse()[0]
+            if previousResponse:
+                previousResponse = previousResponse.replace('"', '\\"')
+                stdout, stderr = subprocess.Popen(f'''{description.strip()} "{previousResponse}"''', shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                if stdout:
+                    print2("\n```output")
+                    print(stdout.strip())
+                    print2("```\n")
+                    description = f'''Run the following command:\n```command\n{description}\n```'''
+                    config.currentMessages[-1]["content"] = description
+                    config.currentMessages.append({"role": "assistant", "content": stdout.strip()})
+                else:
+                    if stderr:
+                        print2("\n```error")
+                        print(stderr.strip())
+                        print2("```\n")
+                    config.currentMessages = config.currentMessages[:-1]
+            else:
+                config.currentMessages = config.currentMessages[:-1]
+            return None
+        else:
+            if action:
+                # when user specify a tool
+                config.selectedTool = action
+                # notify devloper
+                #if config.developer:
+                #    print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Calling tool</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{config.selectedTool}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
+                chatOnly = False
+            else:
+                # no tool is specified
+                config.selectedTool = ""
+                forceLoadingInternetSearches()
+                chatOnly = False if config.enable_tool_selection_agent else True
+        return chatOnly
+
+    def runSingleAction(self, action: str, description: str, gui: bool=False) -> bool:
+        return self.runSingleActionGui(action, description) if gui else self.runSingleActionTerminal(action, description)
+
+    def runSingleActionGui(self, action: str, description: str) -> bool:
+        chatOnly = self.processSingleAction(action, description)
+        if chatOnly is not None:
+            completion = CallLLM.runGeniusCall(config.currentMessages, chatOnly)
+            QtResponseStreamer(self).workOnGetResponse(completion)
+
+    def processResponseGui(self, response: str):
+        config.desktopAssistant.processResponse()
+
+    def streamResponseGui(self, chunk: str):
+        config.desktopAssistant.streamResponseGui(chunk)
+
+    def runSingleActionTerminal(self, action: str, description: str) -> bool:
+        chatOnly = self.processSingleAction(action, description)
+        if chatOnly is not None:
+            try:
+                # start spinning
+                config.stop_event = threading.Event()
+                config.spinner_thread = threading.Thread(target=spinning_animation, args=(config.stop_event,))
+                config.spinner_thread.start()
+
+                completion = CallLLM.runGeniusCall(config.currentMessages, chatOnly)
+                
+                # stop spinning
+                config.runPython = True
+                stopSpinning()
+
+                if completion is not None:
+                    # Create a new thread for the streaming task
+                    streamingWordWrapper = StreamingWordWrapper()
+                    streaming_event = threading.Event()
+                    self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False))
+                    # Start the streaming thread
+                    self.streaming_thread.start()
+
+                    # wait while text output is steaming; capture key combo 'ctrl+q' or 'ctrl+z' to stop the streaming
+                    streamingWordWrapper.keyToStopStreaming(streaming_event)
+
+                    # when streaming is done or when user press "ctrl+q"
+                    self.streaming_thread.join()
+
+            except:
+                stopSpinning()
+                trace = traceback.format_exc()
+                if "Please reduce the length of the messages or completion" in trace:
+                    print1("Maximum tokens reached!")
+                elif config.developer:
+                    print1(self.divider)
+                    print1(trace)
+                    print1(self.divider)
+                else:
+                    print1("Error encountered!")
+
+                config.defaultEntry = userInput
+                print2("starting a new chat!")
+                self.saveChat(config.currentMessages)
+                return False
+        return True
+
+    def runMultipleActions(self, content: str, gui: bool=False):
+        # check for any tool patterns
+        actions = re.findall(config.toolPattern, f"{content} ") # add a space after `content` to allow tool entry at the end without a description
+        
+        if not actions:
+            if content.strip():
+                # pass to built-in screening or tool-check operations
+                complete = self.runSingleAction("", content, gui)
+                if not complete:
+                    return False
+        else:
+            separator = "＊@＊@＊"
+            descriptions = re.sub(config.toolPattern, separator, f"{content} ").split(separator)
+            if descriptions[0].strip():
+                # in case content entered before the first action declared
+                actions.insert(0, "chat")
+            else:
+                del descriptions[0]
+
+            for index, action in enumerate(actions):
+                description = f"List contents in current directory {os.getcwd()}" if action == "list_current_directory_contents" else descriptions[index]
+                if not description.strip():
+                    # enable tool to work on previous generated response
+                    description = getAssistantPreviousResponse()[0]
+                if description.strip():
+                    def displayActionMessage(message):
+                        try:
+                            print3(message)
+                        except:
+                            print(message)
+                    if action == "deep_reflection":
+                        # think
+                        description = f'''`Think` {description}'''
+                        message = f'''\n@context: {description}\n'''
+                        displayActionMessage(message)
+                        complete = self.runSingleAction("context", description, gui)
+                        if not complete:
+                            return False
+                        # review
+                        message = '''\n@chat: Review, evaluate, and reflect ...\n'''
+                        displayActionMessage(message)
+                        description = config.predefinedContexts["Review"][6:]
+                        complete = self.runSingleAction("chat", description, gui)
+                        if not complete:
+                            return False
+                        # refine
+                        message = '''\n@chat: Refine ...\n'''
+                        displayActionMessage(message)
+                        description = config.predefinedContexts["Refine"][21:]
+                        complete = self.runSingleAction("chat", description, gui)
+                        if not complete:
+                            return False
+                    elif action == "workflow":
+                        workflowFile = refinePath(description.strip())
+                        if not os.path.isfile(workflowFile):
+                            relativeWorkflowFile = os.path.join(config.localStorage, "workflows", workflowFile)
+                            if os.path.isfile(relativeWorkflowFile):
+                                workflowFile = relativeWorkflowFile
+                        if os.path.isfile(workflowFile):
+                            workflowContent = readTextFile(workflowFile)
+                            complete = self.runMultipleActions(workflowContent)
+                            if not complete:
+                                return False
+                        else:
+                            print2("Workflow file invalid!")
+                    else:
+                        message = f'''\n@{action}: {description}'''
+                        displayActionMessage(message)
+                        complete = self.runSingleAction(action, description, gui)
+                        if not complete:
+                            return False
+        return True
+
     def startChats(self):
         tokenValidator = TokenValidator()
         def getDynamicToolBar():
@@ -2376,297 +2702,6 @@ My writing:
                     print2(f"Invalid file path of format!")
             elif userInput and not userInputLower in featuresLower:
 
-                def runSingleAction(action: str, description: str) -> None:
-                    config.selectedTool = ""
-                    config.toolTextOutput = ""
-
-                    def forceLoadingInternetSearches():
-                        if config.loadingInternetSearches == "always":
-                            try:
-                                config.currentMessages = CallLLM.runSingleFunctionCall(config.currentMessages, "integrate_google_searches")
-                            except:
-                                print1("Unable to load internet resources.")
-                                showErrors()
-
-                    # append chat
-                    if action == "append_instruction":
-                        description = f'''description\n{getAssistantPreviousResponse()[0]}'''
-                        action = "chat"
-
-                    # Force Improve Writing
-                    if config.improveInputEntry:
-                        description = self.improveWriting(description)
-
-                    # Run TTS to read action content
-                    if config.ttsInput:
-                        TTSUtil.play(description)
-
-                    # Convert datetime
-                    if action in ("add_outlook_calendar_event", "add_google_calendar_event"):
-                        description = self.convertRelativeDateTime(description).strip()
-
-                    # handle predefined contexts
-                    if action == "context":
-                        contextPattern = "^`([^`]+?)` ([\d\D]*?)$"
-                        searchContext = re.search(contextPattern, description.lstrip())
-                        if searchContext:
-                            contextID = searchContext.group(1)
-                            if contextID and contextID in config.predefinedContexts:
-                                description = searchContext.group(2)
-                                config.predefinedContext = contextID
-                                config.saveConfig()
-                        description = self.addPredefinedContext(description)
-                        # check if the new description call a particular tool
-                        searchTool = re.search(f"^{config.toolPattern}([\d\D]*?)$", description.lstrip())
-                        if searchTool:
-                            action = searchTool.group(1)
-                            description = searchTool.group(2)
-                    
-                    config.currentMessages.append({"role": "user", "content": description})
-
-                    # check if user specify a tool
-                    if action == "chat":
-                        # chat feature only
-                        forceLoadingInternetSearches()
-                        doNotUseTool = True
-                    elif action == "recommend_tool":
-                        print1("Sure, I will review all currently enabled tools before providing my recommendation.\n")
-                        Plugins.displayAvailableTools()
-                        config.currentMessages[-1]["content"] = f"""Recommend which is the best `Tool` that can resolve `My Requests`. Each tool listed below is prefixed with "@" followed by their descriptions.
-
-{config.toolTextOutput}
-
-# My Request
-
-{description}"""
-                        doNotUseTool = True
-                    elif action == "copy_to_clipboard":
-                        pyperclip.copy(description)
-                        message = "Copied!"
-                        print1(message)
-                        config.currentMessages[-1]["content"] = "Copy the following text to the system clipboard:\n\n```" + description + "\n```"
-                        config.currentMessages.append({"role": "assistant", "content": message})
-                        return None
-                    elif action == "paste_from_clipboard":
-                        clipboardText = pyperclip.paste()
-                        print1(f"\n{clipboardText}")
-                        config.currentMessages[-1]["content"] = "Retrieve and display the contents of the system clipboard."
-                        config.currentMessages.append({"role": "assistant", "content": clipboardText})
-                        return None
-                    elif action == "extract_python_code":
-                        # extract
-                        python_code = extractPythonCode(description)
-                        content = f'''```python
-{python_code}
-```''' if python_code else "Not found!"
-                        # display code
-                        print("")
-                        displayPythonCode(python_code) if python_code else print1(content)
-                        # update main message chain
-                        config.currentMessages[-1]["content"] = f"Extract the python code in:\n\n{description}"
-                        config.currentMessages.append({"role": "assistant", "content": content})
-                        return None
-                    elif action == "run_python_code":
-                        # extract
-                        python_code = extractPythonCode(description)
-                        # execute
-                        self.runPythonScript(python_code)
-                        # display and update
-                        if not python_code:
-                            message = "Python code not found!"
-                        elif config.toolTextOutput.strip():
-                            message = config.toolTextOutput
-                        else:
-                            message = "Done!"
-                        print1(f"\n{message}")
-                        config.currentMessages[-1]["content"] = f"Run the python code in:\n\n{description}"
-                        config.currentMessages.append({"role": "assistant", "content": message})
-                        return None
-                    elif action == "list_current_directory_contents":
-                        dirs, files = self.getPath.displayDirectoryContent()
-                        content = f'''# Directories
-
-{dirs if dirs else "Not found!"}
-
-# Files
-
-{files if files else "Not found!"}'''
-                        config.currentMessages[-1]["content"] = f'''List contents in current directory {os.getcwd()}'''
-                        config.currentMessages.append({"role": "assistant", "content": content})
-                        return None
-                    elif action == "convert_relative_datetime":
-                        improvedWriting = self.convertRelativeDateTime(description).strip()
-                        if improvedWriting:
-                            print2("\n```improved")
-                            print(improvedWriting)
-                            print2("```\n")
-                            config.currentMessages[-1]["content"] = "Convert any relative dates and times in the following writing:\n\n```" + description + "\n```"
-                            config.currentMessages.append({"role": "assistant", "content": improvedWriting})
-                        else:
-                            config.currentMessages = config.currentMessages[:-1]
-                        return None
-                    elif action == "improve_writing":
-                        improvedWriting = self.improveWriting(description).strip()
-                        if improvedWriting:
-                            config.currentMessages[-1]["content"] = f"Improve the following writing, according to {config.improvedWritingSytle}:\n\n```" + description + "\n```"
-                            config.currentMessages.append({"role": "assistant", "content": improvedWriting})
-                        else:
-                            config.currentMessages = config.currentMessages[:-1]
-                        return None
-                    elif action == "command":
-                        stdout, stderr = subprocess.Popen(description, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-                        if stdout:
-                            print2("\n```output")
-                            print(stdout.strip())
-                            print2("```\n")
-                            description = f'''Run the following command:\n```command\n{description}\n```'''
-                            config.currentMessages[-1]["content"] = description
-                            config.currentMessages.append({"role": "assistant", "content": stdout.strip()})
-                        else:
-                            if stderr:
-                                print2("\n```error")
-                                print(stderr.strip())
-                                print2("```\n")
-                            config.currentMessages = config.currentMessages[:-1]
-                        return None
-                    elif action == "append_command":
-                        previousResponse = getAssistantPreviousResponse()[0]
-                        if previousResponse:
-                            previousResponse = previousResponse.replace('"', '\\"')
-                            stdout, stderr = subprocess.Popen(f'''{description.strip()} "{previousResponse}"''', shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-                            if stdout:
-                                print2("\n```output")
-                                print(stdout.strip())
-                                print2("```\n")
-                                description = f'''Run the following command:\n```command\n{description}\n```'''
-                                config.currentMessages[-1]["content"] = description
-                                config.currentMessages.append({"role": "assistant", "content": stdout.strip()})
-                            else:
-                                if stderr:
-                                    print2("\n```error")
-                                    print(stderr.strip())
-                                    print2("```\n")
-                                config.currentMessages = config.currentMessages[:-1]
-                        else:
-                            config.currentMessages = config.currentMessages[:-1]
-                        return None
-                    else:
-                        if action:
-                            # when user specify a tool
-                            config.selectedTool = action
-                            # notify devloper
-                            #if config.developer:
-                            #    print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Calling tool</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{config.selectedTool}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
-                            doNotUseTool = False
-                        else:
-                            # no tool is specified
-                            config.selectedTool = ""
-                            forceLoadingInternetSearches()
-                            doNotUseTool = False if config.enable_tool_selection_agent else True
-
-                    try:
-                        # start spinning
-                        config.stop_event = threading.Event()
-                        config.spinner_thread = threading.Thread(target=spinning_animation, args=(config.stop_event,))
-                        config.spinner_thread.start()
-
-                        completion = CallLLM.runGeniusCall(config.currentMessages, doNotUseTool)
-                        
-                        # stop spinning
-                        config.runPython = True
-                        stopSpinning()
-
-                        if completion is not None:
-                            # Create a new thread for the streaming task
-                            streamingWordWrapper = StreamingWordWrapper()
-                            streaming_event = threading.Event()
-                            self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False))
-                            # Start the streaming thread
-                            self.streaming_thread.start()
-
-                            # wait while text output is steaming; capture key combo 'ctrl+q' or 'ctrl+z' to stop the streaming
-                            streamingWordWrapper.keyToStopStreaming(streaming_event)
-
-                            # when streaming is done or when user press "ctrl+q"
-                            self.streaming_thread.join()
-
-                    except:
-                        stopSpinning()
-                        trace = traceback.format_exc()
-                        if "Please reduce the length of the messages or completion" in trace:
-                            print1("Maximum tokens reached!")
-                        elif config.developer:
-                            print1(self.divider)
-                            print1(trace)
-                            print1(self.divider)
-                        else:
-                            print1("Error encountered!")
-
-                        config.defaultEntry = userInput
-                        print2("starting a new chat!")
-                        self.saveChat(config.currentMessages)
-                        _, config.currentMessages = startChat()
-
-                def checkAndRunActions(content):
-
-                    # check for any tool patterns
-                    actions = re.findall(config.toolPattern, f"{content} ") # add a space after `content` to allow tool entry at the end without a description
-                    
-                    if not actions:
-                        if content.strip():
-                            # pass to built-in screening or tool-check operations
-                            runSingleAction("", content)
-                    else:
-                        separator = "＊@＊@＊"
-                        descriptions = re.sub(config.toolPattern, separator, f"{content} ").split(separator)
-                        if descriptions[0].strip():
-                            # in case content entered before the first action declared
-                            actions.insert(0, "chat")
-                        else:
-                            del descriptions[0]
-                        for index, action in enumerate(actions):
-                            description = f"List contents in current directory {os.getcwd()}" if action == "list_current_directory_contents" else descriptions[index]
-                            if not description.strip():
-                                # enable tool to work on previous generated response
-                                description = getAssistantPreviousResponse()[0]
-                            if description.strip():
-                                def displayActionMessage(message):
-                                    try:
-                                        print3(message)
-                                    except:
-                                        print(message)
-                                if action == "deep_reflection":
-                                    # think
-                                    description = f'''`Think` {description}'''
-                                    message = f'''\n@context: {description}\n'''
-                                    displayActionMessage(message)
-                                    runSingleAction("context", description)
-                                    # review
-                                    message = '''\n@chat: Review, evaluate, and reflect ...\n'''
-                                    displayActionMessage(message)
-                                    description = config.predefinedContexts["Review"][6:]
-                                    runSingleAction("chat", description)
-                                    # refine
-                                    message = '''\n@chat: Refine ...\n'''
-                                    displayActionMessage(message)
-                                    description = config.predefinedContexts["Refine"][21:]
-                                    runSingleAction("chat", description)
-                                elif action == "workflow":
-                                    workflowFile = refinePath(description.strip())
-                                    if not os.path.isfile(workflowFile):
-                                        relativeWorkflowFile = os.path.join(config.localStorage, "workflows", workflowFile)
-                                        if os.path.isfile(relativeWorkflowFile):
-                                            workflowFile = relativeWorkflowFile
-                                    if os.path.isfile(workflowFile):
-                                        workflowContent = readTextFile(workflowFile)
-                                        checkAndRunActions(workflowContent)
-                                    else:
-                                        print2("Workflow file invalid!")
-                                else:
-                                    message = f'''\n@{action}: {description}'''
-                                    displayActionMessage(message)
-                                    runSingleAction(action, description)
-
                 # tweak for `Let me Translate`
                 if config.predefinedContext == "Let me Translate" and userInput.startswith("@chat Assist me by acting as a translator.\nPlease translate"):
                     print1("Please specify the language you would like the content to be translated into:")
@@ -2684,7 +2719,9 @@ My writing:
                     config.predefinedContext = config.predefinedContextTemp
                     config.predefinedContextTemp = ""
 
-                checkAndRunActions(userInput)
+                complete = self.runMultipleActions(userInput)
+                if not complete:
+                    _, config.currentMessages = startChat()
 
     def launchChatbot(self, chatbot, userInput):
         if not chatbot:

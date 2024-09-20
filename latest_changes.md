@@ -1,8 +1,18 @@
+# Version 0.3.36-0.3.37
+
+* testing gui in developer mode
+
+1. Run `toolmateai`
+
+2. Select `Desktop Assistant [experimental]` from the system tray.
+
+This is a raw one, not yet ready for production.
+
 # Version 0.3.35
 
 * added tool `@create_image_flux` to create images with Flux.1.
 
-Running Flux models locally requires GPU support, read [GPU Acceleration](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/GPU%20Acceleration.md)
+Running Flux models locally requires GPU support, read [GPU Acceleration](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/GPU%20Acceleration.md#stable-diffusion-cpp-python)
 
 # Version 0.3.34
 

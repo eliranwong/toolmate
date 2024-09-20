@@ -15,8 +15,9 @@ For an example:
 1. Save the following content in a plain text file, named `my_workflow` in home directory:
 
 ```
-@command echo "Machine Learning"
-@append_instruction Describe
+@paste_from_clipboard
+@improve_writing
+@copy_to_clipboard
 ```
 
 2. Run in ToolMate AI prompt:

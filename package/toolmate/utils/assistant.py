@@ -2397,13 +2397,10 @@ My writing:
         chatOnly = self.processSingleAction(action, description)
         if chatOnly is not None:
             completion = CallLLM.runGeniusCall(config.currentMessages, chatOnly)
-            QtResponseStreamer(self).workOnGetResponse(completion)
-
-    def processResponseGui(self, response: str):
-        config.desktopAssistant.processResponse()
-
-    def streamResponseGui(self, chunk: str):
-        config.desktopAssistant.streamResponseGui(chunk)
+            if completion is None:
+                return False
+            QtResponseStreamer(config.desktopAssistant).workOnCompletion(completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False)
+        return True
 
     def runSingleActionTerminal(self, action: str, description: str) -> bool:
         chatOnly = self.processSingleAction(action, description)

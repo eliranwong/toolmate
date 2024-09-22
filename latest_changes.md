@@ -1,10 +1,20 @@
-# Version 0.3.36-0.3.37
+# Version 0.3.39
+
+* updated Ollama model list
+
+* gui development in progress
+
+# Version 0.3.36-0.3.38
 
 * testing gui in developer mode
 
-1. Run `toolmateai`
+1. Run `toolmate`
 
-2. Select `Desktop Assistant [experimental]` from the system tray.
+2. Enable `Developer Mode`, by entering `.toggledeveloper`
+
+3. Run `toolmateai`
+
+4. Select `Desktop Assistant [experimental]` from the system tray.
 
 This is a raw one, not yet ready for production.
 

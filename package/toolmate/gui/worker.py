@@ -97,8 +97,8 @@ class QtResponseStreamer:
             # append to a chunk for reading
             config.llmTextChunk += answer
 
-    def processCompletion(self, completion, progress_callback):
-        openai = True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False
+    def processCompletion(self, completion, progress_callback, openai: bool):
+        #openai = True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False
         config.new_chat_response = ""
 
         def finishOutputs(chat_response):
@@ -169,11 +169,11 @@ class QtResponseStreamer:
             config.llmTextChunk = ""
         finishOutputs(chat_response)
 
-    def workOnGetResponse(self, completion):
+    def workOnCompletion(self, completion, openai: bool):
         # Pass the function to execute
-        worker = Worker(self.processCompletion, completion) # Any other args, kwargs are passed to the run function
-        worker.signals.result.connect(self.parent.processResponseGui) # process the output return by self.parent.getResponse
-        worker.signals.progress.connect(self.parent.streamResponseGui)
+        worker = Worker(self.processCompletion, completion, openai=openai) # Any other args, kwargs are passed to the run function
+        worker.signals.result.connect(self.parent.processResponse) # process the output return by self.parent.getResponse
+        worker.signals.progress.connect(self.parent.streamResponse)
         # Connection
         #worker.signals.finished.connect(None)
         # Execute

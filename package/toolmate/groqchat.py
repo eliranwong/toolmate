@@ -99,8 +99,6 @@ class GroqChatbot:
                 self.messages = self.resetMessages()
                 print("New chat started!")
             elif prompt := prompt.strip():
-                streamingWordWrapper = StreamingWordWrapper()
-
                 try:
                     completion = getGroqClient().chat.completions.create(
                         model=config.groqApi_chat_model if config.useAdditionalChatModel else config.groqApi_main_model,
@@ -114,13 +112,12 @@ class GroqChatbot:
 
                     # Create a new thread for the streaming task
                     streaming_event = threading.Event()
+                    streamingWordWrapper = StreamingWordWrapper()
                     self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True))
                     # Start the streaming thread
                     self.streaming_thread.start()
-
                     # wait while text output is steaming; capture key combo 'ctrl+q' or 'ctrl+z' to stop the streaming
                     streamingWordWrapper.keyToStopStreaming(streaming_event)
-
                     # when streaming is done or when user press "ctrl+q"
                     self.streaming_thread.join()
 

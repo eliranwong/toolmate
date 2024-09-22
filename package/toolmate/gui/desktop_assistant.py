@@ -91,7 +91,7 @@ class CentralWidget(QWidget):
         self.progressBar.hide()
         self.userInput.setFocus()
 
-    def streamResponseGui(self, content):
+    def streamResponse(self, content):
         self.contentView.insertPlainText(content)
         self.contentScrollBar.setValue(self.contentScrollBar.maximum())
 
@@ -117,6 +117,9 @@ class DesktopAssistant(QMainWindow):
         Plugins.runPlugins()
         # gui
         self.initUI()
+        # shortcuts
+        self.processResponse = self.centralWidget.processResponse
+        self.streamResponse = self.centralWidget.streamResponse
 
     def closeEvent(self, event):
         if self.standalone:
@@ -127,15 +130,58 @@ class DesktopAssistant(QMainWindow):
             self.hide()
 
     def initUI(self):
+        config.conversationStarted = False
         self.centralWidget = CentralWidget(self)
         self.setCentralWidget(self.centralWidget)
         self.resize(config.desktopAssistantWidth, config.desktopAssistantHeight)
-        # shortcuts
-        self.processResponse = self.centralWidget.processResponse
-        self.streamResponseGui = self.centralWidget.streamResponseGui
+        #
+        self.createMenubar()
 
     def resizeEvent(self, event):
         size = event.size()
         config.desktopAssistantWidth = size.width()
         config.desktopAssistantHeight = size.height()
         config.saveConfig()
+    
+    def printTextOutput(self, text):
+        self.centralWidget.addContent(f"\n{text}", False)
+
+    def createMenubar(self):
+        # Create a menu bar
+        menubar = self.menuBar()
+
+        # Create a File menu and add it to the menu bar
+        file_menu = menubar.addMenu("Chat")
+
+        new_action = QAction("New", self)
+        new_action.setShortcut("Ctrl+N")
+        new_action.triggered.connect(self.newConversation)
+        file_menu.addAction(new_action)
+
+        """new_action = QAction("Open", self)
+        new_action.setShortcut("Ctrl+O")
+        new_action.triggered.connect(self.openConversation)
+        file_menu.addAction(new_action)
+
+        new_action = QAction("Save", self)
+        new_action.setShortcut("Ctrl+S")
+        new_action.triggered.connect(self.saveConversation)
+        file_menu.addAction(new_action)
+
+        new_action = QAction("Save As...", self)
+        new_action.triggered.connect(self.saveAsConversation)
+        file_menu.addAction(new_action)
+
+        new_action = QAction("Export", self)
+        new_action.triggered.connect(self.exportConversation)
+        file_menu.addAction(new_action)
+
+        file_menu.addSeparator()"""
+
+    def newConversation(self):
+        config.toolmate.saveChat(config.currentMessages)
+        config.currentMessages = CallLLM.resetMessages()
+        self.centralWidget.contentView.setPlainText("")
+
+    def openConversation(self):
+        ...

@@ -227,10 +227,10 @@ class CallGroq:
 
     @staticmethod
     @check_llm_errors
-    def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None):
+    def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None, chat_model: Optional[str]=None):
         chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         return getGroqClient().chat.completions.create(
-            model=config.groqApi_main_model,
+            model=chat_model if chat_model is not None else config.groqApi_main_model,
             messages=chatMessages,
             n=1,
             temperature=temperature if temperature is not None else config.llmTemperature,

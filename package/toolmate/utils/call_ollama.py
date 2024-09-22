@@ -109,11 +109,11 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     @check_ollama_errors
-    def regularCall(messages: dict, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None):
+    def regularCall(messages: dict, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, chat_model: Optional[str]=None):
         chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         return getOllamaServerClient().chat(
             keep_alive=config.ollamaMainModel_keep_alive,
-            model=config.ollamaMainModel,
+            model=chat_model if chat_model is not None else config.ollamaMainModel,
             messages=chatMessages,
             stream=True,
             options=Options(

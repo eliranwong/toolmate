@@ -105,6 +105,7 @@ class Plugins:
     # display available tools
     @staticmethod
     def displayAvailableTools():
+        print("")
         config.toolTextOutput = "# Tools\n"
         tools = copy.deepcopy(config.builtinTools)
         for key, value in config.toolFunctionSchemas.items():
@@ -114,6 +115,7 @@ class Plugins:
             tool = f"@{key}: {value}"
             config.toolTextOutput += f"\n{tool}"
             print3(tool)
+        print("")
 
 class ToolStore:
 

@@ -496,6 +496,11 @@ def getDownloadedGgufModels() -> dict:
 
 # text
 
+def removeDuplicatedListItems(lst):
+    # remove duplicates and matain order
+    seen = set()
+    return [x for x in lst if not (x in seen or seen.add(x))]
+
 def displayLoadedMessages(messages):
     # display loaded messages
     print("")
@@ -544,6 +549,19 @@ def getAssistantPreviousResponse():
                 break
     if not content:
         print2("Previous response not found! Action cancelled!")
+    return (content, index)
+
+def getUserPreviousRequest():
+    index = 0
+    content = ""
+    for order, item in enumerate(reversed(config.currentMessages)):
+        if item.get("role", "") == "user":
+            content = item.get("content", "").strip()
+            if content:
+                index = (order + 1)*-1
+                break
+    if not content:
+        print2("Previous request not found! Action cancelled!")
     return (content, index)
 
 # Function to convert HTML to Markdown
@@ -657,7 +675,7 @@ Name={command}"""
 
 # tool selection
 
-def selectTool(search_result, closest_distance) -> Optional[int]:
+def selectTool_old(search_result, closest_distance) -> Optional[int]:
     if closest_distance <= config.tool_auto_selection_threshold:
         # auto
         return 0
@@ -680,6 +698,34 @@ def selectTool(search_result, closest_distance) -> Optional[int]:
         )
         if tool:
             return int(tool)
+    return None
+
+def selectTool(recommend_tools) -> Optional[str]:
+    if config.enable_auto_tool_selection:
+        # auto
+        return recommend_tools[0]
+    else:
+        # manual
+        tool_options = []
+        tool_descriptions = []
+        for i in recommend_tools:
+            tool_options.append(i)
+            tool_descriptions.append(i.replace("_", " "))
+        if not "chat" in recommend_tools:
+            tool_options.append("chat")
+            tool_descriptions.append("chat only")
+        tool_options.append("more")
+        tool_descriptions.append("more ...")
+        stopSpinning()
+        tool = TerminalModeDialogs(None).getValidOptions(
+            title="Tool Selection",
+            text="Select a tool:",
+            options=tool_options,
+            descriptions=tool_descriptions,
+            default=tool_options[0],
+        )
+        if tool:
+            return tool
     return None
 
 def selectEnabledTool() -> Optional[str]:

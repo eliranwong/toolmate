@@ -138,7 +138,8 @@ def main(tempInterface=""):
     for i in ("chats", "paths", "commands"):
         filepath = os.path.join(config.localStorage, "history", i)
         set_log_file_max_lines(filepath, 3000)
-    ToolMate().startChats()
+    config.toolmate = ToolMate()
+    config.toolmate.startChats()
     # Do the following tasks before exit
     # backup configurations
     config.saveConfig()

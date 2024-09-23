@@ -1,9 +1,10 @@
-from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, refinePath, displayLoadedMessages
-from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText
+from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, refinePath, displayLoadedMessages, removeDuplicatedListItems
+from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getUserPreviousRequest, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText
 from toolmate import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runToolMateCommand, displayPythonCode
 from toolmate.utils.call_llm import CallLLM
 from toolmate.utils.tool_plugins import ToolStore
 import threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy, pyperclip
+from flashtext import KeywordProcessor
 from typing import Optional
 from huggingface_hub import hf_hub_download
 from pathlib import Path
@@ -2255,7 +2256,7 @@ My writing:
             forceLoadingInternetSearches()
             chatOnly = True
         elif action == "recommend_tool":
-            print1("Sure, I will review all currently enabled tools before providing my recommendation.\n")
+            print1("Sure, I will review all currently enabled tools before providing my recommendation.")
             Plugins.displayAvailableTools()
             config.currentMessages[-1]["content"] = f"""Recommend which is the best `Tool` that can resolve `My Requests`. Each tool listed below is prefixed with "@" followed by their descriptions.
 
@@ -2264,7 +2265,16 @@ My writing:
 # My Request
 
 {description}"""
-            chatOnly = True
+            completion = CallLLM.regularCall(config.currentMessages)
+            self.streamCompletion(completion)
+            if config.enable_tool_selection_agent:
+                message, _ = getAssistantPreviousResponse()
+                recommendation = message.replace("\\", "")
+                keyword_processor = KeywordProcessor()
+                keyword_processor.add_keywords_from_list(config.toolPattern[2:-5].split("|"))
+                tools_found = removeDuplicatedListItems(keyword_processor.extract_keywords(recommendation))
+            
+            return None
         elif action == "copy_to_clipboard":
             pyperclip.copy(description)
             message = "Copied!"
@@ -2391,62 +2401,61 @@ My writing:
         return chatOnly
 
     def runSingleAction(self, action: str, description: str, gui: bool=False) -> bool:
-        return self.runSingleActionGui(action, description) if gui else self.runSingleActionTerminal(action, description)
-
-    def runSingleActionGui(self, action: str, description: str) -> bool:
-        chatOnly = self.processSingleAction(action, description)
-        if chatOnly is not None:
-            completion = CallLLM.runGeniusCall(config.currentMessages, chatOnly)
-            if completion is None:
-                return False
-            QtResponseStreamer(config.desktopAssistant).workOnCompletion(completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False)
-        return True
-
-    def runSingleActionTerminal(self, action: str, description: str) -> bool:
         chatOnly = self.processSingleAction(action, description)
         if chatOnly is not None:
             try:
-                # start spinning
-                config.stop_event = threading.Event()
-                config.spinner_thread = threading.Thread(target=spinning_animation, args=(config.stop_event,))
-                config.spinner_thread.start()
-
+                if not gui:
+                    # start spinning in tui
+                    config.stop_event = threading.Event()
+                    config.spinner_thread = threading.Thread(target=spinning_animation, args=(config.stop_event,))
+                    config.spinner_thread.start()
                 completion = CallLLM.runGeniusCall(config.currentMessages, chatOnly)
-                
-                # stop spinning
-                config.runPython = True
-                stopSpinning()
-
-                if completion is not None:
-                    # Create a new thread for the streaming task
-                    streamingWordWrapper = StreamingWordWrapper()
-                    streaming_event = threading.Event()
-                    self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False))
-                    # Start the streaming thread
-                    self.streaming_thread.start()
-
-                    # wait while text output is steaming; capture key combo 'ctrl+q' or 'ctrl+z' to stop the streaming
-                    streamingWordWrapper.keyToStopStreaming(streaming_event)
-
-                    # when streaming is done or when user press "ctrl+q"
-                    self.streaming_thread.join()
-
+                if not gui:
+                    # stop spinning in tui
+                    config.runPython = True
+                    stopSpinning()
             except:
                 stopSpinning()
+
                 trace = traceback.format_exc()
-                if "Please reduce the length of the messages or completion" in trace:
+                if "Please reduce the length of the messages or completion" in trace or "tokens" in trace:
                     print1("Maximum tokens reached!")
                 elif config.developer:
-                    print1(self.divider)
-                    print1(trace)
-                    print1(self.divider)
+                    print(self.divider)
+                    print(trace)
+                    print(self.divider)
                 else:
-                    print1("Error encountered!")
+                    print("Error encountered!")
 
-                config.defaultEntry = userInput
+                clear()
+                previousRequest, _ = getUserPreviousRequest()
+                config.defaultEntry = previousRequest
                 print2("starting a new chat!")
                 self.saveChat(config.currentMessages)
                 return False
+            return True if completion is None else self.streamCompletion(completion, gui)
+        return True
+
+    def streamCompletion(self, completion, gui: Optional[bool]=None) -> bool:
+        if gui is None:
+            gui = True if hasattr(config, "desktopAssistant") else False
+        try:
+            if gui:
+                QtResponseStreamer(config.desktopAssistant).workOnCompletion(completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False)
+            else:
+                # Create a new thread for the streaming task
+                streamingWordWrapper = StreamingWordWrapper()
+                streaming_event = threading.Event()
+                self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False))
+                # Start the streaming thread
+                self.streaming_thread.start()
+                # wait while text output is steaming; capture key combo 'ctrl+q' or 'ctrl+z' to stop the streaming
+                streamingWordWrapper.keyToStopStreaming(streaming_event)
+                # when streaming is done or when user press "ctrl+q"
+                self.streaming_thread.join()
+        except:
+            print(traceback.format_exc())
+            return False
         return True
 
     def runMultipleActions(self, content: str, gui: bool=False):

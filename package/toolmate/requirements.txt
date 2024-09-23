@@ -119,3 +119,4 @@ stable-diffusion-cpp-python
 pytz
 geopy
 psutil
+flashtext

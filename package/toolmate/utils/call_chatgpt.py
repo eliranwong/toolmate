@@ -1,4 +1,4 @@
-from toolmate import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution, useChatSystemMessage
+from toolmate import showErrors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution, useChatSystemMessage
 from toolmate import config
 from toolmate import print1, print2, print3, getDynamicTokens, selectTool, selectEnabledTool
 import re, traceback, openai, pprint, copy, textwrap, json, pygments
@@ -361,55 +361,16 @@ class CallChatGPT:
     # Auto Function Call equivalence
 
     @staticmethod
-    def runGeniusCall(messages: dict, chatOnly: bool = False):
-        user_request = messages[-1]["content"]
-        if config.enable_tool_selection_agent and config.enable_tool_screening_agent and config.tool_dependence > 0.0:
-            # 1. Intent Screening
-            chatOnly = True if chatOnly else CallChatGPT.isChatOnly(messages=messages)
-        if not config.selectedTool and (chatOnly or config.tool_dependence <= 0.0):
+    def runToolCall(messages: dict):
+        if not config.selectedTool:
             return CallChatGPT.regularCall(messages)
         else:
             # 2. Tool Selection
-            if config.selectedTool and config.selectedTool in config.toolFunctionSchemas:
+            if config.selectedTool and not config.selectedTool == "chat" and config.selectedTool in config.toolFunctionSchemas:
                 tool_name = config.selectedTool
                 tool_schema = config.toolFunctionSchemas[tool_name]
                 config.selectedTool = ""
             else:
-                if config.developer:
-                    print1("selecting tool ...")
-                tool_collection = get_or_create_collection(config.tool_store_client, "tools")
-                search_result = query_vectors(tool_collection, user_request, config.tool_selection_max_choices)
-                
-                # no tool is available; return a regular call instead
-                if not search_result:
-                    return CallChatGPT.regularCall(messages)
-
-                # check the closest distance
-                closest_distance = search_result["distances"][0][0]
-                
-                # when a tool is irrelevant
-                if closest_distance > config.tool_dependence:
-                    return CallChatGPT.regularCall(messages)
-
-                # auto or manual selection
-                selected_index = selectTool(search_result, closest_distance)
-                if selected_index is None:
-                    return CallChatGPT.regularCall(messages)
-                elif selected_index >= len(search_result["metadatas"][0]):
-                    tool_name = selectEnabledTool()
-                    semantic_distance = None
-                    if tool_name is None:
-                        return CallChatGPT.regularCall(messages)
-                else:
-                    semantic_distance = search_result["distances"][0][selected_index]
-                    metadatas = search_result["metadatas"][0][selected_index]
-                    tool_name = metadatas["name"]
-
-                tool_schema = config.toolFunctionSchemas[tool_name]
-                if config.developer:
-                    semantic_distance = "" if semantic_distance is None else f" ({semantic_distance})"
-                    print3(f"Selected: {tool_name}{semantic_distance}")
-            if tool_name == "chat":
                 return CallChatGPT.regularCall(messages)
             # 3. Parameter Extraction
             if config.developer:
@@ -468,35 +429,6 @@ class CallChatGPT:
                     return None
 
     @staticmethod
-    def isChatOnly(messages: dict) -> bool:
-        print2("```screening")
-        properties = {
-            "answer": {
-                "type": "string",
-                "description": """Evaluate my request to determine if you are able to resolve my request as a text-based AI:
-- Answer 'no' if you are asked to execute a computing task or an online search.
-- Answer 'no' if you are asked for updates / news / real-time information.
-- Answer 'yes' if the request is a greeting or translation.
-- Answer 'yes' only if you have full information to give a direct response.""",
-                "enum": ['yes', 'no'],
-            },
-        }
-        schema = {
-            "name": "screen_user_request",
-            "description": f'''Estimate user request''',
-            "parameters": {
-                "type": "object",
-                "properties": properties,
-                "required": ["code"],
-            },
-        }
-        output = CallChatGPT.getDictionaryOutput(messages, schema=schema)
-        chatOnly = True if "yes" in str(output).lower() else False
-        print3(f"""Tool may {"not " if chatOnly else ""}be required.""")
-        print2("```")
-        return chatOnly
-
-    @staticmethod
     def extractToolParameters(schema: dict, ongoingMessages: list = [], **kwargs) -> dict:
         """
         Extract action parameters
@@ -541,11 +473,11 @@ class CallLetMeDoIt:
 
     @staticmethod
     @check_openai_errors
-    def runGeniusCall(thisMessage, chatOnly=False):
+    def runToolCall(thisMessage):
         functionJustCalled = False
         def runThisCompletion(thisThisMessage):
             nonlocal functionJustCalled
-            if config.toolFunctionSchemas and not functionJustCalled and not chatOnly:
+            if config.toolFunctionSchemas and not functionJustCalled:
                 toolFunctionSchemas = [config.toolFunctionSchemas[config.selectedTool]] if config.selectedTool and config.selectedTool in config.toolFunctionSchemas else config.toolFunctionSchemas.values()
                 return config.oai_client.chat.completions.create(
                     model=config.chatGPTApiModel,

@@ -18,7 +18,7 @@ class Plugins:
         }
         config.predefinedInstructions = {}
         config.inputSuggestions = [
-            "@recommend_tool ",
+            "@recommend_tool ", # note: have to keep as the first tool
             "@command ",
             "@append_command ",
             "@append_instruction ",
@@ -84,6 +84,7 @@ class Plugins:
         # tool pattern
         toolNames = "|".join(config.toolFunctionMethods.keys())
         config.toolPattern = f"""@({"|".join(config.builtinTools.keys())}|{toolNames})[ \n]"""
+        config.allEnabledTools = list(config.builtinTools.keys())[1:] + list(config.toolFunctionMethods.keys()) # exclude the tool `recommend_tool`
 
     # integrate function call plugin
     @staticmethod
@@ -93,7 +94,7 @@ class Plugins:
             if not name in config.toolFunctionSchemas: # prevent duplicaiton
                 config.toolFunctionSchemas[name] = {key: value for key, value in signature.items() if not key in ("intent", "examples")}
                 config.toolFunctionMethods[name] = method
-                ToolStore.add_tool(signature)
+                print3(f"Adding tool: {name}")
                 if deviceInfo:
                     config.deviceInfoPlugins.append(name)
                 # input suggestions
@@ -104,45 +105,25 @@ class Plugins:
 
     # display available tools
     @staticmethod
-    def displayAvailableTools():
+    def checkAvailableTools(display=True, includeRequirements=False):
         print("")
         config.toolTextOutput = "# Tools\n"
         tools = copy.deepcopy(config.builtinTools)
         for key, value in config.toolFunctionSchemas.items():
-            tools[key] = value.get("description", "")
+            description = value.get("description", "")
+            if includeRequirements:
+                try:
+                    requirements = value["parameters"].get("required", [])
+                except:
+                    requirements = []
+                if requirements:
+                    description += f" (Requirements: {str(requirements)[1:-1]})"
+            tools[key] = description
         tools = dict(sorted(tools.items()))
         for key, value in tools.items():
             tool = f"@{key}: {value}"
             config.toolTextOutput += f"\n{tool}"
-            print3(tool)
-        print("")
-
-class ToolStore:
-
-    @staticmethod
-    def setupToolStoreClient():
-        tool_store = os.path.join(config.localStorage, "tool_store")
-        try:
-            shutil.rmtree(tool_store, ignore_errors=True)
-            print2("Old tool store removed!")
-        except:
-            print2("Failed to remove old tool store!")
-        Path(tool_store).mkdir(parents=True, exist_ok=True)
-        config.tool_store_client = chromadb.PersistentClient(tool_store, Settings(anonymized_telemetry=False))
-
-    @staticmethod
-    def add_tool(signature):
-        name, description, parameters = signature["name"], signature["description"], signature["parameters"]
-        print(f"Adding tool: {name}")
-        if "examples" in signature:
-            #description = description + "\n" + "\n".join(signature["examples"])
-            description = "\n".join(signature["examples"])
-        collection = get_or_create_collection(config.tool_store_client, "tools")
-        metadata = {
-            "name": name,
-            "parameters": json.dumps(parameters),
-        }
-        add_vector(collection, description, metadata)
-        # add input suggestions
-        if "examples" in signature:
-            config.inputSuggestions += signature["examples"]
+            if display:
+                print3(tool)
+        if display:
+            print("")

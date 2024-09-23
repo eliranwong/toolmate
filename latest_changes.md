@@ -1,3 +1,31 @@
+# Version 0.3.44-0.3.45
+
+* enhance Tool Selection Agent, read [Tool Selection Agent](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Selection%20Configurations.md)
+
+* Added an option for tool selection configurations, i.e.:
+
+`Would you like to inform the Tool Selection Agent of each tool's requirements? Doing so could improve the selection outcome, but it will consume more tokens and processing power.`
+
+* maintain backward compatibility to LetMeDoIt mode
+
+* optimised tool `@recommend_tool`
+
+# Version 0.3.42-0.3.43
+
+* get rid of old tool selection code to make launching faster
+
+# Version 0.3.41
+
+* implemented the new tool selection agent to all other backends
+
+* TODO: check backward compatibility of letmedoit mode
+
+# Version 0.3.40
+
+* brand new tool selection agent
+
+* implemented the new tool selection agent to Groq backend
+
 # Version 0.3.39
 
 * updated Ollama model list
@@ -128,7 +156,7 @@ For set up of Vertex AI Credentials, read https://github.com/eliranwong/toolmate
 
 * Added an option `config.enable_tool_screening_agent` to enable / disable tool-screening agent.
 
-* Added an option `config.enable_tool_selection_agent` to enable / disable tool-selection agent.
+* Added an option `config.tool_selection_agent` to enable / disable tool-selection agent.
 
 # Version: 0.3.09
 

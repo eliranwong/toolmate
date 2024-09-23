@@ -32,6 +32,8 @@ Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/d
 
 # Distinctive Features
 
+[NEW! Tool Selection Agent](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Selection%20Configurations.md)
+
 [NEW! Deep Reflection Agents](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Reflection%20Agents.md)
 
 [NEW! Running Multiple Tools in One Go](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md)
@@ -60,7 +62,13 @@ Tips:
 * `@execute_computing_task` is like a magic tool designed to execute computing tasks upon user requests.
 * `@recommend_tool` is designed to help users to find an appropriate tool to resolve a given request.
 
-# A Few Screenshots
+# Selectie Screenshots
+
+## Brand New Tool Selection Agent
+
+![tool_selection_agent_compressed](https://github.com/user-attachments/assets/c963ca48-cb01-4eb7-b40d-57e2a4a92eaf)
+
+[Read more ...](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Selection%20Configurations.md)
 
 ## Multiple Tools in One Go
 

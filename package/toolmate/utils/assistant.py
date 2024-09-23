@@ -1,8 +1,7 @@
 from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, refinePath, displayLoadedMessages, removeDuplicatedListItems
-from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, setToolDependence, tokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getUserPreviousRequest, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText
-from toolmate import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runToolMateCommand, displayPythonCode
+from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, tokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getUserPreviousRequest, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText
+from toolmate import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runToolMateCommand, displayPythonCode, selectTool
 from toolmate.utils.call_llm import CallLLM
-from toolmate.utils.tool_plugins import ToolStore
 import threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy, pyperclip
 from flashtext import KeywordProcessor
 from typing import Optional
@@ -59,7 +58,6 @@ class ToolMate:
     def setup(self):
         config.currentMessages = []
         # set up tool store client
-        ToolStore.setupToolStoreClient()
 
         self.models = list(tokenLimits.keys())
         config.divider = self.divider = "--------------------"
@@ -149,7 +147,7 @@ class ToolMate:
             #".chatmodel": ("change chat-only model", self.setChatbot),
 
             ".plugins": ("change plugins", self.selectPlugins),
-            ".tools": ("change tool configurations", self.setToolSelectionConfigs),
+            ".tools": ("configure tool selection agent", self.setToolSelectionConfigs),
             #".maxautocorrect": ("change maximum consecutive auto-correction", self.setMaxAutoCorrect), # joined ".tools"
             ".managerisk": ("manage code execution risk", self.manageCodeExecutionRisk), # joined ".tools"
             ".context": ("change default predefined context", None),
@@ -959,96 +957,63 @@ class ToolMate:
 
     def configureToolSelectionAgent(self) -> bool:
         options = ("yes", "no")
-        question = "Would you like our built-in tool selection agent to choose the appropriate tools for resolving your requests?\nRemarks: You can always manually call a tool by entering a tool name prefixed with `@`.\nRead https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Selection%20Configurations.md"
+        question = "Would you like our built-in tool selection agent to choose the appropriate tools for resolving your requests?\nRemarks: You can manually call a specific tool at any time by entering a tool name prefixed with `@`."
         print1(question)
-        enable_tool_selection_agent = self.dialogs.getValidOptions(
+        tool_selection_agent = self.dialogs.getValidOptions(
             options=options,
             title="Enable Tool Selection Agent",
-            default="yes" if config.enable_tool_selection_agent else "no",
+            default="yes" if config.tool_selection_agent else "no",
             text=question,
         )
-        if enable_tool_selection_agent:
-            if enable_tool_selection_agent == "yes":
-                config.enable_tool_selection_agent = True
+        if tool_selection_agent:
+            if tool_selection_agent == "yes":
+                config.tool_selection_agent = True
                 return True
             else:
-                config.enable_tool_selection_agent = False
+                config.tool_selection_agent = False
         return False
 
-    def configureToolScreeningAgent(self) -> bool:
+    def configureToolSelectionRequirements(self) -> bool:
         options = ("yes", "no")
-        question = "Would you like our built-in tool-screening agent to suggest if a tool is required for your requests?"
+        question = "Would you like to inform the Tool Selection Agent of each tool's requirements? Doing so could improve the selection outcome, but it will consume more tokens and processing power."
         print1(question)
-        enable_tool_screening_agent = self.dialogs.getValidOptions(
+        tool_selection_requirements = self.dialogs.getValidOptions(
             options=options,
-            title="Enable Tool Screening Agent",
-            default="yes" if config.enable_tool_screening_agent else "no",
+            title="Include Tool Requirements",
+            default="yes" if config.tool_selection_requirements else "no",
             text=question,
         )
-        if enable_tool_screening_agent:
-            if enable_tool_screening_agent == "yes":
-                config.enable_tool_screening_agent = True
+        if tool_selection_requirements:
+            if tool_selection_requirements == "yes":
+                config.tool_selection_requirements = True
                 return True
             else:
-                config.enable_tool_screening_agent = False
+                config.tool_selection_requirements = False
+        return False
+
+    def configureAutoToolSelection(self) -> bool:
+        options = ("yes", "no")
+        question = "Would you like to automatically use the first recommended tool suggested by our built-in tool selection agent?"
+        print1(question)
+        auto_tool_selection = self.dialogs.getValidOptions(
+            options=options,
+            title="Enable Automatic Tool Selection",
+            default="yes" if config.auto_tool_selection else "no",
+            text=question,
+        )
+        if auto_tool_selection:
+            if auto_tool_selection == "yes":
+                config.auto_tool_selection = True
+                return True
+            else:
+                config.auto_tool_selection = False
         return False
 
     def setToolSelectionConfigs(self):
         self.configureToolSelectionAgent()
-        if not config.enable_tool_selection_agent:
-            return None
-        if config.llmInterface in ("ollama", "llamacpp", "llamacppserver", "groq", "gemini", "chatgpt"):
-            self.configureToolScreeningAgent()
-        print2(config.divider)
-        self.setMaxAutoCorrect()
-        print2(config.divider)
-        print2("# Tool Selection Configurations")
-        print2("ToolMate AI extends LLM capabilities via tool plugins. You can either specify particular tool(s) or rely on ToolMate AI to choose a tool for you for each request. When you enter a prompt, without specifiying a particular tool, ToolMate AI searches for suitable tools from its tool store. This search involves finding similarities between the user query and the examples provided in the tool plugins. Users have the flexibility to customize the tool selection process by adjusting the following three key configurations:")
-        print2("""1) tool_dependence
-2) tool_auto_selection_threshold
-3) tool_selection_max_choices""")
-        print1("\nWe will guide you step-by-step to configure each of these settings ...\n")
-        print2("# Tool Dependence. The value of 'tool_dependence' determines how you want to rely on tools.")
-        print1("Acceptable range: 0.0 - 1.0")
-        print1("A value of 0.0 indicates that tools are disabled. ToolMate's responses are totally based on capabilities of the selected LLM.")
-        print1("A value of 1.0 indicates that tools always apply for each response.")
-        print1("A value between 0.0 and 0.1 indicates that a tool is selected only when tool distance search is less than or equal to its value.")
-        print1("Therefore, you are more likely to use tools when you set a higher value.")
-        print2("Please enter a value between 0.0 and 1.0 to set its value:")
-        tool_dependence = self.prompts.simplePrompt(style=self.prompts.promptStyle2, validator=FloatValidator(), default=str(config.tool_dependence))
-        if tool_dependence and not tool_dependence.strip().lower() == config.exit_entry:
-            tool_dependence = float(tool_dependence)
-            if tool_dependence < 0:
-                tool_dependence = 0.0
-            elif tool_dependence > 1:
-                tool_dependence = 1.0
-            config.tool_dependence = tool_dependence
-            print3(f"Tool Dependence: {tool_dependence}")
-        print2("# Tool Auto Selection Threshold. The value of 'tool_auto_selection_threshold' determines the threshold of automatic tool selection.")
-        print3("Remarks: `Tool Auto Selection Threshold` does not apply to running multiple tools for a single request. Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md")
-        print1("Acceptable range: 0.0 - [the value of tool_dependence]")
-        print1("A value of 0.0 indicates that automatic tool selection is disabled. Users must manually choose a tool from the most relevant options identified in each tool search.")
-        print1("A value that is equal to or larger than the value of 'tool_dependence' indicates that tool selection is always automatic.")
-        print1("A value between 0.0 and the value of 'tool_dependence' indicates that tool selection is only automatic when its value is larger than or equal to the tool search distance. Users need to choose a tool from the most relevant options in case automatic tool selection is not applied and tool search distance is less than or equal to the value of tool_dependence.")
-        print2(f"Please enter a value between 0.0 and {config.tool_dependence} to set its value:")
-        tool_auto_selection_threshold = self.prompts.simplePrompt(style=self.prompts.promptStyle2, validator=FloatValidator(), default=str(config.tool_auto_selection_threshold))
-        if tool_auto_selection_threshold and not tool_auto_selection_threshold.strip().lower() == config.exit_entry:
-            tool_auto_selection_threshold = float(tool_auto_selection_threshold)
-            if tool_auto_selection_threshold < 0:
-                tool_auto_selection_threshold = 0.0
-            elif tool_auto_selection_threshold > config.tool_dependence:
-                tool_auto_selection_threshold = config.tool_dependence
-            config.tool_auto_selection_threshold = tool_auto_selection_threshold
-            print3(f"Tool Auto Selection Threshold: {tool_auto_selection_threshold}")
-        print2("# Tool Selection Max Choices. The value of 'tool_selection_max_choices' determines the maximum number of available options for manual tool selection.")
-        print3("Remarks: `Tool Selection Max Choices` does not apply to running multiple tools for a single request. Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md")
-        print1("Default value: 4")
-        print2("Please enter a number for this value:")
-        tool_selection_max_choices = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.tool_selection_max_choices))
-        if tool_selection_max_choices and not tool_selection_max_choices.strip().lower() == config.exit_entry:
-            config.tool_selection_max_choices = int(tool_selection_max_choices)
-            print3(f"Tool Selection Max Choices: {tool_selection_max_choices}")
-        config.saveConfig()
+        if config.tool_selection_agent:
+            self.configureToolSelectionRequirements()
+            self.configureAutoToolSelection()
 
     def selectLlmPlatform(self):
         instruction = "Select an AI platform:"
@@ -1383,7 +1348,7 @@ class ToolMate:
             ),
             title="Groq Model",
             default=config.groqApi_chat_model if feature == "chat" else config.groqApi_main_model,
-            text="Select a function call model:\n(for both chat and task execution)",
+            text=f"Select a {'chat' if feature=='chat' else 'tool'} call model:\n(for {'conversations only' if feature=='chat' else 'both chat and task execution'})",
         )
         if model:
             if feature == "default":
@@ -1398,7 +1363,7 @@ class ToolMate:
             options=models,
             title="Gemini Models",
             default=config.gemini_model if config.gemini_model in models else models[0],
-            text="Select a function call model:\n(for both chat and task execution)",
+            text="Select a tool call model:\n(for both chat and task execution)",
         )
         if model:
             config.gemini_model = model
@@ -1411,7 +1376,7 @@ class ToolMate:
             options=self.models,
             title="ChatGPT Model",
             default=config.chatGPTApiModel if config.chatGPTApiModel in self.models else self.models[0],
-            text="Select a function call model:\n(for both chat and task execution)",
+            text="Select a tool call model:\n(for both chat and task execution)",
         )
         if model:
             config.chatGPTApiModel = model
@@ -1991,7 +1956,7 @@ class ToolMate:
                         overwrite = self.dialogs.getValidOptions(
                             options=options,
                             title="Overwrite?",
-                            default="yes" if config.enable_tool_screening_agent else "no",
+                            default="no",
                             text=question,
                         )
                         if not overwrite == "yes":
@@ -2079,7 +2044,7 @@ class ToolMate:
                                 overwrite = self.dialogs.getValidOptions(
                                     options=options,
                                     title="Overwrite?",
-                                    default="yes" if config.enable_tool_screening_agent else "no",
+                                    default="no",
                                     text=question,
                                 )
                                 if not overwrite == "yes":
@@ -2202,7 +2167,7 @@ My writing:
                     print(f"```\n{writing}\n```")
         return writing
 
-    def processSingleAction(self, action: str, description: str) -> Optional[bool]:
+    def processSingleAction(self, action: str, description: str, gui: bool=False) -> Optional[bool]:
         config.selectedTool = ""
         config.toolTextOutput = ""
 
@@ -2213,6 +2178,12 @@ My writing:
                 except:
                     print1("Unable to load internet resources.")
                     showErrors()
+
+        # backward compatibility to LetMeDoIt Mode
+        # tool_selection_agent applies only to backends other than LetMeDoIt Mode
+
+        if action == "recommend_tool" and config.llmInterface == "letmedoit":
+            action == "chat"
 
         # append chat
         if action == "append_instruction":
@@ -2254,10 +2225,10 @@ My writing:
         if action == "chat":
             # chat feature only
             forceLoadingInternetSearches()
-            chatOnly = True
+            runLLM = True
         elif action == "recommend_tool":
-            print1("Sure, I will review all currently enabled tools before providing my recommendation.")
-            Plugins.displayAvailableTools()
+            print1("Sure, I am reviewing all currently enabled tools before providing my recommendation ...")
+            Plugins.checkAvailableTools(display=False, includeRequirements=config.tool_selection_requirements)
             config.currentMessages[-1]["content"] = f"""Recommend which is the best `Tool` that can resolve `My Requests`. Each tool listed below is prefixed with "@" followed by their descriptions.
 
 {config.toolTextOutput}
@@ -2267,13 +2238,20 @@ My writing:
 {description}"""
             completion = CallLLM.regularCall(config.currentMessages)
             self.streamCompletion(completion)
-            if config.enable_tool_selection_agent:
+            if config.tool_selection_agent:
                 message, _ = getAssistantPreviousResponse()
                 recommendation = message.replace("\\", "")
                 keyword_processor = KeywordProcessor()
-                keyword_processor.add_keywords_from_list(config.toolPattern[2:-5].split("|"))
-                tools_found = removeDuplicatedListItems(keyword_processor.extract_keywords(recommendation))
-            
+                keyword_processor.add_keywords_from_list(config.allEnabledTools)
+                recommended_tools = removeDuplicatedListItems(keyword_processor.extract_keywords(recommendation))
+                if config.auto_tool_selection:
+                    selectedTool = recommended_tools[0]
+                else:
+                    selectedTool = selectTool(recommended_tools)
+                if selectedTool:
+                    action = selectedTool
+                    config.currentMessages = config.currentMessages[:-2]
+                    self.runSingleAction(action, description, gui)
             return None
         elif action == "copy_to_clipboard":
             pyperclip.copy(description)
@@ -2392,24 +2370,24 @@ My writing:
                 # notify devloper
                 #if config.developer:
                 #    print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Calling tool</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{config.selectedTool}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
-                chatOnly = False
+                runLLM = True
             else:
                 # no tool is specified
                 config.selectedTool = ""
                 forceLoadingInternetSearches()
-                chatOnly = False if config.enable_tool_selection_agent else True
-        return chatOnly
+                runLLM = True
+        return runLLM
 
     def runSingleAction(self, action: str, description: str, gui: bool=False) -> bool:
-        chatOnly = self.processSingleAction(action, description)
-        if chatOnly is not None:
+        runLLM = self.processSingleAction(action, description, gui)
+        if runLLM is not None:
             try:
                 if not gui:
                     # start spinning in tui
                     config.stop_event = threading.Event()
                     config.spinner_thread = threading.Thread(target=spinning_animation, args=(config.stop_event,))
                     config.spinner_thread.start()
-                completion = CallLLM.runGeniusCall(config.currentMessages, chatOnly)
+                completion = CallLLM.runToolCall(config.currentMessages)
                 if not gui:
                     # stop spinning in tui
                     config.runPython = True
@@ -2465,7 +2443,7 @@ My writing:
         if not actions:
             if content.strip():
                 # pass to built-in screening or tool-check operations
-                complete = self.runSingleAction("", content, gui)
+                complete = self.runSingleAction("recommend_tool" if config.tool_selection_agent else "chat", content, gui)
                 if not complete:
                     return False
         else:
@@ -2623,9 +2601,6 @@ My writing:
             elif userInputLower.startswith(".") and not userInputLower in (config.exit_entry, config.cancel_entry, ".new", ".context"):
                 userInput = userInputLower = self.runActions("...", userInput)
 
-            if setToolDependence(userInput):
-                continue
-
             # replace alias, if any, with full entry
             for alias, fullEntry in config.aliases.items():
                 #userInput = re.sub(alias, fullEntry, userInput) # error on Windows coz of Windows path
@@ -2646,7 +2621,7 @@ My writing:
                     pass
 
             if userInput == "@":
-                Plugins.displayAvailableTools()
+                Plugins.checkAvailableTools(display=True, includeRequirements=True)
                 continue
 
             # try eval

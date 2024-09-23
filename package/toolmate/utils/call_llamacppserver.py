@@ -1,6 +1,6 @@
-from toolmate import showErrors, get_or_create_collection, query_vectors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution, useChatSystemMessage
+from toolmate import showErrors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution, useChatSystemMessage
 from toolmate import config
-from toolmate import print1, print2, print3, selectTool, check_llm_errors, toParameterSchema, extractPythonCode, selectEnabledTool, getLlamacppServerClient
+from toolmate import print1, print2, print3, check_llm_errors, toParameterSchema, extractPythonCode, getLlamacppServerClient
 import re, traceback, pprint, copy, textwrap, json, pygments
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit import print_formatted_text, HTML
@@ -264,56 +264,17 @@ class CallLlamaCppServer:
 
     # Auto Function Call equivalence
     @staticmethod
-    def runGeniusCall(messages: dict, chatOnly: bool = False):
+    def runToolCall(messages: dict):
         user_request = messages[-1]["content"]
-        if config.enable_tool_selection_agent and config.enable_tool_screening_agent and config.tool_dependence > 0.0:
-            # 1. Intent Screening
-            chatOnly = True if chatOnly else CallLlamaCppServer.isChatOnly(user_request=user_request)
-        if not config.selectedTool and (chatOnly or config.tool_dependence <= 0.0):
+        if not config.selectedTool:
             return CallLlamaCppServer.regularCall(messages)
         else:
             # 2. Tool Selection
-            if config.selectedTool and config.selectedTool in config.toolFunctionSchemas:
+            if config.selectedTool and not config.selectedTool == "chat" and config.selectedTool in config.toolFunctionSchemas:
                 tool_name = config.selectedTool
                 tool_schema = config.toolFunctionSchemas[tool_name]
                 config.selectedTool = ""
             else:
-                if config.developer:
-                    print1("selecting tool ...")
-                tool_collection = get_or_create_collection(config.tool_store_client, "tools")
-                search_result = query_vectors(tool_collection, user_request, config.tool_selection_max_choices)
-                
-                # no tool is available; return a regular call instead
-                if not search_result:
-                    return CallLlamaCppServer.regularCall(messages)
-
-                # check the closest distance
-                closest_distance = search_result["distances"][0][0]
-                
-                # when a tool is irrelevant
-                if closest_distance > config.tool_dependence:
-                    return CallLlamaCppServer.regularCall(messages)
-
-                # auto or manual selection
-                selected_index = selectTool(search_result, closest_distance)
-                if selected_index is None:
-                    return CallLlamaCppServer.regularCall(messages)
-                elif selected_index >= len(search_result["metadatas"][0]):
-                    tool_name = selectEnabledTool()
-                    semantic_distance = None
-                    if tool_name is None:
-                        return CallLlamaCppServer.regularCall(messages)
-                else:
-                    semantic_distance = search_result["distances"][0][selected_index]
-                    metadatas = search_result["metadatas"][0][selected_index]
-                    tool_name = metadatas["name"]
-                
-                tool_schema = config.toolFunctionSchemas[tool_name]
-
-                if config.developer:
-                    semantic_distance = "" if semantic_distance is None else f" ({semantic_distance})"
-                    print3(f"Selected: {tool_name}{semantic_distance}")
-            if tool_name == "chat":
                 return CallLlamaCppServer.regularCall(messages)
             # 3. Parameter Extraction
             if config.developer:
@@ -360,59 +321,6 @@ Supplementary information:
                     config.toolTextOutput = ""
                     config.conversationStarted = True
                     return None
-
-    @staticmethod
-    def isChatOnly(user_request: str) -> bool:
-        print2("```screening")
-        try:
-            chat_completion = getLlamacppServerClient().chat.completions.create(
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are a text-based language model that evaluate the nature of my request and tell me whether you can resolve it with full confidence. Output your answer in JSON. Your answer can only be either 'yes' or 'no'.",
-                    },
-                    {
-                        "role": "user",
-                        "content": f"""Answer either 'yes' or 'no' in JSON format, in response to my request:
-<request>
-{user_request}
-</request>
-
-Question: Tell me honesly whether you are able to resolve the above request?
-- Answer 'no' if you are asked to execute a computing task or an online search.
-- Answer 'no' if you are asked for updates / news / real-time information.
-- Answer 'yes' if the request is a greeting or translation.
-- Answer 'yes' only if you have full information to give a direct response.
-
-Remember, answer either 'yes' or 'no' in JSON, without extra information.""",
-                    },
-                ],
-                model="toolmate",
-                temperature=0,
-                max_tokens=20,
-                stream=False,
-                response_format={
-                    "type": "json_object",
-                    "schema": {
-                        "type": "object",
-                        "properties": {"answer": {"type": "string"}},
-                        "required": ["answer"],
-                    },
-                },
-                stop=config.customToolServer_stop,
-                timeout=config.customToolServer_timeout,
-                **config.customToolServer_additional_options,
-            )
-            answer = json.loads(chat_completion.choices[0].message.content)["answer"]
-        except:
-            # in case JSON output is failed
-            print3("Error: Unable to complete screening!")
-            answer = "no"
-        #print(answer) # check
-        answer = True if "yes" in str(answer).lower() else False
-        print3(f"""Comment: Tool may {"not " if answer else ""}be required.""")
-        print2("```")
-        return answer
 
     @staticmethod
     def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], temperature: Optional[float]=None, max_tokens: Optional[int]=None) -> dict:

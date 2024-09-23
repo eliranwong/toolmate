@@ -1,5 +1,5 @@
-from toolmate import getDeviceInfo, showErrors, get_or_create_collection, query_vectors, toGeminiMessages, executeToolFunction, extractPythonCode, useChatSystemMessage
-from toolmate import print1, print2, print3, selectTool, getPythonFunctionResponse, isValidPythodCode, selectEnabledTool
+from toolmate import getDeviceInfo, showErrors, toGeminiMessages, executeToolFunction, extractPythonCode
+from toolmate import print1, print2, print3, getPythonFunctionResponse, isValidPythodCode
 from toolmate import config
 from prompt_toolkit import prompt
 import traceback, os, json, pprint, copy, datetime, codecs
@@ -210,57 +210,19 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     # Auto Function Call equivalence
 
     @staticmethod
-    def runGeniusCall(messages: dict, chatOnly: bool = False):
+    def runToolCall(messages: dict):
         user_request = messages[-1]["content"]
-        if config.enable_tool_selection_agent and config.enable_tool_screening_agent and config.tool_dependence > 0.0:
-            # 1. Intent Screening
-            chatOnly = True if chatOnly else CallGemini.isChatOnly(messages=messages, user_request=user_request)
-        if not config.selectedTool and (chatOnly or config.tool_dependence <= 0.0):
+        if not config.selectedTool:
             return CallGemini.regularCall(messages)
         else:
             # 2. Tool Selection
-            if config.selectedTool and config.selectedTool in config.toolFunctionSchemas:
+            if config.selectedTool and not config.selectedTool == "chat" and config.selectedTool in config.toolFunctionSchemas:
                 tool_name = config.selectedTool
                 tool_schema = config.toolFunctionSchemas[tool_name]
                 config.selectedTool = ""
             else:
-                if config.developer:
-                    print1("selecting tool ...")
-                tool_collection = get_or_create_collection(config.tool_store_client, "tools")
-                search_result = query_vectors(tool_collection, user_request, config.tool_selection_max_choices)
-                
-                # no tool is available; return a regular call instead
-                if not search_result:
-                    return CallGemini.regularCall(messages)
-
-                # check the closest distance
-                closest_distance = search_result["distances"][0][0]
-                
-                # when a tool is irrelevant
-                if closest_distance > config.tool_dependence:
-                    return CallGemini.regularCall(messages)
-
-                # auto or manual selection
-                selected_index = selectTool(search_result, closest_distance)
-                if selected_index is None:
-                    return CallGemini.regularCall(messages)
-                elif selected_index >= len(search_result["metadatas"][0]):
-                    tool_name = selectEnabledTool()
-                    semantic_distance = None
-                    if tool_name is None:
-                        return CallGemini.regularCall(messages)
-                else:
-                    semantic_distance = search_result["distances"][0][selected_index]
-                    metadatas = search_result["metadatas"][0][selected_index]
-                    tool_name = metadatas["name"]
-
-                tool_schema = config.toolFunctionSchemas[tool_name]
-                if config.developer:
-                    semantic_distance = "" if semantic_distance is None else f" ({semantic_distance})"
-                    print3(f"Selected: {tool_name}{semantic_distance}")            
-            if tool_name == "chat":
                 return CallGemini.regularCall(messages)
-            elif tool_name in config.deviceInfoPlugins:
+            if tool_name in config.deviceInfoPlugins:
                 user_request = f"""Context: Today is {config.dayOfWeek}. The current date and time here in {config.state}, {config.country} is {str(datetime.datetime.now())}.
 {user_request}"""
             # 3. Parameter Extraction
@@ -304,44 +266,6 @@ Your response:
                     config.toolTextOutput = ""
                     config.conversationStarted = True
                     return None
-
-    @staticmethod
-    def isChatOnly(messages: dict, user_request: str) -> bool:
-        print2("```screening")
-        deviceInfo = f"""\n\nMy device information:\n{getDeviceInfo()}""" if config.includeDeviceInfoInContext else ""
-        properties = {
-            "answer": {
-                "type": "string",
-                "description": """Evaluate my request to determine if you are able to resolve my request as a text-based AI:
-- Answer 'no' if you are asked to execute a computing task or an online search.
-- Answer 'no' if you are asked for updates / news / real-time information.
-- Answer 'yes' if the request is a greeting or translation.
-- Answer 'yes' only if you have full information to give a direct response.""",
-                "enum": ['yes', 'no'],
-            },
-        }
-        schema = {
-            "name": "screen_user_request",
-            "description": f'''Estimate user request''',
-            "parameters": {
-                "type": "object",
-                "properties": properties,
-                "required": ["code"],
-            },
-        }
-        userMessage = f"""Answer either 'yes' or 'no', to tell if you are able to resolve my request below as a text-based AI:
-
-<request>
-{user_request}{deviceInfo}
-</request>"""
-
-        history, *_ = toGeminiMessages(messages=messages)
-
-        output = CallGemini.getDictionaryOutput(history, schema=schema, userMessage=userMessage)
-        chatOnly = True if "yes" in str(output).lower() else False
-        print3(f"""Tool may {"not " if chatOnly else ""}be required.""")
-        print2("```")
-        return chatOnly
 
     @staticmethod
     def extractToolParameters(schema: dict, userInput: str, ongoingMessages: list = [], **kwargs) -> dict:

@@ -30,12 +30,13 @@ defaultSettings = (
     ('text2art_font1', 'cybermedum'),
     ('text2art_font2', 'white_bubble'),
     ('llmInterface', ""), # "llamacpp", "llamacppserver", "ollama", "gemini", "chatgpt", "letmedoit", "groq"
-    ('enable_tool_screening_agent', False), # set True to increase both reliability and waiting time
-    ('enable_tool_selection_agent', False),
-    ('enable_auto_tool_selection', False), 
-    ('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools
-    ('tool_auto_selection_threshold', 0.5), # range: 0.0 - 1.0; tool auto selection is implemented when the closest tool match has a semantic distance lower than its value; manual selection from top matched tools is implemented when the closest distance fall between its value and tool_dependence
-    ('tool_selection_max_choices', 4), # when tool search distance is higher than tool_auto_selection_threshold but lower than or equal to tool_dependence, manual selection implemented among the top matched tools.  This value specifies the maximum number of choices for manual tool selection in such cases.
+    ('tool_selection_agent', True), # automatically screens user request and recommend tools, can also be manually triggered by tool `@recommend_tool`
+    ('tool_selection_requirements', False), # convey each tool's requirements to the tool selection agent for the tool selection process.
+    ('auto_tool_selection', False), # apply only if tool_selection_agent is set to True
+    #('enable_tool_screening_agent', False), # set True to increase both reliability and waiting time
+    #('tool_dependence', 0.8), # range: 0.0 - 1.0; 0.0 means model's its own capabilities; 1.0; use at least one function call plugin among available tools
+    #('tool_auto_selection_threshold', 0.5), # range: 0.0 - 1.0; tool auto selection is implemented when the closest tool match has a semantic distance lower than its value; manual selection from top matched tools is implemented when the closest distance fall between its value and tool_dependence
+    #('tool_selection_max_choices', 4), # when tool search distance is higher than tool_auto_selection_threshold but lower than or equal to tool_dependence, manual selection implemented among the top matched tools.  This value specifies the maximum number of choices for manual tool selection in such cases.
     ('tokenizers_parallelism', 'true'), # 'true' / 'false'
     ('includeDeviceInfoInContext', False),
     ('includeIpInDeviceInfo', False),
@@ -289,6 +290,7 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "allEnabledTools",
     "toolmate",
     "chatGui",
     "builtinTools",

@@ -66,6 +66,8 @@ Our recent developments, for example, [the ability to run multiple tools in a si
 
 [Tool Calling for Any LLMs](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Function%20Call%20Approach%20with%20Any%20LLMs.md)
 
+[Tool Selection Agent](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Selection%20Configurations.md)
+
 [Deep Reflection Agents](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Reflection%20Agents.md)
 
 [Running Multiple Tools in One Go](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md)

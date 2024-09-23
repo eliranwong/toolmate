@@ -4,9 +4,9 @@ class CallLlamaFile:
     # not workable yet; may not support it
 
     @staticmethod
-    def runGeniusCall(messages: dict, chatOnly: bool = False):
+    def runToolCall(messages: dict, chatOnly: bool = False):
         user_request = messages[-1]["content"]
-        if config.enable_tool_selection_agent and config.enable_tool_screening_agent and config.tool_dependence > 0.0:
+        if config.tool_selection_agent and config.enable_tool_screening_agent and config.tool_dependence > 0.0:
             # 1. Intent Screening
             if config.developer:
                 print1("screening ...")

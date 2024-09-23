@@ -21,7 +21,6 @@ from bs4 import BeautifulSoup
 from urllib.parse import quote
 from guidance import select, gen
 from typing import Union
-from transformers import pipeline
 from groq import Groq
 from ollama import Client
 import speech_recognition as sr
@@ -109,6 +108,7 @@ import sounddevice
 # transformers
 
 def classify(user_input, candidate_labels):
+    from transformers import pipeline
     classifier = pipeline(task="zero-shot-classification", model=config.zero_shot_classification_model)
     response = classifier(
         user_input,
@@ -675,46 +675,21 @@ Name={command}"""
 
 # tool selection
 
-def selectTool_old(search_result, closest_distance) -> Optional[int]:
-    if closest_distance <= config.tool_auto_selection_threshold:
+def selectTool(recommended_tools) -> Optional[str]:
+    if config.auto_tool_selection:
         # auto
-        return 0
+        return recommended_tools[0]
     else:
         # manual
         tool_options = []
         tool_descriptions = []
-        for index, item in enumerate(search_result["metadatas"][0]):
-            tool_options.append(str(index))
-            tool_descriptions.append(item["name"].replace("_", " "))
-        tool_options.append(str(len(search_result["metadatas"][0])))
-        tool_descriptions.append("more ...")
-        stopSpinning()
-        tool = TerminalModeDialogs(None).getValidOptions(
-            title="Tool Selection",
-            text="Select a tool:",
-            options=tool_options,
-            descriptions=tool_descriptions,
-            default=tool_options[0],
-        )
-        if tool:
-            return int(tool)
-    return None
-
-def selectTool(recommend_tools) -> Optional[str]:
-    if config.enable_auto_tool_selection:
-        # auto
-        return recommend_tools[0]
-    else:
-        # manual
-        tool_options = []
-        tool_descriptions = []
-        for i in recommend_tools:
+        for i in recommended_tools:
             tool_options.append(i)
             tool_descriptions.append(i.replace("_", " "))
-        if not "chat" in recommend_tools:
+        if not "chat" in recommended_tools:
             tool_options.append("chat")
             tool_descriptions.append("chat only")
-        tool_options.append("more")
+        tool_options.append("xxxmorexxx")
         tool_descriptions.append("more ...")
         stopSpinning()
         tool = TerminalModeDialogs(None).getValidOptions(
@@ -725,13 +700,13 @@ def selectTool(recommend_tools) -> Optional[str]:
             default=tool_options[0],
         )
         if tool:
-            return tool
+            return selectEnabledTool() if tool == "xxxmorexxx" else tool
     return None
 
 def selectEnabledTool() -> Optional[str]:
     tool_options = []
     tool_descriptions = []
-    for name in config.toolFunctionSchemas:
+    for name in config.allEnabledTools:
         tool_options.append(name)
         tool_descriptions.append(name.replace("_", " "))
     stopSpinning()
@@ -742,7 +717,7 @@ def selectEnabledTool() -> Optional[str]:
         descriptions=tool_descriptions,
         default=tool_options[0],
     )
-    return tool
+    return tool if tool else None
 
 # connectivity
 
@@ -1611,35 +1586,3 @@ def toggleoutputaudio():
     config.ttsOutput = not config.ttsOutput
     config.saveConfig()
     print3(f"Output Audio: '{'enabled' if config.ttsOutput else 'disabled'}'!")
-
-def setToolDependence(entry: Any) -> bool:
-    """
-    A quick way to change config.tool_dependence and config.tool_auto_selection_threshold
-    """
-    try:
-        splits = entry.split("!", 1)
-        if len(splits) == 2:
-            tool_dependence, tool_auto_selection_threshold = splits
-        else:
-            tool_dependence = entry
-            tool_auto_selection_threshold = None
-        tool_dependence = float(tool_dependence)
-        if 0 <= tool_dependence <=1.0:
-            config.tool_dependence = tool_dependence
-            print3(f"Tool dependence changed to: {tool_dependence}")
-
-            if tool_auto_selection_threshold is not None:
-                tool_auto_selection_threshold = float(tool_auto_selection_threshold)
-                if 0 <= tool_auto_selection_threshold <=1.0:
-                    config.tool_auto_selection_threshold = tool_auto_selection_threshold
-            else:
-                # 3/4 of config.tool_dependence
-                config.tool_auto_selection_threshold = round(config.tool_dependence * 5/8, 5)
-            print3(f"Tool auto selection threshold changed to: {config.tool_auto_selection_threshold}")
-
-            config.saveConfig()
-
-            return True
-    except:
-        pass
-    return False

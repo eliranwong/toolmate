@@ -153,18 +153,18 @@ Always remember that you are much more than a text-based AI. You possess both vi
         return CallLetMeDoIt.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
 
     @staticmethod
-    def runGeniusCall(messages, chatOnly=False):
+    def runToolCall(messages):
         if config.llmInterface == "ollama":
-            return CallOllama.runGeniusCall(messages, chatOnly)
+            return CallOllama.runToolCall(messages)
         elif config.llmInterface == "groq":
-            return CallGroq.runGeniusCall(messages, chatOnly)
+            return CallGroq.runToolCall(messages)
         elif config.llmInterface == "llamacppserver":
-            return CallLlamaCppServer.runGeniusCall(messages, chatOnly)
+            return CallLlamaCppServer.runToolCall(messages)
         elif config.llmInterface == "llamacpp":
-            return CallLlamaCpp.runGeniusCall(messages, chatOnly)
+            return CallLlamaCpp.runToolCall(messages)
         elif config.llmInterface == "gemini":
-            return CallGemini.runGeniusCall(messages, chatOnly)
+            return CallGemini.runToolCall(messages)
         elif config.llmInterface == "chatgpt":
-            return CallChatGPT.runGeniusCall(messages, chatOnly)
+            return CallChatGPT.runToolCall(messages)
         # letmedoit
-        return CallLetMeDoIt.runGeniusCall(messages, chatOnly)
+        return CallLetMeDoIt.runToolCall(messages)

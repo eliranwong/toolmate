@@ -19,8 +19,8 @@ In essence, no existing solution matches the capabilities of OpenAI's function c
 
 This novel strategy involves breaking down the function calling process into several distinct steps for multiple generations:
 
-1. Intent Screening via [Tool Screening Agent](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Selection%20Configurations.md#tool-screening-agent)
-2. Tool Selection via [Tool Selection Agent](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Selection%20Configurations.md#tool-selection-agent)
+1. Intent Screening via [Tool Selection Agent](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Selection%20Configurations.md)
+2. Tool Selection via [Tool Selection Agent](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Selection%20Configurations.md)
 3. Retrival of Structured Data
 4. Tool Execution
 5. Chat Extension

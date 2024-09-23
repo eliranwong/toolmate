@@ -1,3 +1,9 @@
+# Version 0.3.46
+
+* unload Ollama model when a chat session is finished or the app exits.
+
+* updated two Ollama plugins
+
 # Version 0.3.44-0.3.45
 
 * enhance Tool Selection Agent, read [Tool Selection Agent](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Selection%20Configurations.md)

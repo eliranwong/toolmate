@@ -3,7 +3,7 @@ from toolmate import config
 import os, shutil, argparse, pyperclip
 from pathlib import Path
 
-from toolmate import updateApp, configFile
+from toolmate import updateApp, configFile, getOllamaServerClient
 from toolmate.utils.assistant import ToolMate
 from prompt_toolkit.shortcuts import set_title, clear_title
 
@@ -155,6 +155,9 @@ def main(tempInterface=""):
     # clear title
     clear_title()
 
+    if config.llmInterface == "ollama":
+        getOllamaServerClient().generate(model=config.ollamaMainModel, keep_alive=0, stream=False,)
+        print(f"Ollama model '{config.ollamaMainModel}' unloaded!")
     if hasattr(config, "llamacppMainModel"):
         del config.llamacppMainModel
 

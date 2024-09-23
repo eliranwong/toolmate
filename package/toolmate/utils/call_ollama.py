@@ -109,10 +109,19 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     @check_ollama_errors
+    def unloadModels(model=None):
+        if model is None:
+            getOllamaServerClient().generate(model=config.ollamaMainModel, keep_alive=0, stream=False,)
+            #print(f"'{config.ollamaMainModel}' unloaded!")
+        else:
+            getOllamaServerClient().generate(model=model, keep_alive=0)
+
+    @staticmethod
+    @check_ollama_errors
     def regularCall(messages: dict, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, chat_model: Optional[str]=None):
         chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         return getOllamaServerClient().chat(
-            keep_alive=config.ollamaMainModel_keep_alive,
+            keep_alive=0 if chat_model is not None and not chat_model == config.ollamaMainModel else config.ollamaMainModel_keep_alive,
             model=chat_model if chat_model is not None else config.ollamaMainModel,
             messages=chatMessages,
             stream=True,

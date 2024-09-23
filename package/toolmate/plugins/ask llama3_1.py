@@ -6,14 +6,22 @@ Ask Llama2 for information
 [FUNCTION_CALL]
 """
 
-
 from toolmate import config
+from toolmate import print2
 from toolmate.ollamachat import OllamaChat
+#from toolmate.utils.ollama_models import ollama_models
+
+from toolmate.utils.call_ollama import CallOllama
 
 def ask_llama3_1(function_args):
-    query = function_args.get("query") # required
+    model = "llama3.1"
     config.stopSpinning()
-    OllamaChat().run(query, model="llama3.1", once=True)
+    query = function_args.get("query") # required
+    config.currentMessages[-1] = {"role": "user", "content": query}
+    completion = CallOllama.regularCall(config.currentMessages, chat_model=model)
+    config.toolmate.streamCompletion(completion)
+    if not model == config.ollamaMainModel:
+        CallOllama.unloadModels(model)
     return ""
 
 functionSignature = {

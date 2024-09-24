@@ -154,23 +154,8 @@ Please answer my question, based on the context given above."""
 
         streamingWordWrapper = StreamingWordWrapper()
 
-        try:
-            completion = CallLLM.regularCall(messages)
-
-            # Create a new thread for the streaming task
-            streaming_event = threading.Event()
-            self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False))
-            # Start the streaming thread
-            self.streaming_thread.start()
-
-            # wait while text output is steaming; capture key combo 'ctrl+q' or 'ctrl+z' to stop the streaming
-            streamingWordWrapper.keyToStopStreaming(streaming_event)
-
-            # when streaming is done or when user press "ctrl+q"
-            self.streaming_thread.join()
-        except:
-            print(traceback.format_exc())
-            self.streaming_thread.join()
+        completion = CallLLM.regularCall(messages)
+        config.toolmate.streamCompletion(completion)
         
         return ""
 

@@ -1,3 +1,7 @@
+# Version 0.3.48
+
+* added risk assessment agent to safeguard from running harmful system command.
+
 # Version 0.3.47
 
 * added gui support to a few plugins

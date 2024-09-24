@@ -9,20 +9,18 @@ Ask Google Codey for information about coding
 
 from toolmate import config
 import vertexai
-from vertexai.language_models import ChatModel, ChatMessage
+from vertexai.language_models import CodeChatModel, ChatMessage
 
 def ask_codey(function_args):
     config.stopSpinning()
     query = function_args.get("query") # required
     config.currentMessages[-1] = {"role": "user", "content": query}
 
-    model = ChatModel.from_pretrained("codechat-bison-32k")
+    model = CodeChatModel.from_pretrained("codechat-bison-32k")
     # https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/text-chat
     parameters = {
         "temperature": config.llmTemperature,  # Temperature controls the degree of randomness in token selection; 0.0–1.0; Default: 0.0
         "max_output_tokens": 2048,  # Token limit determines the maximum amount of text output; 1–2048; Default: 1024
-        "top_p": 0.95,  # Tokens are selected from most probable to least until the sum of their probabilities equals the top_p value; 0.0–1.0; Default: 0.95
-        "top_k": 40,  # A top_k of 1 means the selected token is the most probable among all tokens; 1-40; Default: 40
     }
     history = []
     user = True
@@ -45,10 +43,12 @@ def ask_codey(function_args):
         #],
     )
 
-    completion = chat.send_message_streaming(query, **parameters)
-    config.toolmate.streamCompletion(completion, openai=False)
-    #response = chat.send_message(query, **parameters)
-    #answer = response.text.strip()
+    response = chat.send_message(query, **parameters)
+    config.toolTextOutput = response.text.strip()
+    if hasattr(config, "desktopAssistant"):
+        config.desktopAssistant.printTextOutput(config.toolTextOutput)
+    else:
+        print(config.toolTextOutput)
     return ""
 
 functionSignature = {

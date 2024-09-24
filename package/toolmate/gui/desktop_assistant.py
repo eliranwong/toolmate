@@ -143,8 +143,8 @@ class DesktopAssistant(QMainWindow):
         config.desktopAssistantHeight = size.height()
         config.saveConfig()
     
-    def printTextOutput(self, text):
-        self.centralWidget.addContent(f"\n{text}", False)
+    def printTextOutput(self, output):
+        self.centralWidget.addContent(output, False)
 
     def createMenubar(self):
         # Create a menu bar

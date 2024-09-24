@@ -36,6 +36,8 @@ Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/d
 
 [NEW! Deep Reflection Agents](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Reflection%20Agents.md)
 
+[NEW! Risk Management Agent](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Risk%20Management%20Agent.md)
+
 [NEW! Running Multiple Tools in One Go](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md)
 
 [Tool Calling for Any LLMs](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Function%20Call%20Approach%20with%20Any%20LLMs.md)

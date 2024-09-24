@@ -1,6 +1,6 @@
 from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, refinePath, displayLoadedMessages, removeDuplicatedListItems
 from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, tokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getUserPreviousRequest, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText
-from toolmate import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runToolMateCommand, displayPythonCode, selectTool
+from toolmate import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runToolMateCommand, displayPythonCode, selectTool, showRisk, confirmExecution
 from toolmate.utils.call_llm import CallLLM
 import threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy, pyperclip
 from flashtext import KeywordProcessor
@@ -14,6 +14,7 @@ from toolmate.utils.ollama_models import ollama_models
 #from pygments.lexers.shell import BashLexer
 #from pygments.lexers.markup import MarkdownLexer
 #from prompt_toolkit.formatted_text import PygmentsTokens
+from prompt_toolkit import prompt
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.completion import WordCompleter, FuzzyCompleter, NestedCompleter, ThreadedCompleter
@@ -76,6 +77,7 @@ class ToolMate:
         config.getWrappedHTMLText = self.getWrappedHTMLText
         config.addPredefinedContext = self.addPredefinedContext
         config.improveWriting = self.improveWriting
+        config.generateSystemCommand = self.generateSystemCommand
         config.convertRelativeDateTime = self.convertRelativeDateTime
         config.launchPager = self.launchPager
         config.changeOpenweathermapApi = self.changeOpenweathermapApi
@@ -2142,6 +2144,57 @@ My writing:
                     print(f"```\n{writing}\n```")
         return writing
 
+    def generateSystemCommand(self, request: str):
+        instruction = f"""# Instructions
+
+* Generate a system command line to resolve `My Request` given below.
+* Remember, provide me with the generated system command line ONLY, without additional notes or explanations.
+* Enclose the system command line with triple backticks ``` at the beginning and at the end of the command line in your output.
+
+# My Request
+
+{request}"""
+        cli = CallLLM.getSingleChatResponse(instruction)
+        if cli := cli.strip():
+            cli = cli[3:-3] if cli.startswith("```") and cli.endswith("```") else re.sub("^.*?```(.*?)```.*?$", r"\1", cli)
+        if config.developer:
+            print2(f"```command")
+            print(cli)
+            print2(f"```")
+        return cli
+
+    def riskAssessment(self, content: str, target="python code"):
+        instruction = f"""# Instructions
+
+* You are a senior {target} engineer.
+* Assess the risk level (high / medium / low) of damaging my device upon executing the `{target.capitalize()}` that I will provide for you. For examples, file deletions or similar significant impacts are regarded as ```high``` level.
+* Enclose the risk level with triple backticks ```
+* Answer me either ```high``` or ```medium``` or ```low``` ONLY, without additional notes or explanations.
+
+Acess the risk level of the following `{target.capitalize()}`:
+
+# {target.capitalize()}
+
+{content}"""
+        risk = CallLLM.getSingleChatResponse(instruction)
+        if risk := risk.strip():
+            risk = risk[3:-3] if risk.startswith("```") and risk.endswith("```") else re.sub("^.*?```(.*?)```.*?$", r"\1", risk)
+        if "high" in risk:
+            risk = "high"
+        elif "medium" in risk:
+            risk = "medium"
+        elif "low" in risk:
+            risk = "low"
+        else:
+            risk = "high"
+        showRisk(risk)
+        if confirmExecution(risk):
+            print1("Do you want to continue? [y]es / [N]o")
+            confirmation = prompt(style=config.promptStyle2, default="y")
+            if not confirmation.lower() in ("y", "yes"):
+                return ""
+        return risk
+
     def convertRelativeDateTime(self, writing: str):
         # Feature: improve writing:
         if writing:
@@ -2328,37 +2381,61 @@ My writing:
             return None
         elif action == "command":
             stdout, stderr = subprocess.Popen(description, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-            if stdout:
+            if stderr and not stdout:
+                cli = self.generateSystemCommand(description)
+                if risk := self.riskAssessment(cli, target="system command"):
+                    stdout, stderr = subprocess.Popen(cli, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+            # refine description
+            description = f'''Run system command:\n```command\n{description}\n```'''
+            config.currentMessages[-1]["content"] = description
+            if stderr and not risk:
+                done = "Cancelled!"
+                config.currentMessages.append({"role": "assistant", "content": done})
+                print2(done)
+            elif stdout:
                 print2("\n```output")
                 print(stdout.strip())
                 print2("```\n")
-                description = f'''Run the following command:\n```command\n{description}\n```'''
-                config.currentMessages[-1]["content"] = description
                 config.currentMessages.append({"role": "assistant", "content": stdout.strip()})
-            else:
-                if stderr:
-                    print2("\n```error")
-                    print(stderr.strip())
-                    print2("```\n")
+            elif not stdout and not stderr:
+                done = "Done!"
+                config.currentMessages.append({"role": "assistant", "content": done})
+                print2(done)
+            elif stderr:
+                print2("\n```error")
+                print(stderr.strip())
+                print2("```\n")
                 config.currentMessages = config.currentMessages[:-1]
             return None
         elif action == "append_command":
             previousResponse = getAssistantPreviousResponse()[0]
             if previousResponse:
                 previousResponse = previousResponse.replace('"', '\\"')
-                stdout, stderr = subprocess.Popen(f'''{description.strip()} "{previousResponse}"''', shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-                if stdout:
+                description = f'''{description.strip()} "{previousResponse}"'''
+                stdout, stderr = subprocess.Popen(description, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                if stderr and not stdout:
+                    cli = self.generateSystemCommand(description)
+                    if risk := self.riskAssessment(cli, target="system command"):
+                        stdout, stderr = subprocess.Popen(cli, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                description = f'''Run system command:\n```command\n{description}\n```'''
+                config.currentMessages[-1]["content"] = description
+                if stderr and not risk:
+                    done = "Cancelled!"
+                    config.currentMessages.append({"role": "assistant", "content": done})
+                    print2(done)
+                elif stdout:
                     print2("\n```output")
                     print(stdout.strip())
                     print2("```\n")
-                    description = f'''Run the following command:\n```command\n{description}\n```'''
-                    config.currentMessages[-1]["content"] = description
                     config.currentMessages.append({"role": "assistant", "content": stdout.strip()})
-                else:
-                    if stderr:
-                        print2("\n```error")
-                        print(stderr.strip())
-                        print2("```\n")
+                elif not stdout and not stderr:
+                    done = "Done!"
+                    config.currentMessages.append({"role": "assistant", "content": done})
+                    print2(done)
+                elif stderr:
+                    print2("\n```error")
+                    print(stderr.strip())
+                    print2("```\n")
                     config.currentMessages = config.currentMessages[:-1]
             else:
                 config.currentMessages = config.currentMessages[:-1]

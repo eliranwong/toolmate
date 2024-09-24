@@ -13,13 +13,13 @@ class CallLlamaCppServer:
     @staticmethod
     def riskAssessment(code):
         content = f"""You are a senior python engineer.
-    Assess the risk level of damaging my device upon executing the python code that I will provide for you.
-    Answer me either 'high', 'medium' or 'low', without giving me any extra information.
-    e.g. file deletions or similar significant impacts are regarded as 'high' level.
-    Acess the risk level of this Python code:
-    ```
-    {code}
-    ```"""
+Assess the risk level of damaging my device upon executing the python code that I will provide for you.
+Answer me either 'high', 'medium' or 'low', without giving me any extra information.
+e.g. file deletions or similar significant impacts are regarded as 'high' level.
+Acess the risk level of this Python code:
+```
+{code}
+```"""
         try:
             answer = CallLlamaCppServer.getSingleChatResponse(content, temperature=0.0)
             if not answer:

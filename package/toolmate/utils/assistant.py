@@ -2414,17 +2414,19 @@ My writing:
             return True if completion is None else self.streamCompletion(completion, gui)
         return True
 
-    def streamCompletion(self, completion, gui: Optional[bool]=None) -> bool:
+    def streamCompletion(self, completion, gui: Optional[bool]=None, openai: Optional[bool]=None) -> bool:
         if gui is None:
             gui = True if hasattr(config, "desktopAssistant") else False
+        if openai is None:
+            openai = True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False
         try:
             if gui:
-                QtResponseStreamer(config.desktopAssistant).workOnCompletion(completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False)
+                QtResponseStreamer(config.desktopAssistant).workOnCompletion(completion, openai)
             else:
                 # Create a new thread for the streaming task
                 streamingWordWrapper = StreamingWordWrapper()
                 streaming_event = threading.Event()
-                self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False))
+                self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, openai))
                 # Start the streaming thread
                 self.streaming_thread.start()
                 # wait while text output is steaming; capture key combo 'ctrl+q' or 'ctrl+z' to stop the streaming

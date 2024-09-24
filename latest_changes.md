@@ -1,3 +1,7 @@
+# Version 0.3.47
+
+* added gui support to a few plugins
+
 # Version 0.3.46
 
 * unload Ollama model when a chat session is finished or the app exits.

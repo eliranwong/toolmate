@@ -8,13 +8,14 @@ Ask ChatGPT for conversation only; no function calling
 
 
 from toolmate import config
-from toolmate.llamacpp import LlamacppChat
+from toolmate.utils.call_llamacpp import CallLlamaCpp
 
 def ask_llamacpp(function_args):
     config.stopSpinning()
     query = function_args.get("query") # required
-    config.currentMessages = config.currentMessages[:-1]
-    LlamacppChat().run(query, once=True)
+    config.currentMessages[-1] = {"role": "user", "content": query}
+    completion = CallLlamaCpp.regularCall(config.currentMessages)
+    config.toolmate.streamCompletion(completion, openai=False)
     return ""
 
 functionSignature = {

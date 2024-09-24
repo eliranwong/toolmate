@@ -8,12 +8,14 @@ Ask Google Gemini Pro for information
 
 
 from toolmate import config
-from toolmate.geminipro import GeminiPro
+from toolmate.utils.call_gemini import CallGemini
 
 def ask_gemini(function_args):
     config.stopSpinning()
     query = function_args.get("query") # required
-    GeminiPro(temperature=config.llmTemperature).run(query, once=True)
+    config.currentMessages[-1] = {"role": "user", "content": query}
+    completion = CallGemini.regularCall(config.currentMessages)
+    config.toolmate.streamCompletion(completion, openai=False)
     return ""
 
 functionSignature = {

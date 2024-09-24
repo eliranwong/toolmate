@@ -8,13 +8,14 @@ Ask llama.cpp server Model for conversation only; no function calling
 
 
 from toolmate import config
-from toolmate.llamacppserver import LlamacppServerChat
+from toolmate.utils.call_llamacppserver import CallLlamaCppServer
 
 def ask_llamacppserver(function_args):
     config.stopSpinning()
     query = function_args.get("query") # required
-    config.currentMessages = config.currentMessages[:-1]
-    LlamacppServerChat().run(query, once=True)
+    config.currentMessages[-1] = {"role": "user", "content": query}
+    completion = CallLlamaCppServer.regularCall(config.currentMessages)
+    config.toolmate.streamCompletion(completion, openai=True)
     return ""
 
 functionSignature = {

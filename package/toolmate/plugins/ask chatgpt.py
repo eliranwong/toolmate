@@ -8,13 +8,14 @@ Ask ChatGPT for conversation only; no function calling
 
 
 from toolmate import config
-from toolmate.chatgpt import ChatGPT
+from toolmate.utils.call_chatgpt import CallChatGPT
 
 def ask_chatgpt(function_args):
     config.stopSpinning()
     query = function_args.get("query") # required
-    config.currentMessages = config.currentMessages[:-1]
-    ChatGPT().run(query, once=True)
+    config.currentMessages[-1] = {"role": "user", "content": query}
+    completion = CallChatGPT.regularCall(config.currentMessages)
+    config.toolmate.streamCompletion(completion, openai=True)
     return ""
 
 functionSignature = {

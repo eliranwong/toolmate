@@ -7,11 +7,7 @@ Ask Ollama Chat for information
 """
 
 from toolmate import config
-from toolmate import print2
-from toolmate.ollamachat import OllamaChat
 #from toolmate.utils.ollama_models import ollama_models
-
-
 from toolmate.utils.call_ollama import CallOllama
 
 def ask_ollama(function_args):
@@ -19,7 +15,7 @@ def ask_ollama(function_args):
     query = function_args.get("query") # required
     config.currentMessages[-1] = {"role": "user", "content": query}
     completion = CallOllama.regularCall(config.currentMessages, chat_model=config.ollamaChatModel if config.useAdditionalChatModel else None)
-    config.toolmate.streamCompletion(completion)
+    config.toolmate.streamCompletion(completion, openai=False)
     if config.useAdditionalChatModel and not config.ollamaChatModel == config.ollamaMainModel:
         CallOllama.unloadModels(config.ollamaChatModel)
     return ""

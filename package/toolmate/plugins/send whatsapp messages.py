@@ -3,7 +3,7 @@ ToolMate AI Plugin - send whatsapp messages
 
 send whatsapp messages
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config

@@ -3,7 +3,7 @@ ToolMate AI Plugin - create images flux
 
 generate images with model "Flux.1"
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, print2, print3, getCurrentDateTime, getCliOutput, getCpuThreads

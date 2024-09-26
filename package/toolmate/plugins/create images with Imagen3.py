@@ -3,7 +3,7 @@ ToolMate AI Plugin - create images
 
 generate images with model "Google Imagen 3"
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, print3, getCurrentDateTime

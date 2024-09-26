@@ -3,7 +3,7 @@ ToolMate AI Plugin - remove image background
 
 Remove image background
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, is_valid_image_file

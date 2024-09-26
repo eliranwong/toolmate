@@ -3,7 +3,7 @@ ToolMate AI Plugin - ask Gemma
 
 Ask Google Gemma for information
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 

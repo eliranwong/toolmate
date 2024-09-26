@@ -3,7 +3,7 @@ ToolMate AI Plugin - ask groq
 
 Ask Groq Model for conversation only; no function calling
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 

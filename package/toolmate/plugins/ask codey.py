@@ -3,7 +3,7 @@ ToolMate AI Plugin - ask Codey
 
 Ask Google Codey for information about coding
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 

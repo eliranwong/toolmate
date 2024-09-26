@@ -3,7 +3,7 @@ ToolMate AI Plugin - ask gemini pro
 
 Ask Google Gemini Pro for information
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 

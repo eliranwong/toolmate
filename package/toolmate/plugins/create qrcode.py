@@ -3,7 +3,7 @@ ToolMate AI Plugin - create qr code
 
 Create qr code image
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config

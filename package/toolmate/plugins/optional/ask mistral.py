@@ -3,7 +3,7 @@ ToolMate AI Plugin - ask Mistral
 
 Ask Mistral for information
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 

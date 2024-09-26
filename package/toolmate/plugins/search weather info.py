@@ -3,7 +3,7 @@ ToolMate AI Plugin - search weather info
 
 search for weather information
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 if not config.openweathermapApi:

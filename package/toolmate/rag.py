@@ -1,5 +1,5 @@
 import os
-from toolmate import config, print2, print3, getUnstructuredFiles, get_or_create_collection, add_vector, query_vectors, refinePath, ragSearchContext, ragRefineDocsPath, ragGetSplits
+from toolmate import config, print2, print3, getUnstructuredFiles, get_or_create_collection, add_vector, query_vectors, refinePath, ragSearchContext, ragRefineDocsPath, ragGetSplits, getRagPrompt
 from toolmate.utils.call_llm import CallLLM
 import os, traceback, re, datetime, traceback, threading, shutil, chromadb
 from chromadb.config import Settings
@@ -58,17 +58,7 @@ class RAG:
                 formatted_context = fileObj.read()
 
         # format prompt
-        formatted_prompt = f"""Question:
-<question>
-{query}
-</question>
-
-Context:
-<context>
-{formatted_context}
-</context>
-
-Please answer my question, based on the context given above."""
+        formatted_prompt = getRagPrompt(query, formatted_context)
 
         if hasattr(config, "currentMessages"):
             messages = config.currentMessages[:-1] + [{"role": "user", "content" : formatted_prompt}]

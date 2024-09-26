@@ -3,7 +3,7 @@ ToolMate AI Plugin - create images
 
 generate images with model "dall-e-3"
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, print2, print3, getCurrentDateTime, getCliOutput, getCpuThreads, downloadStableDiffusionFiles

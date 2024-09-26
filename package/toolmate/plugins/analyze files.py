@@ -3,14 +3,15 @@ ToolMate AI Plugin - analyze files
 
 analyze files with integrated "AutoGen Retriever"
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 
-from toolmate import config, is_valid_image_file, ragRefineDocsPath, ragGetSplits, ragSearchContext
+from toolmate import config, is_valid_image_file, ragRefineDocsPath, ragGetSplits, ragSearchContext, getRagPrompt
 from toolmate import print2, print3
-import os
+from toolmate.utils.call_llm import CallLLM
 from toolmate.autoretriever import AutoGenRetriever
+import os
 #from PIL import Image
 
 
@@ -37,17 +38,7 @@ def analyze_files(function_args):
 
             retrievedContext = ragSearchContext(ragGetSplits(ragRefineDocsPath(files)), query)
 
-            formatted_prompt = f"""Question:
-<question>
-{query}
-</question>
-
-Context:
-<context>
-{retrievedContext}
-</context>
-
-Please answer my question, based on the context given above."""
+            formatted_prompt = getRagPrompt(query, retrievedContext)
 
             messages = config.currentMessages[:-1] + [{"role": "user", "content" : formatted_prompt}]
 

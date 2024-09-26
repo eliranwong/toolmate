@@ -3,7 +3,7 @@ ToolMate AI Plugin - create maps
 
 Create maps
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, print3

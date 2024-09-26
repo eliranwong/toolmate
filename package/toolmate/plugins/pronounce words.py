@@ -3,7 +3,7 @@ ToolMate AI Plugin - pronunce words
 
 pronunce words
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 try:

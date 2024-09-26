@@ -3,7 +3,7 @@ ToolMate AI Plugin - ask llama.cpp server
 
 Ask llama.cpp server Model for conversation only; no function calling
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 

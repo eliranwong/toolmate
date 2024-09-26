@@ -3,7 +3,7 @@ ToolMate AI Plugin - modify images
 
 modify the given images according to changes specified by users
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, is_valid_image_file, is_valid_image_url, print1, print3, startLlamacppVisionServer, stopLlamacppVisionServer, print2, encode_image, getCliOutput, getCpuThreads, runToolMateCommand, getLlamacppServerClient, downloadStableDiffusionFiles

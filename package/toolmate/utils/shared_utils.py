@@ -1568,11 +1568,11 @@ def getEmbeddingFunction(embeddingModel=None):
 
 # chromadb
 
-def get_or_create_collection(client, collection_name):
+def get_or_create_collection(client, collection_name, embeddingModel=None):
     collection = client.get_or_create_collection(
         name=collection_name,
         metadata={"hnsw:space": "cosine"},
-        embedding_function=getEmbeddingFunction(),
+        embedding_function=getEmbeddingFunction(embeddingModel=embeddingModel),
     )
     return collection
 
@@ -1643,7 +1643,7 @@ def ragRefineDocsPath(docs_path) -> Optional[list]:
     # return refined paths
     return docs_path
 
-def ragGetSplits(docs_path):
+def ragGetSplits(docs_path, chunk_size=1000, chunk_overlap=200):
     # https://python.langchain.com/docs/integrations/providers/unstructured
     loader = UnstructuredLoader(docs_path) # file_path: Union[str, List[str]]
     doc = loader.load()
@@ -1654,7 +1654,7 @@ def ragGetSplits(docs_path):
     #print(doc)
 
     #chunk it
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200, add_start_index=True)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap, add_start_index=True)
     splits = text_splitter.split_documents(doc)
     #print(splits)
     return splits
@@ -1714,3 +1714,34 @@ hf = HuggingFaceEmbeddings(
 Chromadb
 https://cookbook.chromadb.dev/embeddings/gpu-support/
 """
+
+def getRagPrompt(query, retrievedContext):
+    return f"""Question:
+<question>
+{query}
+</question>
+
+Context:
+<context>
+{retrievedContext}
+</context>
+
+Please answer my question, based on the context given above."""
+
+#from toolmate import config, get_or_create_collection, add_vector, ragRefineDocsPath, ragGetSplits
+#from pathlib import Path
+#from chromadb.config import Settings
+import chromadb
+
+def getHelpCollection(vectorStore=None):
+    vectorStore = vectorStore if vectorStore else os.path.join(config.toolMateAIFolder, "help")
+    Path(vectorStore).mkdir(parents=True, exist_ok=True)
+    chroma_client = chromadb.PersistentClient(vectorStore, Settings(anonymized_telemetry=False))
+    return get_or_create_collection(chroma_client, "help", embeddingModel="all-mpnet-base-v2")
+
+def buildHelpStore():
+    collection = getHelpCollection()
+    docs_path = ragRefineDocsPath(os.path.join(config.toolMateAIFolder, "docs"))
+    splits = ragGetSplits(docs_path)
+    for i in splits:
+        add_vector(collection, i.page_content, metadata={"source": i.metadata.get("source")[0]})

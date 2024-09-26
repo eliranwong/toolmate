@@ -5,7 +5,7 @@ Save and retrieve memory
 
 modified from source: https://medium.com/@simon_attard/building-a-memory-layer-for-gpt-using-function-calling-da17d66920d0
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, get_or_create_collection, add_vector, query_vectors

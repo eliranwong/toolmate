@@ -3,7 +3,7 @@ ToolMate AI Plugin - search chat records
 
 search and open old chat records
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, get_or_create_collection, add_vector, query_vectors, showErrors, displayLoadedMessages

@@ -4,7 +4,7 @@ ToolMate AI Plugin - execute termux command
 
 execute termux command
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, showRisk, confirmExecution, getPygmentsStyle, showErrors

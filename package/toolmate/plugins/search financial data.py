@@ -3,7 +3,7 @@ ToolMate AI Plugin - search financial data
 
 search financial data with yfinance
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config

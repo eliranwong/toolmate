@@ -3,7 +3,7 @@ ToolMate AI Plugin - open web browser
 
 open a url with default web browser
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, openURL

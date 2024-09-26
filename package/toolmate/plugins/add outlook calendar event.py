@@ -9,7 +9,7 @@ supported calendars:
 * google calendar
 * outlook calendar
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 """

@@ -3,12 +3,13 @@ ToolMate AI Plugin - analyze web content
 
 analyze web content with "AutoGen Retriever"
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 
 from toolmate import config
-from toolmate import print1, print2, print3, is_valid_url, downloadWebContent, ragRefineDocsPath, ragGetSplits, ragSearchContext
+from toolmate import print1, print2, print3, is_valid_url, downloadWebContent, ragRefineDocsPath, ragGetSplits, ragSearchContext, getRagPrompt
+from toolmate.utils.call_llm import CallLLM
 from toolmate.autoretriever import AutoGenRetriever
 
 def analyze_web_content(function_args):
@@ -41,17 +42,7 @@ def analyze_web_content(function_args):
 
         retrievedContext = ragSearchContext(ragGetSplits(ragRefineDocsPath(filename)), query)
 
-        formatted_prompt = f"""Question:
-<question>
-{query}
-</question>
-
-Context:
-<context>
-{retrievedContext}
-</context>
-
-Please answer my question, based on the context given above."""
+        formatted_prompt = getRagPrompt(query, retrievedContext)
 
         messages = config.currentMessages[:-1] + [{"role": "user", "content" : formatted_prompt}]
 

@@ -5,7 +5,7 @@ ToolMate AI Plugin - download youtube or web content
 
 * download Youtube audio and convert it into mp3
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, showErrors, isCommandInstalled, print1, print3, is_valid_url, downloadWebContent

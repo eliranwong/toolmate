@@ -3,7 +3,7 @@ ToolMate AI Plugin - search latest news
 
 search latest news
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config

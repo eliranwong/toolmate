@@ -13,7 +13,7 @@ functionalities:
 User can define the maximum number of auto-correctioning attempts by editing "max_consecutive_auto_correction" in config.py.
 The default value of config.max_consecutive_auto_correction is 3.
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 def correct_python_code(function_args):

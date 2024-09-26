@@ -18,7 +18,7 @@ Platform: chaptgpt, letmedoit
 Model "gpt-4o"
 Reference: https://platform.openai.com/docs/guides/vision
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url, encode_image, runToolMateCommand, getLlamacppServerClient

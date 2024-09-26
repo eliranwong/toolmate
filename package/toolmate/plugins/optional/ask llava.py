@@ -3,7 +3,7 @@ ToolMate AI Plugin - ask LLava
 
 Ask LLava for information
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 

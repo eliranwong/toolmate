@@ -1,3 +1,9 @@
+# Version 0.3.54
+
+* added a help vector store for searching documentations
+
+* added a tool `@help` to search for offline documentations
+
 # Version 0.3.53
 
 * prompt confirm chaning embedding model

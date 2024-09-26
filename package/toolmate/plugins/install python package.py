@@ -3,7 +3,7 @@ ToolMate AI Plugin - install python package
 
 install python package into the environment that runs LetMeDoIt AI
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config

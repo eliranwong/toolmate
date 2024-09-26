@@ -3,7 +3,7 @@ ToolMate AI Plugin - create statistical graphics
 
 create statistical graphics to visulize data
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config

@@ -3,7 +3,7 @@ ToolMate AI Plugin - send emails
 
 send google or outlook emails
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, openURL

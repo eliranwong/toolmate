@@ -3,7 +3,7 @@ ToolMate AI Plugin - dates and times
 
 Retrieve information about dates and times
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config

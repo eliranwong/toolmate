@@ -3,7 +3,7 @@ ToolMate AI Plugin - edit text
 
 edit text files
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, isCommandInstalled

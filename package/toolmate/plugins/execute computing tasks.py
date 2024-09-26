@@ -3,7 +3,7 @@ ToolMate AI Plugin - execute computing tasks
 
 execute computing tasks
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, fineTunePythonCode, showRisk, confirmExecution, getPygmentsStyle

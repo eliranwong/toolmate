@@ -3,7 +3,7 @@ ToolMate AI Plugin - send tweet
 
 send a tweet to twitter
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, openURL

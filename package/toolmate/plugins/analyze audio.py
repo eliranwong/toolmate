@@ -3,7 +3,7 @@ ToolMate AI Plugin - analyze audio file
 
 analyze audio file
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, showErrors, getGroqClient

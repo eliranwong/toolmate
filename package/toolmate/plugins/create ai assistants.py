@@ -3,7 +3,7 @@ ToolMate AI Plugin - build agents
 
 build a group of agents to execute a task with integrated "AutoGen Agent Builder"
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 

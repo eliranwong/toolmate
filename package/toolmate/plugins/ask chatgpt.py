@@ -3,7 +3,7 @@ ToolMate AI Plugin - ask chatgpt
 
 Ask ChatGPT for conversation only; no function calling
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 

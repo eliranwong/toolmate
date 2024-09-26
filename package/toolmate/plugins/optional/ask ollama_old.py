@@ -3,7 +3,7 @@ ToolMate AI Plugin - ask Ollama Chat
 
 Ask Ollama Chat for information
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config

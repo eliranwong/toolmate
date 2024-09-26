@@ -3,7 +3,7 @@ ToolMate AI Plugin - ask sqlite
 
 Ask SQLite file. To retrieve information from or make changes in a sqlite file, e.g. fetch data, update records, etc.
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 from toolmate import config, showErrors

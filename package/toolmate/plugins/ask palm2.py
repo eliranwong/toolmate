@@ -3,7 +3,7 @@ ToolMate AI Plugin - ask PaLM 2
 
 Ask Google PaLM 2 for information
 
-[FUNCTION_CALL]
+[TOOL_CALL]
 """
 
 

@@ -7,11 +7,10 @@ analyze files with integrated "AutoGen Retriever"
 """
 
 
-from toolmate import config, is_valid_image_file
+from toolmate import config, is_valid_image_file, ragRefineDocsPath, ragGetSplits, ragSearchContext
 from toolmate import print2, print3
 import os
 from toolmate.autoretriever import AutoGenRetriever
-from toolmate.rag import RAG
 #from PIL import Image
 
 
@@ -35,7 +34,28 @@ def analyze_files(function_args):
             print2("AutoGen Retriever closed!")
         else:
             print2("Retriever utility launched!")
-            RAG().getResponse(files, query)
+
+            retrievedContext = ragSearchContext(ragGetSplits(ragRefineDocsPath(files)), query)
+
+            formatted_prompt = f"""Question:
+<question>
+{query}
+</question>
+
+Context:
+<context>
+{retrievedContext}
+</context>
+
+Please answer my question, based on the context given above."""
+
+            messages = config.currentMessages[:-1] + [{"role": "user", "content" : formatted_prompt}]
+
+            completion = CallLLM.regularCall(messages)
+            print2(config.divider)
+            config.toolmate.streamCompletion(completion)
+            print2(config.divider)
+
             print2("Retriever utility closed!")
         return ""
 

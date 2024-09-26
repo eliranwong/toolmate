@@ -1667,7 +1667,7 @@ def ragSearchContext(splits, query) -> Optional[dict]:
     #embedding = OpenAIEmbeddings(model=config.embeddingModel) if config.embeddingModel in ("text-embedding-3-large", "text-embedding-3-small", "text-embedding-ada-002") else SentenceTransformerEmbeddings(model_name=config.embeddingModel)
     if config.embeddingModel in ("text-embedding-3-large", "text-embedding-3-small", "text-embedding-ada-002"):
         embedding = OpenAIEmbeddings(model=config.embeddingModel)
-    elif embeddingModel.startswith("_ollama_"):
+    elif config.embeddingModel.startswith("_ollama_"):
         embedding = OllamaEmbeddings(model=config.embeddingModel[8:])
     else:
         embedding = HuggingFaceEmbeddings(model_name=config.embeddingModel)

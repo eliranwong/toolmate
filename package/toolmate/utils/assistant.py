@@ -1045,6 +1045,7 @@ class ToolMate:
         def askAdditionalChatModel() -> bool:
             options = ("yes", "no")
             question = "Would you like an additional model for running chat-only features?"
+            print2("# Additional Chat Model [Optional] ...")
             print1(question)
             useAdditionalChatModel = self.dialogs.getValidOptions(
                 options=options,
@@ -1406,9 +1407,20 @@ class ToolMate:
             print3(f"Chat-only model: {model}")
 
     def setEmbeddingModel(self):
-        print1("Caution is advised! It is essential to use a consistent embedding model for searching stored vector databases. If you decide to switch to a different embedding model, you must delete any previous vector stores saved with ToolMate AI for ToolMate AI to function correctly. Do you want to continue? [y]es / [N]o")
-        confirmation = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default="yes")
-        if not confirmation.lower() in ("y", "yes"):
+        def askChangingEmbedding():
+            options = ("yes", "no")
+            question = "Caution is advised! It is essential to use a consistent embedding model for searching stored vector databases. If you decide to switch to a different embedding model, you must delete any previous vector stores saved with ToolMate AI for ToolMate AI to function correctly. Do you want to change the default embedding model now?"
+            print2("# Changing Embbeding Model [Optional] ...")
+            print1(question)
+            change = self.dialogs.getValidOptions(
+                options=options,
+                title="Changing Embbeding Model [Optional] ...",
+                default="no",
+                text=question,
+            )
+            return False if not change or not change == "yes" else True
+
+        if not askChangingEmbedding():
             return None
         oldEmbeddingModel = config.embeddingModel
         model = self.dialogs.getValidOptions(
@@ -1419,7 +1431,7 @@ class ToolMate:
         )
         if model:
             if model == "Ollama models":
-                self.setLlmModel_ollama(feature=="embedding")
+                self.setLlmModel_ollama(feature="embedding")
             elif model == "custom":
                 print1("Enter OpenAI or Sentence Transformer Embedding model:")
                 print1("OpenAI Embedding Models: https://platform.openai.com/docs/guides/embeddings/embedding-models")

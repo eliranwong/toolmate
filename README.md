@@ -40,7 +40,7 @@ Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/d
 
 [NEW! Running Multiple Tools in One Go](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md)
 
-[Tool Calling for Any LLMs](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Function%20Call%20Approach%20with%20Any%20LLMs.md)
+[Plentiful Built-in Tools](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Descriptions.md)
 
 [Highly Customisable Plugins](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md#plugins)
 

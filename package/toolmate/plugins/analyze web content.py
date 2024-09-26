@@ -8,9 +8,8 @@ analyze web content with "AutoGen Retriever"
 
 
 from toolmate import config
-from toolmate import print1, print2, print3, is_valid_url, downloadWebContent
+from toolmate import print1, print2, print3, is_valid_url, downloadWebContent, ragRefineDocsPath, ragGetSplits, ragSearchContext
 from toolmate.autoretriever import AutoGenRetriever
-from toolmate.rag import RAG
 
 def analyze_web_content(function_args):
     query = function_args.get("query") # required
@@ -39,7 +38,28 @@ def analyze_web_content(function_args):
         print2("AutoGen Retriever closed!")
     else:
         print2("Retriever utility launched!")
-        RAG().getResponse(filename, query)
+
+        retrievedContext = ragSearchContext(ragGetSplits(ragRefineDocsPath(filename)), query)
+
+        formatted_prompt = f"""Question:
+<question>
+{query}
+</question>
+
+Context:
+<context>
+{retrievedContext}
+</context>
+
+Please answer my question, based on the context given above."""
+
+        messages = config.currentMessages[:-1] + [{"role": "user", "content" : formatted_prompt}]
+
+        completion = CallLLM.regularCall(messages)
+        print2(config.divider)
+        config.toolmate.streamCompletion(completion)
+        print2(config.divider)
+
         print2("Retriever utility closed!")
     return ""
 

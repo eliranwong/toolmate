@@ -1,3 +1,15 @@
+# Version 0.3.53
+
+* prompt confirm chaning embedding model
+
+# Version 0.3.52
+
+* fixed loading Ollama models for embedding
+
+# Version 0.3.51
+
+* support RAG utilities in GUI
+
 # Version 0.3.50
 
 * support Ollama models for embedding

@@ -3,7 +3,6 @@ from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
 import sys, os, geocoder, platform, socket, geocoder, datetime, requests, netifaces, getpass, pendulum, pkg_resources, webbrowser, unicodedata
 import traceback, uuid, re, textwrap, signal, wcwidth, shutil, threading, time, tiktoken, subprocess, json, base64, html2text, pydoc, codecs, psutil
 from packaging import version
-from chromadb.utils import embedding_functions
 import pygments
 from pygments.lexers.python import PythonLexer
 from pygments.styles import get_style_by_name
@@ -1028,39 +1027,6 @@ def confirmExecution(risk):
     else:
         return False
 
-# embedding
-
-def getEmbeddingFunction(embeddingModel=None):
-    # import statement is placed here to make this file compatible on Android
-    embeddingModel = embeddingModel if embeddingModel is not None else config.embeddingModel
-    if embeddingModel in ("text-embedding-3-large", "text-embedding-3-small", "text-embedding-ada-002"):
-        return embedding_functions.OpenAIEmbeddingFunction(api_key=config.openaiApiKey, model_name=embeddingModel)
-    return embedding_functions.SentenceTransformerEmbeddingFunction(model_name=embeddingModel) # support custom Sentence Transformer Embedding models by modifying config.embeddingModel
-
-# chromadb
-
-def get_or_create_collection(client, collection_name):
-    collection = client.get_or_create_collection(
-        name=collection_name,
-        metadata={"hnsw:space": "cosine"},
-        embedding_function=getEmbeddingFunction(),
-    )
-    return collection
-
-def add_vector(collection, text, metadata):
-    id = str(uuid.uuid4())
-    collection.add(
-        documents = [text],
-        metadatas = [metadata],
-        ids = [id]
-    )
-
-def query_vectors(collection, query, n=1):
-    return collection.query(
-        query_texts=[query],
-        n_results = n,
-    )
-
 # spinning
 
 def spinning_animation(stop_event):
@@ -1586,3 +1552,165 @@ def toggleoutputaudio():
     config.ttsOutput = not config.ttsOutput
     config.saveConfig()
     print3(f"Output Audio: '{'enabled' if config.ttsOutput else 'disabled'}'!")
+
+# embedding
+
+from chromadb.utils.embedding_functions import OllamaEmbeddingFunction, OpenAIEmbeddingFunction, SentenceTransformerEmbeddingFunction
+
+def getEmbeddingFunction(embeddingModel=None):
+    # import statement is placed here to make this file compatible on Android
+    embeddingModel = embeddingModel if embeddingModel is not None else config.embeddingModel
+    if embeddingModel in ("text-embedding-3-large", "text-embedding-3-small", "text-embedding-ada-002"):
+        return OpenAIEmbeddingFunction(api_key=config.openaiApiKey, model_name=embeddingModel)
+    elif embeddingModel.startswith("_ollama_"):
+        return OllamaEmbeddingFunction(model_name=embeddingModel[8:], url="http://localhost:11434/api/embeddings",)
+    return SentenceTransformerEmbeddingFunction(model_name=embeddingModel) # support custom Sentence Transformer Embedding models by modifying config.embeddingModel
+
+# chromadb
+
+def get_or_create_collection(client, collection_name):
+    collection = client.get_or_create_collection(
+        name=collection_name,
+        metadata={"hnsw:space": "cosine"},
+        embedding_function=getEmbeddingFunction(),
+    )
+    return collection
+
+def add_vector(collection, text, metadata):
+    id = str(uuid.uuid4())
+    collection.add(
+        documents = [text],
+        metadatas = [metadata],
+        ids = [id]
+    )
+
+def query_vectors(collection, query, n=1):
+    return collection.query(
+        query_texts=[query],
+        n_results = n,
+    )
+
+# rag
+# references:
+# https://python.langchain.com/docs/integrations/providers/unstructured/
+# https://python.langchain.com/docs/integrations/document_loaders/unstructured_file/
+# https://python.langchain.com/docs/tutorials/rag/
+
+import zipfile
+from chromadb.config import Settings
+from langchain_ollama import OllamaEmbeddings
+from langchain_openai import OpenAIEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_unstructured import UnstructuredLoader
+from autogen.retrieve_utils import TEXT_FORMATS
+
+def ragRefineDocsPath(docs_path) -> Optional[list]:
+    if not os.path.exists(docs_path):
+        print2("Invalid path!")
+        return None
+
+    rag = os.path.join(config.localStorage, "rag")
+    Path(rag).mkdir(parents=True, exist_ok=True)
+
+    _, file_extension = os.path.splitext(docs_path)
+    if file_extension.lower() == ".zip":
+        # support zip file; unzip zip file, if any
+        currentTime = re.sub("[\. :]", "_", str(datetime.datetime.now()))
+        extract_to_path = os.path.join(rag, "unpacked", currentTime)
+        print3(f"Unpacking content to: {extract_to_path}")
+        if not os.path.isdir(extract_to_path):
+            Path(rag).mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(docs_path) as zip_ref:
+            zip_ref.extractall(extract_to_path)
+        docs_path = extract_to_path
+    # check if file format is supported
+    if os.path.isfile(docs_path):
+        if file_extension[1:] in TEXT_FORMATS:
+            docs_path = [docs_path]
+        else:
+            print2("File format not supported!")
+            return None
+    elif os.path.isdir(docs_path):
+        docs_path = getUnstructuredFiles(docs_path)
+        if not docs_path:
+            print2("Support files not found!")
+            return None
+    else:
+        print2("Document path invalid!")
+        return None
+    # return refined paths
+    return docs_path
+
+def ragGetSplits(docs_path):
+    # https://python.langchain.com/docs/integrations/providers/unstructured
+    loader = UnstructuredLoader(docs_path) # file_path: Union[str, List[str]]
+    doc = loader.load()
+    for i in doc:
+        languages = i.metadata['languages']
+        if isinstance(languages, list):
+            i.metadata['languages'] = languages[0]
+    #print(doc)
+
+    #chunk it
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200, add_start_index=True)
+    splits = text_splitter.split_documents(doc)
+    #print(splits)
+    return splits
+
+def ragSearchContext(splits, query) -> Optional[dict]:
+    for i in splits:
+        i.metadata["source"] = i.metadata["source"][0]
+    # https://python.langchain.com/docs/integrations/text_embedding/sentence_transformers
+    #embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    #embedding = OpenAIEmbeddings(model=config.embeddingModel) if config.embeddingModel in ("text-embedding-3-large", "text-embedding-3-small", "text-embedding-ada-002") else SentenceTransformerEmbeddings(model_name=config.embeddingModel)
+    if config.embeddingModel in ("text-embedding-3-large", "text-embedding-3-small", "text-embedding-ada-002"):
+        embedding = OpenAIEmbeddings(model=config.embeddingModel)
+    elif embeddingModel.startswith("_ollama_"):
+        embedding = OllamaEmbeddings(model=config.embeddingModel[8:])
+    else:
+        embedding = HuggingFaceEmbeddings(model_name=config.embeddingModel)
+    # https://python.langchain.com/docs/integrations/vectorstores/chroma
+    # https://github.com/langchain-ai/langchain/issues/7804
+    vectorstore = Chroma.from_documents(
+        documents=splits,
+        embedding=embedding,
+        client_settings=Settings(anonymized_telemetry=False),
+    )
+    # reference: https://python.langchain.com/docs/modules/data_connection/retrievers/vectorstore
+    # Create the retriever
+    #retriever_settings = {"search_type": "similarity_score_threshold", "search_kwargs": {"score_threshold": 0.5}}
+    #retriever_settings = {"search_type": "mmr"}
+    if config.rag_retrieverSettings: # default: {'search_kwargs': {'k': 5}}
+        # align setting with config.rag_closestMatches
+        if not "search_kwargs" in config.rag_retrieverSettings:
+            config.rag_retrieverSettings["search_kwargs"] = {"k": 5}
+        elif "search_kwargs" in config.rag_retrieverSettings and (not "k" in config.rag_retrieverSettings["search_kwargs"] or ("k" in config.rag_retrieverSettings["search_kwargs"] and not config.rag_retrieverSettings["search_kwargs"]["k"] == config.rag_closestMatches)):
+                config.rag_retrieverSettings["search_kwargs"]["k"] = config.rag_closestMatches
+        retriever = vectorstore.as_retriever(**config.rag_retrieverSettings)
+    else:
+        retriever = vectorstore.as_retriever()
+    # retrieve document
+    retrieved_docs = retriever.invoke(query)
+    if not retrieved_docs:
+        return None
+    else:
+        formatted_context = {f"information_{index}": item.page_content for index, item in enumerate(retrieved_docs)}
+    return formatted_context
+
+"""
+Note: run embedding with GPU, e.g. HuggingFaceEmbeddings
+
+model_name = "sentence-transformers/all-mpnet-base-v2"
+model_kwargs = {'device': 'cpu'}
+encode_kwargs = {'normalize_embeddings': False}
+hf = HuggingFaceEmbeddings(
+    model_name=model_name,
+    model_kwargs=model_kwargs,
+    encode_kwargs=encode_kwargs
+)
+
+Chromadb
+https://cookbook.chromadb.dev/embeddings/gpu-support/
+"""

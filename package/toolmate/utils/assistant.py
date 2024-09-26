@@ -1113,12 +1113,15 @@ class ToolMate:
         model_session = PromptSession(history=FileHistory(model_history))
         completer = FuzzyCompleter(WordCompleter(sorted(ollama_models), ignore_case=True))
         bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
-        default = config.ollamaChatModel if feature == "chat" else config.ollamaMainModel
-        if config.llmInterface == "llamacpp":
+        if feature == "embedding":
+            default = config.embeddingModel[8:] if config.embeddingModel.startswith("_ollama_") else "nomic-embed-text"
+        elif config.llmInterface == "llamacpp":
             if feature == "default" and config.llamacppMainModel_ollama_tag:
                 default = config.llamacppMainModel_ollama_tag
             elif feature == "chat" and config.llamacppChatModel_ollama_tag:
                 default = config.llamacppChatModel_ollama_tag
+        else:
+            default = config.ollamaChatModel if feature == "chat" else config.ollamaMainModel
         # prompt
         print1(message)
         print1("(For details, visit https://ollama.com/library)")
@@ -1136,6 +1139,8 @@ class ToolMate:
                     config.ollamaMainModel = model
                 elif feature == "chat":
                     config.ollamaChatModel = model
+                elif feature == "embedding":
+                    config.embeddingModel = f"_ollama_{model}"
             else:
                 if shutil.which("ollama"):
                     try:
@@ -1144,6 +1149,8 @@ class ToolMate:
                             config.ollamaMainModel = model
                         elif feature == "chat":
                             config.ollamaChatModel = model
+                        elif feature == "embedding":
+                            config.embeddingModel = f"_ollama_{model}"
                     except:
                         print2(f"Failed to download '{model}'! Please make sure you enter a valid model name or tag.")
                 else:
@@ -1399,17 +1406,24 @@ class ToolMate:
             print3(f"Chat-only model: {model}")
 
     def setEmbeddingModel(self):
+        print1("Caution is advised! It is essential to use a consistent embedding model for searching stored vector databases. If you decide to switch to a different embedding model, you must delete any previous vector stores saved with ToolMate AI for ToolMate AI to function correctly. Do you want to continue? [y]es / [N]o")
+        confirmation = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default="yes")
+        if not confirmation.lower() in ("y", "yes"):
+            return None
         oldEmbeddingModel = config.embeddingModel
         model = self.dialogs.getValidOptions(
-            options=("text-embedding-3-large", "text-embedding-3-small", "text-embedding-ada-002", "paraphrase-multilingual-mpnet-base-v2", "all-mpnet-base-v2", "all-MiniLM-L6-v2", "custom"),
+            options=("text-embedding-3-large", "text-embedding-3-small", "text-embedding-ada-002", "paraphrase-multilingual-mpnet-base-v2", "all-mpnet-base-v2", "all-MiniLM-L6-v2", "Ollama models", "custom"),
             title="Embedding model",
             default=config.embeddingModel,
             text="Select an embedding model:",
         )
         if model:
-            if model == "custom":
+            if model == "Ollama models":
+                self.setLlmModel_ollama(feature=="embedding")
+            elif model == "custom":
                 print1("Enter OpenAI or Sentence Transformer Embedding model:")
-                print1("Read more at: https://www.sbert.net/docs/pretrained_models.html")
+                print1("OpenAI Embedding Models: https://platform.openai.com/docs/guides/embeddings/embedding-models")
+                print1("Sentence Transformer Models: https://www.sbert.net/docs/pretrained_models.html")
                 customModel = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.embeddingModel)
                 if customModel and not customModel.strip().lower() == config.exit_entry:
                     config.embeddingModel = customModel 
@@ -1418,13 +1432,14 @@ class ToolMate:
             print3(f"Embedding model: {model}")
         if not oldEmbeddingModel == config.embeddingModel:
             print1(f"You've change the embedding model from '{oldEmbeddingModel}' to '{config.embeddingModel}'.")
-            print1("To work with the newly selected model, previous memory store and retrieved collections need to be deleted.")
+            print1("To work with the newly selected model, you need to delete the previous memory store and saved vector databases, saved by ToolMate AI.")
             print1("Do you want to delete them now? [y]es / [N]o")
             confirmation = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default="yes")
             if confirmation.lower() in ("y", "yes"):
+                ragStore = os.path.join(config.localStorage, "rag")
                 memory_store = os.path.join(config.localStorage, "memory")
                 retrieved_collections = os.path.join(config.localStorage, "autogen", "retriever")
-                for folder in (memory_store, retrieved_collections):
+                for folder in (ragStore, memory_store, retrieved_collections):
                     shutil.rmtree(folder, ignore_errors=True)
             else:
                 print1(f"Do you want to change back the embedding model from '{config.embeddingModel}' to '{oldEmbeddingModel}'? [y]es / [N]o")

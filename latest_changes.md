@@ -1,3 +1,13 @@
+# Version 0.3.50
+
+* support Ollama models for embedding
+
+# Version 0.3.49
+
+* updated RAG utilities
+
+* updated dependencies
+
 # Version 0.3.48
 
 * added risk assessment agent to safeguard from running harmful system command.

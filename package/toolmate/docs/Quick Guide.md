@@ -2,7 +2,7 @@
 
 # Installation
 
-https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md#Installation
+https://github.com/eliranwong/toolmate/wiki#Installation
 
 # Launch ToolMate AI
 
@@ -62,7 +62,7 @@ https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Change%20
 
 # How to Set up Google or OpenAI Credentials? [Optional]
 
-https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md#optional-setup
+https://github.com/eliranwong/toolmate/wiki#optional-setup
 
 # Work with Both Text Generation and Task Execution
 

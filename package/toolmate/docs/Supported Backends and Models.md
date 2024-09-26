@@ -69,7 +69,7 @@ Remarks: Groq cloud currently does not support multimodal models. Other backends
 
 ## Text-to-Option Options
 
-1. [Offline TTS](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md#offline-text-to-speech) - [Windows - wsay](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Offline%20TTS%20-%20Windows.md); [macOS - say](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Offline%20TTS%20-%20macOS.md); [Linux - piper](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Offline%20TTS%20-%20Linux.md)
+1. [Offline TTS](https://github.com/eliranwong/toolmate/wiki#offline-text-to-speech) - [Windows - wsay](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Offline%20TTS%20-%20Windows.md); [macOS - say](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Offline%20TTS%20-%20macOS.md); [Linux - piper](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Offline%20TTS%20-%20Linux.md)
 2. Google Text-to-Speech (Generic)
 3. Google Text-to-Speech (API)
 4. Elevenlabs (API)

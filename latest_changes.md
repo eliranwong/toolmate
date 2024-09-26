@@ -1,3 +1,13 @@
+# Version 0.3.55-0.3.56
+
+* added ToolMate AI icon
+
+* fixed image-related plugins
+
+* fixed plugin "ask gemini"
+
+* rebuilt help vector store
+
 # Version 0.3.54
 
 * added a help vector store for searching documentations

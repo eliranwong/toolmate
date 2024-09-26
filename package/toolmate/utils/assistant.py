@@ -206,7 +206,7 @@ class ToolMate:
             ".install": ("install python package", self.installPythonPackage), # TODO: changed to a tool
             # help
             ".keys": (f"learn about key entries and bindings {str(config.hotkey_display_key_combo)}", config.showKeyBindings),
-            ".help": ("open documentations", lambda: openURL('https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md')),
+            ".help": ("open documentations", lambda: openURL('https://github.com/eliranwong/toolmate/wiki')),
             ".donate": ("donate and support ToolMate AI", lambda: openURL('https://www.paypal.com/paypalme/letmedoitai')),
         }
 

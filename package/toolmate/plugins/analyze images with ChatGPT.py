@@ -67,7 +67,7 @@ def analyze_images_chatgpt(function_args):
         if is_valid_url(i) and is_valid_image_url(i):
             content.append({"type": "image_url", "image_url": {"url": i,},})
         elif os.path.isfile(i) and is_valid_image_file(i):
-            content.append({"type": "image_url", "image_url": encode_image(i),})
+            content.append({"type": "image_url", "image_url": {"url": encode_image(i)},})
         else:
             files.remove(i)
 

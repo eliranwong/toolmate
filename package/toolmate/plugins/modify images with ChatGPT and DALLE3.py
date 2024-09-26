@@ -90,7 +90,7 @@ def modify_images(function_args):
                     "role": "user",
                     "content": [
                         {"type": "text", "text": "Describe image in detail",},
-                        {"type": "image_url", "image_url": encode_image(imageFile),}
+                        {"type": "image_url", "image_url": {"url": encode_image(imageFile)},}
                     ],
                     }
                 ],
@@ -139,7 +139,7 @@ def get_description(filename):
         content.append({"type": "image_url", "image_url": {"url": filename,},})
         filename = quote(filename, safe="")
     elif is_valid_image_file(filename):
-        content.append({"type": "image_url", "image_url": encode_image(filename),})
+        content.append({"type": "image_url", "image_url": {"url": encode_image(filename)},})
 
     if content:
         content.insert(0, {"type": "text", "text": "Describe this image in as much detail as possible, including color patterns, positions and orientations of all objects and backgrounds in the image",})

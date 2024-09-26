@@ -10,7 +10,7 @@ https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/LetMeDoIt
 
 # Documentation
 
-https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md
+https://github.com/eliranwong/toolmate/wiki
 
 # Latest changes
 
@@ -42,11 +42,11 @@ Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/d
 
 [Plentiful Built-in Tools](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Descriptions.md)
 
-[Highly Customisable Plugins](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md#plugins)
+[Highly Customisable Plugins](https://github.com/eliranwong/toolmate/wiki#plugins)
 
 [Savable, Searchable and Sharable Records](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Chat%20Record%20Management.md)
 
-[Integration with Popular AI Tools](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md#integration)
+[Integration with Popular AI Tools](https://github.com/eliranwong/toolmate/wiki#integration)
 
 # Quick Tool Calling
 
@@ -142,7 +142,7 @@ To start up with a particular backend, you may use parameter `-b`, e.g.:
 
 > toolmate -b groq
 
-Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md#installation
+Read more at https://github.com/eliranwong/toolmate/wiki#installation
 
 # GPU Acceleration
 
@@ -156,7 +156,7 @@ https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Quick%20G
 
 # More
 
-Documentation https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/000_Home.md
+Documentation https://github.com/eliranwong/toolmate/wiki
 
 # Welcome Contributions
 

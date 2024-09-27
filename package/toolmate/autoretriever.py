@@ -89,7 +89,7 @@ class AutoGenRetriever:
                 return None
 
         if config.llmInterface == "ollama":
-            llm = config.ollamaMainModel
+            llm = config.ollamaToolModel
             config_list = [
                 {
                     "model": llm,
@@ -99,17 +99,17 @@ class AutoGenRetriever:
                 }
             ]
         elif config.llmInterface == "llamacpp":
-            llm = config.llamacppMainModel_model_path
+            llm = config.llamacppToolModel_model_path
             config_list = [
                 {
                     "model": llm,
-                    "base_url": f"http://localhost:{config.llamacppMainModel_server_port}/v1",
+                    "base_url": f"http://localhost:{config.llamacppToolModel_server_port}/v1",
                     "api_type": "open_ai",
                     "api_key": "toolmate",
                 }
             ]
         elif config.llmInterface == "llamacppserver":
-            llm = config.llamacppMainModel_model_path
+            llm = config.llamacppToolModel_model_path
             config_list = [
                 {
                     "model": llm,
@@ -119,7 +119,7 @@ class AutoGenRetriever:
                 }
             ]
         elif config.llmInterface == "groq":
-            llm = config.groqApi_main_model
+            llm = config.groqApi_tool_model
             config_list = [
                 {
                     "model": llm,

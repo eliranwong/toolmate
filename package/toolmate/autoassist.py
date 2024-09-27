@@ -61,7 +61,7 @@ Below is my message:
         if config.llmInterface == "ollama":
             config_list = [
                 {
-                    "model": config.ollamaMainModel,
+                    "model": config.ollamaToolModel,
                     "base_url": "http://localhost:11434/v1",
                     "api_type": "open_ai",
                     "api_key": "toolmate",
@@ -70,8 +70,8 @@ Below is my message:
         elif config.llmInterface == "llamacpp":
             config_list = [
                 {
-                    "model": config.llamacppMainModel_model_path,
-                    "base_url": f"http://localhost:{config.llamacppMainModel_server_port}/v1",
+                    "model": config.llamacppToolModel_model_path,
+                    "base_url": f"http://localhost:{config.llamacppToolModel_server_port}/v1",
                     "api_type": "open_ai",
                     "api_key": "toolmate",
                 }
@@ -79,7 +79,7 @@ Below is my message:
         elif config.llmInterface == "llamacppserver":
             config_list = [
                 {
-                    "model": config.llamacppMainModel_model_path,
+                    "model": config.llamacppToolModel_model_path,
                     "base_url": f"http://localhost:{config.customToolServer_port}/v1",
                     "api_type": "open_ai",
                     "api_key": "toolmate",
@@ -88,7 +88,7 @@ Below is my message:
         elif config.llmInterface == "groq":
             config_list = [
                 {
-                    "model": config.groqApi_main_model,
+                    "model": config.groqApi_tool_model,
                     "base_url": "https://api.groq.com/openai/v1",
                     "api_type": "open_ai",
                     "api_key": getGroqApi_key(),

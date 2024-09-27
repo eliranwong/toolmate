@@ -156,10 +156,10 @@ def main(tempInterface=""):
     clear_title()
 
     if config.llmInterface == "ollama":
-        getOllamaServerClient().generate(model=config.ollamaMainModel, keep_alive=0, stream=False,)
-        print(f"Ollama model '{config.ollamaMainModel}' unloaded!")
-    if hasattr(config, "llamacppMainModel"):
-        del config.llamacppMainModel
+        getOllamaServerClient().generate(model=config.ollamaToolModel, keep_alive=0, stream=False,)
+        print(f"Ollama model '{config.ollamaToolModel}' unloaded!")
+    if hasattr(config, "llamacppToolModel"):
+        del config.llamacppToolModel
 
 if __name__ == "__main__":
     main()

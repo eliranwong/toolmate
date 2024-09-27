@@ -20,7 +20,7 @@ def ask_llama3_1(function_args):
     config.currentMessages[-1] = {"role": "user", "content": query}
     completion = CallOllama.regularCall(config.currentMessages, chat_model=model)
     config.toolmate.streamCompletion(completion, openai=False)
-    if not model == config.ollamaMainModel:
+    if not model == config.ollamaToolModel:
         CallOllama.unloadModels(model)
     return ""
 

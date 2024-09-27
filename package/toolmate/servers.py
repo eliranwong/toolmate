@@ -2,10 +2,10 @@ from toolmate import config, isServerAlive, print2
 import os, sys
 
 def main():
-    if isServerAlive("127.0.0.1", config.llamacppMainModel_server_port):
-        print2(f"A service is already running at 127.0.0.1:{config.llamacppMainModel_server_port}!")
+    if isServerAlive("127.0.0.1", config.llamacppToolModel_server_port):
+        print2(f"A service is already running at 127.0.0.1:{config.llamacppToolModel_server_port}!")
         return None
-    cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppMainModel_server_port} --model "{config.llamacppMainModel_model_path}" --verbose True --chat_format chatml --n_ctx {config.llamacppMainModel_n_ctx} --n_gpu_layers {config.llamacppMainModel_n_gpu_layers} --n_batch {config.llamacppMainModel_n_batch} {config.llamacppMainModel_additional_server_options}"""
+    cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppToolModel_server_port} --model "{config.llamacppToolModel_model_path}" --verbose True --chat_format chatml --n_ctx {config.llamacppToolModel_n_ctx} --n_gpu_layers {config.llamacppToolModel_n_gpu_layers} --n_batch {config.llamacppToolModel_n_batch} {config.llamacppToolModel_additional_server_options}"""
     os.system(cmd)
 
 def chat():

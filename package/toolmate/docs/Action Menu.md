@@ -37,7 +37,6 @@ Press 'ctrl+k' and scroll to the bottom for a full list of quick actions, e.g.:
 .temperature: change output temperature
 .maxtokens: change maximum output tokens
 .mintokens: change minimum output tokens
-.dynamictokencount: change dynamic token count
 .maxmemorymatches: change maximum memory matches
 .maxchatrecordmatches: change maximum chat record matches
 .ipinfo: change ip information integration

@@ -8,7 +8,7 @@ tool = False
 
 user_input = "What time is it now?"
 
-lm = models.LlamaCpp(config.llamacppMainModel_model_path, echo = False)
+lm = models.LlamaCpp(config.llamacppToolModel_model_path, echo = False)
 
 lm += f"""Analyze the following input and decide if a tool a tool is necessary for resolution:
 <input>Me: {user_input}</input>

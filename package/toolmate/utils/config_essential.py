@@ -70,19 +70,19 @@ defaultSettings = (
     ('ollamaChatServer_port', 11434),
     ('ollamaVisionServer_port', 11434),
     ('ollamaVisionModel', 'llava'), # ollama model used for vision
-    ('ollamaMainModel', 'wizardlm2'), # ollama model used for both task execution and conversation
-    ('ollamaMainModel_additional_options', {}),
+    ('ollamaToolModel', 'wizardlm2'), # ollama model used for both task execution and conversation
+    ('ollamaToolModel_additional_options', {}),
     ('ollamaChatModel_additional_options', {}),
-    ('ollamaMainModel_num_ctx', 100000), # ollama tool model context window
-    ('ollamaMainModel_num_batch', 512), # ollama chat model batch size
-    ('ollamaMainModel_num_predict', -1), # ollama tool model maximum tokens
-    ('ollamaMainModel_keep_alive', "5m"), # ollama tool model keep alive time
+    ('ollamaToolModel_num_ctx', 2048), # ollama tool model context window
+    ('ollamaToolModel_num_batch', 512), # ollama chat model batch size
+    ('ollamaToolModel_num_predict', -1), # ollama tool model maximum tokens
+    ('ollamaToolModel_keep_alive', "5m"), # ollama tool model keep alive time
     ('ollamaChatModel', 'llama3.1'), # ollama model used for chat
-    ('ollamaChatModel_num_ctx', 100000), # ollama chat model context window
+    ('ollamaChatModel_num_ctx', 2048), # ollama chat model context window
     ('ollamaChatModel_num_batch', 512), # ollama chat model batch size
     ('ollamaChatModel_num_predict', -1), # ollama chat model maximum tokens
     ('ollamaChatModel_keep_alive', "5m"), # ollama chat model keep alive time
-    ('llamacppMainModel_verbose', False),
+    ('llamacppToolModel_verbose', False),
     ('llamacppChatModel_verbose', False),
     ('llamacppVisionModel_verbose', False),
     ('customToolServer_command', ""),
@@ -103,7 +103,7 @@ defaultSettings = (
     ('customToolServer_port', 8000),
     ('customChatServer_port', 8001),
     ('customVisionServer_port', 8002),
-    ('llamacppMainModel_server_port', 8000),
+    ('llamacppToolModel_server_port', 8000),
     ('llamacppChatModel_server_port', 8001),
     ('llamacppVisionModel_server_port', 8002),
     ('llamacppVisionModel_model_path', ''), # specify file path of llama.cpp model for vision
@@ -111,30 +111,30 @@ defaultSettings = (
     ('llamacppVisionModel_additional_server_options', ''),
     ('llamacppVisionModel_additional_model_options', {}),
     ('llamacppVisionModel_additional_chat_options', {}),
-    ('llamacppVisionModel_max_tokens', 10000), # llama.cpp vision model maximum tokens
+    ('llamacppVisionModel_max_tokens', 2048), # llama.cpp vision model maximum tokens
     ('llamacppVisionModel_n_gpu_layers', 0), # -1 automatic if gpu is in place
     ('llamacppVisionModel_n_batch', 512),
     ('llamacppVisionModel_n_ctx', 0),
-    ('llamacppMainModel_additional_server_options', ''),
+    ('llamacppToolModel_additional_server_options', ''),
     ('llamacppChatModel_additional_server_options', ''),
-    ('llamacppMainModel_additional_model_options', {}),
-    ('llamacppMainModel_additional_chat_options', {}),
+    ('llamacppToolModel_additional_model_options', {}),
+    ('llamacppToolModel_additional_chat_options', {}),
     ('llamacppChatModel_additional_model_options', {}),
     ('llamacppChatModel_additional_chat_options', {}),
-    ('llamacppMainModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
-    ('llamacppMainModel_model_path', ''), # specify file path of llama.cpp model for general purpose
-    ('llamacppMainModel_repo_id', 'MaziyarPanahi/WizardLM-2-7B-GGUF'), # llama.cpp model used for both task execution and conversation, e.g. 'TheBloke/phi-2-GGUF', 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
-    ('llamacppMainModel_filename', 'WizardLM-2-7B.Q4_K_M.gguf'), # llama.cpp model used for both task execution and conversation, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
-    ('llamacppMainModel_n_ctx', 0), # llama.cpp tool model context window
-    ('llamacppMainModel_max_tokens', 10000), # llama.cpp tool model maximum tokens
-    ('llamacppMainModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
-    ('llamacppMainModel_n_batch', 512), # The batch size to use per eval
+    ('llamacppToolModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
+    ('llamacppToolModel_model_path', ''), # specify file path of llama.cpp model for general purpose
+    ('llamacppToolModel_repo_id', 'MaziyarPanahi/WizardLM-2-7B-GGUF'), # llama.cpp model used for both task execution and conversation, e.g. 'TheBloke/phi-2-GGUF', 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
+    ('llamacppToolModel_filename', 'WizardLM-2-7B.Q4_K_M.gguf'), # llama.cpp model used for both task execution and conversation, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
+    ('llamacppToolModel_n_ctx', 0), # llama.cpp tool model context window
+    ('llamacppToolModel_max_tokens', 2048), # llama.cpp tool model maximum tokens
+    ('llamacppToolModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
+    ('llamacppToolModel_n_batch', 512), # The batch size to use per eval
     ('llamacppChatModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
     ('llamacppChatModel_model_path', ''), # specify file path of llama.cpp model for chat
     ('llamacppChatModel_repo_id', 'bartowski/Meta-Llama-3.1-8B-Instruct-GGUF'), # llama.cpp model used for chat, e.g. 'TheBloke/CodeLlama-7B-Python-GGUF'
     ('llamacppChatModel_filename', 'Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf'), # llama.cpp model used for chat, e.g. 'codellama-7b-python.Q4_K_M.gguf'
     ('llamacppChatModel_n_ctx', 0), # llama.cpp chat model context window
-    ('llamacppChatModel_max_tokens', 10000), # llama.cpp chat model maximum tokens
+    ('llamacppChatModel_max_tokens', 2048), # llama.cpp chat model maximum tokens
     ('llamacppChatModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
     ('llamacppChatModel_n_batch', 512), # The batch size to use per eval
     ('gemini_model', "gemini-1.5-pro-001"), # "gemini-1.0-pro-001", "gemini-1.0-pro-002", "gemini-1.5-flash-001", "gemini-1.5-pro-001", read models that support function calling https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling
@@ -191,11 +191,12 @@ defaultSettings = (
     ('say_additional_options', ""),
     ('piper_additional_options', ""),
     ('groqApi_key', ''),
-    ('groqApi_main_model', 'mixtral-8x7b-32768'),
-    ('groqApi_main_model_additional_chat_options', {}),
+    ('groqApi_tool_model', 'mixtral-8x7b-32768'),
+    ('groqApi_tool_model_additional_chat_options', {}),
     ('groqApi_chat_model', 'llama3-70b-8192'),
     ('groqApi_chat_model_additional_chat_options', {}),
-    ('groqApi_max_tokens', 10000),
+    ('groqApi_tool_model_max_tokens', 2048),
+    ('groqApi_chat_model_max_tokens', 2048),
     ('openaiApiKey', ''),
     ('openaiApiOrganization', ''),
     ('loadingInternetSearches', "auto"),
@@ -224,7 +225,7 @@ defaultSettings = (
     ('terminalEditorScrollLineCount', 20),
     ('terminalEditorTabText', "    "),
     ('blankEntryAction', "..."),
-    ('defaultBlankEntryAction', ".context"),
+    ('defaultActionMenuItem', ".export"),
     ('storagedirectory', ""),
     ('suggestSystemCommand', True),
     ('improveInputEntry', False),
@@ -304,7 +305,7 @@ temporaryConfigs = [
     "autogenstudioServer",
     "gemini_generation_config",
     "gemini_safety_settings",
-    "llamacppMainModel",
+    "llamacppToolModel",
     "llamacppChatModel",
     "new_chat_response",
     "runPython",
@@ -370,7 +371,7 @@ temporaryConfigs = [
     "stopSpinning",
     "toggleMultiline",
     "getWrappedHTMLText",
-    "fineTuneUserInput",
+    "addPredefinedContext",
     "launchPager",
     "isTermux",
 ]

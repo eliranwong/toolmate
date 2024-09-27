@@ -19,7 +19,7 @@ class GroqChatbot:
     It is created for use with 3rd-party applications.
     """
 
-    def __init__(self, name="Groq Chatbot", temperature=config.llmTemperature, max_output_tokens=config.groqApi_max_tokens):
+    def __init__(self, name="Groq Chatbot", temperature=config.llmTemperature, max_output_tokens=config.groqApi_tool_model_max_tokens):
         self.name, self.temperature, self.max_output_tokens = name, temperature, max_output_tokens
         self.messages = self.resetMessages()
         if hasattr(config, "currentMessages") and config.currentMessages:
@@ -101,10 +101,10 @@ class GroqChatbot:
             elif prompt := prompt.strip():
                 try:
                     completion = getGroqClient().chat.completions.create(
-                        model=config.groqApi_chat_model if config.useAdditionalChatModel else config.groqApi_main_model,
+                        model=config.groqApi_chat_model if config.useAdditionalChatModel else config.groqApi_tool_model,
                         messages=self.messages,
                         temperature=self.temperature,
-                        max_tokens=config.groqApi_max_tokens,
+                        max_tokens=config.groqApi_chat_model_max_tokens if config.useAdditionalChatModel else config.groqApi_tool_model_max_tokens,
                         n=1,
                         stream=True,
                         **config.groqApi_chat_model_additional_chat_options,
@@ -141,7 +141,7 @@ def main():
     parser = argparse.ArgumentParser(description="groq cli options")
     # Add arguments
     parser.add_argument("default", nargs="?", default=None, help="default entry")
-    parser.add_argument('-o', '--outputtokens', action='store', dest='outputtokens', help=f"specify maximum output tokens with -o flag; default: {config.groqApi_max_tokens}")
+    parser.add_argument('-o', '--outputtokens', action='store', dest='outputtokens', help=f"specify maximum output tokens with -o flag; default: {config.groqApi_tool_model_max_tokens}")
     parser.add_argument('-t', '--temperature', action='store', dest='temperature', help=f"specify temperature with -t flag: default: {config.llmTemperature}")
     # Parse arguments
     args = parser.parse_args()
@@ -151,9 +151,9 @@ def main():
         try:
             max_output_tokens = int(args.outputtokens.strip())
         except:
-            max_output_tokens = config.groqApi_max_tokens
+            max_output_tokens = config.groqApi_tool_model_max_tokens
     else:
-        max_output_tokens = config.groqApi_max_tokens
+        max_output_tokens = config.groqApi_tool_model_max_tokens
     if args.temperature and args.temperature.strip():
         try:
             temperature = float(args.temperature.strip())

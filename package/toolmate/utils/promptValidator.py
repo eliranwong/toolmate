@@ -26,7 +26,7 @@ class TokenValidator(Validator):
                 availableFunctionTokens = count_tokens_from_functions(config.toolFunctionSchemas)
             '''
             availableFunctionTokens = count_tokens_from_functions(config.toolFunctionSchemas)
-            currentInputTokens = len(encoding.encode(config.fineTuneUserInput(currentInput)))
+            currentInputTokens = len(encoding.encode(config.addPredefinedContext(currentInput)))
             loadedMessageTokens = count_tokens_from_messages(config.currentMessages)
             selectedModelLimit = tokenLimits[config.chatGPTApiModel]
             #estimatedAvailableTokens = selectedModelLimit - availableFunctionTokens - loadedMessageTokens - currentInputTokens
@@ -46,7 +46,8 @@ class NumberValidator(Validator):
 
         if text.lower() in (config.exit_entry, config.cancel_entry):
             pass
-        elif text and not text.isdigit():
+        #elif text and not text.isdigit():
+        elif text and not re.search("^[-]*[0-9]+?$", text): # allow negative values like -1
             i = 0
 
             # Get index of first non numeric character.

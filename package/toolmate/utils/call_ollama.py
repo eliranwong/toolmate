@@ -30,7 +30,7 @@ class CallOllama:
     @check_ollama_errors
     def checkCompletion():
         if shutil.which("ollama"):
-            for i in (config.ollamaMainModel, config.ollamaChatModel, config.ollamaVisionModel):
+            for i in (config.ollamaToolModel, config.ollamaChatModel, config.ollamaVisionModel):
                 Downloader.downloadOllamaModel(i)
         else:
             print("Ollama not found! Install it first!")
@@ -111,8 +111,8 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     @check_ollama_errors
     def unloadModels(model=None):
         if model is None:
-            getOllamaServerClient().generate(model=config.ollamaMainModel, keep_alive=0, stream=False,)
-            #print(f"'{config.ollamaMainModel}' unloaded!")
+            getOllamaServerClient().generate(model=config.ollamaToolModel, keep_alive=0, stream=False,)
+            #print(f"'{config.ollamaToolModel}' unloaded!")
         else:
             getOllamaServerClient().generate(model=model, keep_alive=0)
 
@@ -121,16 +121,16 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     def regularCall(messages: dict, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, chat_model: Optional[str]=None):
         chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         return getOllamaServerClient().chat(
-            keep_alive=0 if chat_model is not None and not chat_model == config.ollamaMainModel else config.ollamaMainModel_keep_alive,
-            model=chat_model if chat_model is not None else config.ollamaMainModel,
+            keep_alive=0 if chat_model is not None and not chat_model == config.ollamaToolModel else config.ollamaToolModel_keep_alive,
+            model=chat_model if chat_model is not None else config.ollamaToolModel,
             messages=chatMessages,
             stream=True,
             options=Options(
                 temperature=temperature if temperature is not None else config.llmTemperature,
-                num_ctx=num_ctx if num_ctx is not None else config.ollamaMainModel_num_ctx,
-                num_batch=num_batch if num_batch is not None else config.ollamaMainModel_num_batch,
-                num_predict=num_predict if num_predict is not None else config.ollamaMainModel_num_predict,
-                **config.ollamaMainModel_additional_options,
+                num_ctx=num_ctx if num_ctx is not None else config.ollamaToolModel_num_ctx,
+                num_batch=num_batch if num_batch is not None else config.ollamaToolModel_num_batch,
+                num_predict=num_predict if num_predict is not None else config.ollamaToolModel_num_predict,
+                **config.ollamaToolModel_additional_options,
             ),
         )
 
@@ -140,17 +140,17 @@ Remember, give me the python code ONLY, without additional notes or explanation.
         #pprint.pprint(messages)
         try:
             completion = getOllamaServerClient().chat(
-                keep_alive=config.ollamaMainModel_keep_alive,
-                model=config.ollamaMainModel,
+                keep_alive=config.ollamaToolModel_keep_alive,
+                model=config.ollamaToolModel,
                 messages=messages,
                 format="json",
                 stream=False,
                 options=Options(
                     temperature=temperature if temperature is not None else config.llmTemperature,
-                    num_ctx=num_ctx if num_ctx is not None else config.ollamaMainModel_num_ctx,
-                    num_batch=num_batch if num_batch is not None else config.ollamaMainModel_num_batch,
-                    num_predict=num_predict if num_predict is not None else config.ollamaMainModel_num_predict,
-                    **config.ollamaMainModel_additional_options,
+                    num_ctx=num_ctx if num_ctx is not None else config.ollamaToolModel_num_ctx,
+                    num_batch=num_batch if num_batch is not None else config.ollamaToolModel_num_batch,
+                    num_predict=num_predict if num_predict is not None else config.ollamaToolModel_num_predict,
+                    **config.ollamaToolModel_additional_options,
                 ),
             )
             jsonOutput = completion["message"]["content"]
@@ -172,16 +172,16 @@ Remember, give me the python code ONLY, without additional notes or explanation.
         chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         try:
             completion = getOllamaServerClient().chat(
-                keep_alive=config.ollamaMainModel_keep_alive,
-                model=model if model is not None else config.ollamaMainModel,
+                keep_alive=config.ollamaToolModel_keep_alive,
+                model=model if model is not None else config.ollamaToolModel,
                 messages=chatMessages,
                 stream=False,
                 options=Options(
                     temperature=temperature if temperature is not None else config.llmTemperature,
-                    num_ctx=num_ctx if num_ctx is not None else config.ollamaMainModel_num_ctx,
-                    num_batch=num_batch if num_batch is not None else config.ollamaMainModel_num_batch,
-                    num_predict=num_predict if num_predict is not None else config.ollamaMainModel_num_predict,
-                    **config.ollamaMainModel_additional_options,
+                    num_ctx=num_ctx if num_ctx is not None else config.ollamaToolModel_num_ctx,
+                    num_batch=num_batch if num_batch is not None else config.ollamaToolModel_num_batch,
+                    num_predict=num_predict if num_predict is not None else config.ollamaToolModel_num_predict,
+                    **config.ollamaToolModel_additional_options,
                 ),
             )
             return completion["message"]["content"]

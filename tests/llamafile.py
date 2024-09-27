@@ -10,7 +10,7 @@ class CallLlamaFile:
             # 1. Intent Screening
             if config.developer:
                 print1("screening ...")
-            chatOnly = True if chatOnly else CallOllama.screen_user_request(messages=messages, user_request=user_request, model=config.ollamaMainModel)
+            chatOnly = True if chatOnly else CallOllama.screen_user_request(messages=messages, user_request=user_request, model=config.ollamaToolModel)
         if not config.selectedTool and (chatOnly or config.tool_dependence <= 0.0):
             return CallOllama.regularCall(messages)
         else:
@@ -182,11 +182,11 @@ Remember, answer in JSON with the filled template ONLY.""",
             ]
 
             # switch to a dedicated model for code generation
-            ollamaMainModel = config.ollamaMainModel
-            config.ollamaMainModel = config.ollamaChatModel
+            ollamaToolModel = config.ollamaToolModel
+            config.ollamaToolModel = config.ollamaChatModel
             code = CallOllama.getDictionaryOutput(messages)
             parameters["code"] = code["code"]
-            config.ollamaMainModel = ollamaMainModel
+            config.ollamaToolModel = ollamaToolModel
         return parameters
 
     @staticmethod

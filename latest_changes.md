@@ -1,3 +1,15 @@
+# Version 0.3.58-0.3.60
+
+* fixed dynamic token count feature for chatgpt and letmedoit mode
+
+* added ui to specify context window size and gpu layers
+
+* tweaked using Ollama models
+
+# Version 0.3.57
+
+* fixed loading Ollama models
+
 # Version 0.3.55-0.3.56
 
 * added ToolMate AI icon

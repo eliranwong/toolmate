@@ -119,3 +119,4 @@ pytz
 geopy
 psutil
 flashtext
+#flaml[automl]

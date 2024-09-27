@@ -16,7 +16,7 @@ def ask_ollama(function_args):
     config.currentMessages[-1] = {"role": "user", "content": query}
     completion = CallOllama.regularCall(config.currentMessages, chat_model=config.ollamaChatModel if config.useAdditionalChatModel else None)
     config.toolmate.streamCompletion(completion, openai=False)
-    if config.useAdditionalChatModel and not config.ollamaChatModel == config.ollamaMainModel:
+    if config.useAdditionalChatModel and not config.ollamaChatModel == config.ollamaToolModel:
         CallOllama.unloadModels(config.ollamaChatModel)
     return ""
 

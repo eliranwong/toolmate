@@ -14,7 +14,7 @@ def ask_groq(function_args):
     config.stopSpinning()
     query = function_args.get("query") # required
     config.currentMessages[-1] = {"role": "user", "content": query}
-    completion = CallGroq.regularCall(config.currentMessages, chat_model=config.groqApi_chat_model if config.useAdditionalChatModel else None)
+    completion = CallGroq.regularCall(config.currentMessages, chat_model=config.groqApi_chat_model if config.useAdditionalChatModel else None, max_tokens=config.groqApi_chat_model_max_tokens if config.useAdditionalChatModel else None)
     config.toolmate.streamCompletion(completion, openai=True)
     return ""
 

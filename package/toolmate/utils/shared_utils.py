@@ -360,19 +360,19 @@ def startLlamacppServer():
             config.llamacppServer = None
             print2("Running llama.cpp tool server ...")
             cpuThreads = getCpuThreads()
-            cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppMainModel_server_port} --model "{config.llamacppMainModel_model_path}" --verbose {config.llamacppMainModel_verbose} --chat_format chatml --n_ctx {config.llamacppMainModel_n_ctx} --n_gpu_layers {config.llamacppMainModel_n_gpu_layers} --n_batch {config.llamacppMainModel_n_batch} --n_threads {cpuThreads} --n_threads_batch {cpuThreads} {config.llamacppMainModel_additional_server_options}"""
+            cmd = f"""{sys.executable} -m llama_cpp.server --port {config.llamacppToolModel_server_port} --model "{config.llamacppToolModel_model_path}" --verbose {config.llamacppToolModel_verbose} --chat_format chatml --n_ctx {config.llamacppToolModel_n_ctx} --n_gpu_layers {config.llamacppToolModel_n_gpu_layers} --n_batch {config.llamacppToolModel_n_batch} --n_threads {cpuThreads} --n_threads_batch {cpuThreads} {config.llamacppToolModel_additional_server_options}"""
             config.llamacppServer = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
-            while not isServerAlive("127.0.0.1", config.llamacppMainModel_server_port):
+            while not isServerAlive("127.0.0.1", config.llamacppToolModel_server_port):
                 # wait til the server is up
                 ...
     except:
-        print2(f'''Failed to run llama.cpp server at "localhost:{config.llamacppMainModel_server_port}"!''')
+        print2(f'''Failed to run llama.cpp server at "localhost:{config.llamacppToolModel_server_port}"!''')
         config.llamacppServer = None
-    webbrowser.open(f"http://127.0.0.1:{config.llamacppMainModel_server_port}/docs")
+    webbrowser.open(f"http://127.0.0.1:{config.llamacppToolModel_server_port}/docs")
 
 def stopLlamacppServer():
     if hasattr(config, "llamacppServer") and config.llamacppServer is not None:
-        if isServerAlive("127.0.0.1", config.llamacppMainModel_server_port):
+        if isServerAlive("127.0.0.1", config.llamacppToolModel_server_port):
             print2("Stopping llama.cpp tool server ...")
             os.killpg(os.getpgid(config.llamacppServer.pid), signal.SIGTERM)
         config.llamacppServer = None

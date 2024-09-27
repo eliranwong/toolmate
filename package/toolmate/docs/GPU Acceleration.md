@@ -17,7 +17,7 @@ pip install --upgrade --force-reinstall --no-cache-dir toolmate numpy==1.26.4 ll
 2. [Edit config.py](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Edit%20Config%20Manually.md):
 
 ```
-llamacppMainModel_n_gpu_layers = -1
+llamacppToolModel_n_gpu_layers = -1
 llamacppChatModel_n_gpu_layers = -1
 llamacppVisionModel_n_gpu_layers = -1
 ```

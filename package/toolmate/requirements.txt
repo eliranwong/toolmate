@@ -1,7 +1,7 @@
 wheel
 setuptools
 pipdeptree
-chromadb==0.5.7
+chromadb==0.5.9
 mistralai==1.0.3
 scikit-image==0.24.0
 scikit-learn==1.5.2
@@ -124,3 +124,4 @@ pytz
 geopy
 psutil
 flashtext
+#flaml[automl]

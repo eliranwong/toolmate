@@ -36,11 +36,11 @@ class LlamacppChat:
             # tool model
             self.model = model
             if not name:
-                if config.llamacppMainModel_model_path and os.path.isfile(config.llamacppMainModel_model_path):
-                    if config.llamacppMainModel_model_path.lower().endswith(".gguf"):
-                        name = os.path.splitext(os.path.basename(config.llamacppMainModel_model_path))[0]
-                    elif config.llamacppMainModel_ollama_tag:
-                        name = config.llamacppMainModel_ollama_tag
+                if config.llamacppToolModel_model_path and os.path.isfile(config.llamacppToolModel_model_path):
+                    if config.llamacppToolModel_model_path.lower().endswith(".gguf"):
+                        name = os.path.splitext(os.path.basename(config.llamacppToolModel_model_path))[0]
+                    elif config.llamacppToolModel_ollama_tag:
+                        name = config.llamacppToolModel_ollama_tag
                 else:
                     name = "Llama.cpp chatbot"
 

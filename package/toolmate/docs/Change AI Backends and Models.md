@@ -37,15 +37,15 @@ Check available *gguf models at: https://huggingface.co/
 
 The most direct way is change "*_model_path" in config.py if model files are already in place:
 
-* llamacppMainModel_model_path
+* llamacppToolModel_model_path
 
 * llamacppChatModel_model_path
 
 Alternately, to download and set modes, change:
 
-* llamacppMainModel_repo_id, e.g. 'TheBloke/phi-2-GGUF' (default), 'TheBloke/Llama-2-7B-Chat-GGUF', 'SinpxAI/Neural-Chat-7B-v3.3-GGUF', 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
+* llamacppToolModel_repo_id, e.g. 'TheBloke/phi-2-GGUF' (default), 'TheBloke/Llama-2-7B-Chat-GGUF', 'SinpxAI/Neural-Chat-7B-v3.3-GGUF', 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
 
-* llamacppMainModel_filename, e.g. 'phi-2.Q4_K_M.gguf' (default), 'llama-2-7b-chat.Q4_K_M.gguf', 'neural-chat-7b-v3.3.Q4_K_M.gguf', 'TheBloke/neural-chat-7B-v3-1-GGUF', 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
+* llamacppToolModel_filename, e.g. 'phi-2.Q4_K_M.gguf' (default), 'llama-2-7b-chat.Q4_K_M.gguf', 'neural-chat-7b-v3.3.Q4_K_M.gguf', 'TheBloke/neural-chat-7B-v3-1-GGUF', 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
 
 * llamacppChatModel_repo_id, e.g. 'TheBloke/phi-2-GGUF' (default), 'TheBloke/CodeLlama-7B-Python-GGUF'
 
@@ -57,7 +57,7 @@ Remarks: match repo_id and filename reasonably that sepecified filename have to 
 
 Check available models at: https://ollama.com/library
 
-* ollamaMainModel, e.g. 'phi' (default), 'mistral', 'llama2', e.g.
+* ollamaToolModel, e.g. 'phi' (default), 'mistral', 'llama2', e.g.
 
 * ollamaChatModel, e.g. 'phi' (default), 'codellama', 'starcoder2', e.g.
 

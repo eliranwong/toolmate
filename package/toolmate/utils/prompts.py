@@ -147,7 +147,7 @@ class Prompts:
                     availableFunctionTokens = count_tokens_from_functions(config.toolFunctionSchemas)
                 '''
                 availableFunctionTokens = count_tokens_from_functions(config.toolFunctionSchemas)
-                currentInputTokens = len(encoding.encode(config.fineTuneUserInput(currentInput)))
+                currentInputTokens = len(encoding.encode(config.addPredefinedContext(currentInput)))
                 loadedMessageTokens = count_tokens_from_messages(config.currentMessages)
                 selectedModelLimit = tokenLimits[config.chatGPTApiModel]
                 estimatedAvailableTokens = selectedModelLimit - availableFunctionTokens - loadedMessageTokens - currentInputTokens

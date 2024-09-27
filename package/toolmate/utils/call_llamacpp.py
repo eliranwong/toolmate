@@ -18,30 +18,30 @@ class CallLlamaCpp:
         Path(llm_directory).mkdir(parents=True, exist_ok=True)
 
         def loadMainModel():
-            llamacppMainModel_model_path = os.path.join(llm_directory, config.llamacppMainModel_filename)
-            if not config.llamacppMainModel_model_path or not os.path.isfile(config.llamacppMainModel_model_path):
-                config.llamacppMainModel_model_path = llamacppMainModel_model_path
-            if not os.path.isfile(config.llamacppMainModel_model_path):
+            llamacppToolModel_model_path = os.path.join(llm_directory, config.llamacppToolModel_filename)
+            if not config.llamacppToolModel_model_path or not os.path.isfile(config.llamacppToolModel_model_path):
+                config.llamacppToolModel_model_path = llamacppToolModel_model_path
+            if not os.path.isfile(config.llamacppToolModel_model_path):
                 # download llava clip model
                 print2("Downloading tool model ...")
                 hf_hub_download(
-                    repo_id=config.llamacppMainModel_repo_id,
-                    filename=config.llamacppMainModel_filename,
+                    repo_id=config.llamacppToolModel_repo_id,
+                    filename=config.llamacppToolModel_filename,
                     local_dir=llm_directory,
                     #local_dir_use_symlinks=False,
                 )
-            config.llamacppMainModel = None
+            config.llamacppToolModel = None
             cpuThreads = getCpuThreads()
-            config.llamacppMainModel = Llama(
-                model_path=config.llamacppMainModel_model_path,
+            config.llamacppToolModel = Llama(
+                model_path=config.llamacppToolModel_model_path,
                 chat_format="chatml",
-                n_ctx=config.llamacppMainModel_n_ctx,
-                n_batch=config.llamacppMainModel_n_batch,
-                verbose=config.llamacppMainModel_verbose,
+                n_ctx=config.llamacppToolModel_n_ctx,
+                n_batch=config.llamacppToolModel_n_batch,
+                verbose=config.llamacppToolModel_verbose,
                 n_threads=cpuThreads,
                 n_threads_batch=cpuThreads,
-                n_gpu_layers=config.llamacppMainModel_n_gpu_layers,
-                **config.llamacppMainModel_additional_model_options,
+                n_gpu_layers=config.llamacppToolModel_n_gpu_layers,
+                **config.llamacppToolModel_additional_model_options,
             )
 
         def downloadChatModel():
@@ -64,10 +64,10 @@ class CallLlamaCpp:
         except:
             # restore default config
             print2("Errors! Restoring default tool model!")
-            config.llamacppMainModel_ollama_tag = ""
-            config.llamacppMainModel_model_path = ""
-            config.llamacppMainModel_repo_id = "MaziyarPanahi/WizardLM-2-7B-GGUF"
-            config.llamacppMainModel_filename = "WizardLM-2-7B.Q4_K_M.gguf"
+            config.llamacppToolModel_ollama_tag = ""
+            config.llamacppToolModel_model_path = ""
+            config.llamacppToolModel_repo_id = "MaziyarPanahi/WizardLM-2-7B-GGUF"
+            config.llamacppToolModel_filename = "WizardLM-2-7B.Q4_K_M.gguf"
             loadMainModel()
 
         try:
@@ -179,12 +179,12 @@ Remember, output the new copy of python code ONLY, without additional notes or e
     @staticmethod
     def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None):
         chatMessages = useChatSystemMessage(copy.deepcopy(messages))
-        return config.llamacppMainModel.create_chat_completion(
+        return config.llamacppToolModel.create_chat_completion(
             messages=chatMessages,
             temperature=temperature if temperature is not None else config.llmTemperature,
-            max_tokens=max_tokens if max_tokens is not None else config.llamacppMainModel_max_tokens,
+            max_tokens=max_tokens if max_tokens is not None else config.llamacppToolModel_max_tokens,
             stream=True,
-            **config.llamacppMainModel_additional_chat_options,
+            **config.llamacppToolModel_additional_chat_options,
         )
 
     @staticmethod
@@ -236,13 +236,13 @@ Remember, output the new copy of python code ONLY, without additional notes or e
     def getDictionaryOutput(messages: list, schema: dict={}, temperature: Optional[float]=None, max_tokens: Optional[int]=None) -> dict:
         schema = toParameterSchema(schema)
         try:
-            completion = config.llamacppMainModel.create_chat_completion(
+            completion = config.llamacppToolModel.create_chat_completion(
                 messages=messages,
                 response_format={"type": "json_object", "schema": schema} if schema else {"type": "json_object"},
                 temperature=temperature if temperature is not None else config.llmTemperature,
-                max_tokens=max_tokens if max_tokens is not None else config.llamacppMainModel_max_tokens,
+                max_tokens=max_tokens if max_tokens is not None else config.llamacppToolModel_max_tokens,
                 stream=False,
-                **config.llamacppMainModel_additional_chat_options,
+                **config.llamacppToolModel_additional_chat_options,
             )
             jsonOutput = completion["choices"][0]["message"].get("content", "{}")
             jsonOutput = re.sub("^[^{]*?({.*?})[^}]*?$", r"\1", jsonOutput)
@@ -259,12 +259,12 @@ Remember, output the new copy of python code ONLY, without additional notes or e
             messages.append({"role": "user", "content" : userInput})
         chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         try:
-            completion = config.llamacppMainModel.create_chat_completion(
+            completion = config.llamacppToolModel.create_chat_completion(
                 messages=chatMessages,
                 temperature=temperature if temperature is not None else config.llmTemperature,
-                max_tokens=max_tokens if max_tokens is not None else config.llamacppMainModel_max_tokens,
+                max_tokens=max_tokens if max_tokens is not None else config.llamacppToolModel_max_tokens,
                 stream=False,
-                **config.llamacppMainModel_additional_chat_options,
+                **config.llamacppToolModel_additional_chat_options,
             )
             return completion["choices"][0]["message"].get("content", "")
         except:

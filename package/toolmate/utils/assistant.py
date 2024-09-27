@@ -143,10 +143,16 @@ class ToolMate:
             ".saveas": ("save current conversation as ...", lambda: self.saveAsChat(config.currentMessages)),
             ".export": (f"export current conversation {str(config.hotkey_export)}", lambda: self.exportChat(config.currentMessages)),
             
+            ".apikeys": ("change API keys", self.changeAPIkeys),
             ".model": ("change AI backends and models", self.setLlmModel),
             #".embedding": ("change embedding model", self.setEmbeddingModel), # joined ".model"
-            ".apikeys": ("change API keys", self.changeAPIkeys),
             #".chatmodel": ("change chat-only model", self.setChatbot),
+            # inference
+            ".contextwindow": ("change context window size", self.setContextWindowSize),
+            ".maxtokens": ("change maximum output tokens", self.setMaxTokens),
+            #".mintokens": ("change minimum output tokens", self.setMinTokens), # for chatgp and letmedoit only
+            #".dynamictokencount": ("change dynamic token count", self.setDynamicTokenCount), # for chatgp and letmedoit only
+            ".temperature": ("change output temperature", self.setTemperature),
 
             ".plugins": ("change plugins", self.selectPlugins),
             ".tools": ("configure tool selection agent", self.setToolSelectionConfigs),
@@ -164,12 +170,7 @@ class ToolMate:
             #".termuxapi": ("change Termux API integration", self.setTermuxApi), # joined ".apikeys"
             #".functioncall": ("change function call", self.setFunctionCall),
             #".functioncallintegration": ("change function call integration", self.setFunctionResponse),
-            
-            # inference
-            ".temperature": ("change output temperature", self.setTemperature),
-            ".maxtokens": ("change maximum output tokens", self.setMaxTokens),
-            ".mintokens": ("change minimum output tokens", self.setMinTokens),
-            ".dynamictokencount": ("change dynamic token count", self.setDynamicTokenCount),
+
             # tweak searches
             ".maxmemorymatches": ("change maximum memory matches", self.setMemoryClosestMatches),
             ".maxchatrecordmatches": ("change maximum chat record matches", self.setChatRecordClosestMatches),
@@ -643,7 +644,7 @@ class ToolMate:
                 options=options,
                 descriptions=descriptions,
                 title=config.toolMateAIName,
-                default=config.defaultBlankEntryAction,
+                default=config.defaultActionMenuItem,
                 text="Select an action or make changes:",
                 filter=query,
             )
@@ -959,7 +960,7 @@ class ToolMate:
 
     def configureToolSelectionAgent(self) -> bool:
         options = ("yes", "no")
-        question = "Would you like our built-in tool selection agent to choose the appropriate tools for resolving your requests?\nRemarks: You can manually call a specific tool at any time by entering a tool name prefixed with `@`."
+        question = "Would you like our built-in tool selection agent to choose the appropriate tools for resolving your requests?\nRemarks:\n* Enabling this option consumes more tokens.\n* You can manually call a specific tool at any time by entering a tool name prefixed with `@`."
         print1(question)
         tool_selection_agent = self.dialogs.getValidOptions(
             options=options,
@@ -1038,8 +1039,8 @@ class ToolMate:
         )
         if llmInterface:
             config.llmInterface = llmInterface
-            if not config.llmInterface == "llamacpp" and hasattr(config, "llamacppMainModel"):
-                config.llamacppMainModel = None
+            if not config.llmInterface == "llamacpp" and hasattr(config, "llamacppToolModel"):
+                config.llamacppToolModel = None
 
     def setLlmModel(self):
         def askAdditionalChatModel() -> bool:
@@ -1068,36 +1069,53 @@ class ToolMate:
         if config.llmInterface == "ollama":
             print2("# Tool Model - for both task execution and conversation")
             self.setLlmModel_ollama()
+            self.setContextWindowSize(feature="default")
+            self.setMaxTokens(feature="default")
             if askAdditionalChatModel():
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_ollama("chat")
+                self.setContextWindowSize(feature="chat")
+                self.setMaxTokens(feature="chat")
         elif config.llmInterface == "llamacpp":
             print2("# Tool Model - for both task execution and conversation")
             self.setLlmModel_llamacpp()
+            self.setContextWindowSize(feature="default")
+            self.setMaxTokens(feature="default")
+            self.setGpuLayers(feature="default")
             if askAdditionalChatModel():
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_llamacpp("chat")
+                self.setContextWindowSize(feature="chat")
+                self.setMaxTokens(feature="chat")
+                self.setGpuLayers(feature="chat")
         elif config.llmInterface == "llamacppserver":
             print2("# Tool Server - for both task execution and conversation")
             self.setLlmModel_llamacppserver()
+            self.setMaxTokens(feature="default")
             if askAdditionalChatModel():
                 print2("# Chat Server - for conversation only")
                 self.setLlmModel_llamacppserver("chat")
+                self.setMaxTokens(feature="chat")
             print2("# Vision Server - for vision only")
             self.setLlmModel_llamacppserver("vision")
         elif config.llmInterface == "groq":
             print2("# Tool Model - for both task execution and conversation")
             self.setLlmModel_groq()
+            self.setMaxTokens(feature="default")
             if askAdditionalChatModel():
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_groq("chat")
+                self.setMaxTokens(feature="chat")
         elif config.llmInterface == "gemini":
-            print3("Model selected: Google Gemini Pro")
             self.setLlmModel_gemini()
+            self.setMaxTokens(feature="default")
         else:
             self.setLlmModel_chatgpt()
+            self.setMaxTokens(feature="default")
         config.saveConfig()
         if not config.llmInterface == currentLlmInterface:
+            if currentLlmInterface == "ollama":
+                CallLLM.resetMessages() # unload Ollama models
             print2("LLM Interface changed! Starting a new chat session ...")
             config.defaultEntry = ".new"
             config.accept_default = True
@@ -1117,12 +1135,12 @@ class ToolMate:
         if feature == "embedding":
             default = config.embeddingModel[8:] if config.embeddingModel.startswith("_ollama_") else "nomic-embed-text"
         elif config.llmInterface == "llamacpp":
-            if feature == "default" and config.llamacppMainModel_ollama_tag:
-                default = config.llamacppMainModel_ollama_tag
+            if feature == "default" and config.llamacppToolModel_ollama_tag:
+                default = config.llamacppToolModel_ollama_tag
             elif feature == "chat" and config.llamacppChatModel_ollama_tag:
                 default = config.llamacppChatModel_ollama_tag
         else:
-            default = config.ollamaChatModel if feature == "chat" else config.ollamaMainModel
+            default = config.ollamaChatModel if feature == "chat" else config.ollamaToolModel
         # prompt
         print1(message)
         print1("(For details, visit https://ollama.com/library)")
@@ -1137,7 +1155,7 @@ class ToolMate:
             downloadedOllamaModels = getDownloadedOllamaModels()
             if model in downloadedOllamaModels:
                 if feature == "default":
-                    config.ollamaMainModel = model
+                    config.ollamaToolModel = model
                 elif feature == "chat":
                     config.ollamaChatModel = model
                 elif feature == "embedding":
@@ -1147,7 +1165,7 @@ class ToolMate:
                     try:
                         Downloader.downloadOllamaModel(model, True)
                         if feature == "default":
-                            config.ollamaMainModel = model
+                            config.ollamaToolModel = model
                         elif feature == "chat":
                             config.ollamaChatModel = model
                         elif feature == "embedding":
@@ -1251,7 +1269,7 @@ class ToolMate:
                     downloadedOllamaModels = getDownloadedOllamaModels()
                     if model in downloadedOllamaModels:
                         if feature == "default":
-                            config.llamacppMainModel_model_path = downloadedOllamaModels[model]
+                            config.llamacppToolModel_model_path = downloadedOllamaModels[model]
                         elif feature == "chat":
                             config.llamacppChatModel_model_path = downloadedOllamaModels[model]
                     else:
@@ -1269,7 +1287,7 @@ class ToolMate:
                                 # refresh download list
                                 
                                 if feature == "default":
-                                    config.llamacppMainModel_model_path = model_path
+                                    config.llamacppToolModel_model_path = model_path
                                 elif feature == "chat":
                                     config.llamacppChatModel_model_path = model_path
                             except:
@@ -1278,7 +1296,7 @@ class ToolMate:
                             print("Ollama not found! Install Ollama first to use Ollama model library!")
                             print("To install Ollama, visit https://ollama.com")
                     if feature == "default":
-                        config.llamacppMainModel_ollama_tag = model
+                        config.llamacppToolModel_ollama_tag = model
                     elif feature == "chat":
                         config.llamacppChatModel_ollama_tag = model
             elif library == "Downloaded GGUF Files":
@@ -1296,7 +1314,7 @@ class ToolMate:
                         if model == "Others ...":
                             self.setCustomHuggingfaceModel(feature=feature)
                         elif feature == "default":
-                            config.llamacppMainModel_model_path = downloadedGgufModels[model]
+                            config.llamacppToolModel_model_path = downloadedGgufModels[model]
                         elif feature == "chat":
                             config.llamacppChatModel_model_path = downloadedGgufModels[model]
             elif library == "Custom":
@@ -1309,11 +1327,11 @@ class ToolMate:
             list_content_on_directory_change=True,
             keep_startup_directory=True,
             message="Enter a custom model path:",
-            default=config.llamacppChatModel_model_path if feature == "chat" else config.llamacppMainModel_model_path,
+            default=config.llamacppChatModel_model_path if feature == "chat" else config.llamacppToolModel_model_path,
         )
         if model_path and os.path.isfile(model_path):
             if feature == "default":
-                config.llamacppMainModel_model_path = model_path
+                config.llamacppToolModel_model_path = model_path
             elif feature == "chat":
                 config.llamacppChatModel_model_path = model_path
 
@@ -1326,14 +1344,14 @@ class ToolMate:
         filename_session = PromptSession(history=FileHistory(filename_history))
         bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
         print1("Please specify the huggingface repo id of a *.gguf model:")
-        repo_id = self.prompts.simplePrompt(style=self.prompts.promptStyle2, promptSession=repo_id_session, bottom_toolbar=bottom_toolbar, default=config.llamacppChatModel_repo_id if feature == "chat" else config.llamacppMainModel_repo_id)
+        repo_id = self.prompts.simplePrompt(style=self.prompts.promptStyle2, promptSession=repo_id_session, bottom_toolbar=bottom_toolbar, default=config.llamacppChatModel_repo_id if feature == "chat" else config.llamacppToolModel_repo_id)
         print2("Please specify a filename or glob pattern to match the model file in the repo:")
-        filename = self.prompts.simplePrompt(style=self.prompts.promptStyle2, promptSession=filename_session, bottom_toolbar=bottom_toolbar, default=config.llamacppChatModel_filename if feature == "chat" else config.llamacppMainModel_filename)
+        filename = self.prompts.simplePrompt(style=self.prompts.promptStyle2, promptSession=filename_session, bottom_toolbar=bottom_toolbar, default=config.llamacppChatModel_filename if feature == "chat" else config.llamacppToolModel_filename)
         if (repo_id and not repo_id.lower() == config.exit_entry) and (filename and not filename.lower() == config.exit_entry):
             if feature == "default":
-                config.llamacppMainModel_repo_id = repo_id
-                config.llamacppMainModel_filename = filename
-                config.llamacppMainModel_model_path = ""
+                config.llamacppToolModel_repo_id = repo_id
+                config.llamacppToolModel_filename = filename
+                config.llamacppToolModel_model_path = ""
             elif feature == "chat":
                 config.llamacppChatModel_repo_id = repo_id
                 config.llamacppChatModel_filename = filename
@@ -1357,12 +1375,12 @@ class ToolMate:
                 "llama-3.1-405b-reasoning",
             ),
             title="Groq Model",
-            default=config.groqApi_chat_model if feature == "chat" else config.groqApi_main_model,
+            default=config.groqApi_chat_model if feature == "chat" else config.groqApi_tool_model,
             text=f"Select a {'chat' if feature=='chat' else 'tool'} call model:\n(for {'conversations only' if feature=='chat' else 'both chat and task execution'})",
         )
         if model:
             if feature == "default":
-                config.groqApi_main_model = model
+                config.groqApi_tool_model = model
             elif feature == "chat":
                 config.groqApi_chat_model = model
             print3(f"Groq model: {model}")
@@ -1587,34 +1605,86 @@ class ToolMate:
             maxToken = 4096
         return contextWindowLimit, functionTokens, maxToken
 
-    def setMaxTokens_non_chatgpt(self):
+    def setGpuLayers(self, feature="default"):
+        if not config.llmInterface in ("llamacpp",):
+            print1("Option `GPU Layers` applies to backend `llamacpp` only.")
+            return None
+        print1("Please specify the number of layers to store in VRAM (-1: all layers ):")
+        if config.llmInterface == "llamacpp":
+            default = config.llamacppChatModel_n_gpu_layers if feature == "chat" else config.llamacppToolModel_n_gpu_layers
+        gpuLayers = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(default))
+        if gpuLayers and not gpuLayers.strip().lower() == config.exit_entry and int(gpuLayers) >= -1:
+            gpuLayers = int(gpuLayers)
+            if config.llmInterface == "llamacpp":
+                if feature == "chat":
+                    config.llamacppChatModel_n_gpu_layers = gpuLayers
+                else:
+                    config.llamacppToolModel_n_gpu_layers = gpuLayers
+            config.saveConfig()
+            print3(f"GPU Layers: {gpuLayers}")
+
+    def setContextWindowSize(self, feature="default"):
+        if not config.llmInterface in ("llamacpp", "ollama"):
+            print1("Option `Context window size` applies to backends `llamacpp` and `ollama` only.")
+            return None
+        print1("Please specify context window size below:")
+        if config.llmInterface == "llamacpp":
+            default = config.llamacppChatModel_n_ctx if feature == "chat" else config.llamacppToolModel_n_ctx
+        elif config.llmInterface == "ollama":
+            default = config.ollamaChatModel_num_ctx if feature == "chat" else config.ollamaToolModel_num_ctx
+        contextWindowSize = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(default))
+        if contextWindowSize and not contextWindowSize.strip().lower() == config.exit_entry and int(contextWindowSize) >= 0:
+            contextWindowSize = int(contextWindowSize)
+            if config.llmInterface == "llamacpp":
+                if feature == "chat":
+                    config.llamacppChatModel_n_ctx = contextWindowSize
+                else:
+                    config.llamacppToolModel_n_ctx = contextWindowSize
+            elif config.llmInterface == "ollama":
+                if feature == "chat":
+                    config.ollamaChatModel_num_ctx = contextWindowSize
+                else:
+                    config.ollamaToolModel_num_ctx = contextWindowSize
+            config.saveConfig()
+            print3(f"Context Window Size: {contextWindowSize}")
+
+    def setMaxTokens_non_chatgpt(self, feature="default"):
         print1("Please specify maximum output tokens below:")
         if config.llmInterface == "gemini":
             default = config.gemini_max_output_tokens
-        elif config.llmInterface == "llamacpp":
-            default = config.llamacppMainModel_max_tokens
+        elif config.llmInterface in ("llamacpp", "llamacppserver"):
+            default = config.llamacppChatModel_max_tokens if feature == "chat" else config.llamacppToolModel_max_tokens
         elif config.llmInterface == "ollama":
-            default = config.ollamaMainModel_num_predict
+            default = config.ollamaChatModel_num_predict if feature == "chat" else config.ollamaToolModel_num_predict
         elif config.llmInterface == "groq":
-            default = config.groqApi_max_tokens
+            default = config.groqApi_chat_model_max_tokens if feature == "chat" else config.groqApi_tool_model_max_tokens
         maxtokens = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(default))
-        if maxtokens and not maxtokens.strip().lower() == config.exit_entry and int(maxtokens) > 0:
+        if maxtokens and not maxtokens.strip().lower() == config.exit_entry and int(maxtokens) >= -1:
             maxtokens = int(maxtokens)
             if config.llmInterface == "gemini":
                 config.gemini_max_output_tokens = maxtokens
-            elif config.llmInterface == "llamacpp":
-                config.llamacppMainModel_max_tokens = maxtokens
+            elif config.llmInterface in ("llamacpp", "llamacppserver"):
+                if feature == "chat":
+                    config.llamacppChatModel_max_tokens = maxtokens
+                else:
+                    config.llamacppToolModel_max_tokens = maxtokens
             elif config.llmInterface == "ollama":
-                config.ollamaMainModel_num_predict = maxtokens
+                if feature == "chat":
+                    config.ollamaChatModel_num_predict = maxtokens
+                else:
+                    config.ollamaToolModel_num_predict = maxtokens
             elif config.llmInterface == "groq":
-                config.groqApi_max_tokens = maxtokens
+                if feature == "chat":
+                    config.groqApi_chat_model_max_tokens = maxtokens
+                else:
+                    config.groqApi_tool_model_max_tokens = maxtokens
             config.saveConfig()
             print3(f"Maximum output tokens: {maxtokens}")
 
-    def setMaxTokens(self):
+    def setMaxTokens(self, feature="default"):
         # non-chatgpt settings
         if not config.llmInterface in ("chatgpt", "letmedoit"):
-            self.setMaxTokens_non_chatgpt()
+            self.setMaxTokens_non_chatgpt(feature=feature)
             return None
         # chatgpt settings
         contextWindowLimit, functionTokens, tokenLimit = self.getMaxTokens()
@@ -1637,6 +1707,8 @@ class ToolMate:
                     config.chatGPTApiMaxTokens = tokenLimit
                 config.saveConfig()
                 print3(f"Maximum output tokens: {config.chatGPTApiMaxTokens}")
+        self.setMinTokens()
+        self.setDynamicTokenCount()
 
     def runSystemCommand(self, command):
         command = command.strip()[1:]
@@ -2817,9 +2889,9 @@ Acess the risk level of the following `{target.capitalize()}`:
             #chatbot = "chatgpt"
             ...
         chatbots = {
-            "llamacpp": lambda: LlamacppChat(model=None if config.useAdditionalChatModel else config.llamacppMainModel).run(userInput),
+            "llamacpp": lambda: LlamacppChat(model=None if config.useAdditionalChatModel else config.llamacppToolModel).run(userInput),
             "llamacppserver": lambda: LlamacppServerChat().run(userInput),
-            "ollama": lambda: OllamaChat().run(userInput, model=config.ollamaChatModel if config.useAdditionalChatModel else config.ollamaMainModel),
+            "ollama": lambda: OllamaChat().run(userInput, model=config.ollamaChatModel if config.useAdditionalChatModel else config.ollamaToolModel),
             "groq": lambda: GroqChatbot().run(userInput),
             "chatgpt": lambda: ChatGPT().run(userInput),
             "letmedoit": lambda: ChatGPT().run(userInput),

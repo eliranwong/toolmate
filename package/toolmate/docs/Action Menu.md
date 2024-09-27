@@ -34,9 +34,9 @@ Press 'ctrl+k' and scroll to the bottom for a full list of quick actions, e.g.:
 .tools: change tool configurations
 .managerisk: manage code execution risk
 .context: change default context
+.contextwindow: change context window size
 .temperature: change output temperature
 .maxtokens: change maximum output tokens
-.mintokens: change minimum output tokens
 .maxmemorymatches: change maximum memory matches
 .maxchatrecordmatches: change maximum chat record matches
 .ipinfo: change ip information integration

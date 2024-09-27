@@ -15,6 +15,8 @@ class CallLLM:
         # upload Ollama model
         if config.llmInterface == "ollama":
             CallOllama.unloadModels()
+        #elif config.llmInterface == "llamacpp":
+        #    CallLlamaCpp.unloadModels()
         distro = f" '{config.thisDistro}'" if config.thisDistro else ""
         systemMessage1 = config.systemMessage_tool if config.systemMessage_tool else f'''You’re {config.toolMateAIName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my {config.thisPlatform} device. When you need to generate code, please make sure your code work on {config.thisPlatform}{distro}. Your functionality expands as I add more plugins to you.
 Always remember that you are much more than a text-based AI. You possess both vision and speech capabilities and have direct access to my device operating system, enabling you to execute tasks at my command. Please do not state otherwise.'''

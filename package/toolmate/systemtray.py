@@ -268,6 +268,13 @@ def main():
     trayIcon = ToolMateHub(icon)
     trayIcon.show()
 
+    # unload llama.cpp model to free VRAM
+    try:
+        config.llamacppToolModel.close()
+        print("Llama.cpp model unloaded!")
+    except:
+        pass
+
     sys.exit(app.exec())
 
 if __name__ == "__main__":

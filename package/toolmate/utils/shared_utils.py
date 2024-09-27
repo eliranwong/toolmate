@@ -24,6 +24,8 @@ from groq import Groq
 from ollama import Client
 import speech_recognition as sr
 import sounddevice, soundfile
+from llama_cpp import Llama
+
 
 # voice typing
 
@@ -326,6 +328,20 @@ def stopAutogenstudioServer():
 
 def getOllamaServerClient(server="main"):
     return Client(host=f"http://{config.ollamaChatServer_ip if server=='chat' else config.ollamaToolServer_ip}:{config.ollamaChatServer_port if server=='chat' else config.ollamaToolServer_port}")
+
+def loadLlamacppChatModel():
+    cpuThreads = getCpuThreads()
+    return Llama(
+        model_path=config.llamacppChatModel_model_path,
+        chat_format="chatml",
+        n_ctx=config.llamacppChatModel_n_ctx,
+        n_batch=config.llamacppChatModel_n_batch,
+        verbose=config.llamacppChatModel_verbose,
+        n_threads=cpuThreads,
+        n_threads_batch=cpuThreads,
+        n_gpu_layers=config.llamacppChatModel_n_gpu_layers,
+        **config.llamacppChatModel_additional_model_options,
+    )
 
 def getLlamacppServerClient(server="tool"):
     def getNewClient():
@@ -1735,11 +1751,14 @@ import chromadb
 
 def getHelpCollection(vectorStore=None):
     vectorStore = vectorStore if vectorStore else os.path.join(config.toolMateAIFolder, "help")
+    shutil.rmtree(vectorStore, ignore_errors=True)
     Path(vectorStore).mkdir(parents=True, exist_ok=True)
     chroma_client = chromadb.PersistentClient(vectorStore, Settings(anonymized_telemetry=False))
     return get_or_create_collection(chroma_client, "help", embeddingModel="all-mpnet-base-v2")
 
 def buildHelpStore():
+    # source ../../../../bin/activate
+    # python3 -c "from toolmate import buildHelpStore; buildHelpStore()"
     collection = getHelpCollection()
     docs_path = ragRefineDocsPath(os.path.join(config.toolMateAIFolder, "docs"))
     splits = ragGetSplits(docs_path)

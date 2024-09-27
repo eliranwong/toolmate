@@ -1,3 +1,11 @@
+# Version 0.3.61-0.3.65
+
+* unload Llama.cpp model on exit
+
+* support Lllam.cpp to use additional chat model
+
+* updated help store
+
 # Version 0.3.58-0.3.60
 
 * fixed dynamic token count feature for chatgpt and letmedoit mode

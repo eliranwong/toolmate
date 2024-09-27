@@ -145,6 +145,12 @@ def main(tempInterface=""):
     config.saveConfig()
     if os.path.isdir(config.localStorage):
         shutil.copy(configFile, os.path.join(config.localStorage, "config_backup.py"))
+    # unload llama.cpp model to free VRAM
+    try:
+        config.llamacppToolModel.close()
+        print("Llama.cpp model unloaded!")
+    except:
+        pass
     # delete temporary content
     try:
         tempFolder = os.path.join(config.toolMateAIFolder, "temp")

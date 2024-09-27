@@ -1,5 +1,5 @@
 from toolmate import config
-from toolmate import print1, print2, print3, getCpuThreads, toggleinputaudio, toggleoutputaudio
+from toolmate import print1, print2, print3, getCpuThreads, toggleinputaudio, toggleoutputaudio, loadLlamacppChatModel
 from toolmate.utils.streaming_word_wrapper import StreamingWordWrapper
 from toolmate.utils.single_prompt import SinglePrompt
 from toolmate.utils.tool_plugins import Plugins
@@ -11,7 +11,6 @@ from prompt_toolkit.history import FileHistory
 from prompt_toolkit.shortcuts import clear
 from pathlib import Path
 import threading, argparse, os, traceback
-from llama_cpp import Llama
 
 
 class LlamacppChat:
@@ -23,7 +22,8 @@ class LlamacppChat:
     def __init__(self, name="", temperature=config.llmTemperature, max_output_tokens=config.llamacppChatModel_max_tokens, model=None):
         if model is None:
             # chat model
-            self.model = self.loadChatModel()
+            self.model = self.loadLlamacppChatModel()
+            self.unloadWhenFinish = True
             if not name:
                 if config.llamacppChatModel_model_path and os.path.isfile(config.llamacppChatModel_model_path):
                     if config.llamacppChatModel_model_path.lower().endswith(".gguf"):
@@ -34,6 +34,7 @@ class LlamacppChat:
                     name = "Llama.cpp chatbot"
         else:
             # tool model
+            self.unloadWhenFinish = False
             self.model = model
             if not name:
                 if config.llamacppToolModel_model_path and os.path.isfile(config.llamacppToolModel_model_path):
@@ -55,20 +56,6 @@ class LlamacppChat:
             # Prompt.
             "indicator": config.terminalPromptIndicatorColor2,
         })
-
-    def loadChatModel(self):
-        cpuThreads = getCpuThreads()
-        return Llama(
-            model_path=config.llamacppChatModel_model_path,
-            chat_format="chatml",
-            n_ctx=config.llamacppChatModel_n_ctx,
-            n_batch=config.llamacppChatModel_n_batch,
-            verbose=config.llamacppChatModel_verbose,
-            n_threads=cpuThreads,
-            n_threads_batch=cpuThreads,
-            n_gpu_layers=config.llamacppChatModel_n_gpu_layers,
-            **config.llamacppChatModel_additional_model_options,
-        )
 
     def resetMessages(self):
         return [{"role": "system", "content": config.systemMessage_llamacpp},]
@@ -178,6 +165,13 @@ class LlamacppChat:
             if once:
                 break
 
+        if self.unloadWhenFinish:
+            try:
+                self.model.close()
+                print1("Llama.cpp chat model unloaded!")
+            except:
+                pass
+        
         print2(f"\n{self.name} closed!")
         if hasattr(config, "currentMessages"):
             print2(f"Return back to {config.toolMateAIName} prompt ...")

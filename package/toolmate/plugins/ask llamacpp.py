@@ -7,15 +7,26 @@ Ask ChatGPT for conversation only; no function calling
 """
 
 
-from toolmate import config
+from toolmate import config, print1, loadLlamacppChatModel
 from toolmate.utils.call_llamacpp import CallLlamaCpp
 
 def ask_llamacpp(function_args):
+    chatModel = None
     config.stopSpinning()
     query = function_args.get("query") # required
     config.currentMessages[-1] = {"role": "user", "content": query}
-    completion = CallLlamaCpp.regularCall(config.currentMessages)
+    if config.useAdditionalChatModel:
+        chatModel = loadLlamacppChatModel()
+        completion = CallLlamaCpp.regularCall(config.currentMessages, model=chatModel)
+    else:
+        completion = CallLlamaCpp.regularCall(config.currentMessages)
     config.toolmate.streamCompletion(completion, openai=False)
+    if chatModel is not None:
+        try:
+            chatModel.close()
+            print1("Llama.cpp chat model unloaded!")
+        except:
+            pass
     return ""
 
 functionSignature = {

@@ -14,6 +14,12 @@ class CallLlamaCpp:
     @staticmethod
     def checkCompletion():
 
+        try:
+            config.llamacppToolModel.close()
+            print1("Llama.cpp model unloaded!")
+        except:
+            pass
+
         llm_directory = os.path.join(config.localStorage, "LLMs", "gguf")
         Path(llm_directory).mkdir(parents=True, exist_ok=True)
 
@@ -177,8 +183,16 @@ Remember, output the new copy of python code ONLY, without additional notes or e
             return "[INVALID]"
 
     @staticmethod
-    def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None):
+    def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None, model=None):
         chatMessages = useChatSystemMessage(copy.deepcopy(messages))
+        if model is not None:
+            return model.create_chat_completion(
+                messages=chatMessages,
+                temperature=temperature if temperature is not None else config.llmTemperature,
+                max_tokens=max_tokens if max_tokens is not None else config.llamacppToolModel_max_tokens,
+                stream=True,
+                **config.llamacppToolModel_additional_chat_options,
+            )            
         return config.llamacppToolModel.create_chat_completion(
             messages=chatMessages,
             temperature=temperature if temperature is not None else config.llmTemperature,

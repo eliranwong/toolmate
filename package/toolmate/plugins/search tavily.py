@@ -7,7 +7,7 @@ search Tavily
 """
 
 
-from toolmate import config, getTavilyClient, print1
+from toolmate import config, getTavilyClient
 
 def search_tavily(function_args):
     query = function_args.get("query") # required

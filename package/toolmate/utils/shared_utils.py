@@ -1789,6 +1789,10 @@ def getHelpCollection(vectorStore=None):
 def buildHelpStore():
     # source ../../../../bin/activate
     # python3 -c "from toolmate import buildHelpStore; buildHelpStore()"
+    helpStore = os.path.join(config.toolMateAIFolder, "help")
+    if os.path.isdir(helpStore):
+        shutil.rmtree(helpStore)
+        print2("Old help store removed!")
     collection = getHelpCollection()
     docs_path = ragRefineDocsPath(os.path.join(config.toolMateAIFolder, "docs"))
     splits = ragGetSplits(docs_path)

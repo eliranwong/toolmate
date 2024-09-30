@@ -1,3 +1,9 @@
+# Version 0.3.67
+
+* added plugin `search searxng`
+
+* updated help store
+
 # Version 0.3.66
 
 Updated Grop model lists

@@ -20,7 +20,7 @@ At the time of writing, use of Groq Cloud API is FREE.
 
 ![groq_api_key](https://github.com/eliranwong/toolmate/assets/25262722/d479ad5f-40b5-4d9b-a766-83db023ead1c)
 
-# Set Up Groq API Key in ToolMate
+# Set Up Groq API Key in ToolMate AI
 
 1. Enter ".apikeys" in ToolMate AI prompt
 

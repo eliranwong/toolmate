@@ -353,7 +353,7 @@ Remember, output the new copy of python code ONLY, without additional notes or e
                 return CallLlamaCpp.regularCall(messages)
             else:
                 # record tool selection
-                config.currentMessages[-1]["tool"] = tool_name
+                #config.currentMessages[-1]["tool"] = tool_name
                 if tool_response:
                     if config.developer:
                         print2(config.divider)

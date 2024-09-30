@@ -13,7 +13,7 @@ import json, googlesearch
 # pip3 install googlesearch-python
 # Use google https://pypi.org/project/googlesearch-python/ to search internet for information, about which ChatGPT doesn't know.
 
-def integrate_google_searches(function_args):
+def search_google(function_args):
     # retrieve argument values from a dictionary
     #print(function_args)
     keywords = function_args.get("keywords") # required
@@ -38,8 +38,8 @@ functionSignature = {
         "search online",
         "Google search",
     ],
-    "name": "integrate_google_searches",
-    "description": "Search internet for real-time information or latest updates when LLM lacks information",
+    "name": "search_google",
+    "description": "Search Google for real-time information or latest updates when LLM lacks information",
     "parameters": {
         "type": "object",
         "properties": {
@@ -52,4 +52,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=integrate_google_searches)
+config.addFunctionCall(signature=functionSignature, method=search_google)

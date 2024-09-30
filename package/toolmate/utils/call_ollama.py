@@ -258,7 +258,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                 return CallOllama.regularCall(messages)
             else:
                 # record tool selection
-                config.currentMessages[-1]["tool"] = tool_name
+                #config.currentMessages[-1]["tool"] = tool_name
                 if tool_response:
                     if config.developer:
                         print2(config.divider)

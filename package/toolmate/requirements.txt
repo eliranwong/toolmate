@@ -125,3 +125,4 @@ geopy
 psutil
 flashtext
 #flaml[automl]
+tavily-python

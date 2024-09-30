@@ -182,7 +182,8 @@ class CentralWidget(QWidget):
                 # handle response
                 if not response:
                     # update message chain
-                    config.currentMessages += [user_request, function_call_message, function_call_response]
+                    # config.currentMessages += [user_request, function_call_message, function_call_response] # ideal, but not compatible with other backends
+                    config.currentMessages += [user_request, function_call_response]
                     # function executed without chat extension
                     extendChat = False
                 elif response == "[INVALID]":
@@ -192,7 +193,19 @@ class CentralWidget(QWidget):
                     extendChat = True
                 else:
                     # update message chain
-                    config.currentMessages += [user_request, function_call_message, function_call_response]
+                    #config.currentMessages += [user_request, function_call_message, function_call_response] # ideal, but not compatible with other backends
+                    user_request["content"] = f"""# Instruction
+
+Answer `My Query` below with the `Given Context`
+
+# My Query
+
+{request}
+
+# Given Context
+
+{function_call_response}"""
+                    config.currentMessages += [user_request]
                     # function executed with chat extension
                     extendChat = True
         else:

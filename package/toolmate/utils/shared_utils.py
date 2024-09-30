@@ -25,6 +25,7 @@ from ollama import Client
 import speech_recognition as sr
 import sounddevice, soundfile
 from llama_cpp import Llama
+from tavily import TavilyClient
 
 
 # voice typing
@@ -247,6 +248,27 @@ Action: {select(tool_names, name="tool")}"""
     return lm.get("tool")
 
 # llm
+
+def getTavilyApi_key():
+    '''
+    support multiple tavily api keys to work around search limit
+    User can manually edit config to change the value of config.tavilyApi_key to a list of multiple api keys instead of a string of a single api key
+    '''
+    if config.tavilyApi_key:
+        if isinstance(config.tavilyApi_key, str):
+            return config.tavilyApi_key
+        elif isinstance(config.tavilyApi_key, list):
+            if len(config.tavilyApi_key) > 1:
+                # rotate multiple api keys
+                config.tavilyApi_key = config.tavilyApi_key[1:] + [config.tavilyApi_key[0]]
+            return config.tavilyApi_key[0]
+        else:
+            return ""
+    else:
+        return ""
+
+def getTavilyClient():
+    return TavilyClient(api_key=getTavilyApi_key())
 
 def getGroqApi_key():
     '''
@@ -767,6 +789,12 @@ def is_valid_url(url: str) -> bool:
 
 # files
 
+def getFileSizeInMB(file_path):
+    # Get the file size in bytes
+    file_size = os.path.getsize(file_path)
+    # Convert bytes to megabytes
+    return file_size / (1024 * 1024)
+
 def isExistingPath(docs_path):
     # handle document path dragged to the terminal
     docs_path = docs_path.strip()
@@ -833,7 +861,9 @@ def getLocalStorage():
 
 # image
 
-def encode_image(image_path):
+def encode_image(image_path, size_limit_in_MB=None):
+    if size_limit_in_MB is not None and getFileSizeInMB(image_path) > size_limit_in_MB:
+        return None
     with open(image_path, "rb") as image_file:
         base64_image = base64.b64encode(image_file.read()).decode('utf-8')
     ext = os.path.splitext(os.path.basename(image_path))[1][1:]

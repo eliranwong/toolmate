@@ -277,7 +277,7 @@ The called function could end in several ways:
 For example, in our plugin [integrate google searches](https://github.com/eliranwong/letmedoit/blob/main/package/letmedoit/plugins/integrate%20google%20searches.py), the searched information is passed back to ChatGPT.
 
 ```
-def integrate_google_searches(function_args):
+def search_google(function_args):
     # retrieve argument values from a dictionary
     #print(function_args)
     keywords = function_args.get("keywords") # required

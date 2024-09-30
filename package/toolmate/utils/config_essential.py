@@ -190,6 +190,7 @@ defaultSettings = (
     ('wsay_additional_options', ""),
     ('say_additional_options', ""),
     ('piper_additional_options', ""),
+    ('tavilyApi_key', ''),
     ('groqApi_key', ''),
     ('groqApi_tool_model', 'mixtral-8x7b-32768'),
     ('groqApi_tool_model_additional_chat_options', {}),

@@ -122,6 +122,8 @@ class ToolMate:
             self.changeOpenweathermapApi()
         if not config.elevenlabsApi:
             self.changeElevenlabsApi()
+        if not config.tavilyApi_key:
+            self.changeTavilyApi()
 
         # initial completion check at startup
         if config.initialCompletionCheck:
@@ -477,6 +479,7 @@ class ToolMate:
         self.setAutoGenBuilderConfig()
         self.changeOpenweathermapApi()
         self.changeElevenlabsApi()
+        self.changeTavilyApi()
         self.selectGoogleAPIs()
         if config.isTermux:
             self.setTermuxApi()
@@ -499,6 +502,25 @@ class ToolMate:
             config.saveConfig()
             print2("Configurations updated!")
             setChatGPTAPIkey()
+
+    def changeTavilyApi(self):
+        if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
+            print3("# Tavily API Key: allows access to Tavily hosted LLMs")
+            print1("To set up Tavily API Key, read:\nhttps://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tavily%20API%20Setup.md\n")
+            print1("Enter a single or a list of multiple Tavily API Key(s) [optional]:")
+            print()
+            apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=str(config.tavilyApi_key), is_password=True)
+            if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+                try:
+                    if isinstance(eval(apikey), list):
+                        config.tavilyApi_key = eval(apikey)
+                except:
+                    config.tavilyApi_key = apikey
+                CallLLM.checkCompletion()
+            else:
+                config.tavilyApi_key = "toolmate"
+            config.saveConfig()
+            print2("Configurations updated!")
 
     def changeGroqApi(self):
         if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
@@ -1364,15 +1386,20 @@ class ToolMate:
         model = self.dialogs.getValidOptions(
             options=(
                 "mixtral-8x7b-32768",
-                "gemma-7b-it",
                 "gemma2-9b-it",
-                "llama3-8b-8192",
-                "llama3-70b-8192",
-                "llama3-groq-8b-8192-tool-use-preview",
-                "llama3-groq-70b-8192-tool-use-preview",
-                "llama-3.1-8b-instant",
+                "gemma-7b-it",
+                #"llama-3.2-90b-vision-preview",
+                "llama-3.2-11b-vision-preview",
+                "llama-3.2-3b-preview",
+                "llama-3.2-1b-preview",
+                #"llama-3.1-405b-reasoning",
                 "llama-3.1-70b-versatile",
-                "llama-3.1-405b-reasoning",
+                "llama-3.1-8b-instant",
+                "llama3-70b-8192",
+                "llama3-8b-8192",
+                "llama-guard-3-8b",
+                "llama3-groq-70b-8192-tool-use-preview",
+                "llama3-groq-8b-8192-tool-use-preview",
             ),
             title="Groq Model",
             default=config.groqApi_chat_model if feature == "chat" else config.groqApi_tool_model,
@@ -2081,8 +2108,8 @@ class ToolMate:
                 messageLength = len(messagesCopy)
                 for order, i in enumerate(messagesCopy):
                     isLastItem = (order == (messageLength - 1))
-                    if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") and not isLastItem and i.get("role", "") == "user" and "function_call" in messagesCopy[order+1]:
-                        i["tool"] = messagesCopy[order+1]["function_call"].get("name", "")
+                    #if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") and not isLastItem and i.get("role", "") == "user" and "function_call" in messagesCopy[order+1]:
+                    #    i["tool"] = messagesCopy[order+1]["function_call"].get("name", "")
                     config.save_chat_record(timestamp, order, i)
 
             try:
@@ -2326,7 +2353,7 @@ Acess the risk level of the following `{target.capitalize()}`:
         def forceLoadingInternetSearches():
             if config.loadingInternetSearches == "always":
                 try:
-                    config.currentMessages = CallLLM.runSingleFunctionCall(config.currentMessages, "integrate_google_searches")
+                    config.currentMessages = CallLLM.runSingleFunctionCall(config.currentMessages, "search_google")
                 except:
                     print1("Unable to load internet resources.")
                     showErrors()

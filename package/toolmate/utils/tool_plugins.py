@@ -79,7 +79,7 @@ class Plugins:
                     if not run:
                         config.pluginExcludeList.append(plugin)
         if internetSeraches in config.pluginExcludeList:
-            del config.toolFunctionSchemas["integrate_google_searches"]
+            del config.toolFunctionSchemas["search_google"]
 
         # tool pattern
         toolNames = "|".join(config.toolFunctionMethods.keys())

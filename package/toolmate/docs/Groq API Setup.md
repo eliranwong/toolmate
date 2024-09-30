@@ -24,4 +24,14 @@ At the time of writing, use of Groq Cloud API is FREE.
 
 1. Enter ".apikeys" in ToolMate AI prompt
 
-2. Follow the dialog and enter your Groq API key
+2. Follow the dialog and enter your Groq API key(s)
+
+# Support Mulitple Groq API Keys
+
+ToolMate AI supports use of multiple groq API keys.  API keys take turns for running inference.
+
+To use multiple groq API keys, when you prompts entering Groq API key, enter a list of groq API keys, instead of a single key, e.g.
+
+```
+["groq_api_key_1", "groq_api_key_2", "groq_api_key_3"]
+```

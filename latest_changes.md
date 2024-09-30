@@ -1,3 +1,15 @@
+# Version 0.3.66
+
+Updated Grop model lists
+
+Added plugins:
+
+* analyze images with Groq
+
+* ask tavily
+
+* search tavily
+
 # Version 0.3.61-0.3.65
 
 * unload Llama.cpp model on exit
@@ -394,7 +406,7 @@ Or
 
 * `Let me Translate` feature with pre-defined context
 * `improved writing` feature
-* forcing the app to always `integrate_google_searches`
+* forcing the app to always `search_google`
 
 # Version: 0.2.87
 
@@ -432,7 +444,7 @@ For example, download two more songs from YouTube and play all downloaded mp3 fi
 To integrate multiple tools and chat features in a single prompt, for example:
 
 ```
-@integrate_google_searches Latest updates about OpenAI in 2024 
+@search_google Latest updates about OpenAI in 2024 
 @chat Give me a summary 
 @send_gmail Email your findings to support@letmedoit.ai in detail
 ```
@@ -441,7 +453,7 @@ To integrate multiple tools and chat features in a single prompt, for example:
 * `Let me Translate` feature with pre-defined context
 * `improved writing` feature
 * calling different `chatbots` from the main session
-* forcing the app to always `integrate_google_searches`
+* forcing the app to always `search_google`
 
 They may be added back or changed in coming updates
 
@@ -469,7 +481,7 @@ Changed tool calling pattern from `[TOOL_{tool_name}]` to `@{tool_name}`
 
 Currently supported tools:
 
-@integrate_google_searches
+@search_google
 @add_calendar_event
 @analyze_audio
 @analyze_files

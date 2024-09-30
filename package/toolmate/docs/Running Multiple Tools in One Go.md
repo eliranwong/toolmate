@@ -10,7 +10,7 @@ You can place multiple-step actions in a single prompt.  Begin each step or acti
 
 At the time of writing, available tools are:
 
-@add_google_calendar_event @add_outlook_calendar_event @analyze_audio @analyze_files @analyze_images_chatgpt @analyze_images_gemini @analyze_images_llamacpp @analyze_images_ollama @analyze_web_content @append_command @append_fabric @append_instruction @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @build_agents @chat @command @context @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_sd @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @execute_computing_task @extract_python_code @fabric @improve_writing @install_package @integrate_google_searches @list_current_directory_contents @load_conversations @modify_images @open_browser @paste_from_clipboard @pronunce_words @recommend_tool @reflection @remove_image_background @retrieve_memory @run_python_code @save_memory @search_conversations @search_finance @search_latest_news @search_sqlite @search_weather_info @send_gmail @send_outlook @send_tweet @workflow
+@add_google_calendar_event @add_outlook_calendar_event @analyze_audio @analyze_files @analyze_images_chatgpt @analyze_images_gemini @analyze_images_llamacpp @analyze_images_ollama @analyze_web_content @append_command @append_fabric @append_instruction @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @build_agents @chat @command @context @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_sd @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @execute_computing_task @extract_python_code @fabric @improve_writing @install_package @search_google @list_current_directory_contents @load_conversations @modify_images @open_browser @paste_from_clipboard @pronunce_words @recommend_tool @reflection @remove_image_background @retrieve_memory @run_python_code @save_memory @search_conversations @search_finance @search_latest_news @search_sqlite @search_weather_info @send_gmail @send_outlook @send_tweet @workflow
 
 Remarks:
 
@@ -96,7 +96,7 @@ For example, download two more songs from Youtube and play all downloaded mp3 fi
 To integrate multiple tools and chat features in a single prompt, for example:
 
 ```
-@integrate_google_searches Latest updates about OpenAI in 2024 
+@search_google Latest updates about OpenAI in 2024 
 @chat Give me a summary 
 @send_gmail Email your findings to support@letmedoit.ai in detail
 ```

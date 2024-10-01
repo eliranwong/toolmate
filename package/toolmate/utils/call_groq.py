@@ -87,12 +87,19 @@ Acess the risk level of this Python code:
 
     @staticmethod
     @check_llm_errors
-    def getSingleChatResponse(userInput, messages=[], temperature: Optional[float]=None, max_tokens: Optional[int]=None):
+    def getSingleChatResponse(userInput, messages=[], temperature: Optional[float]=None, max_tokens: Optional[int]=None, prefill: Optional[str]=None, stop: Optional[list]=None):
         """
         non-streaming single call
         """
-        messages.append({"role": "user", "content" : userInput})
+        if userInput:
+            item = {"role": "user", "content" : userInput}
+            if messages and messages[-1].get("role", "") == "assistant":
+                messages.insert(-1, item)
+            else:
+                messages.append(item)
         chatMessages = useChatSystemMessage(copy.deepcopy(messages))
+        if prefill is not None:
+            chatMessages.append({'role': 'assistant', 'content': prefill})
         try:
             completion = getGroqClient().chat.completions.create(
                 model=config.groqApi_tool_model,
@@ -101,6 +108,7 @@ Acess the risk level of this Python code:
                 temperature=temperature if temperature is not None else config.llmTemperature,
                 max_tokens=max_tokens if max_tokens is not None else config.groqApi_tool_model_max_tokens,
                 stream=False,
+                stop=stop if stop else None,
                 **config.groqApi_tool_model_additional_chat_options,
             )
             return completion.choices[0].message.content
@@ -344,7 +352,7 @@ Here is my request:
 
 Remember, response with the required python code ONLY, WITHOUT extra notes or explanations."""
 
-            code = CallGroq.getSingleChatResponse(code_instruction, ongoingMessages[:-1], temperature, max_tokens).replace(r"\\n", "\n")
+            code = CallGroq.getSingleChatResponse(code_instruction, ongoingMessages[:-1], temperature, max_tokens, prefill="```python\n", stop=["```"]).replace(r"\\n", "\n")
             code = extractPythonCode(code, keepInvalid=True)
             if len(schema["properties"]) == 1:
                 return {"code": code}

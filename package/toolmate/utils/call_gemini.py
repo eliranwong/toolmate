@@ -162,7 +162,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             return {}
 
     @staticmethod
-    def getSingleChatResponse(userInput: str, history: Optional[list]=None, **kwargs) -> str:
+    def getSingleChatResponse(userInput: str, history: Optional[list]=None, prefill: Optional[str]=None, stop: Optional[list]=None, **kwargs) -> str:
         # non-streaming single call
         try:
             chat = CallGemini.getGeminiModel().start_chat(history=history)

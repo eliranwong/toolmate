@@ -82,12 +82,19 @@ Acess the risk level of this Python code:
 
     @staticmethod
     @check_llm_errors
-    def getSingleChatResponse(userInput, messages=[], temperature: Optional[float]=None, max_tokens: Optional[int]=None):
+    def getSingleChatResponse(userInput, messages=[], temperature: Optional[float]=None, max_tokens: Optional[int]=None, prefill: Optional[str]=None, stop: Optional[list]=[]):
         """
         non-streaming single call
         """
-        messages.append({"role": "user", "content" : userInput})
+        if userInput:
+            item = {"role": "user", "content" : userInput}
+            if messages and messages[-1].get("role", "") == "assistant":
+                messages.insert(-1, item)
+            else:
+                messages.append(item)
         chatMessages = useChatSystemMessage(copy.deepcopy(messages))
+        if prefill is not None:
+            chatMessages.append({'role': 'assistant', 'content': prefill})
         try:
             completion = getLlamacppServerClient().chat.completions.create(
                 model="toolmate",
@@ -96,7 +103,7 @@ Acess the risk level of this Python code:
                 temperature=temperature if temperature is not None else config.llmTemperature,
                 max_tokens=max_tokens if max_tokens is not None else config.llamacppToolModel_max_tokens,
                 stream=False,
-                stop=config.customToolServer_stop,
+                stop=stop + config.customToolServer_stop,
                 timeout=config.customToolServer_timeout,
                 **config.customToolServer_additional_options,
             )
@@ -350,7 +357,7 @@ Here is my request:
 
 Remember, response with the required python code ONLY, WITHOUT extra notes or explanations."""
 
-            code = CallLlamaCppServer.getSingleChatResponse(code_instruction, ongoingMessages[:-1], temperature, max_tokens).replace(r"\\n", "\n")
+            code = CallLlamaCppServer.getSingleChatResponse(code_instruction, ongoingMessages[:-1], temperature, max_tokens, prefill="```python\n", stop=["```"]).replace(r"\\n", "\n")
             code = extractPythonCode(code, keepInvalid=True)
             if len(schema["properties"]) == 1:
                 return {"code": code}

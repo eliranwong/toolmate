@@ -65,7 +65,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             arguments = function_call_message["function_call"]["arguments"]
             if not arguments:
                 print2("Generating code ...")
-                response = CallOllama.getSingleChatResponse(userInput)
+                response = CallOllama.getSingleChatResponse(userInput, prefill="```python\n", stop=["```"]).replace(r"\\n", "\n")
                 python_code = extractPythonCode(response)
                 if isValidPythodCode(python_code):
                     arguments = {
@@ -165,11 +165,17 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     @check_ollama_errors
-    def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, model: Optional[str]=None):
+    def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, model: Optional[str]=None, prefill: Optional[str]=None, stop: Optional[list]=None):
         # non-streaming single call
         if userInput:
-            messages.append({"role": "user", "content" : userInput})
+            item = {"role": "user", "content" : userInput}
+            if messages and messages[-1].get("role", "") == "assistant":
+                messages.insert(-1, item)
+            else:
+                messages.append(item)
         chatMessages = useChatSystemMessage(copy.deepcopy(messages))
+        if prefill is not None:
+            chatMessages.append({'role': 'assistant', 'content': prefill})
         try:
             completion = getOllamaServerClient().chat(
                 keep_alive=config.ollamaToolModel_keep_alive,
@@ -181,6 +187,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                     num_ctx=num_ctx if num_ctx is not None else config.ollamaToolModel_num_ctx,
                     num_batch=num_batch if num_batch is not None else config.ollamaToolModel_num_batch,
                     num_predict=num_predict if num_predict is not None else config.ollamaToolModel_num_predict,
+                    stop=stop if stop else None,
                     **config.ollamaToolModel_additional_options,
                 ),
             )
@@ -306,7 +313,7 @@ Here is my request:
 
 Remember, response with the required python code ONLY, WITHOUT extra notes or explanations."""
 
-            code = CallOllama.getSingleChatResponse(code_instruction, ongoingMessages[:-1]).replace(r"\\n", "\n")
+            code = CallOllama.getSingleChatResponse(code_instruction, ongoingMessages[:-1], prefill="```python\n", stop=["```"]).replace(r"\\n", "\n")
             code = extractPythonCode(code, keepInvalid=True)
             if len(schema["properties"]) == 1:
                 return {"code": code}

@@ -1,3 +1,13 @@
+# Version 0.3.68-0.3.72
+
+* added an alias `@ask_internet` to point to `@search_searxng`
+
+* updated Ollama model list
+
+* updated documentations
+
+* minor tweaks
+
 # Version 0.3.67
 
 * added plugin `search searxng`
@@ -506,7 +516,7 @@ Currently supported tools:
 @execute_computing_task
 @install_package
 @save_memory
-@retrieve_memory
+@search_memory
 @modify_images
 @open_browser
 @pronunce_words
@@ -514,7 +524,7 @@ Currently supported tools:
 @search_conversations
 @load_conversations
 @search_finance
-@search_latest_news
+@search_news
 @search_sqlite
 @search_weather_info
 @send_email

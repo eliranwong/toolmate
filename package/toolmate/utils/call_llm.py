@@ -1,3 +1,4 @@
+from typing import Optional
 from toolmate import config, getDeviceInfo, toGeminiMessages, useChatSystemMessage
 from toolmate.utils.call_gemini import CallGemini
 from toolmate.utils.call_ollama import CallOllama
@@ -117,15 +118,15 @@ Always remember that you are much more than a text-based AI. You possess both vi
         return CallChatGPT.regularCall(chatMessages)
 
     @staticmethod
-    def getSingleChatResponse(userInput, messages=[], temperature=None):
+    def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=[]):
         """
         non-streaming single call
         """
         chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         if config.llmInterface == "ollama":
-            return CallOllama.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature)
+            return CallOllama.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop)
         elif config.llmInterface == "groq":
-            return CallGroq.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature)
+            return CallGroq.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop)
         elif config.llmInterface == "llamacppserver":
             return CallLlamaCppServer.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature)
         elif config.llmInterface == "llamacpp":

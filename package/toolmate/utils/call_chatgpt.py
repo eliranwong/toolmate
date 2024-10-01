@@ -6,6 +6,7 @@ from pygments.lexers.python import PythonLexer
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit import prompt
+from typing import Optional
 
 # token limit
 # reference: https://platform.openai.com/docs/models/gpt-4
@@ -163,12 +164,19 @@ def getToolArgumentsFromStreams(completion):
     return toolArguments
 
 @check_openai_errors
-def getSingleChatResponse(userInput, messages=[], temperature=None):
+def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None):
     """
     non-streaming single call
     """
-    messages.append({"role": "user", "content" : userInput})
+    if userInput:
+        item = {"role": "user", "content" : userInput}
+        if messages and messages[-1].get("role", "") == "assistant":
+            messages.insert(-1, item)
+        else:
+            messages.append(item)
     chatMessages = useChatSystemMessage(copy.deepcopy(messages))
+    if prefill is not None:
+            chatMessages.append({'role': 'assistant', 'content': prefill})
     try:
         completion = config.oai_client.chat.completions.create(
             model=config.chatGPTApiModel,
@@ -176,6 +184,7 @@ def getSingleChatResponse(userInput, messages=[], temperature=None):
             n=1,
             temperature=temperature if temperature is not None else config.llmTemperature,
             max_tokens=config.chatGPTApiMaxTokens,
+            stop=stop if stop else None,
         )
         return completion.choices[0].message.content
     except:
@@ -311,8 +320,8 @@ class CallChatGPT:
 
     @staticmethod
     @check_openai_errors
-    def getSingleChatResponse(userInput, messages=[], temperature=None):
-        return getSingleChatResponse(userInput, messages, temperature)
+    def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None):
+        return getSingleChatResponse(userInput, messages, temperature, prefill, stop)
 
     @staticmethod
     def finetuneSingleFunctionCallResponse(func_arguments, function_name):
@@ -455,8 +464,8 @@ class CallLetMeDoIt:
 
     @staticmethod
     @check_openai_errors
-    def getSingleChatResponse(userInput, messages=[], temperature=None):
-        return getSingleChatResponse(userInput, messages, temperature)
+    def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None):
+        return getSingleChatResponse(userInput, messages, temperature, prefill, stop)
 
     @staticmethod
     def finetuneSingleFunctionCallResponse(func_arguments, function_name):

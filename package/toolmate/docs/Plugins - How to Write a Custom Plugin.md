@@ -50,7 +50,7 @@ Therefore, I modified the code and developed a simple function method below that
 import feedparser
 
 # Get the latest news from a specific RSS feed
-def search_latest_news(keywords: str) -> None:
+def search_news(keywords: str) -> None:
     feed_url = f"https://news.google.com/rss/search?q={keywords}&hl=en-US&gl=US&ceid=US:en"
     feed = feedparser.parse(feed_url)
 
@@ -70,7 +70,7 @@ Below is the signature that I prepared for the plugin:
 
 ```
 functionSignature = {
-    "name": "search_latest_news",
+    "name": "search_news",
     "description": "Search the latest news with given keywords",
     "parameters": {
         "type": "object",
@@ -91,7 +91,7 @@ Add the following lines to the plugin.  You may read the self-explanatory commen
 
 ```
 # The following line integrate the function method and signature into LetMeDoIt AI
-config.addFunctionCall(name="search_latest_news", signature=functionSignature, method=search_latest_news)
+config.addFunctionCall(name="search_news", signature=functionSignature, method=search_news)
 
 # The following line is optional. It adds an input suggestion to LetMeDoIt AI user input prompt
 config.inputSuggestions.append("Tell me the latest news about ")
@@ -111,7 +111,7 @@ As LetMeDoIt AI passes all arguments to the called function as a dictionary, I m
 import feedparser
 
 # Get the latest news from a specific RSS feed
-def search_latest_news(function_args: dict) -> str:
+def search_news(function_args: dict) -> str:
     keywords = function_args.get("keywords")
     feed_url = f"https://news.google.com/rss/search?q={keywords}&hl=en-US&gl=US&ceid=US:en"
     feed = feedparser.parse(feed_url)
@@ -123,7 +123,7 @@ def search_latest_news(function_args: dict) -> str:
     return ""
 ```
 
-In this example, I make it simple to print all the information when the function method "search_latest_news" is called and return an empty string.
+In this example, I make it simple to print all the information when the function method "search_news" is called and return an empty string.
 
 Depending on what you want, you can finish the function method differently.  For example, if you want to pass the retrieved information to ChatGPT to generate a response based on the retrieved information, instead of printing all information directly, you can modify the method like this one below:
 
@@ -131,7 +131,7 @@ Depending on what you want, you can finish the function method differently.  For
 import feedparser, json
 
 # Get the latest news from a specific RSS feed
-def search_latest_news(function_args: dict) -> str:
+def search_news(function_args: dict) -> str:
     keywords = function_args.get("keywords")
     feed_url = f"https://news.google.com/rss/search?q={keywords}&hl=en-US&gl=US&ceid=US:en"
     feed = feedparser.parse(feed_url)
@@ -157,7 +157,7 @@ from letmedoit import config
 import feedparser
 
 # Get the latest news from a specific RSS feed
-def search_latest_news(function_args: dict) -> str:
+def search_news(function_args: dict) -> str:
     keywords = function_args.get("keywords")
     feed_url = f"https://news.google.com/rss/search?q={keywords}&hl=en-US&gl=US&ceid=US:en"
     feed = feedparser.parse(feed_url)
@@ -178,7 +178,7 @@ def search_latest_news(function_args: dict) -> str:
 # STEP 7 - Save the Plugin
 
 1. Open a text editor
-2. Save the following content with a filename "search latest news.py" in "\~/letmedoit/plugins"
+2. Save the following content with a filename "search news.py" in "\~/letmedoit/plugins"
 
 Remarks:
 * "\~/letmedoit/plugins" is the default storage directory for custom plugins
@@ -189,7 +189,7 @@ from letmedoit import config
 import feedparser
 
 # Function method to get the latest news from a specific RSS feed
-def search_latest_news(function_args: dict) -> str:
+def search_news(function_args: dict) -> str:
     keywords = function_args.get("keywords")
     feed_url = f"https://news.google.com/rss/search?q={keywords}&hl=en-US&gl=US&ceid=US:en"
     feed = feedparser.parse(feed_url)
@@ -208,7 +208,7 @@ def search_latest_news(function_args: dict) -> str:
 
 # Function signature to work with ChatGPT function calling
 functionSignature = {
-    "name": "search_latest_news",
+    "name": "search_news",
     "description": "Search the latest news with given keywords",
     "parameters": {
         "type": "object",
@@ -223,7 +223,7 @@ functionSignature = {
 }
 
 # The following line integrate the function method and signature into LetMeDoIt AI
-config.addFunctionCall(name="search_latest_news", signature=functionSignature, method=search_latest_news)
+config.addFunctionCall(name="search_news", signature=functionSignature, method=search_news)
 
 # The following line is optional. It adds an input suggestion to LetMeDoIt AI user input prompt
 config.inputSuggestions.append("Tell me the latest news about ")
@@ -251,7 +251,7 @@ I launched LetMeDoIt AI and entered the following prompt:
 
 Below is the screenshot of the result.
 
-![search_latest_news](https://github.com/eliranwong/letmedoit/assets/25262722/f1741462-bc67-4171-8604-fa3d17c55762)
+![search_news](https://github.com/eliranwong/letmedoit/assets/25262722/f1741462-bc67-4171-8604-fa3d17c55762)
 
 # STEP 10 - Share Your Plugin With Other Users [OPTIONAL]
 

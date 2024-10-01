@@ -121,3 +121,4 @@ psutil
 flashtext
 #flaml[automl]
 #tavily-python
+wikipedia

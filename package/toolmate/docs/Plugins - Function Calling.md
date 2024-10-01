@@ -274,7 +274,7 @@ The called function could end in several ways:
 
 1. Return information to extend chat conversation:
 
-For example, in our plugin [integrate google searches](https://github.com/eliranwong/letmedoit/blob/main/package/letmedoit/plugins/integrate%20google%20searches.py), the searched information is passed back to ChatGPT.
+For example, in our plugin [search google](https://github.com/eliranwong/letmedoit/blob/main/package/letmedoit/plugins/integrate%20google%20searches.py), the searched information is passed back to ChatGPT.
 
 ```
 def search_google(function_args):
@@ -325,7 +325,7 @@ For example, in plugin "[download YouTube media](https://github.com/eliranwong/l
 
 Return an empty string "" if you just want to function to be executed without a follow-up text response to be generated.
 
-In our plugin "[search latest news](https://github.com/eliranwong/letmedoit/blob/main/package/letmedoit/plugins/search%20latest%20news.py)", the function "search_latest_news" returns an empty string "" after it is executed.  No follow-up response is generated after the execution.
+In our plugin "[search news](https://github.com/eliranwong/letmedoit/blob/main/package/letmedoit/plugins/search%20latest%20news.py)", the function "search_news" returns an empty string "" after it is executed.  No follow-up response is generated after the execution.
 
 # Use of config.tempContent
 

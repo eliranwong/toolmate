@@ -34,7 +34,7 @@ if isServerAlive(config.searx_server, config.searx_port):
             "Search SearxNG",
         ],
         "name": "search_searxng",
-        "description": "Search SearxNG for online information",
+        "description": "Perform online searches to obtain the latest and most up-to-date, real-time information",
         "parameters": {
             "type": "object",
             "properties": {
@@ -48,7 +48,8 @@ if isServerAlive(config.searx_server, config.searx_port):
     }
 
     config.addFunctionCall(signature=functionSignature, method=search_searxng)
-    config.inputSuggestions.append("Search SearxNG: ")
+    config.aliases["@search_searxng "] = "@ask_internet "
+    config.inputSuggestions += ["Search SearxNG: ", "@ask_internet "]
 
 else:
 

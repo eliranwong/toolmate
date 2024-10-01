@@ -177,8 +177,8 @@ class ToolMate:
             ".maxmemorymatches": ("change maximum memory matches", self.setMemoryClosestMatches),
             ".maxchatrecordmatches": ("change maximum chat record matches", self.setChatRecordClosestMatches),
             # tweak input information
-            ".ipinfo": ("change ip information integration", self.setIncludeIpInSystemMessage),
-            ".latestSearches": ("change online searches", self.setLatestSearches),
+            #".ipinfo": ("change ip information integration", self.setIncludeIpInSystemMessage),
+            #".latestSearches": ("change online searches", self.setLatestSearches),
             # tweak output display
             ".codedisplay": ("change code display", self.setCodeDisplay),
             ".pagerview": ("change pager view", self.setPagerView),
@@ -787,11 +787,11 @@ class ToolMate:
             # fine tune
             if config.loadingInternetSearches == "auto":
                 config.chatGPTApiFunctionCall = "auto"
-                if "integrate google searches" in config.pluginExcludeList:
-                    config.pluginExcludeList.remove("integrate google searches")
+                if "search google" in config.pluginExcludeList:
+                    config.pluginExcludeList.remove("search google")
             elif config.loadingInternetSearches == "none":
-                if not "integrate google searches" in config.pluginExcludeList:
-                    config.pluginExcludeList.append("integrate google searches")
+                if not "search google" in config.pluginExcludeList:
+                    config.pluginExcludeList.append("search google")
             # reset plugins
             Plugins.runPlugins()
             # notify
@@ -2261,7 +2261,7 @@ class ToolMate:
             improvedVersion = CallLLM.getSingleChatResponse(f"""Improve the following writing, according to {config.improvedWritingSytle}.
 Remember, provide me with the improved writing only, enclosed in triple quotes ``` and without any additional information or comments.
 My writing:
-{writing}""")
+{writing}""", prefill="```\n", stop=["```"])
             if improvedVersion:
                 writing = improvedVersion[3:-3] if improvedVersion.startswith("```") and improvedVersion.endswith("```") else re.sub("^.*?```(.*?)```.*?$", r"\1", improvedVersion)
                 try:
@@ -2280,9 +2280,9 @@ My writing:
 # My Request
 
 {request}"""
-        cli = CallLLM.getSingleChatResponse(instruction)
+        cli = CallLLM.getSingleChatResponse(instruction, prefill="```\n", stop=["```"])
         if cli := cli.strip():
-            cli = cli[3:-3] if cli.startswith("```") and cli.endswith("```") else re.sub("^.*?```(.*?)```.*?$", r"\1", cli)
+            cli = cli[3:-3].strip() if cli.startswith("```") and cli.endswith("```") else re.sub("^.*?```(.*?)```.*?$", r"\1", cli).strip()
         if config.developer:
             print2(f"```command")
             print(cli)
@@ -2302,9 +2302,9 @@ Acess the risk level of the following `{target.capitalize()}`:
 # {target.capitalize()}
 
 {content}"""
-        risk = CallLLM.getSingleChatResponse(instruction)
+        risk = CallLLM.getSingleChatResponse(instruction, temperature=0.0, prefill="```\n", stop=["```"])
         if risk := risk.strip():
-            risk = risk[3:-3] if risk.startswith("```") and risk.endswith("```") else re.sub("^.*?```(.*?)```.*?$", r"\1", risk)
+            risk = risk[3:-3].strip() if risk.startswith("```") and risk.endswith("```") else re.sub("^.*?```(.*?)```.*?$", r"\1", risk).strip()
         if "high" in risk:
             risk = "high"
         elif "medium" in risk:
@@ -2337,7 +2337,7 @@ Acess the risk level of the following `{target.capitalize()}`:
 
 # My writing:
 
-{writing}""")
+{writing}""", prefill="```\n", stop=["```"])
             if improvedVersion:
                 writing = improvedVersion[3:-3] if improvedVersion.startswith("```") and improvedVersion.endswith("```") else re.sub("^.*?```(.*?)```.*?$", r"\1", improvedVersion)
                 try:
@@ -2378,7 +2378,7 @@ Acess the risk level of the following `{target.capitalize()}`:
             TTSUtil.play(description)
 
         # Convert datetime
-        if action in ("add_outlook_calendar_event", "add_google_calendar_event"):
+        if action in ("add_outlook_calendar_event", "add_google_calendar_event", "save_memory", "search_memory"):
             description = self.convertRelativeDateTime(description).strip()
 
         # handle predefined contexts

@@ -20,7 +20,7 @@ ToolMate AI Plugins allow you to acheive variety of tasks with simple words:
 
 > what is the current weather in New York?
 
-* search latest news
+* search news
 
 > tell me the latest news about ChatGPT
 

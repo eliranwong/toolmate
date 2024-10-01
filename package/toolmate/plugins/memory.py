@@ -51,7 +51,7 @@ def save_memory(function_args):
     config.stopSpinning()
     return "I saved it in my memory!"
 
-def retrieve_memory(function_args):
+def search_memory(function_args):
     query = function_args.get("query") # required
     collection = get_or_create_collection(chroma_client, "memories")
     res = query_vectors(collection, query, config.memoryClosestMatches)
@@ -108,7 +108,7 @@ functionSignature2 = {
         "recall from your memory",
         "do you remember",
     ],
-    "name": "retrieve_memory",
+    "name": "search_memory",
     "description": """Recall memories of important conversation snippets that we had in the past.""",
     "parameters": {
         "type": "object",
@@ -124,4 +124,4 @@ functionSignature2 = {
 
 config.inputSuggestions += ["Remember, ", "Do you remember?"]
 config.addFunctionCall(signature=functionSignature1, method=save_memory)
-config.addFunctionCall(signature=functionSignature2, method=retrieve_memory)
+config.addFunctionCall(signature=functionSignature2, method=search_memory)

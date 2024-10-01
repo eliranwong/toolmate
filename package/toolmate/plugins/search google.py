@@ -1,5 +1,5 @@
 """
-ToolMate AI Plugin - integrate google searches
+ToolMate AI Plugin - search google
 
 Search internet for keywords when ChatGPT lacks information or when user ask about news or latest updates
 

@@ -1,7 +1,7 @@
 """
-ToolMate AI Plugin - search latest news
+ToolMate AI Plugin - search news
 
-search latest news
+search news
 
 [TOOL_CALL]
 """
@@ -11,7 +11,7 @@ from toolmate import print1, print2, print3
 import feedparser, re
 
 # Function method to get the latest news from a specific RSS feed
-def search_latest_news(function_args: dict) -> str:
+def search_news(function_args: dict) -> str:
     keywords = function_args.get("keywords").replace(" ", "+")
     feed_url = f"https://news.google.com/rss/search?q={keywords}&hl=en-US&gl=US&ceid=US:en"
     feed = feedparser.parse(feed_url)
@@ -42,7 +42,7 @@ functionSignature = {
         "latest news",
         "what happened today",
     ],
-    "name": "search_latest_news",
+    "name": "search_news",
     "description": "Search the latest news with given keywords",
     "parameters": {
         "type": "object",
@@ -57,7 +57,7 @@ functionSignature = {
 }
 
 # The following line integrate the function method and signature into LetMeDoIt AI
-config.addFunctionCall(signature=functionSignature, method=search_latest_news)
+config.addFunctionCall(signature=functionSignature, method=search_news)
 
 # The following line is optional. It adds an input suggestion to LetMeDoIt AI user input prompt
 config.inputSuggestions.append("Tell me the latest news about ")

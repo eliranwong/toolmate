@@ -56,8 +56,8 @@ class Plugins:
             pluginFolders = (pluginFolder, customPluginFoler)
         else:
             pluginFolders = (pluginFolder,)
-        # always run 'integrate google searches'
-        internetSeraches = "integrate google searches"
+        # always run 'search google'
+        internetSeraches = "search google"
         script = os.path.join(pluginFolder, "{0}.py".format(internetSeraches))
         execPythonFile(script)
         # always include the following plugins

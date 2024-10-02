@@ -240,8 +240,8 @@ def finetuneSingleFunctionCallResponse(func_arguments, function_name):
     # fine tune function call response; applied to chatgpt only
     def notifyDeveloper(func_name):
         if config.developer:
-            #print1(f"running function '{func_name}' ...")
-            print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
+            #print1(f"running tool '{func_name}' ...")
+            print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running tool</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
     # ChatGPT's built-in function named "python"
     if function_name == "python":
         notifyDeveloper(function_name)

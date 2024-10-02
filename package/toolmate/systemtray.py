@@ -174,8 +174,13 @@ class ToolMateHub(QSystemTrayIcon):
         action.triggered.connect(self.launchPerplexica)
         submenu.addAction(action)
 
+        if hasattr(config, "searx_tabs"):
+            action = QAction("searxng", self)
+            action.triggered.connect(lambda: webbrowser.open(f"http://{config.searx_server}:{config.searx_port}"))
+            submenu.addAction(action)
+
         for i in (
-            "rag",
+            #"rag",
             "etextedit",
             "commandprompt",
         ):

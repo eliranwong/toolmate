@@ -42,7 +42,7 @@ functionSignature = {
                 "description": "Detailed queries about how to use ToolMate AI",
             },
         },
-        "required": ["query", "filepath"],
+        "required": ["query"],
     },
 }
 

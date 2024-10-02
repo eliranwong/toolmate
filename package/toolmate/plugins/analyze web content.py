@@ -28,7 +28,7 @@ def analyze_web_content(function_args):
             "query": query,
             "files": [filename],
         }
-        print3("Running function: 'analyze_images'")
+        print3("Running tool: 'analyze_images'")
         return config.toolFunctionMethods["analyze_images"](function_args)
 
     if config.rag_useAutoRetriever and not config.llmInterface == "gemini":

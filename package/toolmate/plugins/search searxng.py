@@ -1,5 +1,5 @@
 """
-ToolMate AI Plugin - search SearxNG
+ToolMate AI Plugin - search SearXNG
 
 Default Configurations
 (assuming Perplexica is installed locally)
@@ -12,7 +12,7 @@ You can manually edit config.py to customise these settings.
 """
 
 from langchain_community.utilities import SearxSearchWrapper
-from toolmate import config, isServerAlive
+from toolmate import config, isServerAlive, print1, print2, plainTextToUrl
 
 persistentConfigs = (
     ("searx_server", "localhost"),
@@ -22,16 +22,61 @@ config.setConfig(persistentConfigs)
 
 if isServerAlive(config.searx_server, config.searx_port):
 
+    temporaryConfigs = (
+        # tabs: https://docs.searxng.org/user/configured_engines.html
+        ("searx_tabs", [
+            "!general ",
+            "!translate ",
+            "!web ",
+            "!wikimedia ",
+            "!images ",
+            "!web ",
+            "!videos ",
+            "!web ",
+            "!news ",
+            "!web ",
+            "!wikimedia ",
+            "!map ",
+            "!music ",
+            "!lyrics ",
+            "!radio ",
+            "!it ",
+            "!packages ",
+            "!q&a ",
+            "!repos ",
+            "!software_wikis ",
+            "!science ",
+            "!scientific_publications ",
+            "!wikimedia ",
+            "!files ",
+            "!apps ",
+            "!social_media ",
+        ]),
+        ("searx_categories", []),
+    )
+    config.setConfig(temporaryConfigs, temporary=True)
+
     def search_searxng(function_args):
         query = function_args.get("query") # required
         config.currentMessages[-1] = {"role": "user", "content": query}
-        context = SearxSearchWrapper(searx_host=f"http://{config.searx_server}:{config.searx_port}").run(query)
+        if config.searx_categories:
+            config.searx_categories = [i[1:] for i in config.searx_categories]
+            categories = ",".join(config.searx_categories)
+        context = SearxSearchWrapper(searx_host=f"http://{config.searx_server}:{config.searx_port}").run(query, categories=config.searx_categories if config.searx_categories else None)
+        fullUrl = f"http://{config.searx_server}:{config.searx_port}/search?q={plainTextToUrl(query)}&categories={categories}" if config.searx_categories else f"http://{config.searx_server}:{config.searx_port}/search?q={plainTextToUrl(query)}"
+        config.searx_categories = []
         config.stopSpinning()
+        print2("```url")
+        try:
+            print1(fullUrl)
+        except:
+            print(fullUrl)
+        print2("```")
         return context
 
     functionSignature = {
         "examples": [
-            "Search SearxNG",
+            "Search SearXNG",
         ],
         "name": "search_searxng",
         "description": "Perform online searches to obtain the latest and most up-to-date, real-time information",
@@ -48,8 +93,9 @@ if isServerAlive(config.searx_server, config.searx_port):
     }
 
     config.addFunctionCall(signature=functionSignature, method=search_searxng)
-    config.aliases["@search_searxng "] = "@ask_internet "
-    config.inputSuggestions += ["Search SearxNG: ", "@ask_internet "]
+    config.aliases["@ask_internet "] = "@search_searxng "
+    tabsDict = {i: None for i in config.searx_tabs}
+    config.inputSuggestions += ["Search SearxNG: ", {"@search_searxng": tabsDict}, {"@ask_internet": tabsDict}]
 
 else:
 

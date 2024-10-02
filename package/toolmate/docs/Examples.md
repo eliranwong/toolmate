@@ -70,9 +70,9 @@ ToolMate AI Plugins allow you to acheive variety of tasks with simple words:
 
 > When is my birthday?
 
-* search for online information when ChatGPT lacks information, e.g.
+* search for online information when LM lacks information, e.g.
 
-> Tell me somtheing about LetMeDoIt AI?
+> Tell me somtheing about ToolMate AI?
 
 * add google or outlook calendar events, e.g.
 

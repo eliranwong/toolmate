@@ -39,6 +39,18 @@ searx_port = 4000
 
 You may customise these two values by manually editing the file `config.py`.
 
+## Specify Categories for Searches
+
+You may specify categories for your searches: `!general` `!translate` `!web` `!wikimedia` `!images` `!web` `!videos` `!web` `!news` `!web` `!wikimedia` `!map` `!music` `!lyrics` `!radio` `!it` `!packages` `!q&a` `!repos` `!software_wikis` `!science` `!scientific_publications` `!wikimedia` `!files` `!apps` `!social_media`
+
+These categories are loaded for input suggestions when you enter `@search_searxng ` or `@ask_internet `.
+
+For example:
+
+> @ask_internet !news London today
+
+Read supported categories at: https://docs.searxng.org/user/configured_engines.html
+
 # Direct Google Search
 
 If you don't want to set up SearXNG, you can still use tool `@search_google` to search for online information.  However, `@search_searxng` often gives better results in our testings.

@@ -21,7 +21,7 @@ functionSignature = {
         "Search Tavily",
     ],
     "name": "search_tavily",
-    "description": "Search Tavily for online information",
+    "description": "Search for online information with Tavily",
     "parameters": {
         "type": "object",
         "properties": {

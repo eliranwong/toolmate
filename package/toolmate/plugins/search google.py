@@ -1,7 +1,7 @@
 """
 ToolMate AI Plugin - search google
 
-Search internet for keywords when ChatGPT lacks information or when user ask about news or latest updates
+Search internet for keywords when LLM lacks information or when user ask about news or latest updates
 
 [TOOL_CALL]
 """

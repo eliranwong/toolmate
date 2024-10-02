@@ -772,7 +772,7 @@ class ToolMate:
         options = ("always", "auto", "none")
         descriptions = (
             "always search for latest information",
-            "search only when ChatGPT lacks information",
+            "search only when LLM lacks information",
             "do not perform online searches",
         )
         option = self.dialogs.getValidOptions(
@@ -889,7 +889,7 @@ class ToolMate:
             options=calls,
             title="Pass Function Call Response to ChatGPT",
             default="enable" if config.passFunctionCallReturnToChatGPT else "disable",
-            text="Enabling this feature allows\npassing function call responses, if any,\nto extend conversation with ChatGPT.\nDisabling this feature allows\nrunning function calls\nwithout generating further responses."
+            text="Enabling this feature allows\npassing tool call responses, if any,\nto extend conversation with ChatGPT.\nDisabling this feature allows\nrunning tool calls\nwithout generating further responses."
         )
         if call:
             config.passFunctionCallReturnToChatGPT = (call == "enable")
@@ -2566,6 +2566,19 @@ Acess the risk level of the following `{target.capitalize()}`:
             else:
                 config.currentMessages = config.currentMessages[:-1]
             return None
+        elif action == "search_searxng" and hasattr(config, "searx_tabs"):
+            keyword_processor = KeywordProcessor()
+            keyword_processor.add_keywords_from_list([i.rstrip() for i in config.searx_tabs])
+            description = f"{description} "
+            config.searx_categories = removeDuplicatedListItems(keyword_processor.extract_keywords(description))
+            if config.searx_categories:
+                searx_categories = " |".join(config.searx_categories)
+                searx_categories_pattern = f"({searx_categories} )"
+                description = re.sub(searx_categories_pattern, "", description)
+            # passing parameters
+            config.selectedTool = action
+            config.currentMessages[-1]["content"] = description.rstrip()
+            runLLM = True
         else:
             if action:
                 # when user specify a tool

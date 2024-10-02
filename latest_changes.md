@@ -1,3 +1,11 @@
+# Version 0.3.73
+
+* support SearXNG categories syntax for searching online with tool `@ask_internet` or `@search_searxng`. Read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Perplexica%20and%20SearXNG%20Integration.md#searxng-setup
+
+* fixed searching help store
+
+* updated help store
+
 # Version 0.3.68-0.3.72
 
 * added an alias `@ask_internet` to point to `@search_searxng`
@@ -266,7 +274,7 @@ For set up of Vertex AI Credentials, read https://github.com/eliranwong/toolmate
 
 # Version: 0.3
 
-1. Fixed Running function calling with Gemini models
+1. Fixed Running tool calling with Gemini models
 
 2. Changed default models for backend `llamacpp`:
 * tool - MaziyarPanahi/WizardLM-2-7B-GGUF/WizardLM-2-7B.Q4_K_M.gguf

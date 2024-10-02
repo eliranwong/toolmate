@@ -52,7 +52,7 @@ This page content is generated on 17Sept2024.  For the latest information, simpl
 
 `@ask_palm2` Ask PaLM 2 to chat or provide information (Requirements: 'query')
 
-`@ask_tavily` Ask internet to provide information (Requirements: 'query')
+`@ask_tavily` Get a direct and short answer from internet via Tavily (Requirements: 'query')
 
 `@build_agents` build a group of AI assistants or agents to execute a complicated task that other functions cannot resolve (Requirements: 'task', 'title')
 
@@ -140,7 +140,7 @@ This page content is generated on 17Sept2024.  For the latest information, simpl
 
 `@search_sqlite` Search or manage SQLite file, e.g. fetch data, update records, etc. Remember, use this function ONLY IF I provide you with a sqlite file path. (Requirements: 'path', 'request')
 
-`@search_tavily` Search Tavily for online information (Requirements: 'query')
+`@search_tavily` Search for online information with Tavily (Requirements: 'query')
 
 `@search_weather_info` Answer a query about weather (Requirements: 'code')
 

@@ -32,7 +32,7 @@ Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/d
 
 # Distinctive Features
 
-[NEW! Answer with real-time information](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Perplexica%20and%20SearXNG%20Integration.md)
+[NEW! Answer with real-time information via SearXNG](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Perplexica%20and%20SearXNG%20Integration.md#searxng-setup)
 
 [NEW! Tool Selection Agent](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Selection%20Configurations.md)
 

@@ -1,6 +1,6 @@
 from toolmate import config
 from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
-import sys, os, geocoder, platform, socket, geocoder, datetime, requests, netifaces, getpass, pendulum, pkg_resources, webbrowser, unicodedata
+import sys, os, html, geocoder, platform, socket, geocoder, datetime, requests, netifaces, getpass, pendulum, pkg_resources, webbrowser, unicodedata
 import traceback, uuid, re, textwrap, signal, wcwidth, shutil, threading, time, tiktoken, subprocess, json, base64, html2text, pydoc, codecs, psutil
 from packaging import version
 import pygments
@@ -533,6 +533,17 @@ def getDownloadedGgufModels() -> dict:
 
 # text
 
+def plainTextToUrl(text):
+    # https://wiki.python.org/moin/EscapingHtml
+    text = html.escape(text)
+    searchReplace = (
+        (" ", "%20"),
+        ("\n", "%0D%0A"),
+    )
+    for search, replace in searchReplace:
+        text = text.replace(search, replace)
+    return text
+
 def removeDuplicatedListItems(lst):
     # remove duplicates and matain order
     seen = set()
@@ -896,8 +907,8 @@ def is_valid_image_file(file_path):
 def executeToolFunction(func_arguments: dict, function_name: str):
     def notifyDeveloper(func_name):
         if config.developer:
-            #print1(f"running function '{func_name}' ...")
-            print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running function</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
+            #print1(f"running tool '{func_name}' ...")
+            print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Running tool</{config.terminalPromptIndicatorColor2}> <{config.terminalCommandEntryColor2}>'{func_name}'</{config.terminalCommandEntryColor2}> <{config.terminalPromptIndicatorColor2}>...</{config.terminalPromptIndicatorColor2}>"))
     if not function_name in config.toolFunctionMethods:
         if config.developer:
             print1(f"Unexpected function: {function_name}")
@@ -1781,7 +1792,6 @@ import chromadb
 
 def getHelpCollection(vectorStore=None):
     vectorStore = vectorStore if vectorStore else os.path.join(config.toolMateAIFolder, "help")
-    shutil.rmtree(vectorStore, ignore_errors=True)
     Path(vectorStore).mkdir(parents=True, exist_ok=True)
     chroma_client = chromadb.PersistentClient(vectorStore, Settings(anonymized_telemetry=False))
     return get_or_create_collection(chroma_client, "help", embeddingModel="all-mpnet-base-v2")

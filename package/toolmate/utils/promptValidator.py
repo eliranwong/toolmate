@@ -1,8 +1,9 @@
 from toolmate import config, count_tokens_from_messages, count_tokens_from_functions, tokenLimits
 from prompt_toolkit.validation import Validator, ValidationError
 from prompt_toolkit.application import run_in_terminal
-import tiktoken
 import re
+if not config.isTermux:
+    import tiktoken
 
 class TokenValidator(Validator):
     def validate(self, document):

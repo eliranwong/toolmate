@@ -1,7 +1,7 @@
 from toolmate import config
 from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
-import sys, os, html, geocoder, platform, socket, geocoder, datetime, requests, netifaces, getpass, pendulum, pkg_resources, webbrowser, unicodedata
-import traceback, uuid, re, textwrap, signal, wcwidth, shutil, threading, time, tiktoken, subprocess, json, base64, html2text, pydoc, codecs, psutil
+import sys, os, html, geocoder, platform, socket, geocoder, datetime, requests, netifaces, getpass, pkg_resources, webbrowser, unicodedata
+import traceback, uuid, re, textwrap, signal, wcwidth, shutil, threading, time, subprocess, json, base64, html2text, pydoc, codecs, psutil
 from packaging import version
 import pygments
 from pygments.lexers.python import PythonLexer
@@ -14,18 +14,33 @@ from typing import Optional, Any
 from vertexai.generative_models import Content, Part
 from pathlib import Path
 from PIL import Image
-from openai import OpenAI
-from huggingface_hub import hf_hub_download
 from bs4 import BeautifulSoup
 from urllib.parse import quote
-from guidance import select, gen
 from typing import Union
 from groq import Groq
 from ollama import Client
 import speech_recognition as sr
 import sounddevice, soundfile
 from llama_cpp import Llama
-from tavily import TavilyClient
+import zipfile
+if not config.isTermux:
+    from tavily import TavilyClient
+    from guidance import select, gen
+    from openai import OpenAI
+    import chromadb, tiktoken, pendulum
+    from chromadb.utils.embedding_functions import OllamaEmbeddingFunction, OpenAIEmbeddingFunction, SentenceTransformerEmbeddingFunction
+    from chromadb.config import Settings
+    from langchain_ollama import OllamaEmbeddings
+    from langchain_openai import OpenAIEmbeddings
+    from langchain_huggingface import HuggingFaceEmbeddings
+    from langchain_community.vectorstores import Chroma
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
+    from langchain_unstructured import UnstructuredLoader
+    from autogen.retrieve_utils import TEXT_FORMATS
+    from huggingface_hub import hf_hub_download
+
+# a dummy import line to resolve ALSA error display on Linux
+import sounddevice
 
 
 # voice typing
@@ -99,13 +114,6 @@ def voiceTyping():
         process = subprocess.Popen(cli.rstrip(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
         return "[Error]" if stderr and not stdout else stdout.decode("utf-8").strip()
-
-# non-Android only
-if not config.isTermux:
-    from autogen.retrieve_utils import TEXT_FORMATS
-
-# a dummy import line to resolve ALSA error display on Linux
-import sounddevice
 
 # transformers
 
@@ -1612,8 +1620,6 @@ def toggleoutputaudio():
 
 # embedding
 
-from chromadb.utils.embedding_functions import OllamaEmbeddingFunction, OpenAIEmbeddingFunction, SentenceTransformerEmbeddingFunction
-
 def getEmbeddingFunction(embeddingModel=None):
     # import statement is placed here to make this file compatible on Android
     embeddingModel = embeddingModel if embeddingModel is not None else config.embeddingModel
@@ -1652,16 +1658,6 @@ def query_vectors(collection, query, n=1):
 # https://python.langchain.com/docs/integrations/providers/unstructured/
 # https://python.langchain.com/docs/integrations/document_loaders/unstructured_file/
 # https://python.langchain.com/docs/tutorials/rag/
-
-import zipfile
-from chromadb.config import Settings
-from langchain_ollama import OllamaEmbeddings
-from langchain_openai import OpenAIEmbeddings
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Chroma
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_unstructured import UnstructuredLoader
-from autogen.retrieve_utils import TEXT_FORMATS
 
 def ragRefineDocsPath(docs_path) -> Optional[list]:
     if not os.path.exists(docs_path):
@@ -1788,7 +1784,7 @@ Please answer my question, based on the context given above."""
 #from toolmate import config, get_or_create_collection, add_vector, ragRefineDocsPath, ragGetSplits
 #from pathlib import Path
 #from chromadb.config import Settings
-import chromadb
+#import chromadb
 
 def getHelpCollection(vectorStore=None):
     vectorStore = vectorStore if vectorStore else os.path.join(config.toolMateAIFolder, "help")

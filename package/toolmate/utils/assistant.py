@@ -5,7 +5,6 @@ from toolmate.utils.call_llm import CallLLM
 import threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy, pyperclip
 from flashtext import KeywordProcessor
 from typing import Optional
-from huggingface_hub import hf_hub_download
 from pathlib import Path
 from toolmate.gui.worker import QtResponseStreamer
 from toolmate.utils.download import Downloader
@@ -44,6 +43,7 @@ if not config.isTermux:
     from toolmate.geminipro import GeminiPro
     from toolmate.palm2 import Palm2
     from toolmate.codey import Codey
+    from huggingface_hub import hf_hub_download
 from elevenlabs.client import ElevenLabs
 
 

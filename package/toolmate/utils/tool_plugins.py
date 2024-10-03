@@ -1,10 +1,11 @@
 from toolmate import config, get_or_create_collection, add_vector, getFilenamesWithoutExtension, execPythonFile
 from toolmate import print2, print3
 from pathlib import Path
-from chromadb.config import Settings
-import os, shutil, chromadb, json, copy
+import os, shutil, json, copy
 from typing import Callable
-
+if not config.isTermux:
+    import chromadb
+    from chromadb.config import Settings
 
 class Plugins:
 

@@ -1,6 +1,6 @@
 from toolmate import config, getDeviceInfo, restartApp, count_tokens_from_messages, isCommandInstalled, getCpuThreads
 from toolmate import print1, print2, print3, count_tokens_from_functions, voiceTyping, tokenLimits
-import pydoc, textwrap, re, tiktoken
+import pydoc, textwrap, re
 from prompt_toolkit import prompt
 from prompt_toolkit.application import run_in_terminal
 from prompt_toolkit.styles import Style
@@ -10,7 +10,8 @@ from prompt_toolkit.clipboard.pyperclip import PyperclipClipboard
 from toolmate.utils.prompt_shared_key_bindings import prompt_shared_key_bindings
 from toolmate.utils.prompt_multiline_shared_key_bindings import prompt_multiline_shared_key_bindings
 from toolmate.utils.promptValidator import NumberValidator
-
+if not config.isTermux:
+    import tiktoken
 
 class Prompts:
 

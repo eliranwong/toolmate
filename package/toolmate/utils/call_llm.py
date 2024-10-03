@@ -1,12 +1,13 @@
 from typing import Optional
 from toolmate import config, getDeviceInfo, toGeminiMessages, useChatSystemMessage
-from toolmate.utils.call_gemini import CallGemini
 from toolmate.utils.call_ollama import CallOllama
-from toolmate.utils.call_llamacpp import CallLlamaCpp
-from toolmate.utils.call_llamacppserver import CallLlamaCppServer
-from toolmate.utils.call_chatgpt import CallChatGPT, CallLetMeDoIt
 from toolmate.utils.call_groq import CallGroq
 import copy
+if not config.isTermux:
+    from toolmate.utils.call_gemini import CallGemini
+    from toolmate.utils.call_llamacpp import CallLlamaCpp
+    from toolmate.utils.call_llamacppserver import CallLlamaCppServer
+    from toolmate.utils.call_chatgpt import CallChatGPT, CallLetMeDoIt
 
 class CallLLM:
 

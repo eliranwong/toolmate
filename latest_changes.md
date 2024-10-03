@@ -1,3 +1,9 @@
+# Version 0.3.75
+
+* added instructions to install Ollama on Android
+
+* tweaked plugin `search searxng`
+
 # Version 0.3.74
 
 Added tool aliases for `@search_searxng` categories:

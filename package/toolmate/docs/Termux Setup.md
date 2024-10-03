@@ -84,3 +84,27 @@ On Termux, do not use pip3 to install matplotlib, we manage to install matplotli
 
 > pkg install matplotlib
 
+# Instal Ollama on Termux
+
+Install Ollama:
+
+```
+pkg install git cmake golang
+git clone --depth 1 https://github.com/ollama/ollama.git
+cd ollama
+go generate ./...
+go build .
+cp ollama /data/data/com.termux/files/usr/bin/
+```
+
+Start Ollama server:
+
+```
+ollama serve &
+```
+
+Run, e.g. Llama3.2:3b:
+
+```
+ollama run llama3.2:3b
+```

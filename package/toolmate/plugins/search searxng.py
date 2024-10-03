@@ -96,9 +96,9 @@ if isServerAlive(config.searx_server, config.searx_port):
     config.aliases["@ask_internet "] = "@search_searxng "
     for i in config.searx_tabs:
         tool = i[1:-1]
-        config.aliases[f"@{tool} "] = f"@search_searxng {i}"
-        config.inputSuggestions.append(f"@{tool} ")
-        config.builtinTools[tool] = f"""Search the '{"questions_and_answers" if tool=="q&a" else tool}' category for online information."""
+        config.aliases[f'@{"qna" if tool=="q&a" else tool} '] = f"@search_searxng {i}"
+        config.inputSuggestions.append(f'@{"qna" if tool=="q&a" else tool} ')
+        config.builtinTools["qna" if tool=="q&a" else tool] = f"""Search the '{"questions_and_answers" if tool=="q&a" else tool}' category for online information."""
     tabsDict = {i: None for i in config.searx_tabs}
     config.inputSuggestions += ["Search SearxNG: ", {"@search_searxng": tabsDict}, {"@ask_internet": tabsDict}]
 

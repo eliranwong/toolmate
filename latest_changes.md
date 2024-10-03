@@ -1,3 +1,49 @@
+# Version 0.3.74
+
+Added tool aliases for `@search_searxng` categories:
+
+*`@apps` Search for information online in the 'apps' category.
+
+*`@files` Search for information online in the 'files' category.
+
+*`@general` Search for information online in the 'general' category.
+
+*`@images` Search for information online in the 'images' category.
+
+*`@it` Search for information online in the 'it' category.
+
+*`@lyrics` Search for information online in the 'lyrics' category.
+
+*`@map` Search for information online in the 'map' category.
+
+*`@music` Search for information online in the 'music' category.
+
+*`@news` Search for information online in the 'news' category.
+
+*`@packages` Search for information online in the 'packages' category.
+
+*`@qna` Search for information online in the 'questions_and_answers' category.
+
+*`@radio` Search for information online in the 'radio' category.
+
+*`@repos` Search for information online in the 'repos' category.
+
+*`@science` Search for information online in the 'science' category.
+
+*`@scientific_publications` Search for information online in the 'scientific_publications' category.
+
+*`@social_media` Search for information online in the 'social_media' category.
+
+*`@software_wikis` Search for information online in the 'software_wikis' category.
+
+*`@translate` Search for information online in the 'translate' category.
+
+*`@videos` Search for information online in the 'videos' category.
+
+*`@web` Search for information online in the 'web' category.
+
+*`@wikimedia` Search for information online in the 'wikimedia' category.
+
 # Version 0.3.73
 
 * support SearXNG categories syntax for searching online with tool `@ask_internet` or `@search_searxng`. Read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Perplexica%20and%20SearXNG%20Integration.md#searxng-setup

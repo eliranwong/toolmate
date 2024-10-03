@@ -22,7 +22,7 @@ functionSignature = {
         "Ask internet",
     ],
     "name": "ask_tavily",
-    "description": "Ask internet to provide information",
+    "description": "Ask internet for a short and direct answer",
     "parameters": {
         "type": "object",
         "properties": {

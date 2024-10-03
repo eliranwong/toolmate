@@ -4,7 +4,7 @@ This page content is generated on 17Sept2024.  For the latest information, simpl
 
 # Available Tools
 
-@add_google_calendar_event @add_outlook_calendar_event @analyze_audio @analyze_files @analyze_images_chatgpt @analyze_images_gemini @analyze_images_groq @analyze_images_llamacpp @analyze_images_ollama @analyze_web_content @append_command @append_fabric @append_instruction @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_internet @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @ask_tavily @build_agents @chat @command @context @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_sd @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @execute_computing_task @extract_python_code @fabric @help @improve_writing @install_package @list_current_directory_contents @load_conversations @modify_images @open_browser @paste_from_clipboard @pronunce_words @recommend_tool @reflection @remove_image_background @run_python_code @save_memory @search_conversations @search_finance @search_google @search_memory @search_news @search_searxng @search_sqlite @search_tavily @search_weather_info @send_gmail @send_outlook @send_tweet @workflow
+@add_google_calendar_event @add_outlook_calendar_event @analyze_audio @analyze_files @analyze_images_chatgpt @analyze_images_gemini @analyze_images_groq @analyze_images_llamacpp @analyze_images_ollama @analyze_web_content @append_command @append_fabric @append_instruction @apps @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @ask_tavily @build_agents @chat @command @context @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_flux @create_image_imagen3 @create_image_sd @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @edit_text @execute_computing_task @extract_python_code @fabric @files @general @help @images @improve_writing @install_package @it @list_current_directory_contents @load_conversations @lyrics @map @modify_images @music @news @open_browser @packages @paste_from_clipboard @pronunce_words @qna @radio @recommend_tool @reflection @remove_image_background @repos @run_python_code @save_memory @science @scientific_publications @search_conversations @search_finance @search_google @search_memory @search_news @search_searxng @search_sqlite @search_tavily @search_weather_info @send_gmail @send_outlook @send_tweet @social_media @software_wikis @translate @videos @web @wikimedia @workflow
 
 # Descriptions
 
@@ -26,11 +26,15 @@ This page content is generated on 17Sept2024.  For the latest information, simpl
 
 `@analyze_images_ollama` Describe or compare images with Ollama (Requirements: 'query', 'image_filepath')
 
+`@analyze_web_content` retrieve information from a webpage if an url is provided (Requirements: 'query', 'url')
+
 `@append_command` Execute a system command with the previous text output appended to it
 
 `@append_fabric` Execute a fabric command with the previous text output appended to it
 
 `@append_instruction` Append the previous text output to a given instruction
+
+`@apps` Search for information online in the 'apps' category.
 
 `@ask_chatgpt` Ask ChatGPT to chat or provide information (Requirements: 'query')
 
@@ -39,8 +43,6 @@ This page content is generated on 17Sept2024.  For the latest information, simpl
 `@ask_gemini` Ask Gemini to chat or provide information (Requirements: 'query')
 
 `@ask_groq` Ask Groq to chat or provide information (Requirements: 'query')
-
-`@ask_internet` Ask internet to provide information (Requirements: 'query')
 
 `@ask_llama3_1` Ask Llama3.1 to chat or provide information (Requirements: 'query')
 
@@ -52,7 +54,7 @@ This page content is generated on 17Sept2024.  For the latest information, simpl
 
 `@ask_palm2` Ask PaLM 2 to chat or provide information (Requirements: 'query')
 
-`@ask_tavily` Get a direct and short answer from internet via Tavily (Requirements: 'query')
+`@ask_tavily` Ask internet to provide information (Requirements: 'query')
 
 `@build_agents` build a group of AI assistants or agents to execute a complicated task that other functions cannot resolve (Requirements: 'task', 'title')
 
@@ -92,29 +94,53 @@ This page content is generated on 17Sept2024.  For the latest information, simpl
 
 `@download_youtube_video` Download Youtube video into mp4 file (Requirements: 'url')
 
+`@edit_text` Edit text files with extensions: '*.txt', '*.md', '*.py'. (Requirements: 'filename')
+
 `@execute_computing_task` Execute computing task or gain access to device information (Requirements: 'code', 'title', 'risk')
 
 `@extract_python_code` Extract the python code in a given content
 
 `@fabric` Execute a fabric command
 
-`@help` Retrieve information from the documentation regarding how to use ToolMate AI (Requirements: 'query', 'filepath')
+`@files` Search for information online in the 'files' category.
+
+`@general` Search for information online in the 'general' category.
+
+`@help` Retrieve information from the documentation regarding how to use ToolMate AI (Requirements: 'query')
+
+`@images` Search for information online in the 'images' category.
 
 `@improve_writing` Improve the writing of a given content
 
 `@install_package` Install a python package (Requirements: 'package')
 
+`@it` Search for information online in the 'it' category.
+
 `@list_current_directory_contents` List the contents in the current directory
 
 `@load_conversations` Load a saved conversations if chat ID / timestamp / file path is given (Requirements: 'id')
 
+`@lyrics` Search for information online in the 'lyrics' category.
+
+`@map` Search for information online in the 'map' category.
+
 `@modify_images` Modify images with ChatGPT and DALLE-3 (Requirements: 'image_fullpath', 'requested_changes_in_detail')
 
+`@music` Search for information online in the 'music' category.
+
+`@news` Search for information online in the 'news' category.
+
 `@open_browser` Open https:// url with web browser (Requirements: 'url')
+
+`@packages` Search for information online in the 'packages' category.
 
 `@paste_from_clipboard` Retrieve the text content from the system clipboard and paste
 
 `@pronunce_words` Pronounce words or sentences with text-to-speech utility (Requirements: 'words', 'language')
+
+`@qna` Search for information online in the 'questions_and_answers' category.
+
+`@radio` Search for information online in the 'radio' category.
 
 `@recommend_tool` Recommand an appropriate tool in response to a given request
 
@@ -122,9 +148,15 @@ This page content is generated on 17Sept2024.  For the latest information, simpl
 
 `@remove_image_background` Remove image background (Requirements: 'filepath')
 
+`@repos` Search for information online in the 'repos' category.
+
 `@run_python_code` Extract and run the python code in a given content
 
 `@save_memory` Use this function if I mention something which you think would be useful in the future and should be saved as a memory. Saved memories will allow you to retrieve snippets of past conversations when needed. (Requirements: 'memory', 'title', 'type', 'tags')
+
+`@science` Search for information online in the 'science' category.
+
+`@scientific_publications` Search for information online in the 'scientific_publications' category.
 
 `@search_conversations` Search chat records or conversations (Requirements: 'query')
 
@@ -149,5 +181,17 @@ This page content is generated on 17Sept2024.  For the latest information, simpl
 `@send_outlook` Send Outlook email (Requirements: 'email', 'subject', 'body')
 
 `@send_tweet` Send a tweet to twitter (Requirements: 'message')
+
+`@social_media` Search for information online in the 'social_media' category.
+
+`@software_wikis` Search for information online in the 'software_wikis' category.
+
+`@translate` Search for information online in the 'translate' category.
+
+`@videos` Search for information online in the 'videos' category.
+
+`@web` Search for information online in the 'web' category.
+
+`@wikimedia` Search for information online in the 'wikimedia' category.
 
 `@workflow` Execute a workflow

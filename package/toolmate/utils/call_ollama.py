@@ -30,8 +30,9 @@ class CallOllama:
     @check_ollama_errors
     def checkCompletion():
         if shutil.which("ollama"):
-            for i in (config.ollamaToolModel, config.ollamaChatModel, config.ollamaVisionModel):
-                Downloader.downloadOllamaModel(i)
+            Downloader.downloadOllamaModel(config.ollamaToolModel)
+            if config.useAdditionalChatModel:
+                Downloader.downloadOllamaModel(config.ollamaChatModel)
         else:
             print("Ollama not found! Install it first!")
             print("Check https://ollama.com")

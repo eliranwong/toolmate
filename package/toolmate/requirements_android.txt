@@ -127,3 +127,4 @@ flashtext
 #flaml[automl]
 #tavily-python
 wikipedia
+tqdm

@@ -6,8 +6,7 @@ Ask Google PaLM 2 for information
 [TOOL_CALL]
 """
 
-
-if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enabledGoogleAPIs:
+if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enabledGoogleAPIs and not config.isTermux:
 
     import vertexai
     from vertexai.generative_models._generative_models import (

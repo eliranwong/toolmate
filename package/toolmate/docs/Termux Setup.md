@@ -108,3 +108,26 @@ Run, e.g. Llama3.2:3b:
 ```
 ollama run llama3.2:3b
 ```
+
+# Install fabric
+
+```
+pkg install golang
+go install github.com/danielmiessler/fabric@latest
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$HOME/.local/bin:$PATH
+fabric --setup
+```
+
+# Install yt-dlp
+
+```
+cd
+mkdir -p ~/.local/bin
+pkg install ffmpeg
+wget -P ~/.local/bin/ https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp
+chmod +x ~/.local/bin/yt-dlp
+export PATH=$HOME/.local/bin:$PATH
+alias mp3='cd /data/data/com.termux/files/home/storage/music && yt-dlp -x --audio-format mp3'
+alias mp4='cd /data/data/com.termux/files/home/storage/movies && yt-dlp -f bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4'
+```

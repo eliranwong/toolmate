@@ -11,7 +11,6 @@ from prompt_toolkit.styles.pygments import style_from_pygments_cls
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit import prompt
 from typing import Optional, Any
-from vertexai.generative_models import Content, Part
 from pathlib import Path
 from PIL import Image
 from bs4 import BeautifulSoup
@@ -21,9 +20,10 @@ from groq import Groq
 from ollama import Client
 import speech_recognition as sr
 import sounddevice, soundfile
-from llama_cpp import Llama
 import zipfile
 if not config.isTermux:
+    from llama_cpp import Llama
+    from vertexai.generative_models import Content, Part
     from tavily import TavilyClient
     from guidance import select, gen
     from openai import OpenAI

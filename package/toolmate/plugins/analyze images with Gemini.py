@@ -21,48 +21,50 @@ Reference: https://platform.openai.com/docs/guides/vision
 [TOOL_CALL]
 """
 
-from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url, runToolMateCommand, getLlamacppServerClient
-from toolmate.utils.call_chatgpt import check_openai_errors
-import os
-from openai import OpenAI
-from toolmate.geminiprovision import GeminiProVision
-from toolmate.utils.call_ollama import CallOllama
+if not config.isTermux:
 
-@check_openai_errors
-def analyze_images_gemini(function_args):
-    from toolmate import config
+    from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url, runToolMateCommand, getLlamacppServerClient
+    from toolmate.utils.call_chatgpt import check_openai_errors
+    import os
+    from openai import OpenAI
+    from toolmate.geminiprovision import GeminiProVision
+    from toolmate.utils.call_ollama import CallOllama
 
-    answer = GeminiProVision(temperature=config.llmTemperature).analyze_images_gemini(function_args)
-    if answer:
-        config.toolTextOutput = answer
-        return ""
-    else:
-        return "[INVALID]"
+    @check_openai_errors
+    def analyze_images_gemini(function_args):
+        from toolmate import config
 
-functionSignature = {
-    "examples": [
-        "describe image",
-        "compare images",
-        "analyze image",
-    ],
-    "name": "analyze_images_gemini",
-    "description": "Describe or compare images with Gemini",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "query": {
-                "type": "string",
-                "description": "Questions or requests that users ask about the given images",
+        answer = GeminiProVision(temperature=config.llmTemperature).analyze_images_gemini(function_args)
+        if answer:
+            config.toolTextOutput = answer
+            return ""
+        else:
+            return "[INVALID]"
+
+    functionSignature = {
+        "examples": [
+            "describe image",
+            "compare images",
+            "analyze image",
+        ],
+        "name": "analyze_images_gemini",
+        "description": "Describe or compare images with Gemini",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "Questions or requests that users ask about the given images",
+                },
+                "image_filepath": {
+                    "type": "string",
+                    "description": """Return a list of image paths or urls, e.g. '["image1.png", "/tmp/image2.png", "https://letmedoit.ai/image.png"]'. Return '[]' if image path is not provided.""",
+                },
             },
-            "image_filepath": {
-                "type": "string",
-                "description": """Return a list of image paths or urls, e.g. '["image1.png", "/tmp/image2.png", "https://letmedoit.ai/image.png"]'. Return '[]' if image path is not provided.""",
-            },
+            "required": ["query", "image_filepath"],
         },
-        "required": ["query", "image_filepath"],
-    },
-}
+    }
 
-config.addFunctionCall(signature=functionSignature, method=analyze_images_gemini)
-config.inputSuggestions.append("Describe this image in detail: ")
-config.inputSuggestions.append("Extract text from this image: ")
+    config.addFunctionCall(signature=functionSignature, method=analyze_images_gemini)
+    config.inputSuggestions.append("Describe this image in detail: ")
+    config.inputSuggestions.append("Extract text from this image: ")

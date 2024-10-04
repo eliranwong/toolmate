@@ -6,7 +6,6 @@ import threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, 
 from flashtext import KeywordProcessor
 from typing import Optional
 from pathlib import Path
-from toolmate.gui.worker import QtResponseStreamer
 from toolmate.utils.download import Downloader
 from toolmate.utils.ollama_models import ollama_models
 #from pygments.lexers.python import PythonLexer
@@ -34,17 +33,18 @@ from toolmate.utils.streaming_word_wrapper import StreamingWordWrapper
 from toolmate.utils.text_utils import TextUtil
 from toolmate.utils.sttLanguages import googleSpeeckToTextLanguages, whisperSpeeckToTextLanguages
 from toolmate.groqchat import GroqChatbot
-from toolmate.chatgpt import ChatGPT
-from toolmate.llamacpp import LlamacppChat
-from toolmate.llamacppserver import LlamacppServerChat
 from toolmate.ollamachat import OllamaChat
+from elevenlabs.client import ElevenLabs
 if not config.isTermux:
+    from toolmate.chatgpt import ChatGPT
+    from toolmate.llamacpp import LlamacppChat
+    from toolmate.llamacppserver import LlamacppServerChat
+    from toolmate.gui.worker import QtResponseStreamer
     from toolmate.autobuilder import AutoGenBuilder
     from toolmate.geminipro import GeminiPro
     from toolmate.palm2 import Palm2
     from toolmate.codey import Codey
     from huggingface_hub import hf_hub_download
-from elevenlabs.client import ElevenLabs
 
 
 class ToolMate:
@@ -116,13 +116,13 @@ class ToolMate:
         # check availability of api keys
         if not config.groqApi_key:
             self.changeGroqApi()
-        if not config.openaiApiKey:
+        if not config.openaiApiKey and not config.isTermux:
             self.changeChatGPTAPIkey()
         if not config.openweathermapApi:
             self.changeOpenweathermapApi()
         if not config.elevenlabsApi:
             self.changeElevenlabsApi()
-        if not config.tavilyApi_key:
+        if not config.tavilyApi_key and not config.isTermux:
             self.changeTavilyApi()
 
         # initial completion check at startup
@@ -475,13 +475,15 @@ class ToolMate:
 
     def changeAPIkeys(self):
         self.changeGroqApi()
-        self.changeChatGPTAPIkey()
-        self.setAutoGenBuilderConfig()
+        if not config.isTermux:
+            self.changeChatGPTAPIkey()
+            self.setAutoGenBuilderConfig()
         self.changeOpenweathermapApi()
         self.changeElevenlabsApi()
-        self.changeTavilyApi()
-        self.selectGoogleAPIs()
-        if config.isTermux:
+        if not config.isTermux:
+            self.changeTavilyApi()
+            self.selectGoogleAPIs()
+        else:
             self.setTermuxApi()
 
     def changeChatGPTAPIkey(self):

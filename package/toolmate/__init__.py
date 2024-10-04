@@ -104,8 +104,9 @@ from toolmate.utils.shortcuts import createShortcuts
 createShortcuts()
 
 # setup optional credentials
-setChatGPTAPIkey()
-setGoogleCredentials()
+if not config.isTermux:
+    setChatGPTAPIkey()
+    setGoogleCredentials()
 
 # context
 g = geocoder.ip('me')

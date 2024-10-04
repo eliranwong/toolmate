@@ -21,28 +21,15 @@ Reference: https://platform.openai.com/docs/guides/vision
 [TOOL_CALL]
 """
 
-from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url, encode_image, runToolMateCommand, getLlamacppServerClient
-from toolmate.utils.call_chatgpt import check_openai_errors
-import os
-from openai import OpenAI
-from toolmate.geminiprovision import GeminiProVision
+from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, is_valid_url, encode_image
 from toolmate.utils.call_ollama import CallOllama
+from toolmate.utils.download import Downloader
+import os
 
-@check_openai_errors
 def analyze_images_ollama(function_args):
     from toolmate import config
 
-    llmInterface = "ollama"
-
-    if llmInterface == "gemini":
-        answer = GeminiProVision(temperature=config.llmTemperature).analyze_images_ollama(function_args)
-        if answer:
-            config.toolTextOutput = answer
-            return ""
-        else:
-            return "[INVALID]"
-    elif llmInterface in ("chatgpt", "letmedoit") and not config.openaiApiKey:
-        return "OpenAI API key not found!"
+    Downloader.downloadOllamaModel(config.ollamaVisionModel)
 
     query = function_args.get("query") # required
     files = function_args.get("image_filepath") # required
@@ -72,24 +59,13 @@ def analyze_images_ollama(function_args):
             files.remove(i)
 
     if content:
-        if llmInterface in ("chatgpt", "letmedoit"):
-            client = OpenAI()
-        elif llmInterface == "llamacpp":
-            # start llama.cpp vision server
-            startLlamacppVisionServer()
-            client = OpenAI(base_url=f"http://localhost:{config.llamacppVisionModel_server_port}/v1", api_key="toolmate")
-        elif llmInterface == "llamacppserver":
-            # start llama.cpp vision server
-            runToolMateCommand("customvisionserver")
-            client = getLlamacppServerClient("vision")
-        elif llmInterface in ("ollama", "groq"):
-            config.currentMessages[-1] = {'role': 'user', 'content': query, 'images': files}
-            answer = CallOllama.getSingleChatResponse("", config.currentMessages, model=config.ollamaVisionModel)
-            config.toolTextOutput = answer
-            print2("```assistant")
-            print1(answer)
-            print2("```")
-            return ""
+        config.currentMessages[-1] = {'role': 'user', 'content': query, 'images': files}
+        answer = CallOllama.getSingleChatResponse("", config.currentMessages, model=config.ollamaVisionModel)
+        config.toolTextOutput = answer
+        print2("```assistant")
+        print1(answer)
+        print2("```")
+        return ""
 
         content.insert(0, {"type": "text", "text": query,})
 
@@ -110,10 +86,6 @@ def analyze_images_ollama(function_args):
         print2("```assistant")
         print1(answer)
         print2("```")
-
-        # stop llama.cpp vision server
-        if llmInterface == "llamacpp":
-            stopLlamacppVisionServer()
 
         return ""
     return "[INVALID]"

@@ -9,7 +9,7 @@ Reference: https://console.groq.com/docs/vision
 """
 
 
-from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, getGroqClient, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url, encode_image, runToolMateCommand, getLlamacppServerClient
+from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, getGroqClient, is_valid_url, encode_image
 import os
 
 def analyze_images_groq(function_args):

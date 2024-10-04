@@ -115,37 +115,15 @@ Fabric Integration: https://github.com/eliranwong/toolmate/blob/main/package/too
 
 # Installation - an example
 
-Install ToolMate AI, by running:
-
-To set up virtual environment (recommended):
-
-> mkdir -p ~/apps/toolmate
-
-> cd ~/apps/toolmate
-
-> python3 -m venv toolmate
-
-> source toolmate/bin/activate
-
-To install:
+For Windows / macOS / LinuX / ChromeOS users:
 
 > pip install --upgrade toolmate
 
-To set up an alias:
+For Android users:
 
-> echo "alias toolmate=~/apps/toolmate/bin/toolmate" >> ~/.bashrc
+> pip install --upgrade toolmate_android
 
-Remarks: Auto-upgrade is supported in macOS and Linux versions, but not in Windows version.  Windows users need to manually upgrade to get the latest features.
-
-To run:
-
-> toolmate
-
-To start up with a particular backend, you may use parameter `-b`, e.g.:
-
-> toolmate -b groq
-
-Read more at https://github.com/eliranwong/toolmate/wiki#installation
+Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Install%20ToolMate.md
 
 # GPU Acceleration
 

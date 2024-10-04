@@ -131,3 +131,33 @@ export PATH=$HOME/.local/bin:$PATH
 alias mp3='cd /data/data/com.termux/files/home/storage/music && yt-dlp -x --audio-format mp3'
 alias mp4='cd /data/data/com.termux/files/home/storage/movies && yt-dlp -f bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4'
 ```
+
+# Install ToolMate_Android
+
+Install ToolMate AI (Android version), by running:
+
+To set up virtual environment (recommended):
+
+> mkdir -p ~/apps/toolmate
+
+> cd ~/apps/toolmate
+
+> python3 -m venv --system-site-packages toolmate
+
+> source toolmate/bin/activate
+
+To install:
+
+> pip install --upgrade toolmate_android
+
+To run:
+
+> toolmate
+
+To start up with a particular backend, you may use parameter `-b`, e.g.:
+
+> toolmate -b groq
+
+To set up an alias:
+
+> echo "alias toolmate=~/apps/toolmate/bin/toolmate" >> ~/.bashrc

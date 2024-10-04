@@ -43,9 +43,9 @@ open(os.path.join(package, "config.py"), "w").close()
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name=package,
-    version="0.3.75",
+    version="0.3.77",
     python_requires=">=3.8, <3.12",
-    description=f"{appFullName} is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. With the ability to perform multi-step actions, users can customize workflows to tackle complex projects with ease.",
+    description=f"ToolMate AI, developed by Eliran Wong, is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. Supports custom workflow and plugins to automate multi-step actions.",
     long_description=long_description,
     author="Eliran Wong",
     author_email="support@letmedoit.ai",

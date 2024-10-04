@@ -138,9 +138,9 @@ Install ToolMate AI (Android version), by running:
 
 To set up virtual environment (recommended):
 
-> mkdir -p ~/apps/toolmate
+> mkdir -p ~/apps
 
-> cd ~/apps/toolmate
+> cd ~/apps
 
 > python3 -m venv --system-site-packages toolmate
 

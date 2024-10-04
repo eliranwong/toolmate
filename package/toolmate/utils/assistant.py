@@ -487,100 +487,95 @@ class ToolMate:
             self.setTermuxApi()
 
     def changeChatGPTAPIkey(self):
-        if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
-            print3("# ChatGPT API Key: allows access to ChatGPT models")
-            print1("To set up ChatGPT API Key, read:\nhttps://github.com/eliranwong/letmedoit/wiki/ChatGPT-API-Key#how-to-obtain\n")
-            print1("Enter your OpenAI API Key [optional]:")
-            apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.openaiApiKey, is_password=True)
-            if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
-                config.openaiApiKey = apikey
-                CallLLM.checkCompletion()
-            else:
-                config.openaiApiKey = "toolmate"
-            #print1("Enter your Organization ID [optional]:")
-            #oid = self.prompts.simplePrompt(default=config.openaiApiOrganization, is_password=True)
-            #if oid and not oid.strip().lower() in (config.cancel_entry, config.exit_entry):
-            #    config.openaiApiOrganization = oid
-            config.saveConfig()
-            print2("Configurations updated!")
-            setChatGPTAPIkey()
+        print3("# ChatGPT API Key: allows access to ChatGPT models")
+        print1("To set up ChatGPT API Key, read:\nhttps://github.com/eliranwong/letmedoit/wiki/ChatGPT-API-Key#how-to-obtain\n")
+        print1("Enter your OpenAI API Key [optional]:")
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.openaiApiKey, is_password=True)
+        if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+            config.openaiApiKey = apikey
+            CallLLM.checkCompletion()
+        else:
+            config.openaiApiKey = "toolmate"
+        #print1("Enter your Organization ID [optional]:")
+        #oid = self.prompts.simplePrompt(default=config.openaiApiOrganization, is_password=True)
+        #if oid and not oid.strip().lower() in (config.cancel_entry, config.exit_entry):
+        #    config.openaiApiOrganization = oid
+        config.saveConfig()
+        print2("Configurations updated!")
+        setChatGPTAPIkey()
 
     def changeTavilyApi(self):
-        if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
-            print3("# Tavily API Key: allows access to Tavily hosted LLMs")
-            print1("To set up Tavily API Key, read:\nhttps://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tavily%20API%20Setup.md\n")
-            print1("Enter a single or a list of multiple Tavily API Key(s) [optional]:")
-            print()
-            apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=str(config.tavilyApi_key), is_password=True)
-            if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
-                try:
-                    if isinstance(eval(apikey), list):
-                        config.tavilyApi_key = eval(apikey)
-                except:
-                    config.tavilyApi_key = apikey
-                CallLLM.checkCompletion()
-            else:
-                config.tavilyApi_key = "toolmate"
-            config.saveConfig()
-            print2("Configurations updated!")
+        print3("# Tavily API Key: allows access to Tavily hosted LLMs")
+        print1("To set up Tavily API Key, read:\nhttps://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tavily%20API%20Setup.md\n")
+        print1("Enter a single or a list of multiple Tavily API Key(s) [optional]:")
+        print()
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=str(config.tavilyApi_key), is_password=True)
+        if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+            try:
+                if isinstance(eval(apikey), list):
+                    config.tavilyApi_key = eval(apikey)
+            except:
+                config.tavilyApi_key = apikey
+            CallLLM.checkCompletion()
+        else:
+            config.tavilyApi_key = "toolmate"
+        config.saveConfig()
+        print2("Configurations updated!")
 
     def changeGroqApi(self):
-        if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
-            print3("# Groq Cloud API Key: allows access to Groq Cloud hosted LLMs")
-            print1("To set up Groq Cloud API Key, read:\nhttps://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Groq%20API%20Setup.md\n")
-            print1("Enter a single or a list of multiple Groq Cloud API Key(s) [optional]:")
-            print()
-            apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=str(config.groqApi_key), is_password=True)
-            if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
-                try:
-                    if isinstance(eval(apikey), list):
-                        config.groqApi_key = eval(apikey)
-                except:
-                    config.groqApi_key = apikey
-                CallLLM.checkCompletion()
-            else:
-                config.groqApi_key = "toolmate"
-            config.saveConfig()
-            print2("Configurations updated!")
+        print3("# Groq Cloud API Key: allows access to Groq Cloud hosted LLMs")
+        print1("To set up Groq Cloud API Key, read:\nhttps://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Groq%20API%20Setup.md\n")
+        print1("Enter a single or a list of multiple Groq Cloud API Key(s) [optional]:")
+        print()
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=str(config.groqApi_key), is_password=True)
+        if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+            try:
+                if isinstance(eval(apikey), list):
+                    config.groqApi_key = eval(apikey)
+            except:
+                config.groqApi_key = apikey
+            CallLLM.checkCompletion()
+        else:
+            config.groqApi_key = "toolmate"
+        config.saveConfig()
+        print2("Configurations updated!")
 
     def changeOpenweathermapApi(self):
-        if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
-            print3("# OpenWeatherMap API Key: allows access to real-time weather information")
-            print1("To set up OpenWeatherMap API Key, read:\nhttps://github.com/eliranwong/letmedoit/wiki/OpenWeatherMap-API-Setup\n")
-            print1("Enter your OpenWeatherMap API Key [optional]:")
-            print()
-            apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.openweathermapApi, is_password=True)
-            if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
-                config.openweathermapApi = apikey
-            if getWeather() is not None:
-                print2("Configurations updated!")
-            else:
-                config.openweathermapApi = "toolmate"
-                print2("Invalid API key entered!")
-            config.saveConfig()
+        print3("# OpenWeatherMap API Key: allows access to real-time weather information")
+        print1("To set up OpenWeatherMap API Key, read:\nhttps://github.com/eliranwong/letmedoit/wiki/OpenWeatherMap-API-Setup\n")
+        print1("Enter your OpenWeatherMap API Key [optional]:")
+        print()
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.openweathermapApi, is_password=True)
+        if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+            config.openweathermapApi = apikey
+        if getWeather() is not None:
+            print2("Configurations updated!")
+        else:
+            config.openweathermapApi = "toolmate"
+            print2("Invalid API key entered!")
+        config.saveConfig()
 
     def changeElevenlabsApi(self):
-        if not config.terminalEnableTermuxAPI or (config.terminalEnableTermuxAPI and self.fingerprint()):
-            print3("# ElevenLabs API Key: allows access to voice generation feature offered by ElevenLabs")
-            print1("To set up ElevenLabs API Key, read:\nhttps://elevenlabs.io/docs/api-reference/text-to-speech#authentication\n")
-            print1("Enter your ElevenLabs API Key [optional]:")
-            print()
-            apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.elevenlabsApi, is_password=True)
-            if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
-                config.elevenlabsApi = apikey
-            try:
-                # testing
-                ElevenLabs(api_key=config.elevenlabsApi).generate(
-                    #api_key=config.elevenlabsApi, # Defaults to os.getenv(ELEVEN_API_KEY)
-                    text="test",
-                    voice=config.elevenlabsVoice,
-                    model="eleven_multilingual_v2"
-                )
-                print2("Configurations updated!")
-            except:
-                config.elevenlabsApi = "toolmate"
-                print2("Invalid API key entered!")
-            config.saveConfig()
+        print3("# ElevenLabs API Key: allows access to voice generation feature offered by ElevenLabs")
+        print1("To set up ElevenLabs API Key, read:\nhttps://elevenlabs.io/docs/api-reference/text-to-speech#authentication\n")
+        print1("Enter your ElevenLabs API Key [optional]:")
+        print()
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.elevenlabsApi, is_password=True)
+        if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+            config.elevenlabsApi = apikey
+        try:
+            # testing
+            ElevenLabs(api_key=config.elevenlabsApi).generate(
+                #api_key=config.elevenlabsApi, # Defaults to os.getenv(ELEVEN_API_KEY)
+                text="test",
+                voice=config.elevenlabsVoice,
+                model="eleven_multilingual_v2"
+            )
+            print2("Configurations updated!")
+        except:
+            config.elevenlabsApi = "toolmate"
+            print2("Invalid API key entered!")
+        config.saveConfig()
 
     def exitAction(self):
         message = "closing ..."

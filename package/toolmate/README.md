@@ -18,7 +18,7 @@ https://github.com/eliranwong/toolmate/blob/main/latest_changes.md
 
 # Supported Platforms
 
-Windows, macOS, Linux, ChromeOS, Android (upcoming)
+Windows, macOS, Linux, ChromeOS, Android
 
 # AI Backends and Models
 
@@ -31,6 +31,8 @@ Our recommendations:
 Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Supported%20Backends%20and%20Models.md
 
 # Distinctive Features
+
+[NEW! ToolMate AI runs on Android too](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Termux%20Setup.md)
 
 [NEW! Answer with real-time information via SearXNG](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Perplexica%20and%20SearXNG%20Integration.md#searxng-setup)
 

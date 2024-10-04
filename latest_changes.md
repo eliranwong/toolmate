@@ -1,3 +1,9 @@
+# Version 0.3.76-0.3.78
+
+* created Android package `toolmate_android`
+
+* updated documentations
+
 # Version 0.3.75
 
 * added instructions to install Ollama on Android

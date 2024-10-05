@@ -1,5 +1,5 @@
 from toolmate import config, getHideOutputSuffix
-import os, traceback, subprocess, re, sounddevice, soundfile, pydoc, shutil
+import os, traceback, subprocess, re, pydoc, shutil
 from pathlib import Path
 from gtts import gTTS
 from elevenlabs.client import ElevenLabs
@@ -19,6 +19,9 @@ try:
 except:
     config.usePygame = False
     config.isPygameInstalled = True
+if not config.isTermux:
+    import sounddevice, soundfile
+
 
 class TTSUtil:
 
@@ -133,6 +136,8 @@ class TTSUtil:
             elif config.isPygameInstalled:
                 # use pygame if config.usePygame or vlc player is not installed
                 TTSUtil.playAudioFilePygame(audioFile)
+            elif config.isTermux and config.terminalEnableTermuxAPI:
+                os.system(f'''termux-media-player play "{audioFile}"''')
             else:
                 sounddevice.play(*soundfile.read(audioFile)) 
                 sounddevice.wait()

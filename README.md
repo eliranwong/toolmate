@@ -32,7 +32,7 @@ Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/d
 
 # Distinctive Features
 
-[NEW! ToolMate AI runs on Android too](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Termux%20Setup.md)
+[NEW! Support Android](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Termux%20Setup.md)
 
 [NEW! Answer with real-time information via SearXNG](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Perplexica%20and%20SearXNG%20Integration.md#searxng-setup)
 
@@ -70,6 +70,10 @@ Tips:
 * `@help` is created for searching documentations
 
 # Selectie Screenshots
+
+## NEW! Supports Android
+
+![Screenshot from 2024-10-05 22-30-20](https://github.com/user-attachments/assets/7d79f258-05eb-4ddf-a5a9-10d4979480fe)
 
 ## Brand New Tool Selection Agent
 

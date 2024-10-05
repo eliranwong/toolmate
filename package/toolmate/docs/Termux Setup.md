@@ -56,17 +56,23 @@ Go to `Settings` > `Apps` > `Termux` > `Permissions` > `Files` > `Allow`
 
 > termux-setup-storage
 
-Located the shared storage in `$HOME/storage`
+Locate the shared storage in `$HOME/storage`
 
 Read more at https://wiki.termux.com/wiki/Sharing_Data
 
 # Install Basic Packages
 
-> pkg install python git binutils libxslt libjpeg-turbo libpng build-essential clang make pkg-config curl wget lynx w3m elinks vlc xclip xsel vim libxml2 libxslt python-apsw which
+> pkg install python git binutils libjpeg-turbo libpng build-essential clang make pkg-config curl wget lynx w3m elinks vlc xclip xsel vim libxml2 libxslt python-apsw which libzmq libsodium libgmp libmpc libmpfr
 
 Please note that we install the official python-apsw package created by Termux team, rather than using pip3, in order to work with regular expression searches.  For details, read https://github.com/termux/termux-packages/issues/12340
 
 Read more at: https://wiki.termux.com/wiki/Python#Python_module_installation_tips_and_tricks
+
+# More about Packages
+
+https://wiki.termux.com/wiki/Package_Management#Other_Package_Managers
+
+https://wiki.termux.com/wiki/Python
 
 # Install matplotlib on Termux
 
@@ -161,3 +167,7 @@ To start up with a particular backend, you may use parameter `-b`, e.g.:
 To set up an alias:
 
 > echo "alias toolmate=~/apps/toolmate/bin/toolmate" >> ~/.bashrc
+
+# Screenshot
+
+![Screenshot from 2024-10-05 22-30-20](https://github.com/user-attachments/assets/7d79f258-05eb-4ddf-a5a9-10d4979480fe)

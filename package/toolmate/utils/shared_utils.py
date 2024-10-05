@@ -19,7 +19,6 @@ from typing import Union
 from groq import Groq
 from ollama import Client
 import speech_recognition as sr
-import sounddevice, soundfile
 import zipfile
 if not config.isTermux:
     from llama_cpp import Llama
@@ -38,16 +37,17 @@ if not config.isTermux:
     from langchain_unstructured import UnstructuredLoader
     from autogen.retrieve_utils import TEXT_FORMATS
     from huggingface_hub import hf_hub_download
-
-# a dummy import line to resolve ALSA error display on Linux
-import sounddevice
+    import sounddevice, soundfile # it is important to import sounddevice on Linux, to resolve ALSA error display
 
 
 # voice typing
 
 def playAudio(audioFile):
-    sounddevice.play(*soundfile.read(audioFile)) 
-    sounddevice.wait()
+    if config.isTermux and config.terminalEnableTermuxAPI:
+        os.system(f'''termux-media-player play "{audioFile}"''')
+    else:
+        sounddevice.play(*soundfile.read(audioFile)) 
+        sounddevice.wait()
 
 def voiceTyping():
     # reference: https://github.com/Uberi/speech_recognition/blob/master/examples/microphone_recognition.py

@@ -31,7 +31,7 @@ with open(package_readme, "r", encoding="utf-8") as fileObj:
 
 # get required packages
 install_requires = []
-with open(os.path.join(package, "requirements.txt"), "r") as fileObj:
+with open(os.path.join(package, "requirements_android.txt"), "r") as fileObj:
     for line in fileObj.readlines():
         mod = line.strip()
         if mod:
@@ -43,7 +43,7 @@ open(os.path.join(package, "config.py"), "w").close()
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name="toolmate_android",
-    version="0.3.78",
+    version="0.3.79",
     python_requires=">=3.8, <3.12",
     description=f"ToolMate AI, developed by Eliran Wong, is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. Supports custom workflow and plugins to automate multi-step actions.",
     long_description=long_description,

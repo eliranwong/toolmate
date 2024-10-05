@@ -1041,10 +1041,13 @@ class ToolMate:
         instruction = "Select an AI platform:"
         print1(instruction)
         options = {
+            "ollama": "Ollama",
+            "groq": "Groq Cloud API",
+        } if config.isTermux else {
             "llamacpp": "Llama.cpp",
             "llamacppserver": "Llama.cpp server [advanced]",
             "ollama": "Ollama",
-            "groq": "Groq [FREE online service]",
+            "groq": "Groq Cloud API",
             "gemini": "Google Gemini [Paid online service]",
             "chatgpt": "OpenAI ChatGPT [Paid online service]",
             "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",

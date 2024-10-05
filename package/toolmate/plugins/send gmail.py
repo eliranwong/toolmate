@@ -6,9 +6,6 @@ send google or outlook emails
 [TOOL_CALL]
 """
 
-from toolmate import config, openURL
-import urllib.parse
-
 """
 # Information
 
@@ -58,68 +55,73 @@ https://outlook.office.com/owa/?path=/mail/action/compose&to=john.doe%40example.
 When you click on this URL, it will open a new window in Outlook web app and fill in the email details for you. You can then send or edit the email as you wish.
 """
 
-def send_gmail(function_args):
-    email = "gmail"
-    recipient = function_args.get("email", "") # required
-    subject = function_args.get("subject", "") # required
-    body = function_args.get("body", "") # required
+if not config.isTermux:
 
-    subject = urllib.parse.quote(subject)
-    body = urllib.parse.quote(body)
+    from toolmate import config, openURL
+    import urllib.parse
 
-    def getGoogleLink():
-        link = "https://mail.google.com/mail/?view=cm&fs=1"
-        if recipient:
-            link += f"&to={recipient}"
-        if subject:
-            link += f"&su={subject}"
-        if body:
-            link += f"&body={body}"
-        return link
+    def send_gmail(function_args):
+        email = "gmail"
+        recipient = function_args.get("email", "") # required
+        subject = function_args.get("subject", "") # required
+        body = function_args.get("body", "") # required
 
-    def getOutlookLink():
-        link = "https://outlook.office.com/owa/?path=/mail/action/compose"
-        if recipient:
-            link += f"&to={recipient}"
-        if subject:
-            link += f"&subject={subject}"
-        if body:
-            link += f"&body={body}"
-        return link
+        subject = urllib.parse.quote(subject)
+        body = urllib.parse.quote(body)
 
-    openURL(getOutlookLink() if email == "outlook" else getGoogleLink())
+        def getGoogleLink():
+            link = "https://mail.google.com/mail/?view=cm&fs=1"
+            if recipient:
+                link += f"&to={recipient}"
+            if subject:
+                link += f"&su={subject}"
+            if body:
+                link += f"&body={body}"
+            return link
 
-    return ""
+        def getOutlookLink():
+            link = "https://outlook.office.com/owa/?path=/mail/action/compose"
+            if recipient:
+                link += f"&to={recipient}"
+            if subject:
+                link += f"&subject={subject}"
+            if body:
+                link += f"&body={body}"
+            return link
 
-functionSignature = {
-    "examples": [
-        "draft an Google email",
-        "write an Google email",
-        "send an Google email",
-        "draft an Gmail",
-        "write an Gmail",
-        "send an Gmail",
-    ],
-    "name": "send_gmail",
-    "description": "Send Gmail",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "email": {
-                "type": "string",
-                "description": "The recipient of the email.",
+        openURL(getOutlookLink() if email == "outlook" else getGoogleLink())
+
+        return ""
+
+    functionSignature = {
+        "examples": [
+            "draft an Google email",
+            "write an Google email",
+            "send an Google email",
+            "draft an Gmail",
+            "write an Gmail",
+            "send an Gmail",
+        ],
+        "name": "send_gmail",
+        "description": "Send Gmail",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "description": "The recipient of the email.",
+                },
+                "subject": {
+                    "type": "string",
+                    "description": "Give a title to the email.",
+                },
+                "body": {
+                    "type": "string",
+                    "description": "The body or content of the email.",
+                },
             },
-            "subject": {
-                "type": "string",
-                "description": "Give a title to the email.",
-            },
-            "body": {
-                "type": "string",
-                "description": "The body or content of the email.",
-            },
+            "required": ["email", "subject", "body"],
         },
-        "required": ["email", "subject", "body"],
-    },
-}
+    }
 
-config.addFunctionCall(signature=functionSignature, method=send_gmail)
+    config.addFunctionCall(signature=functionSignature, method=send_gmail)

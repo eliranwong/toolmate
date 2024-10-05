@@ -1,3 +1,9 @@
+# Android Version
+
+You can run ToolMate AI on Android via Termux.
+
+![android](https://github.com/user-attachments/assets/21775454-bd8e-412b-86ab-54e424ed1754)
+
 # Do NOT use Play Store to Install Termux
 
 The following instructions install the offical `termux` package downloaded from github repository.
@@ -167,7 +173,3 @@ To start up with a particular backend, you may use parameter `-b`, e.g.:
 To set up an alias:
 
 > echo "alias toolmate=~/apps/toolmate/bin/toolmate" >> ~/.bashrc
-
-# Screenshot
-
-![Screenshot from 2024-10-05 22-30-20](https://github.com/user-attachments/assets/7d79f258-05eb-4ddf-a5a9-10d4979480fe)

@@ -73,7 +73,7 @@ Tips:
 
 ## NEW! Supports Android
 
-![Screenshot from 2024-10-05 22-30-20](https://github.com/user-attachments/assets/7d79f258-05eb-4ddf-a5a9-10d4979480fe)
+![android](https://github.com/user-attachments/assets/21775454-bd8e-412b-86ab-54e424ed1754)
 
 ## Brand New Tool Selection Agent
 

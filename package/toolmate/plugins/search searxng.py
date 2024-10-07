@@ -15,6 +15,7 @@ if not config.isTermux:
 
     from langchain_community.utilities import SearxSearchWrapper
     from toolmate import config, isServerAlive, print1, print2, plainTextToUrl
+    import re
 
     persistentConfigs = (
         ("searx_server", "http://localhost"),
@@ -24,7 +25,7 @@ if not config.isTermux:
     if config.searx_server == "localhost":
         config.searx_server = "http://localhost"
 
-    if isServerAlive(config.searx_server, config.searx_port):
+    if isServerAlive(re.sub("http://|https://", "", config.searx_server), config.searx_port):
 
         temporaryConfigs = (
             # tabs: https://docs.searxng.org/user/configured_engines.html
@@ -108,4 +109,4 @@ if not config.isTermux:
 
     else:
 
-        print1(f"Searx Host `{config.searx_server}:{config.searx_port}`! Plugin `search searxng not enabled!`")
+        print1(f"Searx Host `{config.searx_server}:{config.searx_port}` not found! Plugin `search searxng not enabled!`")

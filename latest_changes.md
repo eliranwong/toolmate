@@ -1,3 +1,17 @@
+# 0.3.82
+
+* updated help store
+
+# 0.3.81
+
+* added tool `@termux` in `toolmate_android` version
+
+* support install full version `toolmate` on Android
+
+# 0.3.79
+
+* fixed plugin `search_searxng`
+
 # Version 0.3.76-0.3.78
 
 * created Android package `toolmate_android`

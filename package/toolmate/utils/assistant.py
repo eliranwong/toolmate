@@ -2270,6 +2270,25 @@ My writing:
                     print(f"```\n{writing}\n```")
         return writing
 
+    def generateTermuxAPICommand(self, request: str):
+        instruction = f"""# Instructions
+
+* Generate a Termux API command line to resolve `My Request` given below.
+* Remember, provide me with the generated command line ONLY, without additional notes or explanations.
+* Enclose the command line with triple backticks ``` at the beginning and at the end of the command line in your output.
+
+# My Request
+
+{request}"""
+        cli = CallLLM.getSingleChatResponse(instruction, prefill="```\n", stop=["```"])
+        if cli := cli.strip():
+            cli = cli[3:-3].strip() if cli.startswith("```") and cli.endswith("```") else re.sub("^.*?```(.*?)```.*?$", r"\1", cli).strip()
+        if config.developer:
+            print2(f"```command")
+            print(cli)
+            print2(f"```")
+        return cli
+
     def generateSystemCommand(self, request: str):
         instruction = f"""# Instructions
 
@@ -2503,6 +2522,34 @@ Acess the risk level of the following `{target.capitalize()}`:
                 config.currentMessages[-1]["content"] = f"Improve the following writing, according to {config.improvedWritingSytle}:\n\n```" + description + "\n```"
                 config.currentMessages.append({"role": "assistant", "content": improvedWriting})
             else:
+                config.currentMessages = config.currentMessages[:-1]
+            return None
+        elif action == "termux" and config.isTermux:
+            stdout, stderr = subprocess.Popen(description, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+            if stderr and not stdout:
+                cli = self.generateTermuxAPICommand(description)
+                if risk := self.riskAssessment(cli, target="system command"):
+                    stdout, stderr = subprocess.Popen(cli, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+            # refine description
+            description = f'''Run Termux command:\n```command\n{description}\n```'''
+            config.currentMessages[-1]["content"] = description
+            if stderr and not risk:
+                done = "Cancelled!"
+                config.currentMessages.append({"role": "assistant", "content": done})
+                print2(done)
+            elif stdout:
+                print2("\n```output")
+                print(stdout.strip())
+                print2("```\n")
+                config.currentMessages.append({"role": "assistant", "content": stdout.strip()})
+            elif not stdout and not stderr:
+                done = "Done!"
+                config.currentMessages.append({"role": "assistant", "content": done})
+                print2(done)
+            elif stderr:
+                print2("\n```error")
+                print(stderr.strip())
+                print2("```\n")
                 config.currentMessages = config.currentMessages[:-1]
             return None
         elif action == "command":

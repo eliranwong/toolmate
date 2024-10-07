@@ -31,6 +31,8 @@ class Plugins:
             "@copy_to_clipboard",
             "@paste_from_clipboard",
         ]
+        if config.isTermux:
+            config.inputSuggestions.append("@termux ")
         config.outputTransformers = []
         config.deviceInfoPlugins = []
         config.toolFunctionSchemas = {}
@@ -49,6 +51,8 @@ class Plugins:
             "append_instruction": "Append the previous text output to a given instruction",
             "improve_writing": "Improve the writing of a given content",
         }
+        if config.isTermux:
+            config.builtinTools["termux"] = "Execute a termux api command"
 
         pluginFolder = os.path.join(config.toolMateAIFolder, "plugins")
         if config.localStorage:

@@ -68,7 +68,7 @@ Read more at https://wiki.termux.com/wiki/Sharing_Data
 
 # Install Basic Packages
 
-> pkg install python git binutils libjpeg-turbo libpng build-essential clang make pkg-config curl wget lynx w3m elinks vlc xclip xsel vim libxml2 libxslt python-apsw which libzmq libsodium libgmp libmpc libmpfr
+> pkg install python git binutils libjpeg-turbo libpng build-essential clang make pkg-config curl wget lynx w3m elinks vlc xclip xsel vim libxml2 libxslt python-apsw which libzmq libsodium libgmp libmpc libmpfr python-lxml
 
 Please note that we install the official python-apsw package created by Termux team, rather than using pip3, in order to work with regular expression searches.  For details, read https://github.com/termux/termux-packages/issues/12340
 
@@ -146,6 +146,8 @@ alias mp4='cd /data/data/com.termux/files/home/storage/movies && yt-dlp -f bestv
 
 # Install ToolMate_Android
 
+`toolmate_android` is a light version of `toolmate`, created to work with Termux:API.
+
 Install ToolMate AI (Android version), by running:
 
 To set up virtual environment (recommended):
@@ -173,3 +175,59 @@ To start up with a particular backend, you may use parameter `-b`, e.g.:
 To set up an alias:
 
 > echo "alias toolmate=~/apps/toolmate/bin/toolmate" >> ~/.bashrc
+
+# Install ToolMate AI - Full Version
+
+```
+cd
+pkg update && pkg upgrade && pkg install -y git wget proot
+git clone https://github.com/MFDGaming/ubuntu-in-termux.git
+cd ubuntu-in-termux && chmod +x ubuntu.sh && ./ubuntu.sh -y
+echo 'alias ubuntu='$(pwd)'/startubuntu.sh' >> ~/.bashrc
+source ~/.bashrc
+```
+
+## Start Ubuntu in Termux
+
+```
+ubuntu
+```
+
+## Install ToolMate AI
+
+```
+apt update && apt full-upgrade
+apt install -y python3
+apt install -y python3-setuptools python3-pip python3-dev python3-venv portaudio19-dev ffmpeg vlc wget curl git wget nano micro
+```
+
+```
+mkdir -p ~/apps
+cd ~/apps
+python3 -m venv toolmate
+source toolmate/bin/activate
+pip install --upgrade toolmate
+echo 'alias toolmate='$(pwd)'/toolmate/bin/toolmate' >> ~/.bashrc
+echo 'alias sudo=""' >> ~/.bashrc
+source ~/.bashrc
+```
+
+## Run ToolMate AI
+
+```
+toolmate
+```
+
+Alternately, to launch with a specific backend, e.g.:
+
+```
+toolmate -b groq
+```
+
+You may use 'ctrl+q' to exit toolmate
+
+## Exit Ubuntu in Termux
+
+```
+exit
+```

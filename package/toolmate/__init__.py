@@ -26,7 +26,7 @@ if not os.path.isfile(configFile):
 
 # import config module
 from toolmate import config
-config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
+config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") and not os.getcwd().startswith("/root") else False
 
 # set up shared configs
 

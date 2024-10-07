@@ -17,7 +17,7 @@ from pathlib import Path
 
 def download_web_content(function_args):
     def is_youtube_url(url_string):
-        pattern = r'(?:https?:\/\/)?(?:www\.)?youtu(?:\.be|be\.com)\/(?:watch\?v=|embed\/|v\/)?([a-zA-Z0-9\-_]+)'
+        pattern = r'(?:https?:\/\/)?(?:www\.)?youtu(?:\.be|be\.com)\/(?:watch\?v=|embed\/|v\/)?([a-zA-Z0-9_-]+)'
         match = re.match(pattern, url_string)
         return match is not None
 

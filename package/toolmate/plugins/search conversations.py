@@ -68,7 +68,7 @@ if not config.isTermux:
                 isfile = True
             elif re.search("^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9]_[0-9][0-9]_[0-9][0-9]$", chatFile):
                 # match chat id format
-                folderPath = os.path.join(config.localStorage, "chats", re.sub("^([0-9]+?\-[0-9]+?)\-.*?$", r"\1", chatFile))
+                folderPath = os.path.join(config.localStorage, "chats", re.sub("^([0-9]+?-[0-9]+?)-.*?$", r"\1", chatFile))
                 chatFile = os.path.join(folderPath, f"{chatFile}.txt")
                 if os.path.isfile(chatFile):
                     isfile = True

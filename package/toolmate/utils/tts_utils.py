@@ -116,7 +116,7 @@ class TTSUtil:
                     elif language == "yue":
                         language = "zh"
                     elif "-" in language:
-                        language = re.sub("^(.*?)\-.*?$", r"\1", language)
+                        language = re.sub("^(.*?)-.*?$", r"\1", language)
                     audioFile = os.path.join(config.toolMateAIFolder, "temp", "gtts.mp3")
                     tts = gTTS(content, lang=language, tld=config.gttsTld) if config.gttsTld else gTTS(content, lang=language)
                     tts.save(audioFile)

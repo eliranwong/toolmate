@@ -1031,7 +1031,7 @@ def extractPythonCode(content, keepInvalid=False):
     content = content.replace("</python>", "")
     content = content.replace("<\/python>", "")
     content = re.sub("^python[ ]*\n", "", content).strip()
-    content = re.sub("^[\d\D]*?```.*?\n", "", content, flags=re.M).strip()
+    content = re.sub(r"^[\d\D]*?```.*?\n", "", content, flags=re.M).strip()
     content = re.sub("\n```.*?$", "", content, flags=re.M).strip()
     if code_only := re.search('```python[ ]*\n(.+?)```', content, re.DOTALL):
         content = code_only.group(1).strip()

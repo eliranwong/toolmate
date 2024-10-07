@@ -2402,7 +2402,7 @@ Acess the risk level of the following `{target.capitalize()}`:
 
         # handle predefined contexts
         if action == "context":
-            contextPattern = "^`([^`]+?)` ([\d\D]*?)$"
+            contextPattern = r"^`([^`]+?)` ([\d\D]*?)$"
             searchContext = re.search(contextPattern, description.lstrip())
             if searchContext:
                 contextID = searchContext.group(1)
@@ -2412,7 +2412,7 @@ Acess the risk level of the following `{target.capitalize()}`:
                     config.saveConfig()
             description = self.addPredefinedContext(description)
             # check if the new description call a particular tool
-            searchTool = re.search(f"^{config.toolPattern}([\d\D]*?)$", description.lstrip())
+            searchTool = re.search(rf"^{config.toolPattern}([\d\D]*?)$", description.lstrip())
             if searchTool:
                 action = searchTool.group(1)
                 description = searchTool.group(2)
@@ -2898,7 +2898,7 @@ Acess the risk level of the following `{target.capitalize()}`:
                         pprint.pprint(value)
                         print("")
                         continue
-                    elif re.search("^print\([^\)\)]+?\)$", userInput):
+                    elif re.search(r"^print\([^\)\)]+?\)$", userInput):
                         print("")
                         continue
                 except:

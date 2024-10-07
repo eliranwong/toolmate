@@ -12,7 +12,9 @@ try:
     del mic
     config.pyaudioInstalled = True
 except:
-    if config.isTermux:
+    if os.path.isdir("/data/data/com.termux/files/home") and os.getcwd().startswith("/root"):
+        ... # skip
+    elif config.isTermux:
         config.pyaudioInstalled = False
         #print2("Installing 'portaudio' and 'Pyaudio' ...")
         #os.system("pkg install portaudio")

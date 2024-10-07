@@ -1,3 +1,7 @@
+# 0.3.83-0.3.86
+
+* supports Python 3.12.x
+
 # 0.3.82
 
 * updated help store

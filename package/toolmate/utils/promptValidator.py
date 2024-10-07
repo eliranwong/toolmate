@@ -16,16 +16,6 @@ class TokenValidator(Validator):
                 encoding = tiktoken.encoding_for_model(config.chatGPTApiModel)
             except:
                 encoding = tiktoken.get_encoding("cl100k_base")
-            ''' does not apply for multiple tool cases
-            no_function_call_pattern = "\[NO_TOOL\]|\[CHAT\]|\[CHAT_[^\[\]]+?\]"
-            #if "[NO_TOOL]" in currentInput:
-            if re.search(no_function_call_pattern, currentInput):
-                availableFunctionTokens = 0
-                #currentInput = currentInput.replace("[NO_TOOL]", "")
-                currentInput = re.sub(no_function_call_pattern, "", currentInput)
-            else:
-                availableFunctionTokens = count_tokens_from_functions(config.toolFunctionSchemas)
-            '''
             availableFunctionTokens = count_tokens_from_functions(config.toolFunctionSchemas)
             currentInputTokens = len(encoding.encode(config.addPredefinedContext(currentInput)))
             loadedMessageTokens = count_tokens_from_messages(config.currentMessages)

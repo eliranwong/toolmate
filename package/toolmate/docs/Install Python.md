@@ -1,8 +1,6 @@
 # Install a Supported Python Version
 
-ToolMate AI currently support python version 3.8 - 3.11.  This wiki page describes how to install a specific python version.
-
-Remarks: Python version 3.12 is yet to be fully supported, as v3.12 has issues with package "openai" and "tiktoken".  You may still run toolmate with python 3.12, but some features may not work.
+ToolMate AI currently support python version 3.8 - 3.12.  This wiki page describes how to install a specific python version.
 
 # Example: Install Python 3.11.6 or 3.11.9
 

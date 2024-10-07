@@ -110,25 +110,25 @@ class TextUtil:
                 ("<ansibrightmagenta>", Fore.LIGHTMAGENTA_EX),
                 ("<ansibrightcyan>", Fore.LIGHTCYAN_EX),
 
-                ("<BG\.ansidefault>", Back.RESET),
+                (r"<BG\.ansidefault>", Back.RESET),
 
-                ("<BG\.ansiblack>", Back.BLACK),
-                ("<BG\.ansired>", Back.RED),
-                ("<BG\.ansigreen>", Back.GREEN),
-                ("<BG\.ansiyellow>", Back.YELLOW),
-                ("<BG\.ansiblue>", Back.BLUE),
-                ("<BG\.ansimagenta>", Back.MAGENTA),
-                ("<BG\.ansicyan>", Back.CYAN),
-                ("<BG\.ansigray>", Back.WHITE),
-                ("<BG\.ansiwhite>", Back.WHITE),
+                (r"<BG\.ansiblack>", Back.BLACK),
+                (r"<BG\.ansired>", Back.RED),
+                (r"<BG\.ansigreen>", Back.GREEN),
+                (r"<BG\.ansiyellow>", Back.YELLOW),
+                (r"<BG\.ansiblue>", Back.BLUE),
+                (r"<BG\.ansimagenta>", Back.MAGENTA),
+                (r"<BG\.ansicyan>", Back.CYAN),
+                (r"<BG\.ansigray>", Back.WHITE),
+                (r"<BG\.ansiwhite>", Back.WHITE),
 
-                ("<BG\.ansibrightblack>", Back.LIGHTBLACK_EX),
-                ("<BG\.ansibrightred>", Back.LIGHTRED_EX),
-                ("<BG\.ansibrightgreen>", Back.LIGHTGREEN_EX),
-                ("<BG\.ansibrightyellow>", Back.LIGHTYELLOW_EX),
-                ("<BG\.ansibrightblue>", Back.LIGHTBLUE_EX),
-                ("<BG\.ansibrightmagenta>", Back.LIGHTMAGENTA_EX),
-                ("<BG\.ansibrightcyan>", Back.LIGHTCYAN_EX),
+                (r"<BG\.ansibrightblack>", Back.LIGHTBLACK_EX),
+                (r"<BG\.ansibrightred>", Back.LIGHTRED_EX),
+                (r"<BG\.ansibrightgreen>", Back.LIGHTGREEN_EX),
+                (r"<BG\.ansibrightyellow>", Back.LIGHTYELLOW_EX),
+                (r"<BG\.ansibrightblue>", Back.LIGHTBLUE_EX),
+                (r"<BG\.ansibrightmagenta>", Back.LIGHTMAGENTA_EX),
+                (r"<BG\.ansibrightcyan>", Back.LIGHTCYAN_EX),
 
                 ("<[^<>]*?>", ""),
             )
@@ -172,7 +172,7 @@ class TextUtil:
         if config.runMode == "terminal":
             content = re.sub(r"""<ref onclick="lex\('(H[0-9]+?)'\)" class="G\1" onmouseover="ld\('\1'\); hl1\('','','\1'\)" onmouseout="hl0\('','','\1'\)">\1</ref>""", r"[<ref>\1</ref> ] ", content)
             content = re.sub("""(<heb|<grk)( [^<>]*?onclick="luW\([0-9]+?,')([0-9]+?)('[^<>]*?>)""", r"[<ref>\3</ref> ]\1\2\3\4", content)
-            content = re.sub("""(<ref onclick="[^<>]+?\(')([^<>]+?)('\)">)""", r"[<ref>\2</ref> ] ", content)
+            content = re.sub(r"""(<ref onclick="[^<>]+?\(')([^<>]+?)('\)">)""", r"[<ref>\2</ref> ] ", content)
         # Format text colours
         if config.runMode == "terminal" and colours:
             content = TextUtil.colourTerminalText(content)
@@ -264,7 +264,7 @@ class TextUtil:
     def formulateUBACommandHyperlink(text):
         # Create hyperlink to UBA command
         # work on text formatted like ***[CROSSREFERENCE:::John 3:16@An hyperlink link to open cross-references of John 3:16]
-        return re.sub("\*\*\*\[([^'{0}]*?)@([^'{0}]*?)\]".format('"\*\[\]@'), r"<ref onclick={0}document.title='\1'{0}>\2</ref>".format('"'), text)
+        return re.sub(r"\*\*\*\[([^'{0}]*?)@([^'{0}]*?)\]".format(r'"\*\[\]@'), r"<ref onclick={0}document.title='\1'{0}>\2</ref>".format('"'), text)
 
     @staticmethod
     def fixTextHighlighting(text):

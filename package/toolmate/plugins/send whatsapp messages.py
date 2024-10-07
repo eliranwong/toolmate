@@ -15,7 +15,7 @@ if not config.isTermux:
         recipient = function_args.get("recipient") # required
         message = function_args.get("message") # required
         config.stopSpinning()
-        if re.search("^[\+\(\)0-9]+?$", recipient):
+        if re.search(r"^[+\(\)0-9]+?$", recipient):
             pywhatkit.sendwhatmsg_instantly(recipient, message)
         else:
             pywhatkit.sendwhatmsg_to_group_instantly(recipient, message)

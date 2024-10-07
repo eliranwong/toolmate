@@ -73,7 +73,7 @@ class AutoGenBuilder:
         Path(folder).mkdir(parents=True, exist_ok=True)
         if title:
             title = "_" + quote(title, safe="")
-        currentTime = re.sub("[\. :]", "_", str(datetime.datetime.now()))
+        currentTime = re.sub(r"[\. :]", "_", str(datetime.datetime.now()))
         return os.path.join(folder, f"{currentTime}{title}.json")
 
     def getResponse(self, task, title="", load_path=""):

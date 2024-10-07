@@ -74,7 +74,7 @@ class AutoGenRetriever:
         _, file_extension = os.path.splitext(docs_path)
         # support zip file; unzip zip file, if any
         if file_extension.lower() == ".zip":
-            currentTime = re.sub("[\. :]", "_", str(datetime.datetime.now()))
+            currentTime = re.sub(r"[\. :]", "_", str(datetime.datetime.now()))
             extract_to_path = os.path.join(db, "unpacked", currentTime)
             print3(f"Unpacking content to: {extract_to_path}")
             if not os.path.isdir(extract_to_path):

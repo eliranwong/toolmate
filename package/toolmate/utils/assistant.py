@@ -282,7 +282,7 @@ class ToolMate:
             config.say_voice = ""
         option = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.say_voice, promptSession=voice_session, completer=completer)
         if option and not option in (config.exit_entry, config.cancel_entry):
-            config.say_voice = re.sub(" \[[^\]]*?\]$", "", option)
+            config.say_voice = re.sub(r" \[[^\]]*?\]$", "", option)
             TTSUtil.play("Testing")
 
     def setSaySpeed(self):
@@ -2113,7 +2113,7 @@ class ToolMate:
                     config.save_chat_record(timestamp, order, i)
 
             try:
-                folderPath = os.path.join(config.localStorage, "chats", re.sub("^([0-9]+?\-[0-9]+?)\-.*?$", r"\1", timestamp))
+                folderPath = os.path.join(config.localStorage, "chats", re.sub("^([0-9]+?-[0-9]+?)-.*?$", r"\1", timestamp))
                 Path(folderPath).mkdir(parents=True, exist_ok=True)
                 if os.path.isdir(folderPath):
                     chatFile = os.path.join(folderPath, f"{timestamp}.txt")
@@ -2257,7 +2257,7 @@ class ToolMate:
     def improveWriting(self, writing: str):
         # Feature: improve writing:
         if writing:
-            writing = re.sub("\n\[Current time: [^\n]*?$", "", writing)
+            writing = re.sub(r"\n\[Current time: [^\n]*?$", "", writing)
             improvedVersion = CallLLM.getSingleChatResponse(f"""Improve the following writing, according to {config.improvedWritingSytle}.
 Remember, provide me with the improved writing only, enclosed in triple quotes ``` and without any additional information or comments.
 My writing:
@@ -2343,7 +2343,7 @@ Acess the risk level of the following `{target.capitalize()}`:
     def convertRelativeDateTime(self, writing: str):
         # Feature: improve writing:
         if writing:
-            writing = re.sub("\n\[Current time: [^\n]*?$", "", writing)
+            writing = re.sub(r"\n\[Current time: [^\n]*?$", "", writing)
             if config.isTermux:
                 day_of_week = ""
             else:

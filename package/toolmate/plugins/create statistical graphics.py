@@ -16,7 +16,7 @@ def create_statistical_graphics(function_args):
     code = function_args.get("code") # required
     information = PythonUtil.showAndExecutePythonCode(code)
 
-    pngPattern = """\.savefig\(["']([^\(\)]+\.png)["']\)"""
+    pngPattern = r"""\.savefig\(["']([^\(\)]+\.png)["']\)"""
     match = re.search(pngPattern, code)
     if match:
         pngFile = match.group(1)

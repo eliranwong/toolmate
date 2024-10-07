@@ -44,7 +44,7 @@ open(os.path.join(package, "config.py"), "w").close()
 setup(
     name=package,
     version="0.3.83",
-    python_requires=">=3.8, <=3.12",
+    python_requires=">=3.8, <3.13",
     description=f"ToolMate AI, developed by Eliran Wong, is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. Supports custom workflow and plugins to automate multi-step actions.",
     long_description=long_description,
     author="Eliran Wong",

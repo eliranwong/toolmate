@@ -13,7 +13,7 @@ import re, os
 def create_map(function_args):
     code = function_args.get("code") # required
     information = PythonUtil.showAndExecutePythonCode(code)
-    htmlPattern = """\.save\(["']([^\(\)]+\.html)["']\)"""
+    htmlPattern = r"""\.save\(["']([^\(\)]+\.html)["']\)"""
     match = re.search(htmlPattern, code)
     if match:
         htmlFile = match.group(1)

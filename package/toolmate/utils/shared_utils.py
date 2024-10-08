@@ -37,6 +37,7 @@ if not config.isTermux:
     from langchain_unstructured import UnstructuredLoader
     from autogen.retrieve_utils import TEXT_FORMATS
     from huggingface_hub import hf_hub_download
+    import vosk
     import sounddevice, soundfile # it is important to import sounddevice on Linux, to resolve ALSA error display
 
 
@@ -114,6 +115,21 @@ def voiceTyping():
         process = subprocess.Popen(cli.rstrip(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
         return "[Error]" if stderr and not stdout else stdout.decode("utf-8").strip()
+    elif config.voiceTypingPlatform == "vosk" and not config.isTermux:
+        # disable log
+        vosk.SetLogLevel(-1)
+        # Load the Vosk model
+        model = vosk.Model(model_name=config.voskModel)
+        # Initialize the recognizer with the model
+        recognizer = vosk.KaldiRecognizer(model, 16000)
+        recognizer.AcceptWaveform(audio.get_raw_data(convert_rate=16000, convert_width=2))
+        # Get the final recognized result
+        try:
+            result = json.loads(recognizer.FinalResult())["text"]
+            #print(result)
+            return result
+        except:
+            return "[Error]"
 
 # transformers
 
@@ -481,7 +497,7 @@ def getOllamaModelDir():
     if os.environ['OLLAMA_MODELS']:
         return os.environ['OLLAMA_MODELS']
     elif config.thisPlatform == "Windows":
-        modelDir = os.path.expanduser("~\.ollama\models")
+        modelDir = os.path.expanduser(r"~\.ollama\models")
     elif config.thisPlatform == "macOS":
         modelDir = os.path.expanduser("~/.ollama/models")
     elif config.thisPlatform == "Linux":
@@ -574,9 +590,9 @@ def displayLoadedMessages(messages):
 def refinePath(docs_path):
     docs_path = docs_path.strip()
     docs_path = re.sub("^'(.*?)'$", r"\1", docs_path)
-    if "\\ " in docs_path or "\(" in docs_path:
+    if "\\ " in docs_path or r"\(" in docs_path:
         docs_path = docs_path.replace("\\ ", " ")
-        docs_path = docs_path.replace("\(", "(")
+        docs_path = docs_path.replace(r"\(", "(")
     return os.path.expanduser(docs_path)
 
 def readTextFile(textFile: str) -> str:
@@ -823,10 +839,10 @@ def isExistingPath(docs_path):
     )
     for search, replace in search_replace:
         docs_path = re.sub(search, replace, docs_path)
-    if "\\ " in docs_path or "\(" in docs_path:
+    if "\\ " in docs_path or r"\(" in docs_path:
         search_replace = (
             ("\\ ", " "),
-            ("\(", "("),
+            (r"\(", "("),
         )
         for search, replace in search_replace:
             docs_path = docs_path.replace(search, replace)
@@ -1029,7 +1045,7 @@ def isValidPythodCode(code):
 def extractPythonCode(content, keepInvalid=False):
     content = content.replace("<python>", "")
     content = content.replace("</python>", "")
-    content = content.replace("<\/python>", "")
+    content = content.replace(r"<\/python>", "")
     content = re.sub("^python[ ]*\n", "", content).strip()
     content = re.sub(r"^[\d\D]*?```.*?\n", "", content, flags=re.M).strip()
     content = re.sub("\n```.*?$", "", content, flags=re.M).strip()
@@ -1066,7 +1082,7 @@ def fineTunePythonCode(code):
     code = re.sub("^!(.*?)$", r'import os\nos.system(""" \1 """)', code, flags=re.M)
     if "\n" in code:
         substrings = code.rsplit("\n", 1)
-        lastLine = re.sub("print\((.*)\)", r"\1", substrings[-1])
+        lastLine = re.sub(r"print\((.*)\)", r"\1", substrings[-1])
         if lastLine.startswith(" "):
             lastLine = re.sub("^([ ]+?)([^ ].*?)$", r"\1config.pythonFunctionResponse = \2", lastLine)
             code = f"from toolmate import config\n{substrings[0]}\n{lastLine}"
@@ -1234,7 +1250,7 @@ def downloadFile(url, localpath, timeout=60):
 
 def downloadWebContent(url, timeout=60, folder="", ignoreKind=False):
     print2("Downloading web content ...")
-    hasExt = re.search("\.([^\./]+?)$", url)
+    hasExt = re.search(r"\.([^\./]+?)$", url)
     supported_documents = TEXT_FORMATS[:]
     supported_documents.remove("org")
 
@@ -1276,7 +1292,7 @@ def getCurrentDateTime():
     return current_datetime.strftime("%Y-%m-%d_%H_%M_%S")
 
 def addTimeStamp(content):
-    time = re.sub("\.[^\.]+?$", "", str(datetime.datetime.now()))
+    time = re.sub(r"\.[^\.]+?$", "", str(datetime.datetime.now()))
     return f"{content}\n[Current time: {time}]"
 
 def getDayOfWeek():
@@ -1670,7 +1686,7 @@ def ragRefineDocsPath(docs_path) -> Optional[list]:
     _, file_extension = os.path.splitext(docs_path)
     if file_extension.lower() == ".zip":
         # support zip file; unzip zip file, if any
-        currentTime = re.sub("[\. :]", "_", str(datetime.datetime.now()))
+        currentTime = re.sub(r"[\. :]", "_", str(datetime.datetime.now()))
         extract_to_path = os.path.join(rag, "unpacked", currentTime)
         print3(f"Unpacking content to: {extract_to_path}")
         if not os.path.isdir(extract_to_path):

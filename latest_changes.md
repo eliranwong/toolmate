@@ -1,3 +1,13 @@
+# 0.3.89
+
+* simplified the plugin `read aloud`
+
+# 0.3.87-0.3.88
+
+* added support of Vosk Speech Recognition Toolkit for speech recognition
+
+* added support of edge-tts for speech generation
+
 # 0.3.83-0.3.86
 
 * supports Python 3.12.x

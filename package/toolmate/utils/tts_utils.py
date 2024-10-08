@@ -1,5 +1,5 @@
 from toolmate import config, getHideOutputSuffix
-import os, traceback, subprocess, re, pydoc, shutil
+import os, traceback, subprocess, re, pydoc, shutil, edge_tts, asyncio
 from pathlib import Path
 from gtts import gTTS
 from elevenlabs.client import ElevenLabs
@@ -106,6 +106,15 @@ class TTSUtil:
                     pydoc.pipepager(content, cmd=cmd)
                     if not shutil.which("cvlc") and not shutil.which("aplay"):
                         TTSUtil.playAudioFile(audioFile)
+                elif config.ttsPlatform == "edge":
+                    audioFile = os.path.join(config.toolMateAIFolder, "temp", "edge.wav")
+                    async def saveEdgeAudio() -> None:
+                        rate = (config.edgettsRate - 1.0) * 100
+                        rate = int(round(rate, 0))
+                        communicate = edge_tts.Communicate(content, config.edgettsVoice, rate=f"{'+' if rate >= 0 else ''}{rate}%")
+                        await communicate.save(audioFile)
+                    asyncio.run(saveEdgeAudio())
+                    TTSUtil.playAudioFile(audioFile, vlcSpeed=0.0)
                 else:
                     if not config.ttsPlatform == "google":
                         config.ttsPlatform == "google"
@@ -128,11 +137,11 @@ class TTSUtil:
                     pass
 
     @staticmethod
-    def playAudioFile(audioFile):
+    def playAudioFile(audioFile, vlcSpeed=None):
         try:
             if config.isVlcPlayerInstalled and not config.usePygame:
                 # vlc is preferred as it allows speed control with config.vlcSpeed
-                VlcUtil.playMediaFile(audioFile)
+                VlcUtil.playMediaFile(audioFile, vlcSpeed=vlcSpeed)
             elif config.isPygameInstalled:
                 # use pygame if config.usePygame or vlc player is not installed
                 TTSUtil.playAudioFilePygame(audioFile)

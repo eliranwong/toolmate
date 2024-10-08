@@ -3,6 +3,7 @@ from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIke
 from toolmate import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runToolMateCommand, displayPythonCode, selectTool, showRisk, confirmExecution
 from toolmate.utils.call_llm import CallLLM
 import threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy, pyperclip
+import edge_tts, asyncio, requests
 from flashtext import KeywordProcessor
 from typing import Optional
 from pathlib import Path
@@ -311,6 +312,41 @@ class ToolMate:
             config.piper_voice = option
             TTSUtil.play("Testing")
 
+    def setVoskModel(self):
+        voskModel_history = os.path.join(config.localStorage, "history", "voskModel")
+        voskModel_session = PromptSession(history=FileHistory(voskModel_history))
+        response = requests.get("https://alphacephei.com/vosk/models/model-list.json", timeout=10)
+        models = [model["name"] for model in response.json()]
+        completer = FuzzyCompleter(WordCompleter(models, ignore_case=True))
+        print1("Please specify a Vosk Model:")
+        print1("(Read https://alphacephei.com/vosk/models)")
+        option = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.voskModel, promptSession=voskModel_session, completer=completer)
+        if option and not option in (config.exit_entry, config.cancel_entry) and option in models:
+            config.voskModel = option
+
+    def setEdgeTtsVoice(self):
+        edgettsVoice_history = os.path.join(config.localStorage, "history", "edgettsVoice")
+        edgettsVoice_session = PromptSession(history=FileHistory(edgettsVoice_history))
+        async def getVoices():
+            voices = await edge_tts.list_voices()
+            return voices
+        voices = asyncio.run(getVoices())
+        voices = [voice["ShortName"] for voice in voices if "ShortName" in voice]
+        completer = FuzzyCompleter(WordCompleter(voices, ignore_case=True))
+        print1("Please specify a Microsoft Server Speech Text to Speech Voice:")
+        option = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.edgettsVoice, promptSession=edgettsVoice_session, completer=completer)
+        if option and not option in (config.exit_entry, config.cancel_entry) and option in voices:
+            config.edgettsVoice = option
+        # rate
+        edgettsRate = self.prompts.simplePrompt(style=self.prompts.promptStyle2, validator=FloatValidator(), default=str(config.edgettsRate))
+        if edgettsRate and not edgettsRate.strip().lower() == config.exit_entry:
+            edgettsRate = float(edgettsRate)
+            if edgettsRate < 0.1:
+                edgettsRate = 0.1
+            elif edgettsRate > 2:
+                edgettsRate = 2
+            config.edgettsRate = round(edgettsRate, 1)
+
     # ElevenLabs Text-to-Speech Voice
     def setElevenlabsVoice(self):
         # record in history for easy retrieval by moving arrows upwards / downwards
@@ -326,7 +362,7 @@ class ToolMate:
         default = ids[config.elevenlabsVoice] if config.elevenlabsVoice in ids else "Rachel"
         # completer
         completer = FuzzyCompleter(WordCompleter(options.keys(), ignore_case=True))
-        print1("Please specify ElevenLabs Text-to-Speech Voice:")
+        print1("Please specify a ElevenLabs Text-to-Speech Voice:")
         option = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=default, promptSession=elevenlabsVoice_session, completer=completer)
         if option and not option in (config.exit_entry, config.cancel_entry):
             config.elevenlabsVoice = options[option] if option in options else "21m00Tcm4TlvDq8ikWAM" # Rachel's voice id
@@ -1830,9 +1866,9 @@ class ToolMate:
                 config.usePygame = True
 
     def setTextToSpeechConfig(self):
-        options = ["google", "googlecloud", "elevenlabs", "custom"]
-        descriptions = ["Google Text-to-Speech (Generic)", "Google Text-to-Speech (API)", "ElevenLabs (API)", "Custom Text-to-Speech Command [advanced]"]
-        if config.thisPlatform == "Linux":
+        options = ["edge", "elevenlabs", "custom"] if config.isTermux else ["edge", "google", "googlecloud", "elevenlabs", "custom"]
+        descriptions = ["Microsoft Server Text-to-Speech", "ElevenLabs (credentials required)", "Custom Text-to-Speech Command [advanced]"] if config.isTermux else ["Microsoft Server Text-to-Speech", "Google Text-to-Speech (generic)", "Google Text-to-Speech (credentials required)", "ElevenLabs (credentials required)", "Custom Text-to-Speech Command [advanced]"]
+        if config.thisPlatform == "Linux" and not config.isTermux:
             options.insert(0, "piper")
             descriptions.insert(0, "Piper (Offline; Linux Only)")
         elif config.thisPlatform == "macOS":
@@ -1905,6 +1941,8 @@ class ToolMate:
                 config.ttsPlatform = "google"
             else:
                 self.setElevenlabsVoice()
+        elif config.ttsPlatform == "edge":
+            self.setEdgeTtsVoice()
         elif config.ttsPlatform == "custom":
             self.defineTtsCommand()
         # save configs
@@ -1987,9 +2025,12 @@ class ToolMate:
                 print2("Given path invalid!")
 
     def setSpeechToTextConfig(self):
+        if config.isTermux:
+            print1("You may simply use the Android built-in voice typing feature.")
+            return None
         voiceTypingPlatform = self.dialogs.getValidOptions(
-            options=("google", "googlecloud", "whisper", "whispercpp"),
-            descriptions=("Google Speech-to-Text (Generic) [online]", "Google Speech-to-Text (API) [online]", "OpenAI Whisper [offline; slower with non-English voices]", "Whisper.cpp [offline; installed separately]"),
+            options=("google", "googlecloud", "whisper", "whispercpp", "vosk"),
+            descriptions=("Google Speech-to-Text (generic) [online]", "Google Speech-to-Text (credentials required) [online]", "OpenAI Whisper [offline; slower with non-English voices]", "Whisper.cpp [offline; installed separately]", "Vosk Speech Recognition Toolkit [offline]"),
             title="Voice Recognition Configurations",
             text="Select a speech-to-text platform:",
             default=config.voiceTypingPlatform,
@@ -2015,7 +2056,10 @@ class ToolMate:
             else:
                 config.voiceTypingPlatform = voiceTypingPlatform
         # language
-        self.setSpeechToTextLanguage()
+        if config.voiceTypingPlatform == "vosk":
+            self.setVoskModel()
+        else:
+            self.setSpeechToTextLanguage()
         # whisper.cpp models
         if config.voiceTypingPlatform == "whispercpp":
             whispercpp_model = self.getWhispercppModel()
@@ -2053,8 +2097,11 @@ class ToolMate:
             config.voiceTypingAutoComplete = True if voiceTypingAutoComplete == "Yes" else False
         # notify
         print("")
-        print3(f"Speech-to-Text Model: {config.voiceTypingPlatform}")
-        print3(f"Speech-to-Text Language: {config.voiceTypingLanguage}")
+        print3(f"Speech-to-Text Platform: {config.voiceTypingPlatform}")
+        if config.voiceTypingPlatform == "vosk":
+            print3(f"Vosk Model: {config.voskModel}")
+        else:
+            print3(f"Speech-to-Text Language: {config.voiceTypingLanguage}")
         print3(f"Ambient Noise Adjustment: {config.voiceTypingAdjustAmbientNoise}")
         print3(f"Audio Notification: {config.voiceTypingNotification}")
         print3(f"Auto Completion: {config.voiceTypingAutoComplete}")

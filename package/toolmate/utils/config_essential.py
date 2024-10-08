@@ -231,12 +231,14 @@ defaultSettings = (
     ('suggestSystemCommand', True),
     ('improveInputEntry', False),
     ('improvedWritingSytle', 'standard English'), # e.g. British spoken English
-    ('ttsPlatform', "google"), # "google", "googlecloud", "elevenlabs", "custom"
+    ('ttsPlatform', "google"), # "say", "wsay", "piper", "edge", "google", "googlecloud", "elevenlabs", "custom"
     ('ttsInput', False),
     ('ttsOutput', False),
     ('tts_startReadPattern', "[*.?!,:;”。，：；？！」]"), # regex pattern containing characters that LetMeDoIt AI starts reading text chunk when config.ttsOutput is set to True and the pattern is matched.  
     ('tts_doNotReadPattern', "[*]"), # regex pattern contains characters that are not pronunced
     ('vlcSpeed', 1.0),
+    ('edgettsVoice', "en-GB-SoniaNeural"),
+    ('edgettsRate', 1.0), # "+0%"
     ('gcttsLang', "en-US"), # https://cloud.google.com/text-to-speech/docs/voices
     ('gcttsSpeed', 1.0),
     ('gttsLang', "en"), # gTTS is used by default if ttsCommand is not given
@@ -249,6 +251,7 @@ defaultSettings = (
     ("elevenlabsApi", ""),
     ("elevenlabsVoice", "21m00Tcm4TlvDq8ikWAM"),
     ("pyaudioInstalled", False),
+    ("voskModel", "vosk-model-small-en-us-0.15"),
     ("voiceTypingPlatform", "google"), # "google", "googlecloud", "whisper"
     ("voiceTypingLanguage", "en-US"), # https://cloud.google.com/speech-to-text/docs/speech-to-text-supported-languages
     ("voiceTypingAdjustAmbientNoise", True),

@@ -1,4 +1,4 @@
-from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, refinePath, displayLoadedMessages, removeDuplicatedListItems
+from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, refinePath, displayLoadedMessages, removeDuplicatedListItems, getElevenlabsApi_key
 from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, tokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getUserPreviousRequest, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText
 from toolmate import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runToolMateCommand, displayPythonCode, selectTool, showRisk, confirmExecution
 from toolmate.utils.call_llm import CallLLM
@@ -355,7 +355,7 @@ class ToolMate:
         # input suggestion for options
         options = {}
         ids = {}
-        for voice in list(ElevenLabs(api_key=config.elevenlabsApi).voices.get_all())[0][-1]:
+        for voice in list(ElevenLabs(api_key=getElevenlabsApi_key()).voices.get_all())[0][-1]:
             options[voice.name] = voice.voice_id
             ids[voice.voice_id] = voice.name
         # default
@@ -544,6 +544,7 @@ class ToolMate:
         print3("# Tavily API Key: allows access to Tavily hosted LLMs")
         print1("To set up Tavily API Key, read:\nhttps://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tavily%20API%20Setup.md\n")
         print1("Enter a single or a list of multiple Tavily API Key(s) [optional]:")
+        print1("(To enter multiple keys, use the following format: ['api_key_1', 'api_key_2', 'api_key_3'])")
         print()
         apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=str(config.tavilyApi_key), is_password=True)
         if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
@@ -562,6 +563,7 @@ class ToolMate:
         print3("# Groq Cloud API Key: allows access to Groq Cloud hosted LLMs")
         print1("To set up Groq Cloud API Key, read:\nhttps://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Groq%20API%20Setup.md\n")
         print1("Enter a single or a list of multiple Groq Cloud API Key(s) [optional]:")
+        print1("(To enter multiple keys, use the following format: ['api_key_1', 'api_key_2', 'api_key_3'])")
         print()
         apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=str(config.groqApi_key), is_password=True)
         if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
@@ -579,11 +581,16 @@ class ToolMate:
     def changeOpenweathermapApi(self):
         print3("# OpenWeatherMap API Key: allows access to real-time weather information")
         print1("To set up OpenWeatherMap API Key, read:\nhttps://github.com/eliranwong/letmedoit/wiki/OpenWeatherMap-API-Setup\n")
-        print1("Enter your OpenWeatherMap API Key [optional]:")
+        print1("Enter a single or a list of multiple OpenWeatherMap API Key(s) [optional]:")
+        print1("(To enter multiple keys, use the following format: ['api_key_1', 'api_key_2', 'api_key_3'])")
         print()
-        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.openweathermapApi, is_password=True)
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=str(config.openweathermapApi), is_password=True)
         if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
-            config.openweathermapApi = apikey
+            try:
+                if isinstance(eval(apikey), list):
+                    config.openweathermapApi = eval(apikey)
+            except:
+                config.openweathermapApi = apikey
         if getWeather() is not None:
             print2("Configurations updated!")
         else:
@@ -594,14 +601,19 @@ class ToolMate:
     def changeElevenlabsApi(self):
         print3("# ElevenLabs API Key: allows access to voice generation feature offered by ElevenLabs")
         print1("To set up ElevenLabs API Key, read:\nhttps://elevenlabs.io/docs/api-reference/text-to-speech#authentication\n")
-        print1("Enter your ElevenLabs API Key [optional]:")
+        print1("Enter a single or a list of multiple ElevenLabs API Key(s) [optional]:")
+        print1("(To enter multiple keys, use the following format: ['api_key_1', 'api_key_2', 'api_key_3'])")
         print()
-        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.elevenlabsApi, is_password=True)
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=str(config.elevenlabsApi), is_password=True)
         if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
-            config.elevenlabsApi = apikey
+            try:
+                if isinstance(eval(apikey), list):
+                    config.elevenlabsApi = eval(apikey)
+            except:
+                config.elevenlabsApi = apikey
         try:
             # testing
-            ElevenLabs(api_key=config.elevenlabsApi).generate(
+            ElevenLabs(api_key=getElevenlabsApi_key()).generate(
                 #api_key=config.elevenlabsApi, # Defaults to os.getenv(ELEVEN_API_KEY)
                 text="test",
                 voice=config.elevenlabsVoice,
@@ -1157,6 +1169,8 @@ class ToolMate:
             print2("# Vision Server - for vision only")
             self.setLlmModel_llamacppserver("vision")
         elif config.llmInterface == "groq":
+            if not config.groqApi_key or config.groqApi_key == "toolmate":
+                self.changeGroqApi()
             print2("# Tool Model - for both task execution and conversation")
             self.setLlmModel_groq()
             self.setMaxTokens(feature="default")
@@ -1168,6 +1182,8 @@ class ToolMate:
             self.setLlmModel_gemini()
             self.setMaxTokens(feature="default")
         else:
+            if not config.openaiApiKey or config.openaiApiKey == "toolmate":
+                self.changeChatGPTAPIkey()
             self.setLlmModel_chatgpt()
             self.setMaxTokens(feature="default")
         config.saveConfig()
@@ -2231,6 +2247,21 @@ class ToolMate:
                     except:
                         print2("Failed to save the conversation!\n")
                         showErrors()
+
+    def setGoogleCredentialsPath():
+        filePath = self.getPath.getFilePath(
+            empty_to_cancel=True,
+            list_content_on_directory_change=True,
+            keep_startup_directory=True,
+            message=f"{self.divider}\nEnter the file path of your Google Cloud Credentials:\n(Default: {config.google_cloud_credentials_file})",
+            default=config.google_cloud_credentials,
+        )
+        if filePath:
+            if os.path.isfile(filePath):
+                config.google_cloud_credentials = filePath
+            else:
+                print2("Invalid file path given!")
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = config.google_cloud_credentials if config.google_cloud_credentials and os.path.isfile(config.google_cloud_credentials) else ""
 
     def runInstruction(self):
         instructions = list(config.predefinedInstructions.keys())

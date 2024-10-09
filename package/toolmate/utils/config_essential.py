@@ -231,7 +231,7 @@ defaultSettings = (
     ('suggestSystemCommand', True),
     ('improveInputEntry', False),
     ('improvedWritingSytle', 'standard English'), # e.g. British spoken English
-    ('ttsPlatform', "google"), # "say", "wsay", "piper", "edge", "google", "googlecloud", "elevenlabs", "custom"
+    ('ttsPlatform', "edge"), # "say", "wsay", "piper", "edge", "google", "googlecloud", "elevenlabs", "custom"
     ('ttsInput', False),
     ('ttsOutput', False),
     ('tts_startReadPattern', "[*.?!,:;”。，：；？！」]"), # regex pattern containing characters that LetMeDoIt AI starts reading text chunk when config.ttsOutput is set to True and the pattern is matched.  

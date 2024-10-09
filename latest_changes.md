@@ -1,3 +1,11 @@
+# 0.3.91
+
+* support multiple Open Weather Map API keys
+
+# 0.3.90
+
+* support multiple Elevenlabs API keys
+
 # 0.3.89
 
 * simplified the plugin `read aloud`

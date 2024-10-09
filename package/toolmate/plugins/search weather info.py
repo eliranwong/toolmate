@@ -6,12 +6,12 @@ search for weather information
 [TOOL_CALL]
 """
 
-if not config.openweathermapApi:
+if not config.openweathermapApi or config.openweathermapApi == "toolmate":
     config.changeOpenweathermapApi()
 
 if config.openweathermapApi:
     from toolmate import config
-    from toolmate import print1, print3
+    from toolmate import print1, print3, getOpenweathermapApi_key
     from toolmate.utils.python_utils import PythonUtil
     import json
 
@@ -34,7 +34,7 @@ if config.openweathermapApi:
             "properties": {
                 "code": {
                     "type": "string",
-                    "description": f"""Generate python code that use my OpenWeatherMap API key '{config.openweathermapApi}' to resolve my request. Use Celsius as the unit for temperature.""",
+                    "description": f"""Generate python code that use my OpenWeatherMap API key '{getOpenweathermapApi_key()}' to resolve my request. Use Celsius as the unit for temperature.""",
                 },
             },
             "required": ["code"],

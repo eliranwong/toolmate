@@ -273,9 +273,44 @@ Action: {select(tool_names, name="tool")}"""
 
 # llm
 
+def getOpenweathermapApi_key():
+    '''
+    support multiple open weather map api keys
+    '''
+    if config.openweathermapApi:
+        if isinstance(config.openweathermapApi, str):
+            return config.openweathermapApi
+        elif isinstance(config.openweathermapApi, list):
+            if len(config.openweathermapApi) > 1:
+                # rotate multiple api keys
+                config.openweathermapApi = config.openweathermapApi[1:] + [config.openweathermapApi[0]]
+            return config.openweathermapApi[0]
+        else:
+            return ""
+    else:
+        return ""
+
+def getElevenlabsApi_key():
+    '''
+    support multiple eleven api keys
+    User can manually edit config to change the value of config.tavilyApi_key to a list of multiple api keys instead of a string of a single api key
+    '''
+    if config.elevenlabsApi:
+        if isinstance(config.elevenlabsApi, str):
+            return config.elevenlabsApi
+        elif isinstance(config.elevenlabsApi, list):
+            if len(config.elevenlabsApi) > 1:
+                # rotate multiple api keys
+                config.elevenlabsApi = config.elevenlabsApi[1:] + [config.elevenlabsApi[0]]
+            return config.elevenlabsApi[0]
+        else:
+            return ""
+    else:
+        return ""
+
 def getTavilyApi_key():
     '''
-    support multiple tavily api keys to work around search limit
+    support multiple tavily api keys
     User can manually edit config to change the value of config.tavilyApi_key to a list of multiple api keys instead of a string of a single api key
     '''
     if config.tavilyApi_key:
@@ -296,7 +331,7 @@ def getTavilyClient():
 
 def getGroqApi_key():
     '''
-    support multiple grop api keys to work around rate limit
+    support multiple grop api keys
     User can manually edit config to change the value of config.groqApi_key to a list of multiple api keys instead of a string of a single api key
     '''
     if config.groqApi_key:
@@ -1466,7 +1501,7 @@ def setChatGPTAPIkey():
     os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
 
 def setGoogleCredentials():
-    config.google_cloud_credentials_file = os.path.join(config.localStorage, "credentials_google_cloud.json")
+    config.google_cloud_credentials_file = os.path.join(config.localStorage, "credentials_google_cloud.json") # default path
     if config.google_cloud_credentials and os.path.isfile(config.google_cloud_credentials):
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = config.google_cloud_credentials
     else:
@@ -1489,7 +1524,7 @@ def getWeather(latlng=""):
     # get current weather information
     # Reference: https://openweathermap.org/api/one-call-3
 
-    if not config.openweathermapApi:
+    if not config.openweathermapApi or config.openweathermapApi == "toolmate":
         return None
 
     # latitude, longitude
@@ -1499,7 +1534,7 @@ def getWeather(latlng=""):
     try:
         latitude, longitude = latlng
         # Build the URL for the weather API
-        url = f"https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&appid={config.openweathermapApi}&units=metric"
+        url = f"https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&appid={getOpenweathermapApi_key()}&units=metric"
         # Make the request to the API
         response = requests.get(url)
         # Parse the JSON response

@@ -1,4 +1,4 @@
-from toolmate import config, getHideOutputSuffix
+from toolmate import config, getHideOutputSuffix, getElevenlabsApi_key
 import os, traceback, subprocess, re, pydoc, shutil, edge_tts, asyncio
 from pathlib import Path
 from gtts import gTTS
@@ -65,7 +65,7 @@ class TTSUtil:
                             command = f'''{config.ttsCommand} "{content}"{config.ttsCommandSuffix}'''
                     subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
                 elif config.ttsPlatform == "elevenlabs" and config.elevenlabsApi:
-                    audio = ElevenLabs(api_key=config.elevenlabsApi).generate(
+                    audio = ElevenLabs(api_key=getElevenlabsApi_key()).generate(
                         #api_key=config.elevenlabsApi, # Defaults to os.getenv(ELEVEN_API_KEY)
                         text=content,
                         voice=config.elevenlabsVoice,

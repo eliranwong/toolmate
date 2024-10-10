@@ -99,7 +99,7 @@ class AutoGenBuilder:
             #config_path=config_path, # use default
             builder_model=self.chatGPTmodel,
             agent_model=self.chatGPTmodel,
-            max_tokens=4096,
+            #max_tokens=4096,
             max_agents=config.max_agents,
         )
 

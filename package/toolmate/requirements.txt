@@ -109,7 +109,7 @@ unstructured-client==0.25.9
 langchain-unstructured[local]==0.1.5
 python-magic
 pygame
-PySide6
+#PySide6
 feedparser
 html2text
 pypdf

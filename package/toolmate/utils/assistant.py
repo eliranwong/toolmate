@@ -22,14 +22,14 @@ from prompt_toolkit.application import run_in_terminal
 from prompt_toolkit import print_formatted_text, HTML
 from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
 from toolmate.utils.prompts import Prompts
-from toolmate.utils.promptValidator import FloatValidator, TokenValidator
+from toolmate.utils.prompt_validator import FloatValidator, TokenValidator
 from toolmate.utils.get_path_prompt import GetPath
 from toolmate.utils.prompt_shared_key_bindings import swapTerminalColors
 
 from toolmate.utils.terminal_system_command_prompt import SystemCommandPrompt
 from toolmate.utils.tool_plugins import Plugins
 from toolmate.utils.tts_utils import TTSUtil
-from toolmate.utils.ttsLanguages import TtsLanguages
+from toolmate.utils.tts_languages import TtsLanguages
 from toolmate.utils.streaming_word_wrapper import StreamingWordWrapper
 from toolmate.utils.text_utils import TextUtil
 from toolmate.utils.sttLanguages import googleSpeeckToTextLanguages, whisperSpeeckToTextLanguages
@@ -444,7 +444,26 @@ class ToolMate:
             config.gcttsSpeed = round(gcttsSpeed, 1)
             print3(f"Google Cloud Text-to-Speech playback speed: {gcttsSpeed}")
 
+    def setGoogleCredentialsPath():
+        filePath = self.getPath.getFilePath(
+            empty_to_cancel=True,
+            list_content_on_directory_change=True,
+            keep_startup_directory=True,
+            message=f"{self.divider}\nEnter the file path of your Google Cloud Credentials:\n(Default: {config.google_cloud_credentials_file})",
+            default=config.google_cloud_credentials,
+        )
+        if filePath:
+            if os.path.isfile(filePath):
+                config.google_cloud_credentials = filePath
+            else:
+                print2("Invalid file path given!")
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = config.google_cloud_credentials if config.google_cloud_credentials and os.path.isfile(config.google_cloud_credentials) else ""
+
+
     def selectGoogleAPIs(self):
+        if not os.environ["GOOGLE_APPLICATION_CREDENTIALS"]:
+            self.setGoogleCredentialsPath()
+
         if os.environ["GOOGLE_APPLICATION_CREDENTIALS"]:
             enabledGoogleAPIs = self.dialogs.getMultipleSelection(
                 title="Google Cloud Service",
@@ -2247,21 +2266,6 @@ class ToolMate:
                     except:
                         print2("Failed to save the conversation!\n")
                         showErrors()
-
-    def setGoogleCredentialsPath():
-        filePath = self.getPath.getFilePath(
-            empty_to_cancel=True,
-            list_content_on_directory_change=True,
-            keep_startup_directory=True,
-            message=f"{self.divider}\nEnter the file path of your Google Cloud Credentials:\n(Default: {config.google_cloud_credentials_file})",
-            default=config.google_cloud_credentials,
-        )
-        if filePath:
-            if os.path.isfile(filePath):
-                config.google_cloud_credentials = filePath
-            else:
-                print2("Invalid file path given!")
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = config.google_cloud_credentials if config.google_cloud_credentials and os.path.isfile(config.google_cloud_credentials) else ""
 
     def runInstruction(self):
         instructions = list(config.predefinedInstructions.keys())

@@ -18,7 +18,7 @@ if not config.isTermux:
     from stable_diffusion_cpp import StableDiffusion
     from toolmate.utils.single_prompt import SinglePrompt
     from prompt_toolkit.styles import Style
-    from toolmate.utils.promptValidator import NumberValidator
+    from toolmate.utils.prompt_validator import NumberValidator
 
 
     def create_image_sd(function_args):

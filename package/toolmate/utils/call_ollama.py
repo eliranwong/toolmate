@@ -250,13 +250,17 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             if config.developer:
                 print1("extracting parameters ...")
             try:
-                tool_parameters = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
-                if not tool_parameters:
-                    if config.developer:
-                        print1("Failed to extract parameters!")
-                    return CallOllama.regularCall(messages)
-                # 4. Function Execution
-                tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
+                if not tool_schema["parameters"]["properties"]:
+                    # Execute function directly
+                    tool_response = executeToolFunction(func_arguments={}, function_name=tool_name)
+                else:
+                    tool_parameters = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
+                    if not tool_parameters:
+                        if config.developer:
+                            print1("Failed to extract parameters!")
+                        return CallOllama.regularCall(messages)
+                    # 4. Function Execution
+                    tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
             except:
                 print(traceback.format_exc())
                 tool_response = "[INVALID]"

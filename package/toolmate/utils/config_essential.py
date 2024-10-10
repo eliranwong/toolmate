@@ -262,6 +262,7 @@ defaultSettings = (
     ("enabledGoogleAPIs", ["Vertex AI"]), # "Vertex AI", "Speech-to-Text", "Text-to-Speech"
     ("desktopAssistantWidth", 500),
     ("desktopAssistantHeight", 900),
+    ("parserStandarisation", False),
     ("hotkey_exit", ["c-q"]),
     ("hotkey_cancel", ["c-z"]),
     ("hotkey_new", ["c-n"]),

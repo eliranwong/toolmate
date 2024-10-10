@@ -20,7 +20,7 @@ if not config.isTermux:
     from PIL import Image
     from toolmate.utils.single_prompt import SinglePrompt
     from prompt_toolkit.styles import Style
-    from toolmate.utils.promptValidator import NumberValidator
+    from toolmate.utils.prompt_validator import NumberValidator
 
 
     def modify_images(function_args):

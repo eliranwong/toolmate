@@ -119,7 +119,7 @@ Fabric Integration: https://github.com/eliranwong/toolmate/blob/main/package/too
 
 ![content_creation](https://github.com/eliranwong/toolmate/assets/25262722/5582d519-b925-4e1b-8fd8-ecaa8422d391)
 
-# Installation - an example
+# Installation
 
 For Windows / macOS / LinuX / ChromeOS users:
 
@@ -128,6 +128,16 @@ For Windows / macOS / LinuX / ChromeOS users:
 For Android users:
 
 > pip install --upgrade toolmate_android
+
+## Optional Modules
+
+`gui` install additional GUI library for running gui system tray and experimental desktop assistant
+
+> pip install --upgrade toolmate[gui]
+
+`linux` install additional packages for Linux users, i.e. `flaml[automl]`, `piper-tts`, `pyautogen[autobuild]`
+
+> pip install --upgrade toolmate[linux]
 
 Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Install%20ToolMate.md
 

@@ -1,3 +1,21 @@
+# 0.3.92-0.3.97
+
+* fixed plugin `create ai assistants`
+
+* added support optional modules for installation:
+
+`gui` install additional GUI library for running gui system tray and experimental desktop assistant
+
+> pip install --upgrade toolmate[gui]
+
+`linux` install additional packages for Linux users, i.e. `flaml[automl]`, `piper-tts`, `pyautogen[autobuild]`
+
+> pip install --upgrade toolmate[linux]
+
+`bible` install additional packages for working with bible tools
+
+> pip install --upgrade toolmate[bible]
+
 # 0.3.91
 
 * support multiple Open Weather Map API keys

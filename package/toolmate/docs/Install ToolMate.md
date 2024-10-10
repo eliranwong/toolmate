@@ -1,5 +1,29 @@
 # Installation
 
+For Windows / macOS / LinuX / ChromeOS users:
+
+> pip install --upgrade toolmate
+
+For Android users ([read more](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Termux%20Setup.md)):
+
+> pip install --upgrade toolmate_android
+
+## Optional Modules
+
+`gui` install additional GUI library for running gui system tray and experimental desktop assistant
+
+> pip install --upgrade toolmate[gui]
+
+`linux` install additional packages for Linux users, i.e. `flaml[automl]`, `piper-tts`, `pyautogen[autobuild]`
+
+> pip install --upgrade toolmate[linux]
+
+`bible` install additional libraries for working with bible tools
+
+> pip install --upgrade toolmate[bible]
+
+# An Example
+
 Install ToolMate AI, by running:
 
 To set up virtual environment (recommended):

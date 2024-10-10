@@ -13,11 +13,16 @@ if not hasattr(config, "toolMateAIName") or not config.toolMateAIName:
 config.divider = "--------------------"
 os.environ["TOKENIZERS_PARALLELISM"] = config.tokenizers_parallelism
 
+try:
+    from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication, QMessageBox
+    from PySide6.QtGui import QIcon, QAction, QGuiApplication
+except:
+    print("Module 'gui' not found! Run 'pip install toolmate[gui]' first!")
+    exit()
+
 import sys, platform, webbrowser, shutil
 from toolmate import startAutogenstudioServer, runToolMateCommand, isServerAlive, print2, getCliOutput
 from toolmate.gui.desktop_assistant import DesktopAssistant
-from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication, QMessageBox
-from PySide6.QtGui import QIcon, QAction, QGuiApplication
 from pathlib import Path
 from functools import partial
 from prompt_toolkit.clipboard.pyperclip import PyperclipClipboard

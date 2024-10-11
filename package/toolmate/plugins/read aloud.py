@@ -8,33 +8,30 @@ pronunce words
 
 from toolmate import config, print1
 from toolmate.utils.tts_utils import TTSUtil
+import re
 
 def read_aloud(function_args):
-    words = function_args.get("words") # required
+    content = config.currentMessages[-1]["content"]
+    content = re.sub("^[Rr]ead aloud[:]*", "", content).strip()
+    #words = function_args.get("words") # required
     #language = function_args.get("language") # required
     print1("Loading speech feature ...")
     #TTSUtil.play(words, language)
-    TTSUtil.play(words)
+    TTSUtil.play(content)
     return ""
 
 functionSignature = {
     "examples": [
-        "pronounce",
         "read aloud",
     ],
     "name": "read_aloud",
     "description": "Pronounce words or sentences with text-to-speech utility",
     "parameters": {
         "type": "object",
-        "properties": {
-            "words": {
-                "type": "string",
-                "description": "Words to be pronounced",
-            },
-        },
-        "required": ["words"],
+        "properties": {},
+        "required": [],
     },
 }
 
 config.addFunctionCall(signature=functionSignature, method=read_aloud)
-config.inputSuggestions.append("pronunce ")
+config.inputSuggestions.append("Read aloud: ")

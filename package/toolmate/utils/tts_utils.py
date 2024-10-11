@@ -114,7 +114,10 @@ class TTSUtil:
                         communicate = edge_tts.Communicate(content, config.edgettsVoice, rate=f"{'+' if rate >= 0 else ''}{rate}%")
                         await communicate.save(audioFile)
                     asyncio.run(saveEdgeAudio())
-                    TTSUtil.playAudioFile(audioFile, vlcSpeed=0.0)
+                    if shutil.which("mpv"):
+                        os.system(f'''mpv --really-quiet "{audioFile}"''')
+                    else:
+                        TTSUtil.playAudioFile(audioFile, vlcSpeed=0.0)
                 else:
                     if not config.ttsPlatform == "google":
                         config.ttsPlatform == "google"
@@ -147,6 +150,8 @@ class TTSUtil:
                 TTSUtil.playAudioFilePygame(audioFile)
             elif config.isTermux and config.terminalEnableTermuxAPI:
                 os.system(f'''termux-media-player play "{audioFile}"''')
+            elif shutil.which("mpv"):
+                os.system(f'''mpv --really-quiet "{audioFile}"''')
             else:
                 sounddevice.play(*soundfile.read(audioFile)) 
                 sounddevice.wait()

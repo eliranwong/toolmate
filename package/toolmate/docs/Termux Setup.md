@@ -178,13 +178,18 @@ To set up an alias:
 
 # Install ToolMate AI - Full Version
 
+Run in Termux:
+
 ```
 cd
 pkg update && pkg upgrade && pkg install -y git wget proot
 git clone https://github.com/MFDGaming/ubuntu-in-termux.git
 cd ubuntu-in-termux && chmod +x ubuntu.sh && ./ubuntu.sh -y
 echo 'alias ubuntu='$(pwd)'/startubuntu.sh' >> ~/.bashrc
+echo 'pulseaudio --start --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" --exit-idle-time=-1' >> ~/.bashrc
 source ~/.bashrc
+cd
+mkdir storage/shared/Documents/toolmate
 ```
 
 ## Start Ubuntu in Termux
@@ -195,18 +200,28 @@ ubuntu
 
 ## Install ToolMate AI
 
-```
-apt update && apt full-upgrade
-apt install -y python3
-apt install -y python3-setuptools python3-pip python3-dev python3-venv portaudio19-dev ffmpeg vlc wget curl git wget nano micro
-```
+Inside the `ubuntu`, run:
 
 ```
+cd
+apt update && apt full-upgrade
+apt install -y python3
+apt install -y python3-setuptools python3-pip python3-dev python3-venv portaudio19-dev ffmpeg wget curl git wget nano micro sqlite3 libsqlite3-dev
+apt install libxcb-cursor0 pulseaudio-utils alsa-base alsa-utils mpg123 espeak
+echo 'export PULSE_SERVER=127.0.0.1' >> ~/.bashrc
+source ~/.bashrc
+```
+
+Remarks: `libsqlite3-dev` is required for python package `pysqlite3` to be installed.
+
+```
+cd
+ln -s /data/data/com.termux/files/home/storage/shared/Documents/toolmate toolmate
 mkdir -p ~/apps
 cd ~/apps
 python3 -m venv toolmate
 source toolmate/bin/activate
-pip install --upgrade toolmate
+pip install --upgrade toolmate[linux]
 echo 'alias toolmate='$(pwd)'/toolmate/bin/toolmate' >> ~/.bashrc
 echo 'alias sudo=""' >> ~/.bashrc
 source ~/.bashrc
@@ -218,13 +233,7 @@ source ~/.bashrc
 toolmate
 ```
 
-Alternately, to launch with a specific backend, e.g.:
-
-```
-toolmate -b groq
-```
-
-You may use 'ctrl+q' to exit toolmate
+To exit, enter `.exit` or press `ctrl+q`.
 
 ## Exit Ubuntu in Termux
 

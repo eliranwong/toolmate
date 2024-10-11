@@ -139,6 +139,10 @@ For Android users:
 
 > pip install --upgrade toolmate[linux]
 
+`bible` install additional libraries for working with bible tools
+
+> pip install --upgrade toolmate[bible]
+
 Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Install%20ToolMate.md
 
 # GPU Acceleration

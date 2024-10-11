@@ -296,6 +296,8 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "uniquebible_path",
+    "uniquebible_platform",
     "allEnabledTools",
     "toolmate",
     "chatGui",

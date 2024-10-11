@@ -40,12 +40,13 @@ if not config.isTermux:
     from toolmate.chatgpt import ChatGPT
     from toolmate.llamacpp import LlamacppChat
     from toolmate.llamacppserver import LlamacppServerChat
-    from toolmate.gui.worker import QtResponseStreamer
     from toolmate.autobuilder import AutoGenBuilder
     from toolmate.geminipro import GeminiPro
     from toolmate.palm2 import Palm2
     from toolmate.codey import Codey
     from huggingface_hub import hf_hub_download
+    if hasattr(config, "desktopAssistant"):
+        from toolmate.gui.worker import QtResponseStreamer
 
 
 class ToolMate:
@@ -2463,6 +2464,7 @@ Acess the risk level of the following `{target.capitalize()}`:
         # tool_selection_agent applies only to backends other than LetMeDoIt Mode
 
         if action == "recommend_tool" and config.llmInterface == "letmedoit":
+            # tool `recommend_tool` is not supported in LetMeDoIt mode
             action == "chat"
 
         # append chat

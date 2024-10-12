@@ -26,7 +26,7 @@ try:
     import traceback
     import importlib.resources
 
-    config.uniquebible_path = str(importlib.resources.path(package="uniquebible", resource=""))
+    config.uniquebible_path = str(importlib.resources.files("uniquebible"))
     # load resources information
     cwd = os.getcwd()
     os.chdir(config.uniquebible_path)
@@ -93,7 +93,6 @@ try:
                 config.toolTextOutput += f"{verseText}\n"
 
         # change to uniquebible app directory temporarily
-        uniquebible = str(importlib.resources.path(package="uniquebible", resource=""))
         cwd = os.getcwd()
         os.chdir(config.uniquebible_path)
         # display verses

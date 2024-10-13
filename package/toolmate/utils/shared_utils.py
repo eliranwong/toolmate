@@ -1382,15 +1382,18 @@ City: {g.city}"""
 # token limit
 # reference: https://platform.openai.com/docs/models/gpt-4
 tokenLimits = {
+    "o1-preview": 128000,
+    "o1-mini": 128000,
     "gpt-4o": 128000,
+    "gpt-4o-mini": 128000,
     "gpt-4-turbo": 128000, # Returns a maximum of 4,096 output tokens.
-    "gpt-4-turbo-preview": 128000, # Returns a maximum of 4,096 output tokens.
-    "gpt-4-0125-preview": 128000, # Returns a maximum of 4,096 output tokens.
-    "gpt-4-1106-preview": 128000, # Returns a maximum of 4,096 output tokens.
-    "gpt-3.5-turbo": 16385, # Returns a maximum of 4,096 output tokens.
-    "gpt-3.5-turbo-16k": 16385,
     "gpt-4": 8192,
-    "gpt-4-32k": 32768,
+    #"gpt-4-turbo-preview": 128000, # Returns a maximum of 4,096 output tokens.
+    #"gpt-4-0125-preview": 128000, # Returns a maximum of 4,096 output tokens.
+    #"gpt-4-1106-preview": 128000, # Returns a maximum of 4,096 output tokens.
+    "gpt-3.5-turbo": 16385, # Returns a maximum of 4,096 output tokens.
+    #"gpt-3.5-turbo-16k": 16385,
+    #"gpt-4-32k": 32768,
 }
 
 def getDynamicTokens(messages, functionSignatures=None):
@@ -1433,6 +1436,10 @@ def count_tokens_from_messages(messages, model=""):
         print("Warning: model not found. Using cl100k_base encoding.")
         encoding = tiktoken.get_encoding("cl100k_base")
     if model in {
+            "o1-preview",
+            "o1-mini",
+            "gpt-4o",
+            "gpt-4o-mini",
             "gpt-4o",
             "gpt-3.5-turbo",
             "gpt-3.5-turbo-0125",

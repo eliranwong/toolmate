@@ -1,4 +1,11 @@
 ollama_models = (
+    "shieldgemma",
+    "shieldgemma:2b",
+    "shieldgemma:9b",
+    "shieldgemma:27b",
+    "llama-guard3",
+    "llama-guard3:1b",
+    "llama-guard3:8b",
     "llama3.2",
     "llama3.2:1b",
     "llama3.2:3b",

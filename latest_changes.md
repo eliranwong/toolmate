@@ -1,4 +1,12 @@
-# 0.3.92-0.3.97
+# 0.4.03
+
+* updated ollama model list
+
+# 0.4.02
+
+* updated chatgpt model list
+
+# 0.3.92-0.4.01
 
 * fixed plugin `create ai assistants`
 

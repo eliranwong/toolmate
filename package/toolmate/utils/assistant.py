@@ -1693,12 +1693,25 @@ class ToolMate:
         contextWindowLimit = tokenLimits[config.chatGPTApiModel]
         functionTokens = count_tokens_from_functions(config.toolFunctionSchemas.values())
         maxToken = contextWindowLimit - functionTokens - config.chatGPTApiMinTokens
-        if maxToken > 4096 and config.chatGPTApiModel in (
+        if maxToken > 65536 and config.chatGPTApiModel in (
+            "o1-mini",
+        ):
+            maxToken = 32768
+        elif maxToken > 32768 and config.chatGPTApiModel in (
+            "o1-preview",
+        ):
+            maxToken = 32768
+        elif maxToken > 16384 and config.chatGPTApiModel in (
             "gpt-4o",
+            "gpt-4o-mini",
+        ):
+            maxToken = 16384
+        elif maxToken > 8192 and config.chatGPTApiModel in (
+            "gpt-4",
+        ):
+            maxToken = 8192
+        elif maxToken > 4096 and config.chatGPTApiModel in (
             "gpt-4-turbo",
-            "gpt-4-turbo-preview",
-            "gpt-4-0125-preview",
-            "gpt-4-1106-preview",
             "gpt-3.5-turbo",
         ):
             maxToken = 4096

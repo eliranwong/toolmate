@@ -296,6 +296,9 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "deviceInfoPlugins",
+    "datetimeSensitivePlugins",
+    "tempChatSystemMessage",
     "uniquebible_path",
     "uniquebible_platform",
     "allEnabledTools",
@@ -368,6 +371,7 @@ temporaryConfigs = [
     "outputTransformers", # used with plugins; transform output message
     "predefinedInstructions", # used with plugins; pre-defined instructions
     "predefinedContexts", # used with plugins; pre-defined contexts
+    "predefinedChatSystemMessages", # used with plugins; pre-defined chat system messages
     # used with plugins; function call
     "toolFunctionSchemas",
     "toolFunctionMethods",

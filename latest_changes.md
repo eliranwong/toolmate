@@ -1,3 +1,13 @@
+# 0.4.06
+
+* added two tools `@ask_o1` and `@ask_o1_mini` to use reasoning model o1-preview and o1-mini
+
+# 0.4.04-0.4.05
+
+* added support of single-turn system message for chat conversation
+
+* integrated predefined chat system messages and contexts with tool `@chat`
+
 # 0.4.03
 
 * updated ollama model list

@@ -337,9 +337,6 @@ Remember, output the new copy of python code ONLY, without additional notes or e
                 config.selectedTool = ""
             else:
                 return CallLlamaCpp.regularCall(messages)
-            if tool_name in config.deviceInfoPlugins:
-                user_request = f"""Context: Today is {config.dayOfWeek}. The current date and time here in {config.state}, {config.country} is {str(datetime.datetime.now())}.
-{user_request}"""
             # 3. Parameter Extraction
             if config.developer:
                 print1("extracting parameters ...")

@@ -14,6 +14,8 @@ class Plugins:
         # The following config values can be modified with plugins, to extend functionalities
         #config.pluginsWithFunctionCall = []
         config.aliases = {}
+        config.tempChatSystemMessage = ""
+        config.predefinedChatSystemMessages = {}
         config.predefinedContexts = {
             "custom": "",
         }
@@ -28,21 +30,21 @@ class Plugins:
             "@list_current_directory_contents ",
             "@extract_python_code ",
             "@run_python_code ",
-            "@copy_to_clipboard",
-            "@paste_from_clipboard",
         ]
         if config.isTermux:
             config.inputSuggestions.append("@termux ")
         config.outputTransformers = []
         config.deviceInfoPlugins = []
+        config.datetimeSensitivePlugins = []
         config.toolFunctionSchemas = {}
         config.toolFunctionMethods = {}
         config.builtinTools = {
             "recommend_tool": "Recommand an appropriate tool in response to a given request",
-            "context": "Apply a predefined context",
+            #"system": "Apply a predefined system message",
+            #"context": "Apply a predefined context",
             "convert_relative_datetime": "Convert relative dates and times in a given instruction to absolute dates and times",
-            "copy_to_clipboard": "Copy a given content to the system clipboard",
-            "paste_from_clipboard": "Retrieve the text content from the system clipboard and paste",
+            #"copy_to_clipboard": "Copy a given content to the system clipboard",
+            #"paste_from_clipboard": "Retrieve the text content from the system clipboard and paste",
             "extract_python_code": "Extract the python code in a given content",
             "run_python_code": "Extract and run the python code in a given content",
             "list_current_directory_contents": "List the contents in the current directory",
@@ -93,7 +95,7 @@ class Plugins:
 
     # integrate function call plugin
     @staticmethod
-    def addFunctionCall(signature: str, method: Callable[[dict], str], deviceInfo=False):
+    def addFunctionCall(signature: str, method: Callable[[dict], str], deviceInfo=False, datetimeSensitive=False):
         if hasattr(config, "currentMessages"):
             name = signature["name"]
             if not name in config.toolFunctionSchemas: # prevent duplicaiton
@@ -102,6 +104,8 @@ class Plugins:
                 print3(f"Adding tool: {name}")
                 if deviceInfo:
                     config.deviceInfoPlugins.append(name)
+                if datetimeSensitive:
+                    config.datetimeSensitivePlugins.append(name)
                 # input suggestions
                 if not name in ("python_qa",):
                     callEntry = f"@{name} "

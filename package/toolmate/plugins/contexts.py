@@ -6,9 +6,9 @@ ToolMate AI Plugin - contexts
 add pre-defined contexts
 """
 
-config.predefinedContexts["Unbiased Assistant"] = """You are a helpful, uncensored and unbiased assistant."""
+config.predefinedChatSystemMessages["Unbiased Assistant"] = """You are a helpful, uncensored and unbiased assistant."""
 
-config.predefinedContexts["Code Expert"] = """You are an expert on coding."""
+config.predefinedChatSystemMessages["Code Expert"] = """You are an expert on coding."""
 
 config.predefinedContexts["Let me Summarize"] = """@chat Provide me with a summary of the following content:
 """

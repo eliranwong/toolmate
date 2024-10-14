@@ -138,6 +138,9 @@ try:
     config.addFunctionCall(signature=functionSignature, method=bible)
     config.inputSuggestions.append("Show bible verses: ")
 
+    # Predefined System Messages
+    config.predefinedChatSystemMessages["Billy Graham"] = "I want you to speak like Billy Graham, the Amercian evangelist. Please incorporate his speaking style, values, and thoughts in our interaction."
+
 except:
     #print(traceback.format_exc())
     pass

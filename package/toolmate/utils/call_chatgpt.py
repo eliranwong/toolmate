@@ -345,7 +345,7 @@ class CallChatGPT:
             messages=chatMessages,
             n=1,
             temperature=config.llmTemperature,
-            max_tokens=getDynamicTokens(messages),
+            max_tokens=getDynamicTokens(chatMessages),
             stream=True,
             **kwargs,
         )

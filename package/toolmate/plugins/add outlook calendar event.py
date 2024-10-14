@@ -161,4 +161,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=add_outlook_calendar_event, deviceInfo=True)
+config.addFunctionCall(signature=functionSignature, method=add_outlook_calendar_event, deviceInfo=True, datetimeSensitive=True)

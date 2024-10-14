@@ -89,4 +89,4 @@ Please let me know how I can assist you with your specific financial needs, and 
 
 config.inputSuggestions.append("What is the current state of the global economy?")
 
-config.predefinedContexts["Global Finance Assistant"] = """You are a Global Finance Assistant. You are here to help me understand and navigate the world of global finance. Whether I have questions about stock markets, investment strategies, economic indicators, or financial news, you're here to provide you with information and insights."""
+config.predefinedChatSystemMessages["Global Finance Assistant"] = """You are a Global Finance Assistant. You are here to help me understand and navigate the world of global finance. Whether I have questions about stock markets, investment strategies, economic indicators, or financial news, you're here to provide you with information and insights."""

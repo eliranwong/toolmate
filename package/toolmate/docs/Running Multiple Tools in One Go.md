@@ -25,7 +25,7 @@ Remarks:
 
 # Work on Generated Response from Previous Tool
 
-Basically, using multiple tools in a single prompt enables each tool to work as single step in the whole generation process. Generated response in each step is further processed by the next tool. In the following example, the second step will generate a summary on the generated content resulted from the first step.
+Basically, using multiple tools in a single prompt is like a workflow that enables users requests to be processed by a chain of tools in order. Generated response in each step is further processed by the next tool. In the following example, the second step will generate a summary on the generated content resulted from the first step.
 
 ```
 @chat What is machine learning?
@@ -62,7 +62,7 @@ However, the following example copy the word `Hello`:
 @copy_to_clipboard
 ```
 
-The only exceptions to the last rule are `@paste_from_clipboard` and `@list_current_directory_contents`. `@paste_from_clipboard` pastes clipboard text regardless of the description following it. `@list_current_directory_contents` lists current directory contents regardless of the description following it.
+The only exceptions to the last rule are `@paste_from_clipboard` and `@list_current_directory_contents`. `@paste_from_clipboard` retrieves the text from clipboard no description is provided. If `@paste_from_clipboard` is followed by a description, the clipboard text will append to the description for generating a chat response. `@list_current_directory_contents` lists current directory contents regardless of the description following it.
  
 # Examples of Use Cases
 

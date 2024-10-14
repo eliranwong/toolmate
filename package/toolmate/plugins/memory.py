@@ -126,5 +126,5 @@ if not config.isTermux:
     }
 
     config.inputSuggestions += ["Remember, ", "Do you remember?"]
-    config.addFunctionCall(signature=functionSignature1, method=save_memory)
-    config.addFunctionCall(signature=functionSignature2, method=search_memory)
+    config.addFunctionCall(signature=functionSignature1, method=save_memory, datetimeSensitive=True)
+    config.addFunctionCall(signature=functionSignature2, method=search_memory, datetimeSensitive=True)

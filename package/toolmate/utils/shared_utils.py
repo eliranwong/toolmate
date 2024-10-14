@@ -1005,7 +1005,10 @@ def toChatml(messages: dict=[], use_system_message=True) -> str:
 def useChatSystemMessage(messages: dict) -> dict:
     for i in messages:
         if i.get("role", "") == "system":
-            if config.llmInterface == "ollama":
+            if config.tempChatSystemMessage:
+                i["content"] = config.tempChatSystemMessage
+                config.tempChatSystemMessage = ""
+            elif config.llmInterface == "ollama":
                 i["content"] = config.systemMessage_ollama
             elif config.llmInterface == "groq":
                 i["content"] = config.systemMessage_groq
@@ -1382,8 +1385,8 @@ City: {g.city}"""
 # token limit
 # reference: https://platform.openai.com/docs/models/gpt-4
 tokenLimits = {
-    "o1-preview": 128000,
-    "o1-mini": 128000,
+    #"o1-preview": 128000,
+    #"o1-mini": 128000,
     "gpt-4o": 128000,
     "gpt-4o-mini": 128000,
     "gpt-4-turbo": 128000, # Returns a maximum of 4,096 output tokens.

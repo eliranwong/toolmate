@@ -8,7 +8,7 @@ Create maps
 
 from toolmate import config, print3
 from toolmate.utils.python_utils import PythonUtil
-import re, os
+import re, os, shutil
 
 def create_map(function_args):
     code = function_args.get("code") # required
@@ -17,8 +17,10 @@ def create_map(function_args):
     match = re.search(htmlPattern, code)
     if match:
         htmlFile = match.group(1)
-        os.system(f"{config.open} {htmlFile}")
-        print3(f"Saved: {htmlFile}")
+        if shutil.which(config.open):
+            os.system(f"{config.open} {htmlFile}")
+        config.toolTextOutput = f"Saved: {htmlFile}"
+        print3(config.toolTextOutput)
         return ""
     elif information:
         return information

@@ -15,7 +15,8 @@ if isCommandInstalled(config.fabricPath) or os.path.isfile(config.fabricPath):
     config.aliases["@fabric "] = f"@command {config.fabricPath} "
     config.aliases["@append_fabric "] = f"@append_command {config.fabricPath} "
     # add input suggestions
-    patterns = subprocess.run("fabric -l", shell=True, capture_output=True, text=True).stdout.split("\n\t")[1:]
+    patternsOutput = subprocess.run("fabric -l", shell=True, capture_output=True, text=True).stdout
+    patterns = patternsOutput.split("\n\t")[1:] if "\n\tai" in patternsOutput else patternsOutput.split("\n")
     patterns = {f"{i} ": None for i in patterns}
     config.inputSuggestions += [{"@fabric_pattern": patterns}, {"@append_fabric_pattern": patterns}]
     patterns = {"-p": patterns}

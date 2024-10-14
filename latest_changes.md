@@ -1,3 +1,13 @@
+# 0.4.08
+
+* tweaked plugin `fabric`
+
+* updated help store
+
+# 0.4.07
+
+* minor tweaks for Android
+
 # 0.4.06
 
 * added two tools `@ask_o1` and `@ask_o1_mini` to use reasoning model o1-preview and o1-mini

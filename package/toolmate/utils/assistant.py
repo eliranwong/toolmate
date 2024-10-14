@@ -2197,7 +2197,8 @@ class ToolMate:
                     with open(filePath, "w", encoding="utf-8") as fileObj:
                         fileObj.write(pprint.pformat(messages))
                         print3(f"Conversation saved: {filePath}")
-                    os.system(f"{config.open} {filePath}")
+                    if shutil.which(config.open):
+                        os.system(f"{config.open} {filePath}")
             except:
                 print2("Failed to save the conversation!\n")
                 showErrors()
@@ -2284,8 +2285,9 @@ class ToolMate:
                                     return None
                             with open(filePath, "w", encoding="utf-8") as fileObj:
                                 fileObj.write(plainText)
-                            os.system(f"{config.open} {filePath}")
-                            print2("File saved!")
+                            if shutil.which(config.open):
+                                os.system(f"{config.open} {filePath}")
+                            print3(f"Exported: {filePath}")
                     except:
                         print2("Failed to save the conversation!\n")
                         showErrors()
@@ -2979,7 +2981,7 @@ Acess the risk level of the following `{target.capitalize()}`:
 
             # open file / directory directly
             docs_path = isExistingPath(userInput)
-            if os.path.isfile(docs_path):
+            if os.path.isfile(docs_path) and shutil.which(config.open):
                 os.system(f"{config.open} {docs_path}")
                 continue
             elif os.path.isdir(docs_path):

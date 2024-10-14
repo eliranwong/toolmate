@@ -9,7 +9,7 @@ generate images with model "dall-e-3"
 if not config.isTermux:
 
     from toolmate import config, print2, print3, getCurrentDateTime, getCliOutput, getCpuThreads, downloadStableDiffusionFiles
-    import os
+    import os, shutil
     from base64 import b64decode
     from toolmate.utils.call_chatgpt import check_openai_errors
     from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
@@ -28,11 +28,11 @@ if not config.isTermux:
         def openImageFile(imageFile):
             if config.terminalEnableTermuxAPI:
                 getCliOutput(f"termux-share {imageFile}")
-            else:
+            elif shutil.which(config.open):
                 cli = f"{config.open} {imageFile}"
                 #os.system(cli)
                 subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            message = f"Saved image: {imageFile}"
+            message = f"Image saved: {imageFile}"
             config.toolTextOutput = message
             print3(message)
 

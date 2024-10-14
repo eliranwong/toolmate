@@ -7,7 +7,7 @@ edit text files
 """
 
 from toolmate import config, isCommandInstalled
-import os, re, sys
+import os, re, sys, shutil
 
 # persistent
 # users can customise 'textEditor' and 'textFileExtensions' in config.py
@@ -26,7 +26,7 @@ def edit_text(function_args):
     customTextEditor = config.customTextEditor if config.customTextEditor else f"{sys.executable} {os.path.join(config.toolMateAIFolder, 'eTextEdit.py')}"
     filename = function_args.get("filename") # required
     # in case folder name is mistaken
-    if os.path.isdir(filename):
+    if os.path.isdir(filename) and shutil.which(config.open):
         os.system(f"""{config.open} {filename}""")
         return ""
     else:

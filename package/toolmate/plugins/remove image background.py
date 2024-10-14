@@ -12,7 +12,7 @@ if not config.isTermux:
     from toolmate import config, is_valid_image_file
     from toolmate import print2, print3
     from toolmate.utils.python_utils import PythonUtil
-    import os, json, rembg
+    import os, json, rembg, shutil
 
 
     def remove_image_background(function_args):
@@ -51,11 +51,13 @@ if not config.isTermux:
         if information:
             filepath = json.loads(information)["information"]
             if os.path.isfile(filepath):
-                print3(f"File saved: {filepath}")
-                try:
-                    os.system(f'''{config.open} "{filepath}"''')
-                except:
-                    pass
+                if shutil.which(config.open):
+                    try:
+                        os.system(f'''{config.open} "{filepath}"''')
+                    except:
+                        pass
+                config.toolTextOutput = f"Image saved: {filepath}"
+                print3(config.toolTextOutput)
         return ""
 
     functionSignature = {

@@ -9,7 +9,7 @@ ToolMate AI Plugin - download youtube or web content
 """
 
 from toolmate import config, showErrors, isCommandInstalled, print1, print3, is_valid_url, downloadWebContent
-import re, subprocess, os
+import re, subprocess, os, shutil
 from pathlib import Path
 
 
@@ -33,10 +33,11 @@ def download_youtube_audio(function_args):
                 if isCommandInstalled("pkill"):
                     os.system("pkill yt-dlp")
                 print3(f"Downloaded in: '{outputFolder}'")
-                try:
-                    os.system(f'''{config.open} {outputFolder}''')
-                except:
-                    pass
+                if shutil.which(config.open):
+                    try:
+                        os.system(f'''{config.open} {outputFolder}''')
+                    except:
+                        pass
             except:
                 showErrors() 
         else:

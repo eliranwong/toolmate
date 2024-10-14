@@ -156,8 +156,9 @@ class TTSUtil:
                 sounddevice.play(*soundfile.read(audioFile)) 
                 sounddevice.wait()
         except:
-            command = f"{config.open} {audioFile}"
-            subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+            if shutil.which(config.open):
+                command = f"{config.open} {audioFile}"
+                subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 
     @staticmethod
     def playAudioFilePygame(audioFile):

@@ -8,7 +8,7 @@ Create qr code image
 
 from toolmate import config
 from toolmate import print3
-import os, qrcode
+import os, qrcode, shutil
 
 def create_qrcode(function_args):
     url = function_args.get("url", "") # required
@@ -23,11 +23,13 @@ def create_qrcode(function_args):
     img.save(filepath)
     
     if os.path.isfile(filepath):
-        print3(f"File saved: {filepath}")
-        try:
-            os.system(f'''{config.open} "{filepath}"''')
-        except:
-            pass
+        if shutil.which(config.open):
+            try:
+                os.system(f'''{config.open} "{filepath}"''')
+            except:
+                pass
+        config.toolTextOutput = f"File saved: {filepath}"
+        print3(config.toolTextOutput)
     return ""
 
 functionSignature = {

@@ -10,7 +10,7 @@ modify the given images according to changes specified by users
 if not config.isTermux:
 
     from toolmate import config, is_valid_image_file, is_valid_image_url, print1, print3, startLlamacppVisionServer, stopLlamacppVisionServer, print2, encode_image, getCliOutput, getCpuThreads, runToolMateCommand, getLlamacppServerClient, downloadStableDiffusionFiles
-    import os
+    import os, shutil
     from openai import OpenAI
     from toolmate.utils.call_chatgpt import check_openai_errors
     from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
@@ -44,14 +44,13 @@ if not config.isTermux:
                 files.remove(item)
 
         def openImageFile(imageFile):
-            print3(f"Saved image: {imageFile}")
             if config.terminalEnableTermuxAPI:
                 getCliOutput(f"termux-share {imageFile}")
-            else:
+            elif shutil.which(config.open):
                 cli = f"{config.open} {imageFile}"
                 #os.system(cli)
                 subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            message = f"Saved image: {imageFile}"
+            message = f"Image saved: {imageFile}"
             config.toolTextOutput = message
             print3(message)
 
@@ -213,10 +212,11 @@ Make the following changes:
         config.stopSpinning()
         if config.terminalEnableTermuxAPI:
             getCliOutput(f"termux-share {imageFile}")
-        else:
+        elif shutil.which(config.open):
             os.system(f"{config.open} {imageFile}")
-
         config.stopSpinning()
+        config.toolTextOutput = f"Image saved: {imageFile}"
+        print3(config.toolTextOutput)
         return ""
 
     functionSignature = {

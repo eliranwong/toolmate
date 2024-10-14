@@ -10,7 +10,7 @@ generate images with model "Flux.1"
 if not config.isTermux:
 
     from toolmate import config, print2, print3, getCurrentDateTime, getCliOutput, getCpuThreads
-    import os
+    import os, shutil
     from pathlib import Path
     from stable_diffusion_cpp import StableDiffusion
     from toolmate.utils.single_prompt import SinglePrompt
@@ -82,11 +82,11 @@ if not config.isTermux:
         def openImageFile(imageFile):
             if config.terminalEnableTermuxAPI:
                 getCliOutput(f"termux-share {imageFile}")
-            else:
+            elif shutil.which(config.open):
                 cli = f"{config.open} {imageFile}"
                 #os.system(cli)
                 subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            message = f"Saved image: {imageFile}"
+            message = f"Image saved: {imageFile}"
             config.toolTextOutput = message
             print3(message)
 

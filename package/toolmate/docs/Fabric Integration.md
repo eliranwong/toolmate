@@ -8,6 +8,12 @@ Enter `@fabric` or `@append_fabric`, followed by fabric parameters
 
 `@append_fabric` Append assistant previous response to the given fabric command and execute.
 
+# Requirement
+
+Install `fabric` separately, read https://github.com/danielmiessler/fabric
+
+Set up `fabric` by running `fabric --setup` in terminal.  This step crucial to enable ToolMate AI to retrieve available `fabric` patterns. If you have `fabric` installed without setting it up, you may experience an issue when you start up ToolMate AI.
+
 # How to use `fabric` with other ToolMate AI tools?
 
 Assuming `fabric` is installed and the ToolMate AI tool plugin `fabric` is enabled, you may run something like:

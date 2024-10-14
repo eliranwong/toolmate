@@ -9,7 +9,7 @@ generate images with model "Google Imagen 3"
 if not config.isTermux:
 
   from toolmate import config, print3, getCurrentDateTime
-  import os, subprocess
+  import os, subprocess, shutil
   from pathlib import Path
 
   import vertexai
@@ -20,7 +20,7 @@ if not config.isTermux:
       def openImageFile(imageFile):
           if config.terminalEnableTermuxAPI:
               getCliOutput(f"termux-share {imageFile}")
-          else:
+          elif shutil.which(config.open):
               cli = f"{config.open} {imageFile}"
               #os.system(cli)
               subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -121,7 +121,7 @@ if not config.isTermux:
       imageFile = os.path.join(folder, f"{getCurrentDateTime()}.png")
       # save image
       image[0].save(imageFile)
-      message = f"Saved image: {imageFile}"
+      message = f"Image saved: {imageFile}"
       config.toolTextOutput = message
       print3(message)
       # open image

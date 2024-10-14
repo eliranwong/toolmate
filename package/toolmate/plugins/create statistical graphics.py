@@ -6,9 +6,9 @@ create statistical graphics to visulize data
 [TOOL_CALL]
 """
 
-from toolmate import config
+from toolmate import config, print3
 from toolmate.utils.python_utils import PythonUtil
-import os, re
+import os, re, shutil
 
 def create_statistical_graphics(function_args):
     config.stopSpinning()
@@ -20,8 +20,13 @@ def create_statistical_graphics(function_args):
     match = re.search(pngPattern, code)
     if match:
         pngFile = match.group(1)
-        os.system(f"{config.open} {pngFile}")
-        return f"Saved as '{pngFile}'"
+        if shutil.which(config.open):
+            os.system(f"{config.open} {pngFile}")
+        config.toolTextOutput = f"Saved: {pngFile}"
+        try:
+            print3(config.toolTextOutput)
+        except:
+            print(config.toolTextOutput)
     elif information:
         return information
     return ""

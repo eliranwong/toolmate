@@ -4,9 +4,9 @@ This page content is generated on 17Sept2024.  For the latest information, simpl
 
 # Available Tools
 
-@add_google_calendar_event @add_outlook_calendar_event @analyze_audio_google @analyze_audio_groq @analyze_audio_openai @analyze_audio_whisper @analyze_files @analyze_images_chatgpt @analyze_images_gemini @analyze_images_groq @analyze_images_llamacpp @analyze_images_ollama @analyze_web_content @append_command @append_fabric @append_instruction @apps @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @ask_perplexica @ask_tavily @build_agents @chat @command @context @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_flux @create_image_imagen3 @create_image_sd @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @edit_text @execute_computing_task @extract_python_code @fabric @files @general @help @images @improve_writing @install_package @it @list_current_directory_contents @load_conversations @lyrics @map @modify_images @music @news @open_browser @packages @paste_from_clipboard @pronunce_words @qna @radio @recommend_tool @reflection @remove_image_background @repos @run_python_code @save_memory @science @scientific_publications @search_conversations @search_finance @search_google @search_memory @search_news @search_searxng @search_sqlite @search_tavily @search_weather_info @send_gmail @send_outlook @send_tweet @social_media @software_wikis @translate @transcribe_audio_google @transcribe_audio_groq @transcribe_audio_openai @transcribe_audio_whisper @videos @web @wikimedia @workflow
+@add_google_calendar_event @add_outlook_calendar_event @analyze_audio_google @analyze_audio_groq @analyze_audio_openai @analyze_audio_whisper @analyze_files @analyze_images_chatgpt @analyze_images_gemini @analyze_images_groq @analyze_images_llamacpp @analyze_images_ollama @analyze_web_content @append_command @append_fabric @append_instruction @apps @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_o1 @ask_o1_mini @ask_ollama @ask_palm2 @ask_perplexica @ask_tavily @bible @build_agents @chat @command @context @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_flux @create_image_imagen3 @create_image_sd @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @edit_text @execute_computing_task @extract_bible_references @extract_python_code @fabric @files @general @help @images @improve_writing @install_package @it @list_current_directory_contents @load_conversations @lyrics @map @modify_images @music @news @open_browser @packages @paste_from_clipboard @qna @radio @read_aloud @recommend_tool @reflection @remove_image_background @repos @run_python_code @save_memory @science @scientific_publications @search_conversations @search_finance @search_google @search_memory @search_news @search_searxng @search_sqlite @search_tavily @search_weather_info @send_gmail @send_outlook @send_tweet @social_media @software_wikis @translate @transcribe_audio_google @transcribe_audio_groq @transcribe_audio_openai @transcribe_audio_whisper @videos @web @wikimedia @workflow
 
-# Latest updates
+# Tips
 
 Enter `@` to get the latest descriptions of all available tools.
 
@@ -15,6 +15,14 @@ Enter `@` to get the latest descriptions of all available tools.
 `@add_google_calendar_event` Add a Google calendar event (Requirements: 'title', 'description', 'start_time', 'end_time')
 
 `@add_outlook_calendar_event` Add an Outlook calendar event (Requirements: 'title', 'description', 'start_time', 'end_time')
+
+`@analyze_audio_google` Retrieve information from an audio with Google (Requirements: 'audio_filepath', 'language')
+
+`@analyze_audio_groq` Retrieve information from an audio with Groq (Requirements: 'audio_filepath')
+
+`@analyze_audio_openai` Retrieve information from an audio with OpenAI (Requirements: 'audio_filepath', 'language')
+
+`@analyze_audio_whisper` Retrieve information from an audio with Whisper (Requirements: 'audio_filepath', 'language')
 
 `@analyze_audio` Transcribe audio into text or retrieve information from an audio (Requirements: 'audio_filepath', 'language')
 
@@ -54,11 +62,17 @@ Enter `@` to get the latest descriptions of all available tools.
 
 `@ask_llamacppserver` Ask Llama.cpp Server to chat or provide information (Requirements: 'query')
 
+`@ask_o1` Ask reasoning model o1 to chat or provide information (Requirements: 'query')
+
+`@ask_o1_mini` Ask reasoning model o1-mini to chat or provide information (Requirements: 'query')
+
 `@ask_ollama` Ask an Ollama model to chat or provide information (Requirements: 'query')
 
 `@ask_palm2` Ask PaLM 2 to chat or provide information (Requirements: 'query')
 
 `@ask_tavily` Ask internet to provide information (Requirements: 'query')
+
+`@bible` Show bible verses content
 
 `@build_agents` build a group of AI assistants or agents to execute a complicated task that other functions cannot resolve (Requirements: 'task', 'title')
 
@@ -102,6 +116,8 @@ Enter `@` to get the latest descriptions of all available tools.
 
 `@execute_computing_task` Execute computing task or gain access to device information (Requirements: 'code', 'title', 'risk')
 
+`@extract_bible_references` Extract Bible references from a block of text
+
 `@extract_python_code` Extract the python code in a given content
 
 `@fabric` Execute a fabric command
@@ -140,11 +156,11 @@ Enter `@` to get the latest descriptions of all available tools.
 
 `@paste_from_clipboard` Retrieve the text content from the system clipboard and paste
 
-`@pronunce_words` Pronounce words or sentences with text-to-speech utility (Requirements: 'words', 'language')
-
 `@qna` Search for information online in the 'questions_and_answers' category.
 
 `@radio` Search for information online in the 'radio' category.
+
+`@read_aloud` Pronounce words or sentences with text-to-speech utility
 
 `@recommend_tool` Recommand an appropriate tool in response to a given request
 
@@ -197,5 +213,13 @@ Enter `@` to get the latest descriptions of all available tools.
 `@web` Search for information online in the 'web' category.
 
 `@wikimedia` Search for information online in the 'wikimedia' category.
+
+`@transcribe_audio_google` Transcribe audio into text with Google (Requirements: 'audio_filepath', 'language')
+
+`@transcribe_audio_groq` Transcribe audio into text with Groq (Requirements: 'audio_filepath')
+
+`@transcribe_audio_openai` Transcribe audio into text with OpenAI (Requirements: 'audio_filepath', 'language')
+
+`@transcribe_audio_whisper` Transcribe audio into text with Whisper (Requirements: 'audio_filepath', 'language')
 
 `@workflow` Execute a workflow

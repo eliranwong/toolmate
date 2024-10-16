@@ -124,11 +124,11 @@ vi /etc/apk/repositories
 4. Press the `ESC` key, to leave the edit mode
 5. Enter `:wq` to save the change and exit the editor
 
-Install Docker:
+Install Docker and common tools:
 
 ```
 apk update
-apk add docker docker-cli docker-compose py3-pip
+apk add docker docker-cli docker-compose py3-pip git wget curl
 ```
 
 Start Docker:

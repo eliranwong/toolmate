@@ -131,6 +131,10 @@ export PATH=$GOPATH/bin:$HOME/.local/bin:$PATH
 fabric --setup
 ```
 
+# Install Docker, SearxNG and Perplexica
+
+
+
 # Install yt-dlp
 
 ```

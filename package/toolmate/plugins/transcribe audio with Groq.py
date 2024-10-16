@@ -7,11 +7,11 @@ analyze audio file with Groq
 """
 
 from toolmate import config, showErrors, getGroqClient
-from toolmate import print3
+from toolmate import print2, print3
 import os, shutil, subprocess
 
 # Function method
-def analyze_audio_groq(function_args):
+def transcribe_audio_groq(function_args):
     from toolmate import config
     def check_file_format(file_path):
         # List of allowed file extensions
@@ -50,7 +50,10 @@ def analyze_audio_groq(function_args):
                     #language="en",  # Optional
                     temperature=0.0  # Optional
                 )
-                return transcription.text
+                config.toolTextOutput = transcription.text
+                print2("```transcript")
+                print1(config.toolTextOutput)
+                print2("```")
         except:
             showErrors()
         return ""
@@ -60,10 +63,10 @@ def analyze_audio_groq(function_args):
 # Function Signature
 functionSignature = {
     "examples": [
-        "analyze speech",
+        "Transcribe audio",
     ],
-    "name": "analyze_audio_groq",
-    "description": f'''Retrieve information from an audio with Groq''',
+    "name": "transcribe_audio_groq",
+    "description": f'''Transcribe audio into text with Groq''',
     "parameters": {
         "type": "object",
         "properties": {
@@ -77,4 +80,4 @@ functionSignature = {
 }
 
 # Integrate the signature and method into LetMeDoIt AI
-config.addFunctionCall(signature=functionSignature, method=analyze_audio_groq)
+config.addFunctionCall(signature=functionSignature, method=transcribe_audio_groq)

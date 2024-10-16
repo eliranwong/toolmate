@@ -1,3 +1,7 @@
+# 0.4.09-0.4.10
+
+* added plugins for audio analysis and transcription
+
 # 0.4.08
 
 * tweaked plugin `fabric`

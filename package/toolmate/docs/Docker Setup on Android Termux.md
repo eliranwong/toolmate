@@ -12,13 +12,19 @@ Android web browsers or ToolMate AI tools access the service via forwarded ports
 
 # Preparation 1
 
+Install Termux first!
+
+Read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Termux%20Setup.md
+
+# Preparation 2
+
 Check available free memory on your Android device, by running `free -h`.
 
 ![memory_check](https://github.com/user-attachments/assets/f6364b94-8338-48a3-b216-f2b1f163a29b)
 
 You may consider this piece of information when you assign memory to the virtual machine we are going to build.
 
-# Preparation 2
+# Preparation 3
 
 1. Go to https://www.alpinelinux.org/downloads/
 2. Locate `x86_64` ander the `virtual` session.

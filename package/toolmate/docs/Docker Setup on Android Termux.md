@@ -179,6 +179,10 @@ Test Perplexica with web browser:
 
 Remarks: It takes time the first time for the links to be loaded.  In our testings, Firefox browser loads faster than Chrome browser.
 
+# Integration of SearXNG and Perplexica with ToolMate AI
+
+Read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Perplexica%20and%20SearXNG%20Integration.md
+
 # References
 
 https://github.com/P1N2O/qemu-termux-alpine

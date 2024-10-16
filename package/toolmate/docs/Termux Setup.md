@@ -133,7 +133,7 @@ fabric --setup
 
 # Install Docker, SearxNG and Perplexica
 
-
+https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Docker%20Setup%20on%20Android%20Termux.md
 
 # Install yt-dlp
 

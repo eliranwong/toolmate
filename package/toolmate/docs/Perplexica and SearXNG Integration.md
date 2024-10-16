@@ -2,6 +2,20 @@
 
 Perplexica and SearXNG are both helpful for researching latest information.
 
+# Install SearXNG and Perplexica
+
+Installing Perplexica comes with installation of SearXNG.
+
+```
+cd ~/toolmate
+git clone https://github.com/ItzCrazyKns/Perplexica
+cd Perplexica
+cp sample.config.toml config.toml
+docker compose up -d
+```
+
+To install on Android, read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Docker%20Setup%20on%20Android%20Termux.md
+
 # Perplexica Setup
 
 Users can quickly launch Perplexica via ToolMate AI system tray.
@@ -15,6 +29,10 @@ Windows / macOS users need to set up manually. Read: https://github.com/ItzCrazy
 Default location of Perplexica is set to: ~/toolmate/Perplexica
 
 You can customise Perplexica location by modifying item 'perplexica_directory' in config.py.
+
+Forthcoming:
+
+In addition, we are adding a plugin to integrate Perplexica searches directly into ToolMate AI without a browser.  We will update this page soon.
 
 # SearXNG Setup
 

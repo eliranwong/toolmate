@@ -1,3 +1,7 @@
+# 0.4.11
+
+* added tool `@ask_perplexica`
+
 # 0.4.09-0.4.10
 
 * added plugins for audio analysis and transcription

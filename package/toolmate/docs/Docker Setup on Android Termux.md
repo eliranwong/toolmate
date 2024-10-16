@@ -179,9 +179,13 @@ Test SearXNG with web browser:
 
 > http://localhost:4000
 
+![Screenshot_20241016-004429](https://github.com/user-attachments/assets/ad08f570-9004-4561-9d56-59ca555e3518)
+
 Test Perplexica with web browser:
 
 > http://localhost:3000
+
+![Screenshot_20241016-004411](https://github.com/user-attachments/assets/302401c5-1eac-4285-991f-ae97eae239bd)
 
 Remarks: It takes time the first time for the links to be loaded.  In our testings, Firefox browser loads faster than Chrome browser.
 

@@ -18,7 +18,11 @@ To install on Android, read https://github.com/eliranwong/toolmate/blob/main/pac
 
 # Perplexica Setup
 
-Users can quickly launch Perplexica via ToolMate AI system tray.
+Tool `@ask_perplexica` is bult to integrate Perplexica capabilities with other ToolMate AI tools.  Simply ask a question following `@ask_perplexica` like the screenshot below.  You can make it more powerful, by [using it together with other tools in a ToolMate AI workflow](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md).
+
+![ask_perplexica](https://github.com/user-attachments/assets/95e60cfc-5649-42ae-afe1-665d9211ddc2)
+
+In addition, users can quickly launch Perplexica web interface via ToolMate AI system tray.
 
 <img width="313" alt="Perplexica" src="https://github.com/eliranwong/toolmate/assets/25262722/bb1651f4-0321-4f9a-9e4a-c2f113021736">
 
@@ -29,10 +33,6 @@ Windows / macOS users need to set up manually. Read: https://github.com/ItzCrazy
 Default location of Perplexica is set to: ~/toolmate/Perplexica
 
 You can customise Perplexica location by modifying item 'perplexica_directory' in config.py.
-
-Forthcoming:
-
-In addition, we are adding a plugin to integrate Perplexica searches directly into ToolMate AI without a browser.  We will update this page soon.
 
 # SearXNG Setup
 

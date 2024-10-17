@@ -68,7 +68,7 @@ Read more at https://wiki.termux.com/wiki/Sharing_Data
 
 # Install Basic Packages
 
-> pkg install python git binutils libjpeg-turbo libpng build-essential clang make pkg-config curl wget lynx w3m elinks vlc xclip xsel vim libxml2 libxslt python-apsw which libzmq libsodium libgmp libmpc libmpfr python-lxml
+> pkg install python git binutils libjpeg-turbo libpng build-essential clang make pkg-config curl wget lynx w3m elinks vlc xclip xsel vim libxml2 libxslt python-apsw which libzmq libsodium libgmp libmpc libmpfr python-lxml which micro nano
 
 Please note that we install the official python-apsw package created by Termux team, rather than using pip3, in order to work with regular expression searches.  For details, read https://github.com/termux/termux-packages/issues/12340
 
@@ -210,7 +210,7 @@ Inside the `ubuntu`, run:
 cd
 apt update && apt full-upgrade
 apt install -y python3
-apt install -y python3-setuptools python3-pip python3-dev python3-venv portaudio19-dev ffmpeg wget curl git wget nano micro sqlite3 libsqlite3-dev
+apt install -y python3-setuptools python3-pip python3-dev python3-venv portaudio19-dev ffmpeg wget curl git wget nano micro sqlite3 libsqlite3-dev net-tools
 apt install libxcb-cursor0 pulseaudio-utils alsa-base alsa-utils mpg123 espeak
 echo 'export PULSE_SERVER=127.0.0.1' >> ~/.bashrc
 source ~/.bashrc

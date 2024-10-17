@@ -1,6 +1,6 @@
 from toolmate import config
 from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
-import sys, os, html, geocoder, platform, socket, geocoder, datetime, requests, netifaces, getpass, pkg_resources, webbrowser, unicodedata
+import sys, os, html, geocoder, platform, socket, geocoder, datetime, requests, getpass, pkg_resources, webbrowser, unicodedata
 import traceback, uuid, re, textwrap, signal, wcwidth, shutil, threading, time, subprocess, json, base64, html2text, pydoc, codecs, psutil
 from packaging import version
 import pygments
@@ -1243,7 +1243,9 @@ def get_wan_ip():
     except:
         return ""
 
-def get_local_ip():
+"""
+import netifaces
+def get_local_ip_old(): # It does not work in some cases
     interfaces = netifaces.interfaces()
     for interface in interfaces:
         addresses = netifaces.ifaddresses(interface)
@@ -1251,7 +1253,27 @@ def get_local_ip():
             for address in addresses[netifaces.AF_INET]:
                 ip = address['addr']
                 if ip != '127.0.0.1':
-                    return ip
+                    return ip"""
+
+def get_local_ip():
+  """
+  Gets the local IP address of the machine.
+
+  Returns:
+    str: The local IP address.
+  """
+  try:
+    # Create a socket object
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # Connect to a known external server (e.g., Google's DNS server)
+    s.connect(("8.8.8.8", 80))
+    # Get the local IP address assigned to the socket
+    ip_address = s.getsockname()[0]
+    s.close()
+    return ip_address
+  except Exception as e:
+    print(f"Error getting local IP address: {e}")
+    return None
 
 def runSystemCommand(command):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)

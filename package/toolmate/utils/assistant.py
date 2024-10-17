@@ -179,6 +179,7 @@ class ToolMate:
             # tweak searches
             ".maxmemorymatches": ("change maximum memory matches", self.setMemoryClosestMatches),
             ".maxchatrecordmatches": ("change maximum chat record matches", self.setChatRecordClosestMatches),
+            ".maxonlinesearches": ("change maximum online search results", self.setMaximumInternetSearchResults),
             # tweak input information
             #".ipinfo": ("change ip information integration", self.setIncludeIpInSystemMessage),
             #".latestSearches": ("change online searches", self.setLatestSearches),
@@ -220,6 +221,8 @@ class ToolMate:
         for key, value in self.actions.items():
             config.actionHelp += f"{key}: {value[0]}\n"
         config.actionHelp += "\n"
+        # action keys
+        config.actionKeys = list(self.actions.keys()) + ["..."]
 
     # Speech-to-Text Language
     def setSpeechToTextLanguage(self):
@@ -1660,6 +1663,15 @@ class ToolMate:
                 config.saveConfig()
                 print3(f"Custom text editor: {config.customTextEditor}")
 
+    def setMaximumInternetSearchResults(self):
+        print1("Please specify the maximum number of search results to be retrieved from the internet:")
+        print1("(This value is applied in plugins `search google`, `search google news` and `search searxng`.)")
+        maximumInternetSearchResults = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.maximumInternetSearchResults))
+        if maximumInternetSearchResults and not maximumInternetSearchResults.strip().lower() == config.exit_entry and int(maximumInternetSearchResults) >= 0:
+            config.maximumInternetSearchResults = int(maximumInternetSearchResults)
+            config.saveConfig()
+            print3(f"Maximum number of online search results: {config.maximumInternetSearchResults}")
+
     def setChatRecordClosestMatches(self):
         print1("Please specify the number of closest matches in each memory retrieval:")
         chatRecordClosestMatches = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.chatRecordClosestMatches))
@@ -2900,28 +2912,6 @@ Acess the risk level of the following `{target.capitalize()}`:
             return (storagedirectory, messages)
         storagedirectory, config.currentMessages = startChat()
         config.multilineInput = False
-        featuresLower = list(self.actions.keys()) + ["..."]
-        # input suggestions
-        nestedSuggestions = {i: None for i in featuresLower}
-        nestedSuggestions["@chat"] = {f"`{i}` ":None for i in config.predefinedChatSystemMessages}
-        for i in config.predefinedContexts:
-            if not i.startswith("["):
-                nestedSuggestions["@chat"][f"`{i}` "] = None
-        for i in config.inputSuggestions:
-            if isinstance(i, str):
-                nestedSuggestions[i] = None
-            elif isinstance(i, dict):
-                for iKey, iValue in i.items():
-                    nestedSuggestions[iKey] = iValue
-        nestedSuggestions = dict(sorted(nestedSuggestions.items()))
-        # add config items in developer mode
-        nestedSuggestions_developer = copy.deepcopy(nestedSuggestions)
-        for i in dir(config):
-            if not i.startswith("__"):
-                nestedSuggestions_developer[f"config.{i}"] = None
-        # completer
-        completer = FuzzyCompleter(ThreadedCompleter(NestedCompleter.from_nested_dict(nestedSuggestions)))
-        completer_developer = FuzzyCompleter(ThreadedCompleter(NestedCompleter.from_nested_dict(nestedSuggestions_developer)))
         while True:
             # default toolbar text
             config.dynamicToolBarText = f""" {str(config.hotkey_exit).replace("'", "")} exit {str(config.hotkey_display_key_combo).replace("'", "")} shortcuts """
@@ -2943,7 +2933,7 @@ Acess the risk level of the following `{target.capitalize()}`:
             config.defaultEntry = ""
 
             # user input
-            userInput = self.prompts.simplePrompt(promptSession=self.terminal_chat_session, completer=completer_developer if config.developer else completer, default=defaultEntry, accept_default=accept_default, validator=tokenValidator, bottom_toolbar=getDynamicToolBar)
+            userInput = self.prompts.simplePrompt(promptSession=self.terminal_chat_session, completer=config.completer_developer if config.developer else config.completer_user, default=defaultEntry, accept_default=accept_default, validator=tokenValidator, bottom_toolbar=getDynamicToolBar)
             
             # update system message when user enter a new input
             config.currentMessages = self.updateSystemMessage(config.currentMessages)
@@ -3054,7 +3044,7 @@ Acess the risk level of the following `{target.capitalize()}`:
                         config.currentMessages = currentMessages
                 except:
                     print2(f"Invalid file path of format!")
-            elif userInput and not userInputLower in featuresLower:
+            elif userInput and not userInputLower in config.actionKeys:
 
                 # tweak for `Let me Translate`
                 if config.predefinedContext == "Let me Translate" and userInput.startswith("@chat Assist me by acting as a translator.\nPlease translate"):

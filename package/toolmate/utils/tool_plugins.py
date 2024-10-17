@@ -1,6 +1,7 @@
 from toolmate import config, get_or_create_collection, add_vector, getFilenamesWithoutExtension, execPythonFile
 from toolmate import print2, print3
 from pathlib import Path
+from prompt_toolkit.completion import FuzzyCompleter, NestedCompleter, ThreadedCompleter
 import os, shutil, json, copy
 from typing import Callable
 if not config.isTermux:
@@ -92,6 +93,8 @@ class Plugins:
         toolNames = "|".join(config.toolFunctionMethods.keys())
         config.toolPattern = f"""@({"|".join(config.builtinTools.keys())}|{toolNames})[ \n]"""
         config.allEnabledTools = list(config.builtinTools.keys())[1:] + list(config.toolFunctionMethods.keys()) # exclude the tool `recommend_tool`
+        # input suggestions
+        Plugins.buildInputSuggestions()
 
     # integrate function call plugin
     @staticmethod
@@ -111,6 +114,30 @@ class Plugins:
                     callEntry = f"@{name} "
                     if not callEntry in config.inputSuggestions:
                         config.inputSuggestions.append(callEntry)
+
+    # input suggestions
+    @staticmethod
+    def buildInputSuggestions():
+        nestedSuggestions = {i: None for i in config.actionKeys}
+        nestedSuggestions["@chat"] = {f"`{i}` ":None for i in config.predefinedChatSystemMessages}
+        for i in config.predefinedContexts:
+            if not i.startswith("["):
+                nestedSuggestions["@chat"][f"`{i}` "] = None
+        for i in config.inputSuggestions:
+            if isinstance(i, str):
+                nestedSuggestions[i] = None
+            elif isinstance(i, dict):
+                for iKey, iValue in i.items():
+                    nestedSuggestions[iKey] = iValue
+        nestedSuggestions = dict(sorted(nestedSuggestions.items()))
+        # add config items in developer mode
+        nestedSuggestions_developer = copy.deepcopy(nestedSuggestions)
+        for i in dir(config):
+            if not i.startswith("__"):
+                nestedSuggestions_developer[f"config.{i}"] = None
+        # completer
+        config.completer_user = FuzzyCompleter(ThreadedCompleter(NestedCompleter.from_nested_dict(nestedSuggestions)))
+        config.completer_developer = FuzzyCompleter(ThreadedCompleter(NestedCompleter.from_nested_dict(nestedSuggestions_developer)))
 
     # display available tools
     @staticmethod

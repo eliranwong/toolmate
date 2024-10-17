@@ -12,7 +12,7 @@ You can manually edit config.py to customise these settings.
 [TOOL_CALL]
 """
 
-from toolmate import config, isServerAlive, print1, print2, plainTextToUrl
+from toolmate import config, isServerAlive, print1, print2, plainTextToUrl, get_local_ip
 import requests, json, re, copy
 
 persistentConfigs = (
@@ -23,6 +23,9 @@ persistentConfigs = (
 config.setConfig(persistentConfigs)
 if config.perplexica_server == "localhost":
     config.perplexica_server = "http://localhost"
+
+if not isServerAlive(re.sub("http://|https://", "", config.perplexica_server), config.perplexica_backend_port):
+    config.perplexica_server = f"http://{get_local_ip()}" # access to the server running outside a container
 
 if isServerAlive(re.sub("http://|https://", "", config.perplexica_server), config.perplexica_backend_port):
 

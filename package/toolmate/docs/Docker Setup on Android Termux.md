@@ -85,13 +85,15 @@ For most steps in the setup, you may simply press `enter` to use default value, 
 
 ![ntp_client](https://github.com/user-attachments/assets/a86ef5db-ca4d-42b1-9689-c8a441d5c421)
 
-3. Enter `sda` to question `Which disk(s) would you like to use?`
+3. Enter `yes` to question `Allow root ssh login?`
 
-4. Enter `sys` to question `How would you like to use it?`
+4. Enter `sda` to question `Which disk(s) would you like to use?`
+
+5. Enter `sys` to question `How would you like to use it?`
 
 ![alpine_setup_last_steps](https://github.com/user-attachments/assets/6bb78271-863e-456b-aec9-d9f703752a41)
 
-5. At the end, enter `y` to question `Erase the above disk(s) and continue?`
+6. At the end, enter `y` to question `Erase the above disk(s) and continue?`
 
 ```
 poweroff
@@ -192,6 +194,41 @@ Remarks: It takes time the first time for the links to be loaded.  In our testin
 # Integration of SearXNG and Perplexica with ToolMate AI
 
 Read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Perplexica%20and%20SearXNG%20Integration.md
+
+# How to shutdown the virtual machine?
+
+Run in virtual machine:
+
+```
+poweroff
+exit
+```
+
+# How to restart the virtual machine?
+
+Run in Termux:
+
+```
+qemu-system-x86_64 -m 512 -netdev user,id=n1,hostfwd=tcp::2222-:22,hostfwd=tcp::4000-:4000,hostfwd=tcp::3000-:3000,hostfwd=tcp::3001-:3001 -device virtio-net,netdev=n1 -nographic alpine.qcow2
+```
+
+# How to start docker or perplexica after the virtual machine is launched?
+
+Run in virtual machine:
+
+```
+service docker start
+```
+
+You just need to set up Perplexica once.  When you run `service docker start`, it runs the Perplexica and SearXNG service too.
+
+# How to run ToolMate AI while the virtual machine is running?
+
+Long press the left edge of the Termux app and drag gently to the right, then you will see the panel where you can add a `NEW SESSION`.
+
+Launch a `NEW SESSION` in which you may run ToolMate AI.
+
+![new_session](https://github.com/user-attachments/assets/3cc9f388-e878-45a6-9ba7-a846fa092c5d)
 
 # References
 

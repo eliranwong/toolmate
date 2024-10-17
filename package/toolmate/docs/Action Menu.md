@@ -39,6 +39,7 @@ Press 'ctrl+k' and scroll to the bottom for a full list of quick actions, e.g.:
 .maxtokens: change maximum output tokens
 .maxmemorymatches: change maximum memory matches
 .maxchatrecordmatches: change maximum chat record matches
+.maxonlinesearches: change maximum online search results
 .ipinfo: change ip information integration
 .latestSearches: change online searches
 .codedisplay: change code display

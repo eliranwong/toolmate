@@ -1,3 +1,17 @@
+# 0.4.13
+
+* updated plugin `search searxng`, so that it works on both full version and lighter Android version.
+
+* added item `.maxonlinesearches` to action menu, for users to customise the maximum number of online search results to be retrieved.
+
+# 0.4.13
+
+* update input suggestions after changes made to plugin selection
+
+# 0.4.12
+
+* support access to local server installed outside a container running on the same machine.
+
 # 0.4.11
 
 * added tool `@ask_perplexica`

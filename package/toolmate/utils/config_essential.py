@@ -296,6 +296,9 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "completer_user",
+    "completer_developer",
+    "actionKeys",
     "deviceInfoPlugins",
     "datetimeSensitivePlugins",
     "tempChatSystemMessage",

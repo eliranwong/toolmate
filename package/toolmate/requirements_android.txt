@@ -87,7 +87,7 @@ sympy
 prompt_toolkit
 Pygments
 datetime
-netifaces
+#netifaces
 geocoder
 googlesearch-python
 art

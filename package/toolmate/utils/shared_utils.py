@@ -20,13 +20,14 @@ from groq import Groq
 from ollama import Client
 import speech_recognition as sr
 import zipfile
+from openai import OpenAI
+import tiktoken
 if not config.isTermux:
     from llama_cpp import Llama
     from vertexai.generative_models import Content, Part
     from tavily import TavilyClient
     from guidance import select, gen
-    from openai import OpenAI
-    import chromadb, tiktoken, pendulum
+    import chromadb, pendulum
     from chromadb.utils.embedding_functions import OllamaEmbeddingFunction, OpenAIEmbeddingFunction, SentenceTransformerEmbeddingFunction
     from chromadb.config import Settings
     from langchain_ollama import OllamaEmbeddings

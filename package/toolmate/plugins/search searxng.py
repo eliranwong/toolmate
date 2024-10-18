@@ -86,7 +86,6 @@ if isServerAlive(re.sub("http://|https://", "", config.searx_server), config.sea
         if config.searx_categories:
             config.searx_categories = [i[1:] for i in config.searx_categories]
             categories = ",".join(config.searx_categories)
-        # langchain package cannot be installed on Termux without container
         #from langchain_community.utilities import SearxSearchWrapper
         #context = SearxSearchWrapper(searx_host=f"{config.searx_server}:{config.searx_port}").run(query, categories=config.searx_categories if config.searx_categories else None)
         fullUrl = f"{config.searx_server}:{config.searx_port}/search?q={plainTextToUrl(query)}&categories={categories}" if config.searx_categories else f"{config.searx_server}:{config.searx_port}/search?q={plainTextToUrl(query)}"

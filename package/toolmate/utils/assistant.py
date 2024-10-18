@@ -119,7 +119,7 @@ class ToolMate:
         # check availability of api keys
         if not config.groqApi_key:
             self.changeGroqApi()
-        if not config.openaiApiKey and not config.isTermux:
+        if not config.openaiApiKey:
             self.changeChatGPTAPIkey()
         if not config.openweathermapApi:
             self.changeOpenweathermapApi()
@@ -535,8 +535,8 @@ class ToolMate:
 
     def changeAPIkeys(self):
         self.changeGroqApi()
+        self.changeChatGPTAPIkey()
         if not config.isTermux:
-            self.changeChatGPTAPIkey()
             self.setAutoGenBuilderConfig()
         self.changeOpenweathermapApi()
         self.changeElevenlabsApi()
@@ -1115,6 +1115,8 @@ class ToolMate:
         options = {
             "ollama": "Ollama",
             "groq": "Groq Cloud API",
+            "chatgpt": "OpenAI ChatGPT [Paid online service]",
+            "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",
         } if config.isTermux else {
             "llamacpp": "Llama.cpp",
             "llamacppserver": "Llama.cpp server [advanced]",

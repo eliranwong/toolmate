@@ -68,9 +68,13 @@ Read more at https://wiki.termux.com/wiki/Sharing_Data
 
 # Install Basic Packages
 
-> pkg install python git binutils libjpeg-turbo libpng build-essential clang make pkg-config curl wget lynx w3m elinks vlc xclip xsel vim libxml2 libxslt python-apsw which libzmq libsodium libgmp libmpc libmpfr python-lxml which micro nano
+> pkg install python git binutils libjpeg-turbo libpng build-essential clang make pkg-config curl wget lynx w3m elinks vlc xclip xsel vim libxml2 libxslt python-apsw which libzmq libsodium libgmp libmpc libmpfr python-lxml which micro nano rust proot python-torch python-torchaudio python-torchvision
 
-Please note that we install the official python-apsw package created by Termux team, rather than using pip3, in order to work with regular expression searches.  For details, read https://github.com/termux/termux-packages/issues/12340
+Remarks:
+
+1. We install the official python-apsw package created by Termux team, rather than using pip3, in order to work with regular expression searches.  For details, read https://github.com/termux/termux-packages/issues/12340
+
+2. Installation of `rust` is necessary for several python packages to be installed.
 
 Read more at: https://wiki.termux.com/wiki/Python#Python_module_installation_tips_and_tricks
 
@@ -84,17 +88,14 @@ https://wiki.termux.com/wiki/Python
 
 On Termux, do not use pip3 to install matplotlib, we manage to install matplotlib on Termux by running:
 
-> pip3 install 'kiwisolver<1.4.0,>=1.0.1' --force-reinstall
-
-> pip3 install cycler
-
-> pip3 install fonttools
-
-> pip3 install python-dateutil
-
-> pkg install python-numpy
-
-> pkg install matplotlib
+```
+pip3 install 'kiwisolver<1.4.0,>=1.0.1' --force-reinstall
+pip3 install cycler
+pip3 install fonttools
+pip3 install python-dateutil
+pkg install python-numpy
+pkg install matplotlib
+```
 
 # Instal Ollama on Termux
 
@@ -152,6 +153,14 @@ alias mp4='cd /data/data/com.termux/files/home/storage/movies && yt-dlp -f bestv
 
 `toolmate_android` is a light version of `toolmate`, created to work with Termux:API.
 
+Set up a shared folder where you can access content by ToolMate AI, from Termux and Android file manager
+
+```
+cd
+mkdir -p storage/shared/Documents/toolmate
+ln -s storage/shared/Documents/toolmate toolmate
+```
+
 Install ToolMate AI (Android version), by running:
 
 To set up virtual environment (recommended):
@@ -160,7 +169,7 @@ To set up virtual environment (recommended):
 
 > cd ~/apps
 
-> python3 -m venv --system-site-packages toolmate
+> python -m venv --system-site-packages toolmate
 
 > source toolmate/bin/activate
 
@@ -186,14 +195,13 @@ Run in Termux:
 
 ```
 cd
+mkdir -p storage/shared/Documents/toolmate
 pkg update && pkg upgrade && pkg install -y git wget proot
 git clone https://github.com/MFDGaming/ubuntu-in-termux.git
 cd ubuntu-in-termux && chmod +x ubuntu.sh && ./ubuntu.sh -y
 echo 'alias ubuntu='$(pwd)'/startubuntu.sh' >> ~/.bashrc
 echo 'pulseaudio --start --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" --exit-idle-time=-1' >> ~/.bashrc
 source ~/.bashrc
-cd
-mkdir storage/shared/Documents/toolmate
 ```
 
 ## Start Ubuntu in Termux

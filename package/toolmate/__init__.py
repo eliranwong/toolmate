@@ -104,8 +104,8 @@ from toolmate.utils.shortcuts import createShortcuts
 createShortcuts()
 
 # setup optional credentials
+setChatGPTAPIkey()
 if not config.isTermux:
-    setChatGPTAPIkey()
     setGoogleCredentials()
 
 # context

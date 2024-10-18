@@ -10,8 +10,7 @@ from prompt_toolkit.clipboard.pyperclip import PyperclipClipboard
 from toolmate.utils.prompt_shared_key_bindings import prompt_shared_key_bindings
 from toolmate.utils.prompt_multiline_shared_key_bindings import prompt_multiline_shared_key_bindings
 from toolmate.utils.prompt_validator import NumberValidator
-if not config.isTermux:
-    import tiktoken
+import tiktoken
 
 class Prompts:
 

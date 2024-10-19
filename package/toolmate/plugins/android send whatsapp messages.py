@@ -14,6 +14,7 @@ if config.isTermux:
     def send_whatsapp(function_args):
         message = function_args.get("message").replace('"', '\\"') # required
         config.stopSpinning()
+        # e.g. am start -a android.intent.action.VIEW -d "https://api.whatsapp.com/send?phone=+441234567&text=Hello"
         cli = f'''am start -a android.intent.action.VIEW -d "https://api.whatsapp.com/send?text={message}"'''
         subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return ""

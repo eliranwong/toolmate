@@ -2244,7 +2244,7 @@ class ToolMate:
                 print2("Failed to save the conversation!\n")
                 showErrors()
 
-    def exportChat(self, messages, openFile=True):
+    def exportChat(self, messages, filePath=""):
         if config.conversationStarted:
             plainText = ""
             timestamp = getCurrentDateTime()
@@ -2267,44 +2267,44 @@ class ToolMate:
                             plainText += "\n\n"
                         plainText += f"{content}\n\n"
             plainText = plainText.strip()
-            if config.terminalEnableTermuxAPI:
-                pydoc.pipepager(plainText, cmd="termux-share -a send")
-            else:
-
+            if not filePath:
                 filePath = self.getPath.getFilePath(
                     empty_to_cancel=True,
                     list_content_on_directory_change=True,
                     keep_startup_directory=True,
                     message=f"{self.divider}\nEnter a file name or a file path:",
                 )
-                if filePath:
-                    try:
-                        dirname = os.path.dirname(filePath)
-                        if not dirname:
-                            dirname = os.getcwd()
-                        Path(dirname).mkdir(parents=True, exist_ok=True)
-                        if os.path.isdir(dirname):
-                            if os.path.isfile(filePath):
-                                # overwrite existing file?
-                                options = ("yes", "no")
-                                question = "Given file path exists! Would you like to overwrite it?"
-                                print1(question)
-                                overwrite = self.dialogs.getValidOptions(
-                                    options=options,
-                                    title="Overwrite?",
-                                    default="no",
-                                    text=question,
-                                )
-                                if not overwrite == "yes":
-                                    return None
-                            with open(filePath, "w", encoding="utf-8") as fileObj:
-                                fileObj.write(plainText)
-                            if shutil.which(config.open):
-                                os.system(f"{config.open} {filePath}")
-                            print3(f"Exported: {filePath}")
-                    except:
-                        print2("Failed to save the conversation!\n")
-                        showErrors()
+            if filePath:
+                try:
+                    dirname = os.path.dirname(filePath)
+                    if not dirname:
+                        dirname = os.getcwd()
+                    Path(dirname).mkdir(parents=True, exist_ok=True)
+                    if os.path.isdir(dirname):
+                        if os.path.isfile(filePath):
+                            # overwrite existing file?
+                            options = ("yes", "no")
+                            question = "Given file path exists! Would you like to overwrite it?"
+                            print1(question)
+                            overwrite = self.dialogs.getValidOptions(
+                                options=options,
+                                title="Overwrite?",
+                                default="no",
+                                text=question,
+                            )
+                            if not overwrite == "yes":
+                                return None
+                        with open(filePath, "w", encoding="utf-8") as fileObj:
+                            fileObj.write(plainText)
+                        if config.terminalEnableTermuxAPI:
+                            cli = f'''termux-share -a send "{filePath}"'''
+                            subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        elif shutil.which(config.open):
+                            os.system(f"{config.open} {filePath}")
+                        print3(f"Exported: {filePath}")
+                except:
+                    print2("Failed to save the conversation!\n")
+                    showErrors()
 
     def runInstruction(self):
         instructions = list(config.predefinedInstructions.keys())

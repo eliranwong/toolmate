@@ -8,8 +8,9 @@ send email on Android
 
 if config.isTermux:
 
-    from toolmate import config, openURL
+    from toolmate import config
     import urllib.parse
+    import subprocess
 
     def send_email(function_args):
         recipient = function_args.get("email", "") # required

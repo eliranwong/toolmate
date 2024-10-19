@@ -216,6 +216,9 @@ class ToolMate:
             ".help": ("open documentations", lambda: openURL('https://github.com/eliranwong/toolmate/wiki')),
             ".donate": ("donate and support ToolMate AI", lambda: openURL('https://www.paypal.com/paypalme/letmedoitai')),
         }
+        if config.terminalEnableTermuxAPI:
+            self.actions[".timer"] = ("set timer", lambda: subprocess.Popen("am start -a android.intent.action.SET_TIMER", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE))
+            self.actions[".alarm"] = ("set alarm", lambda: subprocess.Popen("am start -a android.intent.action.SET_ALARM", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE))
 
         config.actionHelp = f"# Quick Actions\n(entries that start with '.')\n"
         for key, value in self.actions.items():

@@ -69,7 +69,7 @@ def add_google_calendar_event(function_args):
     title = function_args.get("title") # required
     description = function_args.get("description") # required
     url = function_args.get("url", "") # optional
-    start_time = function_args.get("start_time") # required
+    start_time = function_args.get("start_time", "") # required
     start_time = f"{re.sub('Z$', '', start_time.replace('-', ''))}000000"[:15]
     end_time = function_args.get("end_time", "") # optional
     end_time = f"{re.sub('Z$', '', end_time.replace('-', ''))}000000"[:15]
@@ -157,7 +157,7 @@ functionSignature = {
                 "description": "The location or venue of the event.",
             },
         },
-        "required": ["title", "description", "start_time", "end_time"],
+        "required": ["title", "description"],
     },
 }
 

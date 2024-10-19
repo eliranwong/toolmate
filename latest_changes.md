@@ -1,6 +1,8 @@
-# 0.4.17
+# 0.4.17-0.4.18
 
-* added Android tools `@share_file`, `@send_email`, `@send_whatsapp`
+* added Android tools `@share_file`, `@send_email`, `@send_whatsapp`, `@add_calendar_event`, `@open_browser`
+
+* added Android actions `.timer`, `.alarm`
 
 # 0.4.14-0.4.16
 

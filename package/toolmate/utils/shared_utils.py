@@ -1290,7 +1290,7 @@ def openURL(url):
     if not url.startswith("https://") or not url.startswith("http://"):
         url = f"https://{url}"
     config.stopSpinning()
-    if config.isTermux and config.terminalEnableTermuxAPI:
+    if config.terminalEnableTermuxAPI:
         command = f'''termux-open-url "{url}"'''
         runSystemCommand(command)
     else:

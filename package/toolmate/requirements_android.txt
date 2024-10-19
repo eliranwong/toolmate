@@ -96,7 +96,6 @@ art
 gTTS
 #google-cloud-speech
 #google-cloud-texttospeech
-#pywhatkit
 yt-dlp
 #rembg
 qrcode

@@ -1,3 +1,11 @@
+# 0.4.17
+
+* added Android tools `@share_file`, `@send_email`, `@send_whatsapp`
+
+# 0.4.14-0.4.16
+
+* fixed Dalle tools on running on Android
+
 # 0.4.13
 
 * updated plugin `search searxng`, so that it works on both full version and lighter Android version.

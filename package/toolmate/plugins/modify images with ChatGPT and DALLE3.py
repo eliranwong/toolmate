@@ -96,6 +96,7 @@ def get_description(filename):
 @check_openai_errors
 def create_image(description, original_filename):
     basename = os.path.basename(original_filename)
+    config.stopSpinning()
     title = f"Modifying '{basename}' ..."
     dialogs = TerminalModeDialogs(None)
     # size selection
@@ -107,7 +108,6 @@ def create_image(description, original_filename):
         text="Select size below:"
     )
     if not size:
-        config.stopSpinning()
         return "[INVALID]"
     # quality selection
     options = ("standard", "hd")
@@ -118,7 +118,6 @@ def create_image(description, original_filename):
         text="Select quality below:"
     )
     if not quality:
-        config.stopSpinning()
         return "[INVALID]"
 
     # get responses

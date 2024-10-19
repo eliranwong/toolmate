@@ -36,6 +36,7 @@ def create_image_dalle3(function_args):
     Path(folder).mkdir(parents=True, exist_ok=True)
     imageFile = os.path.join(folder, f"{getCurrentDateTime()}.png")
 
+    config.stopSpinning()
     dialogs = TerminalModeDialogs(None)
     # size selection
     options = ("1024x1024", "1024x1792", "1792x1024")
@@ -46,7 +47,6 @@ def create_image_dalle3(function_args):
         text="Select size below:"
     )
     if not size:
-        config.stopSpinning()
         return "[INVALID]"
 
     # quality selection
@@ -58,7 +58,6 @@ def create_image_dalle3(function_args):
         text="Select quality below:"
     )
     if not quality:
-        config.stopSpinning()
         return "[INVALID]"
 
     # get responses

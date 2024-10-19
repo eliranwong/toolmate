@@ -1,24 +1,21 @@
 """
 ToolMate AI Plugin - send whatsapp messages
 
-send whatsapp messages
+send whatsapp messages on Android
 
 [TOOL_CALL]
 """
 
-if not config.isTermux:
+if config.isTermux:
 
     from toolmate import config
-    import re, pywhatkit
+    import subprocess
 
     def send_whatsapp(function_args):
-        recipient = function_args.get("recipient") # required
-        message = function_args.get("message") # required
+        message = function_args.get("message").replace('"', '\\"') # required
         config.stopSpinning()
-        if re.search(r"^[+\(\)0-9]+?$", recipient):
-            pywhatkit.sendwhatmsg_instantly(recipient, message)
-        else:
-            pywhatkit.sendwhatmsg_to_group_instantly(recipient, message)
+        cli = f'''am start -a android.intent.action.VIEW -d "https://api.whatsapp.com/send?text={message}"'''
+        subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return ""
 
     functionSignature = {
@@ -30,16 +27,12 @@ if not config.isTermux:
         "parameters": {
             "type": "object",
             "properties": {
-                "recipient": {
-                    "type": "string",
-                    "description": "Recipient's phone number or group name. Phone number is preferred. Figure out the group name only if phone number is not provided.",
-                },
                 "message": {
                     "type": "string",
                     "description": "The message that is to be sent to the recipient",
                 },
             },
-            "required": ["recipient", "message"],
+            "required": ["message"],
         },
     }
 

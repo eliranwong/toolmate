@@ -1,5 +1,5 @@
 from toolmate import config, print1, print2, getCliOutput
-if config.terminalEnableTermuxAPI
+if config.terminalEnableTermuxAPI:
     import pydoc
 else:
     import pyperclip
@@ -32,8 +32,7 @@ def paste_from_clipboard(function_args):
     print2("\n```clipboard")
     print1(f"{clipboardText}")
     print2("```")
-    if not content.strip():
-        config.currentMessages[-1]["content"] = "Retrieve and display the contents of the system clipboard."
+    if not content.strip() == "Retrieve the clipboard text":
         config.currentMessages.append({"role": "assistant", "content": clipboardText})
         return ""
     config.currentMessages[-1]["content"] = f"{content}\n\n{clipboardText}"
@@ -49,3 +48,13 @@ functionSignature = {
     },
 }
 config.addFunctionCall(signature=functionSignature, method=paste_from_clipboard)
+
+'''
+Notes about pbcopy and pbpaste alternatives:
+
+alias pbcopy='xclip -selection clipboard'
+alias pbpaste='xclip -selection clipboard -o'
+
+alias pbcopy='xsel --clipboard --input'
+alias pbpaste='xsel --clipboard --output'
+'''

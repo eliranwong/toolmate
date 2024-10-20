@@ -1,6 +1,6 @@
 from toolmate import config
 
-import os, shutil, argparse, pyperclip
+import os, shutil, argparse, pyperclip, subprocess
 from pathlib import Path
 
 from toolmate import updateApp, configFile, getOllamaServerClient
@@ -86,10 +86,10 @@ def main(tempInterface=""):
         config.defaultEntry = f"Load chat records with this ID: {load}"
         config.accept_default = True
     elif args.runpaste and args.runpaste.lower() == "true":
-        config.defaultEntry = pyperclip.paste()
+        config.defaultEntry = subprocess.run("termux-clipboard-get", shell=True, capture_output=True, text=True).stdout if shutil.which("termux-clipboard-get") else pyperclip.paste()
         config.accept_default = True
     elif args.paste and args.paste.lower() == "true":
-        config.defaultEntry = pyperclip.paste()
+        config.defaultEntry = subprocess.run("termux-clipboard-get", shell=True, capture_output=True, text=True).stdout if shutil.which("termux-clipboard-get") else pyperclip.paste()
     elif args.runfile or args.file:
         try:
             filename = args.runfile if args.runfile else args.file

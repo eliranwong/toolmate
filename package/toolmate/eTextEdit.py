@@ -26,7 +26,7 @@ Remarks: This is a modified edition of etextedit that work with ToolMate AI
 import os
 startupPath = os.getcwd()
 
-import datetime, sys, os, re, webbrowser, shutil, wcwidth, argparse, pyperclip, platform
+import datetime, sys, os, re, webbrowser, shutil, wcwidth, argparse, pyperclip, platform, subprocess, pydoc
 from asyncio import Future, ensure_future
 from prompt_toolkit.clipboard.pyperclip import PyperclipClipboard
 from prompt_toolkit.input import create_input
@@ -713,12 +713,12 @@ def do_redo(event=None):
 def do_cut(event=None):
     buffer = event.app.current_buffer if event is not None else text_field.buffer
     data = buffer.cut_selection()
-    get_app().clipboard.set_data(data)
+    pydoc.pipepager(data, cmd="termux-clipboard-set") if shutil.which("termux-clipboard-set") else get_app().clipboard.set_data(data)
 
 def do_copy(event=None):
     buffer = event.app.current_buffer if event is not None else text_field.buffer
     data = buffer.copy_selection()
-    get_app().clipboard.set_data(data)
+    pydoc.pipepager(data, cmd="termux-clipboard-set") if shutil.which("termux-clipboard-set") else get_app().clipboard.set_data(data)
 
 def do_backspace(event=None):
     buffer = event.app.current_buffer if event is not None else text_field.buffer
@@ -763,7 +763,7 @@ def do_find_next():
 def do_paste(event=None):
     buffer = event.app.current_buffer if event is not None else text_field.buffer
     buffer.cut_selection()
-    clipboardText = ApplicationState.clipboard.get_data().text
+    clipboardText = subprocess.run("termux-clipboard-get", shell=True, capture_output=True, text=True).stdout if shutil.which("termux-clipboard-get") else ApplicationState.clipboard.get_data().text
     buffer.insert_text(clipboardText)
     # the following line does not work well; cursor position not aligned
     #text_field.buffer.paste_clipboard_data(get_app().clipboard.get_data())
@@ -954,7 +954,7 @@ def main():
         if not sys.stdin.isatty():
             input_text = sys.stdin.read()
         if args.paste and args.paste.lower() == "true":
-            clipboardText = pyperclip.paste()
+            clipboardText = subprocess.run("termux-clipboard-get", shell=True, capture_output=True, text=True).stdout if shutil.which("termux-clipboard-get") else pyperclip.paste()
             input_text = f"{input_text}\n\n{clipboardText}" if input_text else clipboardText
 
         try:

@@ -2847,7 +2847,12 @@ Acess the risk level of the following `{target.capitalize()}`:
                 del descriptions[0]
 
             for index, action in enumerate(actions):
-                description = f"List contents in current directory {os.getcwd()}" if action == "list_current_directory_contents" else descriptions[index]
+                if action == "list_current_directory_contents":
+                    description = f"List contents in current directory {os.getcwd()}"
+                elif action == "paste_from_clipboard" and not description.strip():
+                    description = "Retrieve the clipboard text"
+                else:
+                    descriptions[index]
                 if not description.strip():
                     # enable tool to work on previous generated response
                     description = getAssistantPreviousResponse()[0]

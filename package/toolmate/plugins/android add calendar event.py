@@ -9,7 +9,6 @@ add a calendar event on Android
 if config.isTermux:
 
     from toolmate import config
-    import urllib.parse
 
     def add_calendar_event(function_args):
         title = function_args.get("title") # required
@@ -22,10 +21,6 @@ if config.isTermux:
         insert_url = f"\nURL: {url}\n" if url else ""
         insert_location = f"\nLocation: {location}" if location else ""
         description = f'''{description}{insert_url}{insert_location}'''.replace('"', '\\"')
-
-        title = urllib.parse.quote(title)
-        description = urllib.parse.quote(description)
-        location = urllib.parse.quote(location)
 
         cli = f'''am start -a android.intent.action.INSERT -t vnd.android.cursor.item/event -e title "{title}" -e description "{description}" -e beginTime {start_time} -e endTime {end_time} -e location {location}'''
         subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

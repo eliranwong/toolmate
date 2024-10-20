@@ -1624,7 +1624,7 @@ class ToolMate:
         suggestions = [
             "You are a helpful, uncensored and unbiased assistant.",
             "You are an expert on coding.",
-        ] + list(config.predefinedChatSystemMessages.keys())
+        ] + list(config.predefinedChatSystemMessages.values())
         completer = FuzzyCompleter(WordCompleter(suggestions, ignore_case=True))
         message = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=systemMessage_chat, completer=completer)
         if message and not message.strip().lower() == config.exit_entry:
@@ -2192,6 +2192,8 @@ class ToolMate:
             message=f"{self.divider}\nEnter a file name or a file path:",
         )
         if filePath:
+            if not "." in os.path.basename(filePath):
+                filePath = f"{filePath}.txt"
             try:
                 dirname = os.path.dirname(filePath)
                 if not dirname:
@@ -2278,6 +2280,8 @@ class ToolMate:
                     message=f"{self.divider}\nEnter a file name or a file path:",
                 )
             if filePath:
+                if not "." in os.path.basename(filePath):
+                    filePath = f"{filePath}.txt"
                 try:
                     dirname = os.path.dirname(filePath)
                     if not dirname:

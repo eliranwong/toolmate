@@ -1287,8 +1287,6 @@ def runSystemCommand(command):
     return response
 
 def openURL(url):
-    if not url.startswith("https://") or not url.startswith("http://"):
-        url = f"https://{url}"
     config.stopSpinning()
     if config.terminalEnableTermuxAPI:
         command = f'''termux-open-url "{url}"'''

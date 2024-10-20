@@ -1,4 +1,4 @@
-import os, sys, platform
+import os, sys, platform, shutil
 
 # check python version
 # requires python 3.8+; required by package 'tiktoken'
@@ -27,6 +27,8 @@ if not os.path.isfile(configFile):
 # import config module
 from toolmate import config
 config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") and not os.getcwd().startswith("/root") else False
+if config.isTermux and shutil.which("termux-share"):
+    config.terminalEnableTermuxAPI = True
 
 # set up shared configs
 

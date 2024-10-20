@@ -1,4 +1,16 @@
-# 0.4.17-0.4.18
+# 0.4.21
+
+* fixed custom system messages suggestion
+
+* fixed clipboard tools on Android
+
+* ".txt" extension added to exported conversation by default
+
+# 0.4.20
+
+* automatically check if termux:api is enabled
+
+# 0.4.17-0.4.19
 
 * added Android tools `@share_file`, `@send_email`, `@send_whatsapp`, `@add_calendar_event`, `@open_browser`
 

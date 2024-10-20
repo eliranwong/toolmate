@@ -17,7 +17,7 @@ https://labs.bible.org/api/?passage=John+3:16-17;%20Deut%206:4
 
 try:
     from uniquebible.util.ConfigUtil import ConfigUtil
-    ConfigUtil.setup(noQt=False)
+    ConfigUtil.setup(noQt=True)
     from uniquebible.util.CrossPlatform import CrossPlatform
     from uniquebible.util.BibleVerseParser import BibleVerseParser
     from uniquebible.db.BiblesSqlite import Bible

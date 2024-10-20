@@ -1,10 +1,13 @@
-from toolmate import config, print1, print2
-import pyperclip
+from toolmate import config, print1, print2, getCliOutput
+if config.terminalEnableTermuxAPI
+    import pydoc
+else:
+    import pyperclip
 
 # Tool: @copy_to_clipboard
 def copy_to_clipboard(function_args):
     content = config.currentMessages[-1]["content"]
-    pyperclip.copy(content)
+    pydoc.pipepager(content, cmd="termux-clipboard-set") if config.terminalEnableTermuxAPI else pyperclip.copy(content)
     message = "Copied!"
     print1(message)
     config.currentMessages[-1]["content"] = "Copy the following text to the system clipboard:\n\n```" + content + "\n```"
@@ -25,7 +28,7 @@ config.addFunctionCall(signature=functionSignature, method=copy_to_clipboard)
 # Tool: @paste_from_clipboard
 def paste_from_clipboard(function_args):
     content = config.currentMessages[-1]["content"]
-    clipboardText = pyperclip.paste()
+    clipboardText = getCliOutput("termux-clipboard-get") if config.terminalEnableTermuxAPI else pyperclip.paste()
     print2("\n```clipboard")
     print1(f"{clipboardText}")
     print2("```")

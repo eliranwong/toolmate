@@ -30,7 +30,7 @@ defaultSettings = (
     ('text2art_font1', 'cybermedum'),
     ('text2art_font2', 'white_bubble'),
     ('llmInterface', ""), # "llamacpp", "llamacppserver", "ollama", "gemini", "chatgpt", "letmedoit", "groq"
-    ('tool_selection_agent', False if config.isTermux else True), # automatically screens user request and recommend tools, can also be manually triggered by tool `@recommend_tool`
+    ('tool_selection_agent', False), # automatically screens user request and recommend tools, can also be manually triggered by tool `@recommend_tool`
     ('tool_selection_requirements', False), # convey each tool's requirements to the tool selection agent for the tool selection process.
     ('auto_tool_selection', False), # apply only if tool_selection_agent is set to True
     #('enable_tool_screening_agent', False), # set True to increase both reliability and waiting time

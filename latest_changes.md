@@ -1,3 +1,11 @@
+# 0.4.34
+
+* set `tool_selection_agent` to False by default
+
+# 0.4.35
+
+* added commentary suggestions
+
 # 0.4.32
 
 * added a tool `@share` to share generated result to other apps in Android.

@@ -91,6 +91,7 @@ try:
             fullVerseList = bible.getEverySingleVerseList(verseList)
             for verse in fullVerseList:
                 b, c, v, verseText = bible.readTextVerse(*verse, noAudioTag=True)
+                verseText = re.sub("<[^<>]*?>", "", verseText)
                 verseText = f"({parser.bcvToVerseReference(b, c, v)}) {verseText}"
                 try:
                     print1(verseText)
@@ -237,7 +238,12 @@ try:
         config.addFunctionCall(signature=functionSignature, method=bible_commentary)
         config.inputSuggestions.append("Read bible commentary: ")
 
-
+        commentarySuggestions = {}
+        for i in config.uniquebible_platform.commentaryList:
+            commentarySuggestions[f"`{i}`"] = bookSuggestions
+        for i in standardBibleBooks:
+            commentarySuggestions[i] = bookSuggestions[i]
+        config.inputSuggestions.append({"@bible_commentary": commentarySuggestions})
 
     # Predefined System Messages
     config.predefinedChatSystemMessages["Billy Graham"] = "I want you to speak like Billy Graham, the Amercian evangelist. Please incorporate his speaking style, values, and thoughts in our interaction."

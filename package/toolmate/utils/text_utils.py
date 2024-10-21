@@ -167,14 +167,14 @@ class TextUtil:
         return text
 
     @staticmethod
-    def htmlToPlainText(content, colours=True):
+    def htmlToPlainText(content, colours=False):
         content = content.replace("<hr>", "<br><b>--------------------</b><br>")
-        if config.runMode == "terminal":
-            content = re.sub(r"""<ref onclick="lex\('(H[0-9]+?)'\)" class="G\1" onmouseover="ld\('\1'\); hl1\('','','\1'\)" onmouseout="hl0\('','','\1'\)">\1</ref>""", r"[<ref>\1</ref> ] ", content)
-            content = re.sub("""(<heb|<grk)( [^<>]*?onclick="luW\([0-9]+?,')([0-9]+?)('[^<>]*?>)""", r"[<ref>\3</ref> ]\1\2\3\4", content)
-            content = re.sub(r"""(<ref onclick="[^<>]+?\(')([^<>]+?)('\)">)""", r"[<ref>\2</ref> ] ", content)
+            
+        content = re.sub(r"""<ref onclick="lex\('(H[0-9]+?)'\)" class="G\1" onmouseover="ld\('\1'\); hl1\('','','\1'\)" onmouseout="hl0\('','','\1'\)">\1</ref>""", r"[<ref>\1</ref> ] ", content)
+        content = re.sub("""(<heb|<grk)( [^<>]*?onclick="luW\([0-9]+?,')([0-9]+?)('[^<>]*?>)""", r"[<ref>\3</ref> ]\1\2\3\4", content)
+        content = re.sub(r"""(<ref onclick="[^<>]+?\(')([^<>]+?)('\)">)""", r"[<ref>\2</ref> ] ", content)
         # Format text colours
-        if config.runMode == "terminal" and colours:
+        if colours:
             content = TextUtil.colourTerminalText(content)
         # cconvert text
         if isHtmlTextInstalled:
@@ -187,9 +187,9 @@ class TextUtil:
         else:
             content = re.sub("<br/?>|<br>", "\n", content)
             content = re.sub('<[^<]+?>', '', content)
-        if config.runMode == "terminal" and not colours:
+        if not colours:
             content = re.sub("""「ansi[^「」]+？」|「tm[a-z][a-z] fg="[^「」]*?" bg="[^「」]*?"」|「/tm[a-z][a-z]」""", "", content)
-        elif config.runMode == "terminal" and colours:
+        else:
             searchReplace = (
                 ("「ansiblack」", "<ansiblack>"),
                 ("「ansired」", "<ansired>"),
@@ -241,8 +241,7 @@ class TextUtil:
         for search, replace in searchReplace:
             content = re.sub(search, replace, content)
         # fine tune
-        if config.runMode == "terminal":
-            content = re.sub(r"""(G[0-9]+?)'\)" class="G\1" onmouseover="ld\('\1'\); hl1\('','','\1'\)" onmouseout="hl0\('','','\1""", r"\1", content)
+        content = re.sub(r"""(G[0-9]+?)'\)" class="G\1" onmouseover="ld\('\1'\); hl1\('','','\1'\)" onmouseout="hl0\('','','\1""", r"\1", content)
         return content
 
     @staticmethod

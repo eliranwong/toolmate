@@ -2852,10 +2852,14 @@ Acess the risk level of the following `{target.capitalize()}`:
                 elif action == "paste_from_clipboard" and not description.strip():
                     description = "Retrieve the clipboard text"
                 else:
-                    descriptions[index]
+                    description = descriptions[index]
                 if not description.strip():
                     # enable tool to work on previous generated response
                     description = getAssistantPreviousResponse()[0]
+                elif re.search("^`[^`.,?!]+?`$", description.strip()) or re.search("^`[^`.,?!]+?` `[^`.,?!]+?`$", description.strip()):
+                    # in case description is a predefined system message or a predefined context
+                    assistantPreviousResponse = getAssistantPreviousResponse()[0]
+                    description = f"{description} {assistantPreviousResponse}"
                 if description.strip():
                     def displayActionMessage(message):
                         try:

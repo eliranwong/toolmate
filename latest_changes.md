@@ -1,3 +1,11 @@
+# 0.4.32
+
+* added a tool `@share` to share generated result to other apps in Android.
+
+# 0.4.22-0.4.31
+
+* added commentary integration in bible tool
+
 # 0.4.21
 
 * fixed custom system messages suggestion

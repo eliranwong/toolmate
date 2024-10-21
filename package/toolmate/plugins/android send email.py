@@ -8,7 +8,7 @@ send email on Android
 
 if config.isTermux:
 
-    from toolmate import config
+    from toolmate import config, stopSpinning
     import urllib.parse
     import subprocess
 
@@ -19,6 +19,8 @@ if config.isTermux:
 
         subject = urllib.parse.quote(subject)
         body = urllib.parse.quote(body)
+
+        stopSpinning()
 
         # e.g. am start -a android.intent.action.SENDTO -d "mailto:john.doe@example.com?subject=Hello&body=How%20are%20you?"
         cli = f'''am start -a android.intent.action.SENDTO -d "mailto:{recipient}?subject={subject}&body={body}"'''

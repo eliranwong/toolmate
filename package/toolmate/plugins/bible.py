@@ -17,13 +17,18 @@ https://labs.bible.org/api/?passage=John+3:16-17;%20Deut%206:4
 
 try:
     from uniquebible.util.ConfigUtil import ConfigUtil
-    ConfigUtil.setup(noQt=True)
+    ConfigUtil.setup(noQt=True, runMode="terminal")
+    from uniquebible.util.BibleBooks import BibleBooks
     from uniquebible.util.CrossPlatform import CrossPlatform
     from uniquebible.util.BibleVerseParser import BibleVerseParser
     from uniquebible.db.BiblesSqlite import Bible
-    from toolmate import config, print1, print2, print3, removeDuplicatedListItems
+    from uniquebible.db.ToolsSqlite import Commentary
+    from uniquebible import config as bibleconfig
+    from toolmate import config, print1, print2, print3, removeDuplicatedListItems, stopSpinning
+    from toolmate.utils.text_utils import TextUtil
+    from toolmate.utils.regex_search import RegexSearch
     from flashtext import KeywordProcessor
-    import traceback
+    import traceback, re
     import importlib.resources
 
     config.uniquebible_path = str(importlib.resources.files("uniquebible"))
@@ -56,6 +61,7 @@ try:
 
     # Tool: @extract_bible_references
     def extract_bible_references(function_args):
+        stopSpinning()
         content = config.currentMessages[-1]["content"]
         config.toolTextOutput = BibleVerseParser(False).extractAllReferencesReadable(content)
         print2("\n```references")
@@ -79,7 +85,7 @@ try:
 
     # Tool: @bible
     def bible(function_args):
-
+        stopSpinning()
         def displayBibleVerses(verseList, text=None):
             bible = Bible(text=text)
             fullVerseList = bible.getEverySingleVerseList(verseList)
@@ -98,25 +104,23 @@ try:
         # display verses
         config.toolTextOutput = ""
         content = config.currentMessages[-1]["content"]
+        content = re.sub("([0-9]) (:[0-9])", r"\1\2", content)
         parser = BibleVerseParser(True)
         verseList = parser.extractAllReferences(content)
 
         keyword_processor = KeywordProcessor()
         keyword_processor.add_keywords_from_list([f"`{i}`" for i in config.uniquebible_platform.textList])
         bibles = removeDuplicatedListItems(keyword_processor.extract_keywords(content))
+        if not bibles:
+            bibles = [f"`{bibleconfig.mainText}`"]
 
-        if bibles:
-            for i in bibles:
-                i = i[1:-1]
-                heading = f"# Bible: {i}"
-                config.toolTextOutput += f"\n{heading}\n\n"
-                print()
-                print2(heading)
-                displayBibleVerses(verseList, text=i)
-        else:
-            heading = "# Bible"
+        for i in bibles:
+            i = i[1:-1]
+            heading = f"# Bible: {i}"
             config.toolTextOutput += f"\n{heading}\n\n"
-            displayBibleVerses(verseList)
+            print()
+            print2(heading)
+            displayBibleVerses(verseList, text=i)
 
         config.toolTextOutput = config.toolTextOutput.strip()
 
@@ -128,7 +132,7 @@ try:
             "Show bible verses",
         ],
         "name": "bible",
-        "description": "Show bible verses content",
+        "description": "Retrieve bible verses",
         "parameters": {
             "type": "object",
             "properties": {},
@@ -137,6 +141,103 @@ try:
     }
     config.addFunctionCall(signature=functionSignature, method=bible)
     config.inputSuggestions.append("Show bible verses: ")
+
+    # input suggestions
+    standardBibleBooks = []
+    bookSuggestions = {}
+    abbrev = BibleBooks.abbrev["eng"]
+    for i in range(1, 67):
+        abb, fullName = abbrev[str(i)]
+        standardBibleBooks.append(abb)
+        standardBibleBooks.append(fullName)
+        chapters = BibleBooks.chapters[i]
+        bookSuggestions[abb] = {str(ii): {f":{iii}": None for iii in range(1, BibleBooks.verses[i][ii]+1)} for ii in range(1, chapters+1)}
+        bookSuggestions[fullName] = {str(ii): {f":{iii}": None for iii in range(1, BibleBooks.verses[i][ii]+1)} for ii in range(1, chapters+1)}
+    config.inputSuggestions.append(bookSuggestions)
+    bibleSuggestions = {}
+    for i in config.uniquebible_platform.textList:
+        bibleSuggestions[f"`{i}`"] = bookSuggestions
+    for i in standardBibleBooks:
+        bibleSuggestions[i] = bookSuggestions[i]
+    config.inputSuggestions.append({"@bible": bibleSuggestions})
+
+    # Tool: @bible_commentary
+    if config.uniquebible_platform.commentaryList:
+        def bible_commentary(function_args):
+            stopSpinning()
+            def getCommentaryContent(module, verse):
+                content = ""
+                commentary = Commentary(module)
+                b, c, v, *_ = verse
+                query = "SELECT Scripture FROM Commentary WHERE Book=? AND Chapter=?"
+                commentary.cursor.execute(query, verse[0:2])
+                chapterCommentary = commentary.cursor.fetchone()[0]
+                if chapterCommentary:
+                    pattern = '(<vid id="v[0-9]+?.[0-9]+?.[0-9]+?"></vid>)<hr>'
+                    searchReplaceItems = ((pattern, r"<hr>\1"),)
+                    chapterCommentary = RegexSearch.deepReplace(chapterCommentary, pattern, searchReplaceItems)
+                    verseCommentaries = chapterCommentary.split("<hr>")
+                    for i in verseCommentaries:
+                        if f'<vid id="v{b}.{c}.{v}"' in i:
+                            content = i
+                            break
+                return content
+
+            # change to uniquebible app directory temporarily
+            cwd = os.getcwd()
+            os.chdir(config.uniquebible_path)
+            # display verses
+            config.toolTextOutput = ""
+            content = config.currentMessages[-1]["content"]
+            content = re.sub("([0-9]) (:[0-9])", r"\1\2", content)
+            parser = BibleVerseParser(True)
+            verseList = parser.extractAllReferences(content)
+            bible = Bible(text="KJV")
+            fullVerseList = bible.getEverySingleVerseList(verseList)
+
+            keyword_processor = KeywordProcessor()
+            keyword_processor.add_keywords_from_list([f"`{i}`" for i in config.uniquebible_platform.commentaryList])
+            commentaries = removeDuplicatedListItems(keyword_processor.extract_keywords(content))
+            if not commentaries:
+                commentaries = [f"`{bibleconfig.commentaryText}`"]
+
+            for i in commentaries:
+                loaded = []
+                i = i[1:-1]
+                for ii in fullVerseList:
+                    content = getCommentaryContent(i, ii)
+                    if content and not content in loaded:
+                        loaded.append(content)
+                        heading = f"# Commentary: {i} - {parser.bcvToVerseReference(*ii)}"
+                        config.toolTextOutput += f"\n{heading}\n\n"
+                        print()
+                        print2(heading)
+                        content = TextUtil.htmlToPlainText(content)
+                        config.toolTextOutput += f"{content}\n"
+                        try:
+                            print1(content)
+                        except:
+                            print(content)
+
+            config.toolTextOutput = config.toolTextOutput.strip()
+
+            # change back to previous directory
+            os.chdir(cwd)
+            return ""
+        functionSignature = {
+            "examples": [],
+            "name": "bible_commentary",
+            "description": "Retrieve bible commentary",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
+        }
+        config.addFunctionCall(signature=functionSignature, method=bible_commentary)
+        config.inputSuggestions.append("Read bible commentary: ")
+
+
 
     # Predefined System Messages
     config.predefinedChatSystemMessages["Billy Graham"] = "I want you to speak like Billy Graham, the Amercian evangelist. Please incorporate his speaking style, values, and thoughts in our interaction."

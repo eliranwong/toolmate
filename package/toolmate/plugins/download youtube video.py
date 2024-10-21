@@ -10,7 +10,7 @@ ToolMate AI Plugin - download youtube or web content
 [TOOL_CALL]
 """
 
-from toolmate import config, showErrors, isCommandInstalled, print1, print3, is_valid_url, downloadWebContent
+from toolmate import config, showErrors, isCommandInstalled, print1, print3, is_valid_url, downloadWebContent, find_last_added_file
 import re, subprocess, os, shutil
 from pathlib import Path
 
@@ -54,11 +54,22 @@ def download_youtube_video(function_args):
         format = "video"
         location = function_args.get("location", "") # optional
         if not (location and os.path.isdir(location)):
-            location = os.path.join(config.localStorage, "audio" if format == "audio" else "video")
+            androidMoviesDir = "/data/data/com.termux/files/home/storage/shared/Movies"
+            location = androidMoviesDir if os.path.isdir(androidMoviesDir) else os.path.join(config.localStorage, "audio" if format == "audio" else "video")
             Path(location).mkdir(parents=True, exist_ok=True)
         downloadCommand = "yt-dlp -x --audio-format mp3" if format == "audio" else "yt-dlp -f bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4"
         terminalDownloadYoutubeFile(downloadCommand, url, location)
-        return "Finished! Youtube downloader closed!"
+        if shutil.which("termux-media-scan"):
+            os.system(f'termux-media-scan -r "{location}"')
+        newFile = find_last_added_file(location, ext=".mp4")
+        if newFile:
+            message = f"File saved: {newFile}"
+            config.toolTextOutput = message
+            try:
+                print3(message)
+            except:
+                print(message)
+        return ""
     elif is_valid_url(url):
         try:
             folder = config.localStorage

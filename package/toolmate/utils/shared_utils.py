@@ -860,6 +860,25 @@ def is_valid_url(url: str) -> bool:
 
 # files
 
+import glob
+import os
+
+def find_last_added_file(folder_path, ext=".mp3"):
+    """
+    Finds the filename of the last added .mp3 file in a folder.
+    Args:
+        folder_path: The path to the folder containing the MP3 files.
+    Returns:
+        The filename of the last added .mp3 file, or None if no such file is found.
+    """
+    files = glob.glob(os.path.join(folder_path, f'*{ext}'))
+    if not files:
+        return None
+
+    # Sort files by creation time (oldest to newest)
+    files.sort(key=os.path.getctime)
+    return os.path.basename(files[-1])
+
 def getFileSizeInMB(file_path):
     # Get the file size in bytes
     file_size = os.path.getsize(file_path)

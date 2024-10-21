@@ -1876,6 +1876,7 @@ class ToolMate:
         print1("Define custom text-to-speech command below:")
         print1("""* on macOS ['say -v "?"' to check voices], e.g.:\n'say' or 'say -r 200 -v Daniel'""")
         print1("* on Ubuntu ['espeak --voices' to check voices], e.g.:\n'espeak' or 'espeak -s 175 -v en-gb'")
+        print1("* on Android Termux, e.g.:\n'termux-tts-speak' or 'termux-tts-speak -r 1.3'")
         print1("* on Windows, simply enter 'windows' here to use Windows built-in speech engine") # letmedoit.ai will handle the command for Windows users
         print1("remarks: always place the voice option, if any, at the end")
         ttsCommand = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.ttsCommand)

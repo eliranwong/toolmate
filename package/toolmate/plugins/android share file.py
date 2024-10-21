@@ -8,7 +8,7 @@ share file on Android
 
 if config.isTermux:
 
-    from toolmate import config, stopSpinning
+    from toolmate import config
     import subprocess
 
     def share_file(function_args):

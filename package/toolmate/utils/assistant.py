@@ -2984,9 +2984,11 @@ Acess the risk level of the following `{target.capitalize()}`:
                 userInput = userInputLower = self.runActions("...", userInput)
 
             # replace alias, if any, with full entry
+            userInput = f"{userInput} "
             for alias, fullEntry in config.aliases.items():
                 #userInput = re.sub(alias, fullEntry, userInput) # error on Windows coz of Windows path
                 userInput = userInput.replace(alias, fullEntry)
+            userInput = userInput[:-1]
 
             # open file / directory directly
             docs_path = isExistingPath(userInput)

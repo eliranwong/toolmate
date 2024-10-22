@@ -1,8 +1,8 @@
-# 0.4.35-0.4.37
+# 0.4.35-0.4.39
 
 * added a bundle of Android-only tools:
 
-@get_location @show_connection @start_recording @stop_recording @phone_call @play_media @search_contacts @take_photo @selfie @read_sms @send_sms @send_email @send_whatsapp @share @share_file
+@show_location @show_connection @start_recording @stop_recording @phone_call @play_media @search_contacts @take_photo @selfie @read_sms @send_sms @send_email @send_whatsapp @share @share_file
 
 # 0.4.34
 

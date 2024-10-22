@@ -177,6 +177,10 @@ To install:
 
 > pip install --upgrade toolmate_android
 
+If you want optional integration with [UniqueBible App](https://github.com/eliranwong/UniqueBible):
+
+> pip install --upgrade toolmate_android[bible]
+
 To run:
 
 > toolmate
@@ -221,10 +225,14 @@ apt install -y python3
 apt install -y python3-setuptools python3-pip python3-dev python3-venv portaudio19-dev ffmpeg wget curl git wget nano micro sqlite3 libsqlite3-dev net-tools
 apt install libxcb-cursor0 pulseaudio-utils alsa-base alsa-utils mpg123 espeak
 echo 'export PULSE_SERVER=127.0.0.1' >> ~/.bashrc
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+export PATH=$HOME/.cargo/bin:$PATH
 source ~/.bashrc
 ```
 
-Remarks: `libsqlite3-dev` is required for python package `pysqlite3` to be installed.
+Remarks:
+* `libsqlite3-dev` is required for python installing package `pysqlite3`.
+* Rust toolchain is required for installing package `lightrag-hku`
 
 ```
 cd

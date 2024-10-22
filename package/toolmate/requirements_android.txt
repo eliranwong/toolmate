@@ -130,3 +130,5 @@ wikipedia
 tqdm
 #vosk
 edge-tts
+ftfy
+#lightrag-hku

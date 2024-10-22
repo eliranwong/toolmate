@@ -21,6 +21,7 @@ try:
     from uniquebible.util.BibleBooks import BibleBooks
     from uniquebible.util.CrossPlatform import CrossPlatform
     from uniquebible.util.BibleVerseParser import BibleVerseParser
+    from uniquebible.util.LocalCliHandler import LocalCliHandler
     from uniquebible.db.BiblesSqlite import Bible
     from uniquebible.db.ToolsSqlite import Commentary
     from uniquebible import config as bibleconfig
@@ -37,6 +38,7 @@ try:
     os.chdir(config.uniquebible_path)
     config.uniquebible_platform = CrossPlatform()
     config.uniquebible_platform.setupResourceLists()
+    config.uniquebible_localCliHandler = LocalCliHandler()
     os.chdir(cwd)
 
     """ available resource:
@@ -162,6 +164,35 @@ try:
         bibleSuggestions[i] = bookSuggestions[i]
     config.inputSuggestions.append({"@bible": bibleSuggestions})
 
+    # Tool: @uniquebible @uba
+    def uniquebible(function_args):
+        stopSpinning()
+        command = config.currentMessages[-1]["content"].replace('"', '\\"')
+        config.toolTextOutput = subprocess.run(f'''uniquebible stream "{command}"''', shell=True, capture_output=True, text=True).stdout.strip()
+        print2("\n```UniqueBible App")
+        print1(config.toolTextOutput)
+        print2("```")
+        return ""
+    functionSignature = {
+        "examples": [],
+        "name": "uniquebible",
+        "description": "Run UniqueBible App commands to retrieve bible data",
+        "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+        },
+    }
+    config.addFunctionCall(signature=functionSignature, method=uniquebible)
+    config.inputSuggestions.append("Extract Bible references: ")
+    config.aliases["@uba "] = "@uniquebible "
+    config.builtinTools["uba"] = "Retrieve bible data with UniqueBible App commands"
+
+    textCommandSuggestion = [key + ":::" for key in config.uniquebible_localCliHandler.textCommandParser.interpreters.keys()]
+    commandCompleterSuggestions = config.uniquebible_localCliHandler.getCommandCompleterSuggestions(textCommandSuggestion=textCommandSuggestion)
+    config.inputSuggestions.append({"@uniquebible": commandCompleterSuggestions})
+    config.inputSuggestions.append({"@uba": commandCompleterSuggestions})
+
     # Tool: @bible_commentary
     if config.uniquebible_platform.commentaryList:
         def bible_commentary(function_args):
@@ -249,5 +280,5 @@ try:
     config.predefinedChatSystemMessages["Billy Graham"] = "I want you to speak like Billy Graham, the Amercian evangelist. Please incorporate his speaking style, values, and thoughts in our interaction."
 
 except:
-    #print(traceback.format_exc())
+    print(traceback.format_exc())
     pass

@@ -1,3 +1,7 @@
+# 0.4.45
+
+* fixed loading agents with Ollama and Llama.cpp
+
 # 0.4.44
 
 * updated groqchat

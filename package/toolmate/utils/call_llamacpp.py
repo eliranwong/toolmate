@@ -341,7 +341,7 @@ Remember, output the new copy of python code ONLY, without additional notes or e
             if config.developer:
                 print1("extracting parameters ...")
             try:
-                if not tool_schema["parameters"]["properties"]:
+                if not tool_schema["properties"]:
                     # Execute function directly
                     tool_response = executeToolFunction(func_arguments={}, function_name=tool_name)
                 else:

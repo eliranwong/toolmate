@@ -94,7 +94,8 @@ class Plugins:
         config.toolPattern = f"""@({"|".join(config.builtinTools.keys())}|{toolNames})[ \n]"""
         config.allEnabledTools = list(config.builtinTools.keys())[1:] + list(config.toolFunctionMethods.keys()) # exclude the tool `recommend_tool`
         # input suggestions
-        Plugins.buildInputSuggestions()
+        if hasattr(config, "currentMessages"):
+            Plugins.buildInputSuggestions()
 
     # integrate function call plugin
     @staticmethod

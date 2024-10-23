@@ -139,6 +139,6 @@ Do not include other text on a line containing a tag.
 """
 
 config.inputSuggestions += ["@reflection ", "@deep_reflection "]
-config.aliases["@reflection "] = "@context `Reflection` "
+config.aliases["@reflection "] = "@chat `Reflection` "
 config.builtinTools["reflection"] = "Think and reason through a query, review and refine a response"
 config.builtinTools["deep_reflection"] = "Think and reason through a query, review and refine a response in detail"

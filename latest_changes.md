@@ -1,3 +1,23 @@
+# 0.4.44
+
+* updated groqchat
+
+# 0.4.43
+
+* fixed reflection tools
+
+* automatically saved workflow with `save`, `save as`, and `export`
+
+* added ".workflow" to display the current workflow
+
+* added ".shareworkflow" to share the current workflow on Android
+
+* action item ".workflow" in action menu to display current workflow
+
+# 0.4.40-0.4.42
+
+* integration with bible tools [optional]
+
 # 0.4.35-0.4.39
 
 * added a bundle of Android-only tools:

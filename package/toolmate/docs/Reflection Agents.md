@@ -39,7 +39,7 @@ Input:
 Output:
 
 ```  
-@context: `Reflection` Is it better to drink wine in the morning, afternoon, or evening? 
+@chat: `Reflection` Is it better to drink wine in the morning, afternoon, or evening? 
 
 <thinking>
 I will approach this query by considering the potential effects of drinking wine at different times of the day. This 
@@ -94,7 +94,7 @@ Input:
 Output:
 
 ```                                 
-@context: `Think` Is it better to drink wine in the morning, afternoon, or evening? 
+@chat: `Think` Is it better to drink wine in the morning, afternoon, or evening? 
 
 <thinking>
 

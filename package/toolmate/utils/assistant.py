@@ -163,9 +163,11 @@ class ToolMate:
             ".tools": ("configure tool selection agent", self.setToolSelectionConfigs),
             #".maxautocorrect": ("change maximum consecutive auto-correction", self.setMaxAutoCorrect), # joined ".tools"
             ".managerisk": ("manage code execution risk", self.manageCodeExecutionRisk), # joined ".tools"
-            ".context": ("change default predefined context", None),
+
+            ".context": ("select a predefined context", None),
             #".context": (f"change default context {str(config.hotkey_select_context)}", None),
             #".contextintegration": ("change chat context integration", self.setContextIntegration), # joined ".context"
+            ".workflow": ("display current workflow", self.displayCurrentWorkflow),
 
             #".changeapikey": ("change OpenAI API key", self.changeChatGPTAPIkey), # joined ".apikeys"
             #".openweathermapapi": ("change OpenWeatherMap API key", self.changeOpenweathermapApi), # joined ".apikeys"
@@ -219,6 +221,7 @@ class ToolMate:
         if config.terminalEnableTermuxAPI:
             self.actions[".timer"] = ("set timer", lambda: subprocess.Popen("am start -a android.intent.action.SET_TIMER", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE))
             self.actions[".alarm"] = ("set alarm", lambda: subprocess.Popen("am start -a android.intent.action.SET_ALARM", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE))
+            self.actions[".shareworkflow"] = ("share current workflow", self.shareCurrentWorkflow),
 
         config.actionHelp = f"# Quick Actions\n(entries that start with '.')\n"
         for key, value in self.actions.items():
@@ -226,6 +229,17 @@ class ToolMate:
         config.actionHelp += "\n"
         # action keys
         config.actionKeys = list(self.actions.keys()) + ["..."]
+
+    def displayCurrentWorkflow(self):
+        for action, description in self.workflow:
+            print(f'''@{action} {description}''')
+
+    def getCurrentWorkflow(self):
+        workflow = [f'''@{action} {description}''' for action, description in self.workflow]
+        return "\n".join(workflow)
+
+    def shareCurrentWorkflow(self):
+        pydoc.pipepager(self.getCurrentWorkflow(), cmd="termux-share -a send")
 
     # Speech-to-Text Language
     def setSpeechToTextLanguage(self):
@@ -2195,6 +2209,9 @@ class ToolMate:
         if filePath:
             if not "." in os.path.basename(filePath):
                 filePath = f"{filePath}.txt"
+                workflowPath = f"{filePath}_workflow.txt"
+            else:
+                workflowPath = re.sub(r"(\.[^\.]+?)$", r"_workflow\1", filePath)
             try:
                 dirname = os.path.dirname(filePath)
                 if not dirname:
@@ -2217,7 +2234,13 @@ class ToolMate:
                     with open(filePath, "w", encoding="utf-8") as fileObj:
                         fileObj.write(pprint.pformat(messages))
                         print3(f"Conversation saved: {filePath}")
-                    if shutil.which(config.open):
+                    with open(workflowPath, "w", encoding="utf-8") as fileObj:
+                        fileObj.write(self.getCurrentWorkflow())
+                        print3(f"Workflow saved: {workflowPath}")
+                    if shutil.which("termux-share"):
+                        cli = f'''termux-share -a send "{filePath}"'''
+                        subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    elif shutil.which(config.open):
                         os.system(f"{config.open} {filePath}")
             except:
                 print2("Failed to save the conversation!\n")
@@ -2246,6 +2269,10 @@ class ToolMate:
                     with open(chatFile, "w", encoding="utf-8") as fileObj:
                         fileObj.write(pprint.pformat(messagesCopy))
                         print3(f"Conversation saved: {chatFile}")
+                    workflowFile = os.path.join(folderPath, f"{timestamp}_workflow.txt")
+                    with open(workflowFile, "w", encoding="utf-8") as fileObj:
+                        fileObj.write(self.getCurrentWorkflow())
+                        print3(f"Workflow saved: {workflowFile}")
             except:
                 print2("Failed to save the conversation!\n")
                 showErrors()
@@ -2283,6 +2310,9 @@ class ToolMate:
             if filePath:
                 if not "." in os.path.basename(filePath):
                     filePath = f"{filePath}.txt"
+                    workflowPath = f"{filePath}_workflow.txt"
+                else:
+                    workflowPath = re.sub(r"(\.[^\.]+?)$", r"_workflow\1", filePath)
                 try:
                     dirname = os.path.dirname(filePath)
                     if not dirname:
@@ -2304,14 +2334,17 @@ class ToolMate:
                                 return None
                         with open(filePath, "w", encoding="utf-8") as fileObj:
                             fileObj.write(plainText)
-                        if config.terminalEnableTermuxAPI:
+                            print3(f"Conversation exported: {filePath}")
+                        with open(workflowPath, "w", encoding="utf-8") as fileObj:
+                            fileObj.write(self.getCurrentWorkflow())
+                            print3(f"Workflow exported: {workflowPath}")
+                        if shutil.which("termux-share"):
                             cli = f'''termux-share -a send "{filePath}"'''
                             subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                         elif shutil.which(config.open):
                             os.system(f"{config.open} {filePath}")
-                        print3(f"Exported: {filePath}")
                 except:
-                    print2("Failed to save the conversation!\n")
+                    print2("Failed to export the conversation!\n")
                     showErrors()
 
     def runInstruction(self):
@@ -2324,6 +2357,27 @@ class ToolMate:
         if instruction:
             config.defaultEntry = config.predefinedInstructions[instruction]
             config.accept_default = True
+
+    def insertPredefinedContext(self):
+        contexts = list(config.predefinedContexts.keys())
+        predefinedContext = self.dialogs.getValidOptions(
+            options=contexts,
+            title="Predefined Contexts",
+            default=config.predefinedContext,
+            text="Select a predefined context:",
+        )
+        if predefinedContext:
+            config.predefinedContext = predefinedContext
+            if config.predefinedContext == "custom":
+                print1("Edit custom context below:")
+                customContext = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.customPredefinedContext)
+                if customContext and not customContext.strip().lower() == config.exit_entry:
+                    config.customPredefinedContext = customContext.strip()
+        else:
+            # a way to quickly clean up context
+            config.predefinedContext = "custom"
+        config.saveConfig()
+        config.defaultEntry = f"@chat `{config.predefinedContext}` "
 
     def changeDefaultContext(self):
         contexts = list(config.predefinedContexts.keys())
@@ -2834,8 +2888,10 @@ Acess the risk level of the following `{target.capitalize()}`:
         
         if not actions:
             if content.strip():
+                action = "recommend_tool" if config.tool_selection_agent else "chat"
+                self.workflow.append((action, content))
                 # pass to built-in screening or tool-check operations
-                complete = self.runSingleAction("recommend_tool" if config.tool_selection_agent else "chat", content, gui)
+                complete = self.runSingleAction(action, content, gui)
                 if not complete:
                     return False
         else:
@@ -2848,12 +2904,14 @@ Acess the risk level of the following `{target.capitalize()}`:
                 del descriptions[0]
 
             for index, action in enumerate(actions):
+                rawDescription = descriptions[index]
+                self.workflow.append((action, rawDescription))
                 if action == "list_current_directory_contents":
                     description = f"List contents in current directory {os.getcwd()}"
-                elif action == "paste_from_clipboard" and not description.strip():
+                elif action == "paste_from_clipboard" and not rawDescription.strip():
                     description = "Retrieve the clipboard text"
                 else:
-                    description = descriptions[index]
+                    description = rawDescription
                 if not description.strip():
                     # enable tool to work on previous generated response
                     description = getAssistantPreviousResponse()[0]
@@ -2870,9 +2928,9 @@ Acess the risk level of the following `{target.capitalize()}`:
                     if action == "deep_reflection":
                         # think
                         description = f'''`Think` {description}'''
-                        message = f'''\n@context: {description}\n'''
+                        message = f'''\n@chat: {description}\n'''
                         displayActionMessage(message)
-                        complete = self.runSingleAction("context", description, gui)
+                        complete = self.runSingleAction("chat", description, gui)
                         if not complete:
                             return False
                         # review
@@ -2932,6 +2990,8 @@ Acess the risk level of the following `{target.capitalize()}`:
         storagedirectory, config.currentMessages = startChat()
         config.multilineInput = False
         while True:
+            # clear workflow
+            self.workflow = []
             # default toolbar text
             config.dynamicToolBarText = f""" {str(config.hotkey_exit).replace("'", "")} exit {str(config.hotkey_display_key_combo).replace("'", "")} shortcuts """
             # display current directory if changed
@@ -3044,7 +3104,7 @@ Acess the risk level of the following `{target.capitalize()}`:
             elif userInputLower == config.cancel_entry:
                 pass
             elif userInputLower == ".context":
-                self.changeDefaultContext()
+                self.insertPredefinedContext()
             elif userInputLower == ".new":
                 self.saveChat(config.currentMessages)
                 storagedirectory, config.currentMessages = startChat()

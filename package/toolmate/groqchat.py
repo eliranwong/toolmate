@@ -19,8 +19,8 @@ class GroqChatbot:
     It is created for use with 3rd-party applications.
     """
 
-    def __init__(self, name="Groq Chatbot", temperature=config.llmTemperature, max_output_tokens=config.groqApi_tool_model_max_tokens):
-        self.name, self.temperature, self.max_output_tokens = name, temperature, max_output_tokens
+    def __init__(self, name="Groq Chatbot", temperature=config.llmTemperature, max_output_tokens=config.groqApi_tool_model_max_tokens, system_message=""):
+        self.name, self.temperature, self.max_output_tokens, self.system_message = name, temperature, max_output_tokens, system_message
         self.messages = self.resetMessages()
         if hasattr(config, "currentMessages") and config.currentMessages:
             self.messages += config.currentMessages[:-1]
@@ -33,7 +33,7 @@ class GroqChatbot:
         })
 
     def resetMessages(self):
-        return [{"role": "system", "content": config.systemMessage_groq},]
+        return [{"role": "system", "content": self.system_message if self.system_message else config.systemMessage_groq},]
 
     def setSystemMessage(self):
         # completer
@@ -50,6 +50,7 @@ class GroqChatbot:
         if prompt and not prompt == config.exit_entry:
             config.systemMessage_groq = prompt
             config.saveConfig()
+            self.system_message = prompt
             print2("System message changed!")
             clear()
             self.messages = self.resetMessages()
@@ -65,7 +66,7 @@ class GroqChatbot:
 
         print2(f"\n{self.name} loaded!")
         print2("```system message")
-        print1(config.systemMessage_groq)
+        print1(self.system_message if self.system_message else config.systemMessage_groq)
         print2("```")
         if hasattr(config, "currentMessages"):
             bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
@@ -85,7 +86,8 @@ class GroqChatbot:
                 prompt = SinglePrompt.run(style=self.promptStyle, promptSession=chat_session, bottom_toolbar=bottom_toolbar, default=prompt, accept_default=True, completer=completer)
                 userMessage = {"role": "user", "content": prompt}
                 self.messages.append(userMessage)
-                config.currentMessages.append(userMessage)
+                if hasattr(config, "currentMessages"):
+                    config.currentMessages.append(userMessage)
             if prompt == config.exit_entry:
                 break
             elif not hasattr(config, "currentMessages") and prompt.lower() == ".toggleinputaudio":
@@ -141,12 +143,22 @@ def main():
     parser = argparse.ArgumentParser(description="groq cli options")
     # Add arguments
     parser.add_argument("default", nargs="?", default=None, help="default entry")
+    parser.add_argument('-n', '--name', action='store', dest='name', help="specify the name of the chatbot; default: Groq Chatbot")
     parser.add_argument('-o', '--outputtokens', action='store', dest='outputtokens', help=f"specify maximum output tokens with -o flag; default: {config.groqApi_tool_model_max_tokens}")
-    parser.add_argument('-t', '--temperature', action='store', dest='temperature', help=f"specify temperature with -t flag: default: {config.llmTemperature}")
+    parser.add_argument('-t', '--temperature', action='store', dest='temperature', help=f"specify temperature with -t flag; default: {config.llmTemperature}")
+    parser.add_argument('-s', '--system', action='store', dest='system', help=f"specify system message; default: {config.systemMessage_groq}")
     # Parse arguments
     args = parser.parse_args()
     # Get options
     prompt = args.default.strip() if args.default and args.default.strip() else ""
+    if args.name and args.name.strip():
+        name = args.name.strip()
+    else:
+        name = "Groq Chatbot"
+    if args.system and args.system.strip():
+        system = args.system.strip()
+    else:
+        system = ""
     if args.outputtokens and args.outputtokens.strip():
         try:
             max_output_tokens = int(args.outputtokens.strip())
@@ -162,8 +174,10 @@ def main():
     else:
         temperature = config.llmTemperature
     GroqChatbot(
+        name=name,
         temperature=temperature,
         max_output_tokens = max_output_tokens,
+        system_message = system,
     ).run(
         prompt=prompt,
     )

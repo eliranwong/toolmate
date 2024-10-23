@@ -70,14 +70,14 @@ defaultSettings = (
     ('ollamaChatServer_port', 11434),
     ('ollamaVisionServer_port', 11434),
     ('ollamaVisionModel', 'llava'), # ollama model used for vision
-    ('ollamaToolModel', 'wizardlm2'), # ollama model used for both task execution and conversation
+    ('ollamaToolModel', 'granite3-dense:2b' if config.isTermux else 'wizardlm2'), # ollama model used for both task execution and conversation
     ('ollamaToolModel_additional_options', {}),
     ('ollamaChatModel_additional_options', {}),
     ('ollamaToolModel_num_ctx', 2048), # ollama tool model context window
     ('ollamaToolModel_num_batch', 512), # ollama chat model batch size
     ('ollamaToolModel_num_predict', -1), # ollama tool model maximum tokens
     ('ollamaToolModel_keep_alive', "5m"), # ollama tool model keep alive time
-    ('ollamaChatModel', 'llama3.1'), # ollama model used for chat
+    ('ollamaChatModel', 'llama3.2:3b' if config.isTermux else 'llama3.1'), # ollama model used for chat
     ('ollamaChatModel_num_ctx', 2048), # ollama chat model context window
     ('ollamaChatModel_num_batch', 512), # ollama chat model batch size
     ('ollamaChatModel_num_predict', -1), # ollama chat model maximum tokens
@@ -123,8 +123,8 @@ defaultSettings = (
     ('llamacppChatModel_additional_chat_options', {}),
     ('llamacppToolModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
     ('llamacppToolModel_model_path', ''), # specify file path of llama.cpp model for general purpose
-    ('llamacppToolModel_repo_id', 'MaziyarPanahi/WizardLM-2-7B-GGUF'), # llama.cpp model used for both task execution and conversation, e.g. 'TheBloke/phi-2-GGUF', 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
-    ('llamacppToolModel_filename', 'WizardLM-2-7B.Q4_K_M.gguf'), # llama.cpp model used for both task execution and conversation, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
+    ('llamacppToolModel_repo_id', 'bartowski/Llama-3.2-3B-Instruct-GGUF' if config.isTermux else 'MaziyarPanahi/WizardLM-2-7B-GGUF'), # llama.cpp model used for both task execution and conversation, e.g. 'TheBloke/phi-2-GGUF', 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
+    ('llamacppToolModel_filename', 'Llama-3.2-3B-Instruct-Q4_K_M.gguf' if config.isTermux else 'WizardLM-2-7B.Q4_K_M.gguf'), # llama.cpp model used for both task execution and conversation, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
     ('llamacppToolModel_n_ctx', 0), # llama.cpp tool model context window
     ('llamacppToolModel_max_tokens', 2048), # llama.cpp tool model maximum tokens
     ('llamacppToolModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration

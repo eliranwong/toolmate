@@ -167,6 +167,8 @@ To set up virtual environment (recommended):
 
 > mkdir -p ~/apps
 
+Remarks: In the first run, `Toolmate AI` automatically creates a directory `~/toolmate`, where user content is stored.  Therefore, it is not recommended to install `Toolmate AI` in `~/toolmate`.
+
 > cd ~/apps
 
 > python -m venv --system-site-packages toolmate
@@ -218,19 +220,38 @@ ubuntu
 
 Inside the `ubuntu`, run:
 
+Basic:
+
 ```
 cd
 apt update && apt full-upgrade
 apt install -y python3
 apt install -y python3-setuptools python3-pip python3-dev python3-venv portaudio19-dev ffmpeg wget curl git wget nano micro sqlite3 libsqlite3-dev net-tools
 apt install libxcb-cursor0 pulseaudio-utils alsa-base alsa-utils mpg123 espeak
+# add missing group names
+groupadd -g 3003 groupname3003
+groupadd -g 9997 groupname9997
+groupadd -g 20298 groupname20298
+groupadd -g 50298 groupname50298
+# support container sound output
 echo 'export PULSE_SERVER=127.0.0.1' >> ~/.bashrc
+# install golang
+add-apt-repository ppa:longsleep/golang-backports
+apt update
+apt install golang-go
+# install rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 export PATH=$HOME/.cargo/bin:$PATH
+# install fabric
+mkdir -p .local/bin
+echo "export PATH=$HOME/.local/bin:$PATH" >> ~/.bashrc
+curl -L https://github.com/danielmiessler/fabric/releases/latest/download/fabric-linux-arm64 > ~/.local/bin/fabric && chmod +x ~/.local/bin/fabric && ~/.local/bin/fabric --setup
+# reload variables
 source ~/.bashrc
 ```
 
 Remarks:
+* Configure the `fabric` before installing running `ToolMate AI`.
 * `libsqlite3-dev` is required for python installing package `pysqlite3`.
 * Rust toolchain is required for installing package `lightrag-hku`
 

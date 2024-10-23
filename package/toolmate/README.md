@@ -26,7 +26,6 @@ ToolMate AI supports a wide range of AI backends and models, including [Ollama, 
 
 Our recommendations:
 * For backend selection, we consider [Ollama](https://ollama.com/) as the best friendly free `offline` option and [Groq Cloud API](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Groq%20API%20Setup.md) as the best freiendly and free `online` option.
-* Regarding AI models, we have found that `wizardlm2` and `mixtral` work well with ToolMate AI, though many others are well-supported.
 
 Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Supported%20Backends%20and%20Models.md
 

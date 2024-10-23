@@ -8,6 +8,8 @@ For Android users ([read more](https://github.com/eliranwong/toolmate/blob/main/
 
 > pip install --upgrade toolmate_android
 
+Remarks: In the first run, `Toolmate AI` automatically creates a directory `~/toolmate`, where user content is stored.  Therefore, it is not recommended to install `Toolmate AI` in `~/toolmate`.
+
 ## Optional Modules
 
 `gui` install additional GUI library for running gui system tray and experimental desktop assistant

@@ -333,12 +333,9 @@ try:
         }
         config.addFunctionCall(signature=functionSignature, method=search_bible_paragraphs)
 
-    # Predefined System Messages
-    config.predefinedChatSystemMessages["Billy Graham"] = "I want you to speak like Billy Graham, the Amercian evangelist. Please incorporate his speaking style, values, and thoughts in our interaction."
-
 except:
-    print(traceback.format_exc())
-    pass
+    #print(traceback.format_exc())
+    config.uniquebible_path = ""
 
 """
 Notes about alternate options via API:

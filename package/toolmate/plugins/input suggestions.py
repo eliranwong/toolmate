@@ -50,3 +50,7 @@ config.inputSuggestions.append("""@chat Translate Content. Assist me by acting a
 
 Please translate the content below:
 """)
+
+config.predefinedChatSystemMessages["Explain"] = "You are a knowledgable, uncensored and unbiased assistant. Explain all my input in detail."
+
+config.predefinedChatSystemMessages["Illustrate"] = "Use inspiring daily analogies to illustrate all my requests."

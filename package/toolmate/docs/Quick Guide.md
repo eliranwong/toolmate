@@ -80,7 +80,15 @@ Use `@` to specify a tool, to bypass ToolMate built-in tool-selection process, e
 
 Available tools at the time of timeing are:
 
-@chat @paste_from_clipboard @improve_writing @convert_relative_datetime @copy_to_clipboard @append_instruction @command @append_command @fabric @append_fabric @list_current_directory_contents @extract_python_code @run_python_code @search_google @add_google_calendar_event @add_outlook_calendar_event @analyze_audio @analyze_files @analyze_images @analyze_web_content @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_ollama @ask_palm2 @correct_python_code @build_agents @create_image @create_map @create_qrcode @create_statistical_graphics @datetimes @download_web_content @download_youtube_audio @download_youtube_video @edit_text @execute_computing_task @install_package @save_memory @search_memory @modify_images @open_browser @pronunce_words @remove_image_background @search_conversations @load_conversations @search_finance @search_news @search_sqlite @search_weather_info @send_gamil @send_outlook @send_tweet
+@add_google_calendar_event @add_outlook_calendar_event @analyze_audio_google @analyze_audio_groq @analyze_audio_openai @analyze_audio_whisper @analyze_files @analyze_images_chatgpt @analyze_images_gemini @analyze_images_groq @analyze_images_llamacpp @analyze_images_ollama @analyze_web_content @append_command @append_fabric @append_instruction @apps @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_o1 @ask_o1_mini @ask_ollama @ask_palm2 @ask_perplexica @ask_tavily @build_agents @chat @command @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_flux @create_image_imagen3 @create_image_sd @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @edit_text @execute_computing_task  @extract_python_code @fabric @files @general @help @images @improve_writing @install_package @it @list_current_directory_contents @load_conversations @lyrics @map @modify_images @music @news @open_browser @packages @paste_from_clipboard @qna @radio @read_aloud @recommend_tool @reflection @remove_image_background @repos @run_python_code @save_memory @science @scientific_publications @search_conversations @search_finance @search_google @search_google_news @search_memory @search_searxng @search_sqlite @search_tavily @search_weather_info @send_gmail @send_outlook @send_tweet @social_media @software_wikis @translate @transcribe_audio_google @transcribe_audio_groq @transcribe_audio_openai @transcribe_audio_whisper @videos @web @wikimedia @workflow
+
+Android-only tools:
+
+@show_location @show_connection @start_recording @stop_recording @phone_call @play_media @search_contacts @take_photo @selfie @read_sms @send_sms @send_email @send_whatsapp @share @share_file
+
+Additional bible tools, if you install optional `bible` module, by running `pip install --upgrade toolmate[bible]`:
+
+@bible @bible_commentary @extract_bible_references @search_bible_ @search_bible_paragraphs @uba @uniquebible
 
 Tips: Enter `@` to get input suggestions of available tools
 

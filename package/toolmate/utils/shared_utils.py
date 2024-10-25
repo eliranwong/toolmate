@@ -26,7 +26,6 @@ if not config.isTermux:
     from llama_cpp import Llama
     from vertexai.generative_models import Content, Part
     from tavily import TavilyClient
-    from guidance import select, gen
     import chromadb, pendulum
     from chromadb.utils.embedding_functions import OllamaEmbeddingFunction, OpenAIEmbeddingFunction, SentenceTransformerEmbeddingFunction
     from chromadb.config import Settings
@@ -171,6 +170,8 @@ def isToolRequired(user_input) -> bool:
 # guidance
 
 def screening(lm, user_input) -> bool:
+    from guidance import select
+
     tool = False
 
     print2("```screening")
@@ -225,6 +226,8 @@ Answer: The given request asks for {select(["greeting", "calculation", "translat
     return tool
 
 def outputStructuredData(lm, schema: dict, json_output: bool=False, messages: list = [], use_system_message: bool=True, request: str="", temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs) -> Union[dict, str]:
+    from guidance import select, gen
+
     properties = toParameterSchema(schema)["properties"]
     request = f", particularly related to the following request:\n{request}" if request else "."
     lm += toChatml(messages, use_system_message=use_system_message).rstrip()
@@ -252,6 +255,8 @@ Answer: {select(options, name=key) if "enum" in value else gen(name=key, stop="<
     return json.dumps(response) if json_output else response
 
 def select_tool(lm, user_input):
+    from guidance import select, gen
+
     tool_names = list(config.toolFunctionSchemas.keys())
     tools = {i:config.toolFunctionSchemas[i]["description"] for i in config.toolFunctionSchemas}
 

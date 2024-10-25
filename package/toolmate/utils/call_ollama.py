@@ -16,7 +16,7 @@ def check_ollama_errors(func):
         try:
             return func(*args, **kwargs)
         except ollama.ResponseError as e:
-            print1('Error:', e.error)
+            print('Error:', e.error)
             return finishError()
         except:
             print(traceback.format_exc())

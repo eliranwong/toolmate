@@ -2910,6 +2910,8 @@ Acess the risk level of the following `{target.capitalize()}`:
                     description = f"List contents in current directory {os.getcwd()}"
                 elif action == "paste_from_clipboard" and not rawDescription.strip():
                     description = "Retrieve the clipboard text"
+                elif action in ("search_bible", "search_bible_paragraphs") and not rawDescription.strip():
+                    description = "[NONE]"
                 else:
                     description = rawDescription
                 if not description.strip():

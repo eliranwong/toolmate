@@ -1,0 +1,2306 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d6" for="edge" attr.name="source_id" attr.type="string" />
+  <key id="d5" for="edge" attr.name="keywords" attr.type="string" />
+  <key id="d4" for="edge" attr.name="description" attr.type="string" />
+  <key id="d3" for="edge" attr.name="weight" attr.type="double" />
+  <key id="d2" for="node" attr.name="source_id" attr.type="string" />
+  <key id="d1" for="node" attr.name="description" attr.type="string" />
+  <key id="d0" for="node" attr.name="entity_type" attr.type="string" />
+  <graph edgedefault="undirected">
+    <node id="&quot;.SPEECHRECOGNITION&quot;">
+      <data key="d0">"ACTION"</data>
+      <data key="d1">".speechrecognition is used to configure the settings for speech recognition."</data>
+      <data key="d2">chunk-60d58b7ce45cfee61330ecc133c0504d</data>
+    </node>
+    <node id="&quot;.SPEECHGENERATION&quot;">
+      <data key="d0">"ACTION"</data>
+      <data key="d1">".speechgeneration is used to configure the settings for speech generation."</data>
+      <data key="d2">chunk-60d58b7ce45cfee61330ecc133c0504d</data>
+    </node>
+    <node id="&quot;CONFIGURATION&quot;">
+      <data key="d2">chunk-60d58b7ce45cfee61330ecc133c0504d</data>
+      <data key="d1">".speechrecognition is used for configuring settings related to speech recognition."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;FFMPEG&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"ffmpeg is a media processing tool that needs to be installed for working with the plugin 'download youtube media'."&lt;SEP&gt;"ffmpeg is a multimedia framework and command-line tool used for processing media files."</data>
+      <data key="d2">chunk-56777ce328a2ecdf2846a29756d6b7e4</data>
+    </node>
+    <node id="&quot;TOOLMATE V0.2.42+ &quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"ToolMate v0.2.42+ is a version of the ToolMate organization's AI software."|</data>
+      <data key="d2">chunk-fb3f71c5dc50e2ed48684a953a02ae59</data>
+    </node>
+    <node id="&quot;V1.6.2 &quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"v1.6.2 refers to the specific version of wsay used in current code install."|</data>
+      <data key="d2">chunk-fb3f71c5dc50e2ed48684a953a02ae59</data>
+    </node>
+    <node id="&quot;WSAY &quot;">
+      <data key="d2">chunk-fb3f71c5dc50e2ed48684a953a02ae59</data>
+      <data key="d1">"ToolMate v0.2.42+ integrates wsay for text-to-speech feature."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;TOOLMATE AI V0.2.61 &quot;">
+      <data key="d2">chunk-fb3f71c5dc50e2ed48684a953a02ae59</data>
+      <data key="d1">"When using ToolMate AI v0.2.61, 'wsay.exe' is automatically downloaded and installed in the '~\\toolmate' directory."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;WSAY.EXE &quot;">
+      <data key="d2">chunk-fb3f71c5dc50e2ed48684a953a02ae59</data>
+      <data key="d1">"When using ToolMate AI v0.2.61, 'wsay.exe' is automatically downloaded and installed in the '~\\toolmate' directory."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;INPUT AUDIO &quot;">
+      <data key="d2">chunk-fb3f71c5dc50e2ed48684a953a02ae59</data>
+      <data key="d1">"To enable input text reading on Windows with 'wsay.exe', one must select the "toggle input audio" option from the action menu."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;OUTPUT AUDIO &quot;">
+      <data key="d2">chunk-fb3f71c5dc50e2ed48684a953a02ae59</data>
+      <data key="d1">"Similarly, to enable output text reading, one must select the "toggle output audio" option from the action menu."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;DRINKING WINE&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"Drinking wine in the evening is considered an event that promotes relaxation."</data>
+      <data key="d2">chunk-b245ed81d791c10dab089d8529e31525</data>
+    </node>
+    <node id="&quot;EVENING&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"Evening is a specific time frame during which drinking wine may be most suitable for promoting relaxation."</data>
+      <data key="d2">chunk-b245ed81d791c10dab089d8529e31525</data>
+    </node>
+    <node id="&quot;BODY&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"The body is the recipient of the effects associated with drinking wine in the evening."</data>
+      <data key="d2">chunk-b245ed81d791c10dab089d8529e31525</data>
+    </node>
+    <node id="&quot;MODERATION&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"Moderation is a concept that should be considered when drinking wine in the evening for its relaxing effects."</data>
+      <data key="d2">chunk-b245ed81d791c10dab089d8529e31525</data>
+    </node>
+    <node id="&quot;PERSONAL PREFERENCES&quot;">
+      <data key="d2">chunk-b245ed81d791c10dab089d8529e31525</data>
+      <data key="d1">"Personal preferences should be considered when deciding the time to drink wine for relaxation."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;STUDIES&quot;">
+      <data key="d2">chunk-b245ed81d791c10dab089d8529e31525</data>
+      <data key="d1">"Some studies suggest drinking wine during meals may have additional benefits such as aiding digestion and nutrient absorption."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;WORKFLOWS&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"Workflows are designed to save users from repetitive actions and are used for sharing frequently performed tasks with collaborators or increasing portability."</data>
+      <data key="d2">chunk-c50af8283bd4051d75176ccdda0b2c21</data>
+    </node>
+    <node id="&quot;TOOL WORKFLOW&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"The `@workflow` command is a tool used to execute workflows defined in plain text files."</data>
+      <data key="d2">chunk-c50af8283bd4051d75176ccdda0b2c21</data>
+    </node>
+    <node id="&quot;USER&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"The user is someone who manually edits the `config.py` file to make changes or modifications."&lt;SEP&gt;"Users save their frequently used actions in plain text files and use the `@workflow` command to run these workflows within ToolMate AI."'</data>
+      <data key="d2">chunk-a5078e9e86ba4cecbc3efeb6fa89a54a&lt;SEP&gt;chunk-c50af8283bd4051d75176ccdda0b2c21</data>
+    </node>
+    <node id="&quot;HOME DIRECTORY&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"The home directory is where users save their workflows, such as the `my_workflow` example provided."'</data>
+      <data key="d2">chunk-c50af8283bd4051d75176ccdda0b2c21</data>
+    </node>
+    <node id="&quot;TOOLMATE AI PROMPT&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"ToolMate AI prompts are used in conjunction with the `@workflow` command to run saved workflows."&lt;SEP&gt;"Toolmate AI prompt is a person involved in providing instructions for using ToolMate AI's features, specifically mentioning the use of `.model` command."</data>
+      <data key="d2">chunk-a115146372569d0e13825dac3d3ab3a4&lt;SEP&gt;chunk-c50af8283bd4051d75176ccdda0b2c21</data>
+    </node>
+    <node id="&quot;NESTED WORKFLOWS&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"Users can insert nested workflows within other workflows for more complex tasks."'</data>
+      <data key="d2">chunk-c50af8283bd4051d75176ccdda0b2c21</data>
+    </node>
+    <node id="&quot;WORKFLOW FILES&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"Workflow files are plain text documents containing instructions for specific tasks or processes."'</data>
+      <data key="d2">chunk-c50af8283bd4051d75176ccdda0b2c21</data>
+    </node>
+    <node id="&quot;HOME DIRECTORY &quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"The home directory is where users store their workflow files, such as `my_workflow.txt`."'</data>
+      <data key="d2">chunk-c50af8283bd4051d75176ccdda0b2c21</data>
+    </node>
+    <node id="&quot;NESTED WORK FLOWS &quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"Users can incorporate nested workflows within other workflows for handling complex tasks and processes."'</data>
+      <data key="d2">chunk-c50af8283bd4051d75176ccdda0b2c21</data>
+    </node>
+    <node id="&quot;TOOLMATE AI&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"ToolMate AI is a toolset providing search plugins for android applications like Perplexica and SearxNG."&lt;SEP&gt;"ToolMate AI is an organization or group that provides tools and services related to AI, including model selection and backend changes."&lt;SEP&gt;**ToolMate AI** appears to be a multifunctional platform or entity that supports the use of multiple API keys (Groq and Tavily) for running inference. It also offers services including support and resources for using additional chat models in response to users' queries, managing and configuring large language models (LLMs) offline, and providing tools for text generation and task execution through an interactive interface. ToolMate AI integrates with various platforms like Termux:API, fabric, and supports the use of Tavily API keys. It is designed to provide a platform for advanced users to control LLM backends such as systems like llama.cpp, ollama, gemini, chatgpt, LetMeDoIt, wizardlm2, Llava, Gemini Pro Vision, ChatGPT-4 Vision, OpenAI Whisper, Google Cloud Speech-to-Text Service, Stable Diffusion, Imagen, DALL-E 3, and various text-to-speech options. It also manages functionalities related to saving, sharing, searching, loading, exporting, and managing chat management features for users. ToolMate AI supports configuring settings and launching actions through an action menu provided by the platform.&lt;SEP&gt;"ToolMate AI refers to an AI platform designed for various purposes, such as using complex models like LLaMA in a conversational environment."</data>
+      <data key="d2">chunk-176af1443a44c73060d94e2882e81ef7&lt;SEP&gt;chunk-456a0a486b95b3df18e12a4457464d4e&lt;SEP&gt;chunk-bc0340ecfc8ebb3292fe95e1d1e1e486&lt;SEP&gt;chunk-f50283466db39cca794aea33c114b955&lt;SEP&gt;chunk-60036d0b640ad5bcf69605ca865480fc&lt;SEP&gt;chunk-eba52398f6766e0a128b55af166a6bf8&lt;SEP&gt;chunk-d624e06bb668cd8e8d75854e9a597164&lt;SEP&gt;chunk-28464f4aa1c6b9278b4f0f8e34f2bbf8&lt;SEP&gt;chunk-a115146372569d0e13825dac3d3ab3a4&lt;SEP&gt;chunk-d8ead668718b74679a8edf65563b0c9a&lt;SEP&gt;chunk-59bcb3c8a095b78015ffb20b8805913d&lt;SEP&gt;chunk-a5078e9e86ba4cecbc3efeb6fa89a54a&lt;SEP&gt;chunk-9a7a626018212a6f7f1f885b79ab5ee3&lt;SEP&gt;chunk-d61135b74eb809643c99a0be3a5586a8&lt;SEP&gt;chunk-553045fd78498fa25ba7b348b3528cdf&lt;SEP&gt;chunk-aca3060dd803974c1b7662f780fc795b&lt;SEP&gt;chunk-9a982ed63e47fd8c67dd946baa60e0a0&lt;SEP&gt;chunk-d0c0c1b2598b2aca2f391acf07d5ecad</data>
+    </node>
+    <node id="&quot;PERSON&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"Users are persons who can manually edit the `config.py` file located in ToolMate AI directory."|</data>
+      <data key="d2">chunk-a5078e9e86ba4cecbc3efeb6fa89a54a</data>
+    </node>
+    <node id="TOOLMATE">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"ToolMate is an integration of Piper-tts for Linux, a tool provided by the author to enhance text-to-speech functionality."</data>
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </node>
+    <node id="PIPER-TTS">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"Piper-tts is a speech synthesis technology that allows offline text-to-speech feature on Linux."</data>
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </node>
+    <node id="RHASSPY&lt;PIPER">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"Rhasspy is the organization behind Piper, which includes Piper-tts and related projects."</data>
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </node>
+    <node id="CHANGE_TEXT_TO_SPEECH_CONFIG">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"A user action to change the text-to-speech configuration appears in the setup process."</data>
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </node>
+    <node id="PIPER_VOICE_MODEL">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"Piper voice models are selectable options within the setup for choosing a specific speech synthesis voice."&lt;SEP&gt;"Users can select a specific speech synthesis voice after choosing Piper-tss as an option."</data>
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </node>
+    <node id="VOICE_SPEED">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"Users can optionally specify voice speed if they have VLC player or cvlc command installed, to control the playback rate of the selected piper voice model."&lt;SEP&gt;"Voice speed is a configurable setting that affects the playback rate of the selected piper voice model."</data>
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </node>
+    <node id="TOGGLE_INPUT_AUDIO">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"A user action to toggle input audio appears in the setup process."</data>
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </node>
+    <node id="TOGGLE_OUTPUT_AUDIO">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"A user action to toggle output audio appears in the setup process."</data>
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </node>
+    <node id="DOWNLOAD_MORE_VOICES">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"Downloading more piper voices is a manual step that occurs after using them for the first time."'&lt;SEP&gt;"Users manually download more piper voices from GitHub and place them in the specified folder.'&lt;|"manual action, expansion of options"</data>
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </node>
+    <node id="PIPER_VOICE_STORAGE">
+      <data key="d0">"LOCATION"</data>
+      <data key="d1">"The folder where Piper's voice models are stored by default is located at '~/toolmate/LLMs/piper/'."'</data>
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </node>
+    <node id="SELECT_PIPER_TTS_OPTION">
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+      <data key="d1">"The 'change text-to-speech config' action is a step that precedes selecting Piper-tss as an option."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="USER_ACTION">
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+      <data key="d1">"Users can manually download additional piper voices from their GitHub repository, expanding the available selection of speech synthesis options."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;CHANGE_TEXT_TO_SPEECH_CONFIG&quot;">
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+      <data key="d1">"ToolMate integrates the change text-to-speech configuration action."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;SELECT_PIPER_TTS_OPTION&quot;">
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+      <data key="d1">"Piper-tss is selected as an option after changing the text-to-speech configuration."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="PIPER_TTS">
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+      <data key="d1">"Piper-tss is selected as an option after changing the text-to-speech configuration."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;PIPER_VOICE_MODEL&quot;">
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+      <data key="d1">"Users can choose from available Piper voice models after selecting Piper-tss as an option."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;PIPER_VOICE_STORAGE&quot;">
+      <data key="d2">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+      <data key="d1">"Users manually download more piper voices from GitHub and place them in the specified folder.'&lt;|"manual action, expansion of options"</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;LLMS HAVE LIMITATIONS IN THEIR KNOWLEDGE BASE.&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"LLMs (Language Models) are capable of acquiring new information to expand their knowledge, but they primarily rely on the training data available at the time of their development."</data>
+      <data key="d2">chunk-0972121b1b4cc2486add4c8c3e8b503b</data>
+    </node>
+    <node id="&quot;TOOLMATE AI.&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"ToolMate AI is an organization that provides tools and services to extend LLMs' abilities in obtaining up-to-date real-time information from the internet."&lt;SEP&gt;"ToolMate AI is an organization that provides tools and services to extend LLMs' abilities in obtaining up-to-date real-time information from the internet."&lt;SEP&gt;"ToolMate AI is an organization that provides tools and services to extend LLMs' abilities in obtaining up-to-date real-time information from the internet."&lt;SEP&gt;"ToolMate AI is described as an organization providing tools for extending LLMs' abilities in obtaining real-time information from the internet."&lt;SEP&gt;"ToolMate AI is described as an organization providing tools for extending LLMs' abilities in obtaining real-time information from the internet."&lt;SEP&gt;"ToolMate AI is described as an organization providing tools for extending LLMs' abilities in obtaining real-time information from the internet."</data>
+      <data key="d2">chunk-0972121b1b4cc2486add4c8c3e8b503b</data>
+    </node>
+    <node id="&quot;@SEARCH_GOOGLE.&quot;">
+      <data key="d0">"TOOL"</data>
+      <data key="d1">"@search_google is a tool provided by ToolMate AI for searching Google, which can be used when the LLM lacks specific information."&lt;SEP&gt;"@search_google is a tool provided by ToolMate AI for searching Google, which can be used when the LLM lacks specific information."&lt;SEP&gt;"@search_google is a tool provided by ToolMate AI for searching Google, which can be used when the LLM lacks specific information."&lt;SEP&gt;"@search_google is a tool provided by ToolMate AI, designed to search Google when the LLM lacks specific information."&lt;SEP&gt;"@search_google is a tool provided by ToolMate AI, designed to search Google when the LLM lacks specific information."&lt;SEP&gt;"@search_google is a tool provided by ToolMate AI, designed to search Google when the LLM lacks specific information."</data>
+      <data key="d2">chunk-0972121b1b4cc2486add4c8c3e8b503b</data>
+    </node>
+    <node id="&quot;@SEARCH_SEARXNG.&quot;">
+      <data key="d0">"TOOL"</data>
+      <data key="d1">"@search_searxng is another tool provided by ToolMate AI for online searches and obtaining real-time, up-to-date information from the internet."&lt;SEP&gt;"@search_searxng is another tool provided by ToolMate AI for online searches and obtaining real-time, up-to-date information from the internet."&lt;SEP&gt;"@search_searxng is another tool provided by ToolMate AI for online searches and obtaining real-time, up-to-date information from the internet."&lt;SEP&gt;"@search_searxng is another tool provided by ToolMate AI to perform online searches and obtain the latest real-time information from the internet."&lt;SEP&gt;"@search_searxng is another tool provided by ToolMate AI to perform online searches and obtain the latest real-time information from the internet."&lt;SEP&gt;"@search_searxng is another tool provided by ToolMate AI to perform online searches and obtain the latest real-time information from the internet."</data>
+      <data key="d2">chunk-0972121b1b4cc2486add4c8c3e8b503b</data>
+    </node>
+    <node id="&quot;@ASK_INTERNET.&quot;">
+      <data key="d0">"ALIAS"</data>
+      <data key="d1">"@ask_internet acts as an alias for @search_searxng."|&lt;SEP&gt;"@ask_internet acts as an alias for @search_searxng."|&lt;SEP&gt;"@ask_internet acts as an alias for @search_searxng."|&lt;SEP&gt;"@ask_internet is an alias for @search_searxng, offering similar functionalities."&lt;SEP&gt;"@ask_internet is an alias for @search_searxng, offering similar functionalities."&lt;SEP&gt;"@ask_internet is an alias for @search_searxng, offering similar functionalities."</data>
+      <data key="d2">chunk-0972121b1b4cc2486add4c8c3e8b503b</data>
+    </node>
+    <node id="&quot;@SEARCH_TAVILY.&quot;">
+      <data key="d0">"TOOL"</data>
+      <data key="d1">"@search_tavily is a tool provided by ToolMate AI that allows searching for online information with Tavily."</data>
+      <data key="d2">chunk-0972121b1b4cc2486add4c8c3e8b503b</data>
+    </node>
+    <node id="&quot;@ASK_TAVILY.&quot;">
+      <data key="d0">"ALIAS"</data>
+      <data key="d1">"@ask_tavily acts as an alias for @search_tavily, offering direct and short answers from the internet."&lt;SEP&gt;"@ask_tavily acts as an alias for @search_tavily, offering direct and short answers from the internet."&lt;SEP&gt;"@ask_tavily acts as an alias for @search_tavily, offering direct and short answers from the internet."&lt;SEP&gt;"@ask_tavily is an alias for @search_tavily, providing direct and short answers from the internet."&lt;SEP&gt;"@ask_tavily is an alias for @search_tavily, providing direct and short answers from the internet."&lt;SEP&gt;"@ask_tavily is an alias for @search_tavily, providing direct and short answers from the internet."</data>
+      <data key="d2">chunk-0972121b1b4cc2486add4c8c3e8b503b</data>
+    </node>
+    <node id="&quot;LLMS&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"LLMs refer to Language Models which are a type of AI models that can understand and generate human-like language."</data>
+      <data key="d2">chunk-0972121b1b4cc2486add4c8c3e8b503b</data>
+    </node>
+    <node id="&quot;.NEW&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"A quick action directly triggered by entering '.new' in the ToolMate prompt, initiating a new conversation."</data>
+      <data key="d2">chunk-553045fd78498fa25ba7b348b3528cdf</data>
+    </node>
+    <node id="&quot;.EXIT&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"A quick action directly triggered by entering '.exit' in the ToolMate prompt, exiting the current feature or app."</data>
+      <data key="d2">chunk-553045fd78498fa25ba7b348b3528cdf</data>
+    </node>
+    <node id="&quot;.KEYS&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"A quick action directly triggered by entering '.keys' in the ToolMate prompt, displaying key bindings for quick actions."&lt;SEP&gt;"A quick action directly triggered by entering '.keys' in the ToolMate prompt, displaying key bindings."</data>
+      <data key="d2">chunk-553045fd78498fa25ba7b348b3528cdf</data>
+    </node>
+    <node id="&quot;.OPEN&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"A quick action directly triggered by entering '.open' in the ToolMate prompt, opening a saved conversation."</data>
+      <data key="d2">chunk-553045fd78498fa25ba7b348b3528cdf</data>
+    </node>
+    <node id="&quot;.SAVEAS&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"A quick action directly triggered by entering '.saveas' in the ToolMate prompt, saving current conversation as new."</data>
+      <data key="d2">chunk-553045fd78498fa25ba7b348b3528cdf</data>
+    </node>
+    <node id="&quot;PLUGIN&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"Plugin refers to an add-on component designed to expand the functionality of other software applications, here specifically 'download youtube media' plugin."</data>
+      <data key="d2">chunk-56777ce328a2ecdf2846a29756d6b7e4</data>
+    </node>
+    <node id="&quot;LINUX&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"Linux is a popular operating system primarily used on servers and workstations."</data>
+      <data key="d2">chunk-56777ce328a2ecdf2846a29756d6b7e4</data>
+    </node>
+    <node id="&quot;WINDOWS&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"Windows refers to the Microsoft Windows NT family of proprietary graphical operating systems developed by Microsoft Corporation."</data>
+      <data key="d2">chunk-56777ce328a2ecdf2846a29756d6b7e4</data>
+    </node>
+    <node id="&quot;MACOS&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"macOS is Apple's mobile operating system based on Unix, primarily used in Apple products like Mac computers and iPhones."</data>
+      <data key="d2">chunk-56777ce328a2ecdf2846a29756d6b7e4</data>
+    </node>
+    <node id="&quot;TERMUX API&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"Termux API is an application programming interface used by ToolMate AI to interact with the Android environment."&lt;SEP&gt;"Termux API refers to an application programming interface used by ToolMate AI to interact with the Android environment."</data>
+      <data key="d2">chunk-d0c0c1b2598b2aca2f391acf07d5ecad</data>
+    </node>
+    <node id="&quot;TOOLMATE AI ANDROID VERSION&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"The Android version of ToolMate AI is a separate organization responsible for its installation and setup instructions."&lt;SEP&gt;"ToolMate AI Android version is a separate organization responsible for its installation and setup instructions."</data>
+      <data key="d2">chunk-d0c0c1b2598b2aca2f391acf07d5ecad</data>
+    </node>
+    <node id="&quot;UBUNTU IN TERMUX&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"The setup of Ubuntu within the Termux environment represents an event that integrates various Linux tools into Android applications."&lt;SEP&gt;"Ubuntu in Termux refers to a set of commands used to start the Ubuntu environment within Termux, which involves setting up virtual environments and installing necessary packages."</data>
+      <data key="d2">chunk-d0c0c1b2598b2aca2f391acf07d5ecad</data>
+    </node>
+    <node id="&quot;TOOLMATE AI LINUX VERSION&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"The Linux version of ToolMate AI is an independent entity that can be installed using the provided installation steps."</data>
+      <data key="d2">chunk-d0c0c1b2598b2aca2f391acf07d5ecad</data>
+    </node>
+    <node id="&quot;TERMUX&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"Termux is a cross-platform tool for running Linux applications on Android devices, used as the base environment for installing and setting up ToolMate AI."&lt;SEP&gt;"Termux is a virtual terminal application used for running Linux commands on Android devices."&lt;SEP&gt;"Termux is an open-source cross-platform application framework that runs on Android devices."</data>
+      <data key="d2">chunk-456a0a486b95b3df18e12a4457464d4e&lt;SEP&gt;chunk-bc0340ecfc8ebb3292fe95e1d1e1e486&lt;SEP&gt;chunk-d0c0c1b2598b2aca2f391acf07d5ecad</data>
+    </node>
+    <node id="&quot;FABRIC INTEGRATION&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"A documentation and integration guide for using `fabric`, an unspecified software or service."</data>
+      <data key="d2">chunk-60036d0b640ad5bcf69605ca865480fc</data>
+    </node>
+    <node id="&quot;FREGENIUS AI&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"FreGenius AI refers to the entity providing visual text output and pattern suggestions for fabric commands."</data>
+      <data key="d2">chunk-60036d0b640ad5bcf69605ca865480fc</data>
+    </node>
+    <node id="&quot;GEMINI-1.5-PRO&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"A specific AI tool used in a command sequence involving fabric, indicating its role in text generation."</data>
+      <data key="d2">chunk-60036d0b640ad5bcf69605ca865480fc</data>
+    </node>
+    <node id="&quot;LLAMA3.1:LATEST&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"Another specific AI tool used in the command sequence, involved in wisdom extraction from a previous response."</data>
+      <data key="d2">chunk-60036d0b640ad5bcf69605ca865480fc</data>
+    </node>
+    <node id="&quot;MISTRAL-LARGE:123B&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"A further specific AI tool utilized for summarizing the text provided by gemini-1.5-pro and llama3.1:latest."</data>
+      <data key="d2">chunk-60036d0b640ad5bcf69605ca865480fc</data>
+    </node>
+    <node id="&quot;FABRICPATH&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"Config item allowing users to customize fabric's path, indicating a concept related to software configuration and management."</data>
+      <data key="d2">chunk-60036d0b640ad5bcf69605ca865480fc</data>
+    </node>
+    <node id="&quot;FREEGENIUS_AI&quot;">
+      <data key="d2">chunk-60036d0b640ad5bcf69605ca865480fc</data>
+      <data key="d1">"FreGenius AI offers input suggestions for selecting fabric patterns, suggesting that Fabric Integration benefits from the interface provided by FreGenius AI."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;LETMEDOIT AI&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"An AI assistant that helps users achieve variety of tasks by providing simple instructions."&lt;SEP&gt;"LetMeDoIt AI is an organization that provides AI-based services, particularly in the area of function calling with structured data."&lt;SEP&gt;"Organization that provides plugins for LetMeDoIt AI, including date and times and create maps plugins."&lt;SEP&gt;"LetMeDoIt AI is a platform or service where LetMeDoItAI Plugin operates, supporting function calling for task execution."&lt;SEP&gt;"LetMeDoIt AI refers to the organization or platform that uses the `config.aliases` configuration for command plugins."&lt;SEP&gt;"LetMeDoIt AI is a service or platform providing AI functionalities such as conversational models and plugin integration for image generation."&lt;SEP&gt;"LetMeDoIt AI is a virtual assistant that can be customized with Python plugins."&lt;SEP&gt;"LetMeDoIt AI is a powerful tool that combines the capabilities of a virtual assistant and a code execution environment."</data>
+      <data key="d2">chunk-db0dfa801fe7705dab74e3f34c41b22a&lt;SEP&gt;chunk-46281d2e68eeda94d6ab62fb22bac2fe&lt;SEP&gt;chunk-eba52398f6766e0a128b55af166a6bf8&lt;SEP&gt;chunk-ba0989f99f67e36841d81256bd100791&lt;SEP&gt;chunk-93ddd8ad41905bb4e11714d30ecf4b1e&lt;SEP&gt;chunk-95085e367fcd9e0a48c3c41642cf5c1a&lt;SEP&gt;chunk-539d4b679f0f83e910ef48330bd6c9be&lt;SEP&gt;chunk-091fd1c2512aeedbb720eae6434cc6cb</data>
+    </node>
+    <node id="&quot;OPENAI FUNCTION CALLING FEATURES&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"OpenAI Function Calling Features refer to advanced capabilities for organizing structured data from unstructured queries and accepting multiple functions in a single request."</data>
+      <data key="d2">chunk-ba0989f99f67e36841d81256bd100791</data>
+    </node>
+    <node id="&quot;GEMINI PRO&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"Gemini Pro is an organization that offers function calling features, though with limited capacity compared to OpenAI's."</data>
+      <data key="d2">chunk-ba0989f99f67e36841d81256bd100791</data>
+    </node>
+    <node id="&quot;11TENSORS&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"Eliran W. is a person involved in exploring and developing innovative solutions for implementing function calling features with open-source models on standard hardware."</data>
+      <data key="d2">chunk-ba0989f99f67e36841d81256bd100791</data>
+    </node>
+    <node id="&quot;LLAMA.CPP&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"Llama.cpp is an open-source model that can be used to implement the novel strategy of breaking down the function calling process into several distinct steps for multiple generations."</data>
+      <data key="d2">chunk-ba0989f99f67e36841d81256bd100791</data>
+    </node>
+    <node id="&quot;WORKFLOW&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"Workflow is described as a tool designed to save repetitive actions and shared among collaborators."</data>
+      <data key="d2">chunk-c50af8283bd4051d75176ccdda0b2c21</data>
+    </node>
+    <node id="&quot;WORKFLOW TOOLMATE AI&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"ToolMate AI provides the workflow service, offering tools like '@workflow' for executing workflows."&lt;SEP&gt;"Workflow ToolMate AI is a tool within the organization that allows users to execute workflows using '@workflow' commands."</data>
+      <data key="d2">chunk-c50af8283bd4051d75176ccdda0b2c21</data>
+    </node>
+    <node id="&quot;ALEX TOOLMATE AI&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"ToolMate AI is an organization providing workflow services."</data>
+      <data key="d2">chunk-c50af8283bd4051d75176ccdda0b2c21</data>
+    </node>
+    <node id="&quot;ELIRANWONG&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"Developer Eliranwong created the LetMeDoIt AI organization's plugins."&lt;SEP&gt;"Eliran Wong is the creator and maintainer of LetMeDoIt AI."&lt;SEP&gt;"EliranWong is likely the creator or maintainer of the InputSuggestions plugin, as he authored and customized it in the described example."&lt;SEP&gt;"EliranWong refers to the person who customizes the input suggestions plugin in the described example."</data>
+      <data key="d2">chunk-6195ae51400d4ac8d053d22857a76ba0&lt;SEP&gt;chunk-091fd1c2512aeedbb720eae6434cc6cb&lt;SEP&gt;chunk-93ddd8ad41905bb4e11714d30ecf4b1e</data>
+    </node>
+    <node id="&quot;GITHUB&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"Repository hosting the source code for the LetMeDoIt AI plugins, including dates and times and create maps plugins."</data>
+      <data key="d2">chunk-091fd1c2512aeedbb720eae6434cc6cb</data>
+    </node>
+    <node id="&quot;LETMEDOIT API FUNCTION SIGNATURES&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"Events defined in the ChatGPT API of LetMeDoIt AI to integrate specific packages like pendulum and folium."</data>
+      <data key="d2">chunk-091fd1c2512aeedbb720eae6434cc6cb</data>
+    </node>
+    <node id="&quot;LETMEDOIT API AVAILABLE FUNCTIONS&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"Functions available in the ChatGPT API of LetMeDoIt AI, including datetimes and create_map functions that use packages."</data>
+      <data key="d2">chunk-091fd1c2512aeedbb720eae6434cc6cb</data>
+    </node>
+    <node id="&quot;TOOLMATE AI PLUGINS&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"A set of AI plugins designed for various tasks using simple language inputs."</data>
+      <data key="d2">chunk-eba52398f6766e0a128b55af166a6bf8</data>
+    </node>
+    <node id="&quot;GOOGLE PALM 2&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"A technology developed to assist with a wide range of natural language processing and language generation tasks."</data>
+      <data key="d2">chunk-eba52398f6766e0a128b55af166a6bf8</data>
+    </node>
+    <node id="&quot;CODEY&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"A technology developed for teaching the use of decorators in Python programming."&lt;SEP&gt;"Codey refers to an AI assistant that was used in the research step of developing the LetMeDoItAI plugin."</data>
+      <data key="d2">chunk-db0dfa801fe7705dab74e3f34c41b22a&lt;SEP&gt;chunk-eba52398f6766e0a128b55af166a6bf8</data>
+    </node>
+    <node id="&quot;VLC PLAYER&quot;">
+      <data key="d0">"PRODUCT"</data>
+      <data key="d1">"VLC player, an open-source media player designed to play multimedia contents, including video and audio."</data>
+      <data key="d2">chunk-eba52398f6766e0a128b55af166a6bf8</data>
+    </node>
+    <node id="&quot;GOOGLE CALENDAR&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"A calendar service provided by Google for scheduling events and managing reminders."</data>
+      <data key="d2">chunk-eba52398f6766e0a128b55af166a6bf8</data>
+    </node>
+    <node id="&quot;OUTLOOK CALENDAR&quot;">
+      <data key="d0">"PRODUCT"</data>
+      <data key="d1">"An email application that includes a calendar feature for planning and coordinating activities."</data>
+      <data key="d2">chunk-eba52398f6766e0a128b55af166a6bf8</data>
+    </node>
+    <node id="&quot;ASK LLAMA.CPP SERVER&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"A server provided by Ask Llama.cpp, used to chat or provide information."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;ASK REASONING MODEL O1&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"Reasoning model o1 is a member of the team that can interact and provide information."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;ASK REASONING MODEL O1-MINI&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"Reasoning model o1-mini is another member of the team, capable of interaction and providing information."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;@ASK_O1_MINI&quot;">
+      <data key="d0">"ROLE"</data>
+      <data key="d1">"A user command for interacting with reasoning model o1-mini."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;ASK PALM 2&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"PaLM 2 is a reasoning model in the team, capable of interaction and providing information."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;@ASK_PALM2&quot;">
+      <data key="d0">"ROLE"</data>
+      <data key="d1">"A user command for interacting with PaLM 2."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;ASK INTERNET&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"The internet as a whole is seen here as an organization that can be queried to provide information."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;@ASK_TAVILY&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"Tavily, likely referring to the internet or AI capable of providing information via this command."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;SHOW BIBLE VERSES CONTENT&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"This event involves showing content from the Bible verses."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;BUILD A GROUP OF AI ASSISTANTS OR AGENTS&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"Building a group of AI assistants or agents for executing complex tasks."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;PROVIDE INFORMATION OR ANSWER A QUESTION&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"A general event that involves providing information or answering questions."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;MESSAGE&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"Message refers to the communication between entities, such as humans and AI models."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;CODE&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"Code is a sequence of instructions written in a programming language, used for executing tasks."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;MODULE&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"Module can refer to Python packages or other specialized software components."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;RISK&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"Risk refers to potential adverse outcomes or dangers related to the task execution."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;ID&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"ID likely referring to a unique identifier for chat sessions."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;FILE PATH&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"File path is a sequence of directories and file names that locate a specific file or directory on a storage system."</data>
+      <data key="d2">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </node>
+    <node id="&quot;IFIC_PUBLICATIONS&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"ific_publications is an organization focused on publishing scientific information."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;SEARCH_CONVERSATIONS&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"search_conversations refers to the search for chat records or conversations."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;SEARCH_FINANCE&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"search_finance is related to searching and analyzing financial data, especially when package yfinance is available."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;SEARCH_GOOGLE&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"search_google is used to find real-time information or the latest updates when LLM lacks specific details."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;SEARCH_GOOGLE_NEWS&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"search_google_news involves searching for the latest news based on given keywords."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;SEARCH_MEMORY&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"search_memory is a function to recall important conversation snippets from the past."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;SEARCH_SEARXNG&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"search_searxng is used for searching online information, focusing on real-time updates."&lt;SEP&gt;"search_searxng performs online searches for the latest and most up-to-date real-time information."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;SEARCH_SQLITE&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"search_sqlite is used to search or manage SQLite files, especially when a path is provided with 'request' conditions."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;SEARCH_TAVILY&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"search_tavily searches for online information using the Tavily platform."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;SEARCH_WEATHER_INFO&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"search_weather_info provides weather-related information based on a request with 'code' conditions."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;SEND_GMAIL&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"send_gmail is used to send emails through Gmail, requiring 'email', 'subject', and 'body' inputs for the message."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;SEND_OUTLOOK&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"send_outlook allows sending Outlook emails with similar 'email', 'subject', and 'body' requirements as send_gmail."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;SEND_TWEET&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"send_tweet is used to send a tweet through Twitter, requiring the 'message' input for the tweet content."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;SOCIAL_MEDIA&quot;">
+      <data key="d0">"CATEGORY"</data>
+      <data key="d1">"social_media refers to information and interactions on social media platforms."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;SOFTWARE_WIKIS&quot;">
+      <data key="d0">"CATEGORY"</data>
+      <data key="d1">"software_wikis involves searching for information related to software documentation or guides."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;TRANSLATE&quot;">
+      <data key="d0">"CATEGORY"</data>
+      <data key="d1">"translate focuses on translating text from one language to another."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;VIDEOS&quot;">
+      <data key="d0">"CATEGORY"</data>
+      <data key="d1">"videos is about finding and accessing video content online, such as tutorials or news videos."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;WEB&quot;">
+      <data key="d0">"CATEGORY"</data>
+      <data key="d1">"web involves searching for general web-based information."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;WIKIMEDIA&quot;">
+      <data key="d0">"CATEGORY"</data>
+      <data key="d1">"wikimedia pertains to Wikipedia articles and other Wikimedia projects like Wiktionary or Wikivoyage."</data>
+      <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </node>
+    <node id="&quot;.EDITCONFIGS&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">".editconfigs is an event or command to manually edit `config.py` file in the ToolMate AI directory, used for configuration purposes."</data>
+      <data key="d2">chunk-a5078e9e86ba4cecbc3efeb6fa89a54a</data>
+    </node>
+    <node id="&quot;TOOLMATE AI DIRECTORY&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"The ToolMate AI directory is where the `config.py` file and related configurations are stored."</data>
+      <data key="d2">chunk-a5078e9e86ba4cecbc3efeb6fa89a54a</data>
+    </node>
+    <node id="&quot;LETMEDOITAI PLUGIN&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"LetMeDoItAI is a custom plugin designed to support function calling for task execution."</data>
+      <data key="d2">chunk-db0dfa801fe7705dab74e3f34c41b22a</data>
+    </node>
+    <node id="&quot;LONDON, UK&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"London, UK is a specific geographical location mentioned as part of the search query for news."</data>
+      <data key="d2">chunk-db0dfa801fe7705dab74e3f34c41b22a</data>
+    </node>
+    <node id="&quot;CHATGPT MODEL&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"ChatGPT Model refers to an AI model that was used in creating the function signature and method for LetMeDoItAI plugin functionality."</data>
+      <data key="d2">chunk-db0dfa801fe7705dab74e3f34c41b22a</data>
+    </node>
+    <node id="&quot;CHATGPT&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"ChatGPT is a language model developed by Anthropic, known for generating human-like text in response to various prompts."&lt;SEP&gt;"chatgpt represents an interface supported by ToolMate AI, which includes OpenAI API and ChatGPT models."*&lt;SEP&gt;"ChatGPT is an entity involved in the function calling features discussed in LetMeDoIt AI documentation."</data>
+      <data key="d2">chunk-46281d2e68eeda94d6ab62fb22bac2fe&lt;SEP&gt;chunk-59bcb3c8a095b78015ffb20b8805913d&lt;SEP&gt;chunk-c2b8662b6e049993320b2d9284ad691e</data>
+    </node>
+    <node id="&quot;ME&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"Me, likely referring to an individual seeking information."</data>
+      <data key="d2">chunk-c2b8662b6e049993320b2d9284ad691e</data>
+    </node>
+    <node id="&quot;LETMEDOITPLUGIN&quot;">
+      <data key="d2">chunk-db0dfa801fe7705dab74e3f34c41b22a</data>
+      <data key="d1">"The LetMeDoIt AI platform integrates and supports the LetMeDoItAI Plugin for function calling tasks."|&gt;platform support, integration</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;ADDITIONAL CHAT MODEL&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"The concept of Additional Chat Model refers to a supplementary model used by ToolMate AI for providing enhanced responses and interactions."</data>
+      <data key="d2">chunk-aca3060dd803974c1b7662f780fc795b</data>
+    </node>
+    <node id="&quot;TOOLMATE_ANDROID&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"toolmate_android is a module designed specifically for Android users, allowing them to install the ToolMate AI application on their devices."</data>
+      <data key="d2">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+    </node>
+    <node id="&quot;TOOLMATE AI GUI&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"The installation process of toolmate_gui is part of the event of setting up the GUI system tray and experimental desktop assistant for ToolMate AI."</data>
+      <data key="d2">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+    </node>
+    <node id="&quot;TOOLMATE_LINUX&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"toolmate_linux refers to a set of instructions or packages that are installed on Linux users, enhancing their experience with ToolMate AI by installing additional libraries like flaml[automl], piper-tts, and pyautogen[autobuild]"</data>
+      <data key="d2">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+    </node>
+    <node id="&quot;TOOLMATE AI BIBLE SUPPORT&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"Toolmate AI Bible Support is a feature that allows users to work with bible tools, expanding the functionality of ToolMate AI."</data>
+      <data key="d2">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+    </node>
+    <node id="&quot;TOOLMATE_GUI&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"The installation process of toolmate_gui is part of the event of setting up the GUI system tray and experimental desktop assistant for ToolMate AI."</data>
+      <data key="d2">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+    </node>
+    <node id="&quot;ANDROID USERS&quot;">
+      <data key="d2">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+      <data key="d1">"For Android users, Toolmate AI provides specific instructions and documentation for setting up on their devices."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;TOOLMATE ANDROID&quot;">
+      <data key="d2">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+      <data key="d1">"For Android users, Toolmate AI provides specific instructions and documentation for setting up on their devices."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;TOOLMATE GUI&quot;">
+      <data key="d2">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+      <data key="d1">"The inclusion of the toolmate_gui module in the installation process highlights the importance of a graphical user interface (GUI) for ToolMate AI."|"GUI system tray, experimental desktop assistant"&lt;SEP&gt;"The inclusion of the toolmate_gui module in the installation process highlights the importance of a graphical user interface (GUI) for Toolmate AI."|"GUI system tray, experimental desktop assistant"</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;LINUX USERS&quot;">
+      <data key="d2">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+      <data key="d1">"For Linux users, additional packages like flaml[automl], piper-tts, and pyautogen[autobuild] are recommended to enhance the user experience with ToolMate AI."|"enhanced functionality, library support"&lt;SEP&gt;"The inclusion of toolmate_linux in the installation process indicates that Linux users can benefit from additional packages to improve their experience with ToolMate AI."|"platform-specific guidance, library support"</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;TOOLMATE LINUX&quot;">
+      <data key="d2">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+      <data key="d1">"For Linux users, additional packages like flaml[automl], piper-tts, and pyautogen[autobuild] are recommended to enhance the user experience with ToolMate AI."|"enhanced functionality, library support"&lt;SEP&gt;"The inclusion of toolmate_linux in the installation process indicates that Linux users can benefit from additional packages to improve their experience with ToolMate AI."|"platform-specific guidance, library support"</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;TOOLMATE AI USERS&quot;">
+      <data key="d2">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+      <data key="d1">"Android users have a dedicated installation guide provided by Toolmate AI for setting up their devices."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;BIBLE USERS&quot;">
+      <data key="d2">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+      <data key="d1">"The toolmate_bible support feature allows users who engage with biblical tools to use ToolMate AI effectively."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;TOOLMATE AI USER&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"The user can configure their own models in ToolMate AI and download additional features as needed."</data>
+      <data key="d2">chunk-28464f4aa1c6b9278b4f0f8e34f2bbf8</data>
+    </node>
+    <node id="&quot;HUGGINGFACE CO&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"HuggingFace CO is a platform where users can access LLMs, including GGUF format models."&lt;SEP&gt;"HuggingFace CO provides access to LLMs, including GGUF format models."</data>
+      <data key="d2">chunk-28464f4aa1c6b9278b4f0f8e34f2bbf8</data>
+    </node>
+    <node id="&quot;OLLAMA&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"Ollama is a service or repository that provides access to Ollama models for downloading and using offline."&lt;SEP&gt;"Ollama offers the option for downloading specific models like the Whisper model for offline use."&lt;SEP&gt;"ollama represents an interface supported by ToolMate AI, which includes hosted Ollama models."*&lt;SEP&gt;"ollama represents an interface supported by ToolMate AI, which includes hosted models from Ollama."*&lt;SEP&gt;"Ollama is an organization that provides a server configuration guide for its service."&lt;SEP&gt;"Ollama refers to an organization that provides server configuration guides and Ubuntu server configurations."</data>
+      <data key="d2">chunk-59bcb3c8a095b78015ffb20b8805913d&lt;SEP&gt;chunk-28464f4aa1c6b9278b4f0f8e34f2bbf8&lt;SEP&gt;chunk-0eb61cb4713b99e844cf89f16fd9e657</data>
+    </node>
+    <node id="&quot;TOOLMATE CLI&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"ToolMate CLI refers to the command-line interface used to run ToolMate AI commands and tools directly from the terminal."</data>
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+    </node>
+    <node id="&quot;TOOLMATE WIKI&quot;">
+      <data key="d0">"LOCATION"</data>
+      <data key="d1">"The GitHub repository for documentation, wiki pages, and resources related to ToolMate AI."</data>
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+    </node>
+    <node id="&quot;TOOLMATE ACTION MENU&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"The ToolMate Action Menu is an event that provides users with a guide on how to work with different features and functionalities of the platform."</data>
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+    </node>
+    <node id="&quot;DEVELOPER MODE&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"Developer Mode is an event where advanced users can access a python playground and developer options."</data>
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+    </node>
+    <node id="&quot;INSTALLATION&quot;">
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+      <data key="d1">"The Installation process involves downloading and setting up ToolMate AI, with instructions provided in the Quick Guide."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;LAUNCH TOOLMATE AI&quot;">
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+      <data key="d1">"Users launch ToolMate AI by double-clicking the desktop shortcut or running it via terminal commands."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;PROMPT INTERFACE&quot;">
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+      <data key="d1">"The Prompt Interface is where users input their requests, displayed with a visual example of the interface."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;TOOLMATE PROMPT INTERFACE&quot;">
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+      <data key="d1">"The Prompt Interface is where users input their requests, displayed with a visual example of the interface."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;CLI OPTIONS&quot;">
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+      <data key="d1">"Users can see CLI options by running 'toolmate -h' in terminal."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;TOOLMATE CLI OPTIONS&quot;">
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+      <data key="d1">"Users can see CLI options by running 'toolmate -h' in terminal."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;QUICK ACTIONS&quot;">
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+      <data key="d1">"The Quick Actions include menu changes, cancellation, quitting the app or feature, and showing keyboard shortcuts."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;TOOLMATE QUICK ACTIONS&quot;">
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+      <data key="d1">"The Quick Actions include menu changes, cancellation, quitting the app or feature, and showing keyboard shortcuts."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;MULTILINE INPUT&quot;">
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+      <data key="d1">"Users can toggle between single-line and multi-line input modes in ToolMate, with specific key presses to complete entries."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;TOOLMATE MULTILINE INPUT&quot;">
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+      <data key="d1">"Users can toggle between single-line and multi-line input modes in ToolMate, with specific key presses to complete entries."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;ACTION MENU&quot;">
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+      <data key="d1">"The Action Menu is a part of the platform where users find information on how to work with different features and functionalities."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;CHANGE AI BACKENDS AND MODELS PAGE&quot;">
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+      <data key="d1">"Users can learn about changing AI backends and models, including the process and necessary steps."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;HOW TO CHANGE AI BACKENDS AND MODELS? &quot;">
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+      <data key="d1">"Users can learn about changing AI backends and models, including the process and necessary steps."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;DEVELOPER MODE DOCUMENTATION&quot;">
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+      <data key="d1">"The Developer Mode documentation provides details on how to access developer options for advanced users."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;DEVELOPER MODE EVENT&quot;">
+      <data key="d2">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+      <data key="d1">"The Developer Mode documentation provides details on how to access developer options for advanced users."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;CONFIG.PREDEFINEDCONTEXTS&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"This entity represents a predefined context configuration for the LetMeDoIt AI system, used to customize how the system handles certain contexts and scenarios."&lt;SEP&gt;"config.predefinedContexts is a variable used in LetMeDoIt AI's plugins for predefined contexts."</data>
+      <data key="d2">chunk-00384cff71b1ae137fc155ff097fc80a&lt;SEP&gt;chunk-93ddd8ad41905bb4e11714d30ecf4b1e</data>
+    </node>
+    <node id="&quot;INTRODUCTION&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"An introduction template is provided by this predefined context, intended to create an introductory text."</data>
+      <data key="d2">chunk-00384cff71b1ae137fc155ff097fc80a</data>
+    </node>
+    <node id="&quot;SUMMARY&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"A summary template is provided by this predefined context, intended to create a concise overview of the content or discussion."</data>
+      <data key="d2">chunk-00384cff71b1ae137fc155ff097fc80a</data>
+    </node>
+    <node id="&quot;ENGLISH TRANSLATOR AND IMPROVER&quot;">
+      <data key="d0">"PLUGIN"</data>
+      <data key="d1">"This plugin provides functionality for translating texts into improved versions in English, correcting grammar, spelling, and suggesting more elegant phrasing."</data>
+      <data key="d2">chunk-00384cff71b1ae137fc155ff097fc80a</data>
+    </node>
+    <node id="&quot;SPOKEN ENGLISH TEACHER&quot;">
+      <data key="d0">"PLUGIN"</data>
+      <data key="d1">"This plugin provides a function to act as an English teacher for improving spoken English skills by correcting mistakes, typos, and factual errors."</data>
+      <data key="d2">chunk-00384cff71b1ae137fc155ff097fc80a</data>
+    </node>
+    <node id="&quot;BIBLICAL TRANSLATOR&quot;">
+      <data key="d0">"PLUGIN"</data>
+      <data key="d1">"This plugin is designed to translate texts into the style of biblical language, using more elegant and appropriate words for maintaining meaning while adhering to a literary or formal tone consistent with biblical writing."</data>
+      <data key="d2">chunk-00384cff71b1ae137fc155ff097fc80a</data>
+    </node>
+    <node id="&quot;LETMEDOIT.CONFIG&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"LetMeDoIt AI system configuration, where predefined contexts can be customized via plugins."</data>
+      <data key="d2">chunk-00384cff71b1ae137fc155ff097fc80a</data>
+    </node>
+    <node id="&quot;LETMEDOIT.CONFIG.PREDEFINEDCONTEXTS&quot;">
+      <data key="d2">chunk-00384cff71b1ae137fc155ff097fc80a</data>
+      <data key="d1">"The Introduction context uses content provided by config.predefinedContexts."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;TOOLMATE&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"toolmate refers to the software application used for launching ToolMate AI."&lt;SEP&gt;"toolmate seems to be a person or system name used in a command-line interface context."</data>
+      <data key="d2">chunk-d624e06bb668cd8e8d75854e9a597164&lt;SEP&gt;chunk-3a70ca192bc2713104ce41948a517ec8</data>
+    </node>
+    <node id="&quot;ONLINE BACKEND&quot;">
+      <data key="d0">"LOCATION"</data>
+      <data key="d1">"Online backend is a location where users may specify an online server for launching the app."</data>
+      <data key="d2">chunk-d624e06bb668cd8e8d75854e9a597164</data>
+    </node>
+    <node id="&quot;GROQ&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"Groq is one of the possible options for an online backend used to launch ToolMate AI."</data>
+      <data key="d2">chunk-d624e06bb668cd8e8d75854e9a597164</data>
+    </node>
+    <node id="&quot;FIRST LAUNCH&quot;">
+      <data key="d2">chunk-d624e06bb668cd8e8d75854e9a597164</data>
+      <data key="d1">"ToolMate AI will download and configure necessary large language models during its initial launch."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;ALL CONVERSATION RECORDS&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"This is an organization that manages and saves all conversation records in plain text formats."</data>
+      <data key="d2">chunk-f50283466db39cca794aea33c114b955</data>
+    </node>
+    <node id="&quot;AUTO SAVING&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"Auto Saving is an event where conversation records are automatically saved in plain text formats by ToolMate AI when the app exits properly."</data>
+      <data key="d2">chunk-f50283466db39cca794aea33c114b955</data>
+    </node>
+    <node id="&quot;MANUAL SAVING&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"Manual Saving is an event initiated by users, allowing them to manually save their current conversations using specific commands or menus provided by ToolMate AI."</data>
+      <data key="d2">chunk-f50283466db39cca794aea33c114b955</data>
+    </node>
+    <node id="&quot;SAVE AS ...&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"'Save as...' refers to the concept of saving a conversation with a custom name at a custom location, providing users more flexibility in managing and accessing their chat records."</data>
+      <data key="d2">chunk-f50283466db39cca794aea33c114b955</data>
+    </node>
+    <node id="&quot;OPEN A SAVED CONVERSATION&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"Opening a saved conversation is an event that allows users to resume any previous conversations by using specific commands or menus provided by ToolMate AI."</data>
+      <data key="d2">chunk-f50283466db39cca794aea33c114b955</data>
+    </node>
+    <node id="&quot;SEARCH PREVIOUS CONVERSATIONS&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"Searching previous conversations involves the process of using tools like @search_conversations and @load_conversations to search and load old chat records from a vector database format."</data>
+      <data key="d2">chunk-f50283466db39cca794aea33c114b955</data>
+    </node>
+    <node id="&quot;SHARE CONVERSATIONS&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"Sharing conversations is a concept that involves simply sharing saved conversation files in plain text format with others, who can then use ToolMate AI to continue the conversations."</data>
+      <data key="d2">chunk-f50283466db39cca794aea33c114b955</data>
+    </node>
+    <node id="&quot;KEEP A READABLE COPY&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"Keeping a readable copy refers to saving chat records in an easily readable plain text format using commands or menus provided by ToolMate AI."</data>
+      <data key="d2">chunk-f50283466db39cca794aea33c114b955</data>
+    </node>
+    <node id="&quot;TEXT-TO-SPEECH FEATURE&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"Text-to-speech feature is a technology that enables text conversion to speech, integrated into the plugins for functionality."</data>
+      <data key="d2">chunk-46dc95c8f139e15b02c4f72336590a07</data>
+    </node>
+    <node id="&quot;TTSUTIL&quot;">
+      <data key="d0">"FUNCTIONALITY"</data>
+      <data key="d1">"TTSUtil is a function used in plugins for integrating text-to-speech capability."</data>
+      <data key="d2">chunk-46dc95c8f139e15b02c4f72336590a07</data>
+    </node>
+    <node id="&quot;LETMEDOIT/UTILS/TTS_UTILS.PY&quot;">
+      <data key="d0">"SOFTWARE"</data>
+      <data key="d1">"This file contains utility code, including TTSUtil, which provides functionality for text-to-speech integration into the plugins."</data>
+      <data key="d2">chunk-46dc95c8f139e15b02c4f72336590a07</data>
+    </node>
+    <node id="&quot;VERSION 0.2.54&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"This is an event indicating a specific version of a software or system, lasting for a short duration."</data>
+      <data key="d2">chunk-dc1d20d6cb489144b9f62fd9387d69e9</data>
+    </node>
+    <node id="&quot;APPNAME&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"appName refers to the name or identifier of an application or service."</data>
+      <data key="d2">chunk-dc1d20d6cb489144b9f62fd9387d69e9</data>
+    </node>
+    <node id="&quot;TEXT2ART_FONT1&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"text2art_font1 is likely a font style or configuration used for text2art function in ToolMate."</data>
+      <data key="d2">chunk-dc1d20d6cb489144b9f62fd9387d69e9</data>
+    </node>
+    <node id="&quot;GROQ CLOUD API KEY&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"A service provided by Groq to allow free access to selected open source large language models."</data>
+      <data key="d2">chunk-9a7a626018212a6f7f1f885b79ab5ee3</data>
+    </node>
+    <node id="&quot;API KEY&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"A term used to refer to a unique identifier or access token."</data>
+      <data key="d2">chunk-9a7a626018212a6f7f1f885b79ab5ee3</data>
+    </node>
+    <node id="&quot;TOOLMATE AI SUPPORT MULTI-API KEY USAGE&quot;">
+      <data key="d2">chunk-9a7a626018212a6f7f1f885b79ab5ee3</data>
+      <data key="d1">"ToolMate AI supports use of multiple groq API keys for running inference."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;LLAMA.CPP SERVER&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"LLaMa.cpp Server is the backend for configuring and running LLMs, specifically llama.cpp."</data>
+      <data key="d2">chunk-176af1443a44c73060d94e2882e81ef7</data>
+    </node>
+    <node id="&quot;WIZARDLM2&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"WizardLM2 is the organization or entity providing the gguf model used by the server configuration examples."</data>
+      <data key="d2">chunk-176af1443a44c73060d94e2882e81ef7</data>
+    </node>
+    <node id="&quot;AYERS&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"Ayers is a person mentioned in the text, possibly the user or author of the commands provided."</data>
+      <data key="d2">chunk-6484d1e47218253a33bb3a1d058fe878</data>
+    </node>
+    <node id="&quot;~/MODELS/WIZARDLM2.GGUF&quot;">
+      <data key="d2">chunk-6484d1e47218253a33bb3a1d058fe878</data>
+      <data key="d1">"Ayers uses wizardlm2.gguf as part of their command line for running Llama.cpp server."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;CONFIG.ALIASES&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"config.aliases is a dictionary used to define aliases for commands in the LetMeDoIt AI plugin system."&lt;SEP&gt;"config.aliases is a variable used in LetMeDoIt AI's plugins to add aliases."</data>
+      <data key="d2">chunk-95085e367fcd9e0a48c3c41642cf5c1a&lt;SEP&gt;chunk-93ddd8ad41905bb4e11714d30ecf4b1e</data>
+    </node>
+    <node id="&quot;PYTHON&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"Python is a programming language used in this plugin, specifically for defining aliases and interacting with virtual environments."</data>
+      <data key="d2">chunk-95085e367fcd9e0a48c3c41642cf5c1a</data>
+    </node>
+    <node id="&quot;ETEXTEDIT.PY&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"eTextEdit.py is a Python script likely related to the text editor functionality provided by LetMeDoIt AI plugins."</data>
+      <data key="d2">chunk-95085e367fcd9e0a48c3c41642cf5c1a</data>
+    </node>
+    <node id="&quot;LETMEDOITAIFOLDER&quot;">
+      <data key="d0">"LOCATION"</data>
+      <data key="d1">"LetMeDoItAIFolder is a directory in the LetMeDoIt AI system where various scripts and files, including eTextEdit.py, are stored."</data>
+      <data key="d2">chunk-95085e367fcd9e0a48c3c41642cf5c1a</data>
+    </node>
+    <node id="&quot;!ETEXTEDIT&quot;">
+      <data key="d2">chunk-95085e367fcd9e0a48c3c41642cf5c1a</data>
+      <data key="d1">"The !etextedit alias refers to the eTextEdit.py script defined in config.aliases."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;-H&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"A concept often used with commands to display help information."</data>
+      <data key="d2">chunk-3a70ca192bc2713104ce41948a517ec8</data>
+    </node>
+    <node id="&quot;CHANGE TEXT-TO-SPEECH CONFIG&quot;">
+      <data key="d0">"ACTION"</data>
+      <data key="d1">"An action menu item for changing the text-to-speech configuration on macOS."</data>
+      <data key="d2">chunk-6da1144b98798d92d4d6efc29226e96a</data>
+    </node>
+    <node id="&quot;SAY&quot;">
+      <data key="d0">"ACTION"</data>
+      <data key="d1">"A selectable option from available TTS options in the text-to-speech configuration action menu."</data>
+      <data key="d2">chunk-6da1144b98798d92d4d6efc29226e96a</data>
+    </node>
+    <node id="&quot;TOGGLE INPUT AUDIO&quot;">
+      <data key="d0">"ACTION"</data>
+      <data key="d1">"An action menu item to enable or disable reading of input text on macOS."</data>
+      <data key="d2">chunk-6da1144b98798d92d4d6efc29226e96a</data>
+    </node>
+    <node id="&quot;TOGGLE OUTPUT AUDIO&quot;">
+      <data key="d0">"ACTION"</data>
+      <data key="d1">"An action menu item to enable or disable reading of output text on macOS."</data>
+      <data key="d2">chunk-6da1144b98798d92d4d6efc29226e96a</data>
+    </node>
+    <node id="&quot;MACOS TTS SETUP&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"The sequence of steps to set up macOS built-in text-to-speech features constitutes an event in itself."</data>
+      <data key="d2">chunk-6da1144b98798d92d4d6efc29226e96a</data>
+    </node>
+    <node id="&quot;SETTINGS APP&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"The Settings app is a part of the macOS operating system, allowing users to customize their device settings."</data>
+      <data key="d2">chunk-6da1144b98798d92d4d6efc29226e96a</data>
+    </node>
+    <node id="&quot;ACCESSIBILITY&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"A section within macOS's 'Settings' where users can configure accessibility features like text-to-speech functionality."</data>
+      <data key="d2">chunk-6da1144b98798d92d4d6efc29226e96a</data>
+    </node>
+    <node id="&quot;LIVE SPEECH&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"An event that allows for live speech options and customization in the Accessibility settings of macOS."</data>
+      <data key="d2">chunk-6da1144b98798d92d4d6efc29226e96a</data>
+    </node>
+    <node id="&quot;VOICE&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"The Voice section within the 'Accessibility' &gt; 'Live Speech' menu, where users can manage voice-related features."</data>
+      <data key="d2">chunk-6da1144b98798d92d4d6efc29226e96a</data>
+    </node>
+    <node id="&quot;MANAGE VOICES&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"An event that enables users to download and manage voices in macOS's Accessibility settings."</data>
+      <data key="d2">chunk-6da1144b98798d92d4d6efc29226e96a</data>
+    </node>
+    <node id="&quot;THE TOOL'S CONFIGURATION CHANGE OPTION IS PROVIDED THROUGH THE 'CHANGE TEXT-TO-SPEECH CONFIG' ACTION.&quot;">
+      <data key="d2">chunk-6da1144b98798d92d4d6efc29226e96a</data>
+      <data key="d1">"tool feature, configuration interaction"</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;TOOLMATE V0.2.42+&quot;&lt;/|&gt;&quot;CHANGE TEXT-TO-SPEECH CONFIG&quot;">
+      <data key="d2">chunk-6da1144b98798d92d4d6efc29226e96a</data>
+      <data key="d1">"tool feature, configuration interaction"</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;LETMEDOIT AI MAIN UI&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"LetMeDoIt AI main user interface, based on conversational models like gpt-3 and gpt-4."</data>
+      <data key="d2">chunk-539d4b679f0f83e910ef48330bd6c9be</data>
+    </node>
+    <node id="&quot;GPT-3&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"GPT-3 is a language model created by Anthropic, used in LetMeDoIt AI's user interface."&lt;SEP&gt;"GPT-3 is a large language model created by Anthropic, providing the basis for LetMeDoIt AI's conversational capabilities."</data>
+      <data key="d2">chunk-539d4b679f0f83e910ef48330bd6c9be</data>
+    </node>
+    <node id="&quot;GPT-4&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"GPT-4 is an advanced version of GPT-3, also utilized in the creation and functionality of LetMeDoIt AI."&lt;SEP&gt;"GPT-4 is an advanced version of GPT-3, used in conjunction with gpt-3 to enhance functionality and usability."</data>
+      <data key="d2">chunk-539d4b679f0f83e910ef48330bd6c9be</data>
+    </node>
+    <node id="&quot;FUNCTION CALLS IN PLUGINS&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"Function calls allow developers to utilize non-conversational models within plugins, enabling the integration of DALL-E-3 for image generation."</data>
+      <data key="d2">chunk-539d4b679f0f83e910ef48330bd6c9be</data>
+    </node>
+    <node id="&quot;DALL-E-3&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"DALL-E-3 is a large language model developed by Anthropic and used in conjunction with LetMeDoIt AI to generate images based on prompts provided by users."&lt;SEP&gt;"DALL-E-3 is a model used for generating images within plugins of LetMeDoIt AI."&lt;SEP&gt;"DALL-E-3 is the model used for image generation and is a part of the function calls that are integrated within LetMeDoIt AI's plugins."</data>
+      <data key="d2">chunk-539d4b679f0f83e910ef48330bd6c9be</data>
+    </node>
+    <node id="&quot;IMAGE GENERATION&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"Image generation event, where the DALL-E-3 model is utilized within plugins for image creation based on user input."</data>
+      <data key="d2">chunk-539d4b679f0f83e910ef48330bd6c9be</data>
+    </node>
+    <node id="&quot;PLUGIN - ANALYZE IMAGE&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"Analyzing image event, related to the creation of an analysis tool by Eliran Wong."</data>
+      <data key="d2">chunk-539d4b679f0f83e910ef48330bd6c9be</data>
+    </node>
+    <node id="&quot;ANALYZE IMAGES PLUGIN&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"Analyze Images plugin is part of LetMeDoIt AI, offering functionality for analyzing images."</data>
+      <data key="d2">chunk-539d4b679f0f83e910ef48330bd6c9be</data>
+    </node>
+    <node id="&quot;ANALYZING IMAGE EVENT&quot;">
+      <data key="d2">chunk-539d4b679f0f83e910ef48330bd6c9be</data>
+      <data key="d1">"The function calls in plugins enable an event that analyzes images."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;TAVILY&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"Tavily is an organization that builds the Search API for AI agents (LLMs)."</data>
+      <data key="d2">chunk-d61135b74eb809643c99a0be3a5586a8</data>
+    </node>
+    <node id="&quot;HTTPS://APP.TAVILY.COM/SIGN-IN&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"The URL is for logging in to the Tavily application. "</data>
+      <data key="d2">chunk-d61135b74eb809643c99a0be3a5586a8</data>
+    </node>
+    <node id="&quot;TAVILY API KEY&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"It refers to an identifier used by users to access and configure Tavily API services."</data>
+      <data key="d2">chunk-d61135b74eb809643c99a0be3a5586a8</data>
+    </node>
+    <node id="&quot;LLAMACPP&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"llamacpp is one of the supported interfaces for ToolMate AI, allowing for integration with Llama.cpp models."&lt;SEP&gt;"llamacpp is one of the supported interfaces for ToolMate AI, allowing for integration with Llama.cpp models."*</data>
+      <data key="d2">chunk-59bcb3c8a095b78015ffb20b8805913d</data>
+    </node>
+    <node id="&quot;GEMINI&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"gemini is a geo location associated with Google Vertex AI and Gemini Pro &amp; Gemini Pro Vision models."&lt;SEP&gt;"gemini is a geo location associated with Google Vertex AI and Gemini Pro &amp; Gemini Pro Vision models."*</data>
+      <data key="d2">chunk-59bcb3c8a095b78015ffb20b8805913d</data>
+    </node>
+    <node id="&quot;LETMEDOIT&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"LetMeDoIt is a person associated with the LetMeDoIt mode for ToolMate AI."&lt;SEP&gt;"LetMeDoIt is a person associated with the LetMeDoIt mode for ToolMate AI."*</data>
+      <data key="d2">chunk-59bcb3c8a095b78015ffb20b8805913d</data>
+    </node>
+    <node id="&quot;SYSTEM COMMANDS&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"System commands are likely instructions or directives issued by a system, possibly in response to an event or to manage resources and processes."</data>
+      <data key="d2">chunk-349f3f506b05439b404d6eb6c632e347</data>
+    </node>
+    <node id="&quot;NASA&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"NASA is an international space agency responsible for managing the ISS crew rotations."</data>
+      <data key="d2">chunk-349f3f506b05439b404d6eb6c632e347</data>
+    </node>
+    <node id="&quot;MARK KIMURA&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"Mark Kimura is a NASA astronaut joining the ISS replacing previous member Olivia Chen."</data>
+      <data key="d2">chunk-349f3f506b05439b404d6eb6c632e347</data>
+    </node>
+    <node id="&quot;ISS&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"International Space Station, located in Earth's orbit and managed by multiple space agencies."</data>
+      <data key="d2">chunk-349f3f506b05439b404d6eb6c632e347</data>
+    </node>
+    <node id="&quot;PLUGINS OVERVIEW&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"Plugins Overview is an event where users learn about tailoring LetMeDoIt AI with Python plugins."</data>
+      <data key="d2">chunk-93ddd8ad41905bb4e11714d30ecf4b1e</data>
+    </node>
+    <node id="&quot;PYTHON PLUGINS&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"Python Plugins are external services that can be integrated into LetMeDoIt AI for additional functionalities."</data>
+      <data key="d2">chunk-93ddd8ad41905bb4e11714d30ecf4b1e</data>
+    </node>
+    <node id="&quot;CONFIG.INPUTSUGGESTIONS&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"config.inputSuggestions is a variable used in LetMeDoIt AI's plugins for generating input suggestions."</data>
+      <data key="d2">chunk-93ddd8ad41905bb4e11714d30ecf4b1e</data>
+    </node>
+    <node id="&quot;CONFIG.OUTPUTTRANSFORMERS&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"config.outputTransformers is a variable used in LetMeDoIt AI's plugins to transform text output."</data>
+      <data key="d2">chunk-93ddd8ad41905bb4e11714d30ecf4b1e</data>
+    </node>
+    <node id="&quot;CONFIG.ADDFUNCTIONCALL&quot;">
+      <data key="d0">"VARIABLE"</data>
+      <data key="d1">"This variable represents a way to add a function call within the configuration context, not representing a specific entity type like person, organization, geo, event, etc."&lt;SEP&gt;"config.addFunctionCall is a variable used in LetMeDoIt AI's plugins to add function calls."</data>
+      <data key="d2">chunk-93ddd8ad41905bb4e11714d30ecf4b1e&lt;SEP&gt;chunk-71dca6296e35b426fb6965e5d82c241e</data>
+    </node>
+    <node id="&quot;CONFIG.PY&quot;">
+      <data key="d0">"FILE"</data>
+      <data key="d1">"The config.py file is used for setting up the configuration of ToolMate AI's settings, including model selection and backend configurations."&lt;SEP&gt;"config.py is a configuration file used for setting up various settings in ToolMate AI."</data>
+      <data key="d2">chunk-a115146372569d0e13825dac3d3ab3a4</data>
+    </node>
+    <node id="&quot;.MODEL&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">".model refers to the concept of selecting an AI model or backend within the context of ToolMate AI."</data>
+      <data key="d2">chunk-a115146372569d0e13825dac3d3ab3a4</data>
+    </node>
+    <node id="&quot;MODEL FILES&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"Model files are conceptual elements related to AI models and configurations within ToolMate AI."</data>
+      <data key="d2">chunk-a115146372569d0e13825dac3d3ab3a4</data>
+    </node>
+    <node id="&quot;.LLAMA-CPP-TOOL-MODEL_MODEL_PATH&quot;">
+      <data key="d0">"FILE"</data>
+      <data key="d1">"A specific file path for llama-cpp tool model configuration."</data>
+      <data key="d2">chunk-a115146372569d0e13825dac3d3ab3a4</data>
+    </node>
+    <node id="&quot;.LLAMA-CPP-CHAT-MODEL_MODEL_PATH&quot;">
+      <data key="d0">"FILE"</data>
+      <data key="d1">"A specific file path for llama-cpp chat model configuration."</data>
+      <data key="d2">chunk-a115146372569d0e13825dac3d3ab3a4</data>
+    </node>
+    <node id="&quot;.LLAMA-CPP-TOOL-MODEL_REPO_ID&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"repo_id is a conceptual term referring to the repository identifier used in configuring ToolMate AI's backend."</data>
+      <data key="d2">chunk-a115146372569d0e13825dac3d3ab3a4</data>
+    </node>
+    <node id="&quot;.LLAMA-CPP-CHAT-MODEL_FILENAME&quot;">
+      <data key="d0">"FILE"</data>
+      <data key="d1">"A specific filename for llama-cpp chat model configuration."</data>
+      <data key="d2">chunk-a115146372569d0e13825dac3d3ab3a4</data>
+    </node>
+    <node id="&quot;.OLLAMA-TOOL-MODEL&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"ollama_tool_model is a conceptual term referring to the selection of different AI models or backends in ToolMate AI."</data>
+      <data key="d2">chunk-a115146372569d0e13825dac3d3ab3a4</data>
+    </node>
+    <node id="&quot;.LLAMA2_CHAT_GGUF&quot;">
+      <data key="d0">"FILE"</data>
+      <data key="d1">"A specific file path for configuring the llama2 chat model with GGUF format."</data>
+      <data key="d2">chunk-a115146372569d0e13825dac3d3ab3a4</data>
+    </node>
+    <node id="&quot;.CODELLAMA_PYTHON_GGUF&quot;">
+      <data key="d0">"FILE"</data>
+      <data key="d1">"A specific file path for configuring the codellama-7b python model with GGUF format."</data>
+      <data key="d2">chunk-a115146372569d0e13825dac3d3ab3a4</data>
+    </node>
+    <node id="&quot;INPUT SUGGESTIONS PLUGIN&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"This is a feature provided by the InputSuggestions organization to offer automated suggestions or completions for user input based on context."</data>
+      <data key="d2">chunk-6195ae51400d4ac8d053d22857a76ba0</data>
+    </node>
+    <node id="&quot;LETMEDOIT AI PLUGINS&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"This event refers to a broader category of plugins developed by LetMeDoIt, which include input suggestions among others. It is an overarching term for all their custom plugins."</data>
+      <data key="d2">chunk-6195ae51400d4ac8d053d22857a76ba0</data>
+    </node>
+    <node id="&quot;DOCKER&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"Docker is a technology used for creating and managing containers, which are lightweight virtualization solutions."</data>
+      <data key="d2">chunk-bc0340ecfc8ebb3292fe95e1d1e1e486</data>
+    </node>
+    <node id="&quot;PERPLEXICA&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"Perplexica is an organization known for building conversational AI platforms, specifically Perplexica, a tool designed to facilitate dialogue with complex models like LLaMA."&lt;SEP&gt;"Perplexica refers to an organization or geographical location, not specified in the text."</data>
+      <data key="d2">chunk-456a0a486b95b3df18e12a4457464d4e&lt;SEP&gt;chunk-bc0340ecfc8ebb3292fe95e1d1e1e486</data>
+    </node>
+    <node id="&quot;SEARXNG&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"SearXNG is a search engine service that indexes various sources and provides users with a unified interface for searching."&lt;SEP&gt;"SearXNG refers to an organization or geographical location, not specified in the text."</data>
+      <data key="d2">chunk-456a0a486b95b3df18e12a4457464d4e&lt;SEP&gt;chunk-bc0340ecfc8ebb3292fe95e1d1e1e486</data>
+    </node>
+    <node id="&quot;ALEX&quot;">
+      <data key="d0">"PERSON"</data>
+      <data key="d1">"Alex is a user following instructions for setting up Docker on Android via Termux. "</data>
+      <data key="d2">chunk-bc0340ecfc8ebb3292fe95e1d1e1e486</data>
+    </node>
+    <node id="&quot;ALPINE QCOW2&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"Alpine qcow2 is the name of an image file, likely representing a virtual machine or container based on Alpine Linux."</data>
+      <data key="d2">chunk-456a0a486b95b3df18e12a4457464d4e</data>
+    </node>
+    <node id="&quot;DOCKER-COMPOSE&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"docker-compose is used for defining and running multi-container Docker applications."</data>
+      <data key="d2">chunk-456a0a486b95b3df18e12a4457464d4e</data>
+    </node>
+    <node id="&quot;DOCKER-IN-TERMUX-ALPINE&quot;">
+      <data key="d0">"TECHNOLOGY"</data>
+      <data key="d1">"docker-in-termux-alpine is a GitHub repository that provides documentation and examples on how to run Docker inside Termux."</data>
+      <data key="d2">chunk-456a0a486b95b3df18e12a4457464d4e</data>
+    </node>
+    <node id="&quot;CYBERKERNELOFFICIAL/DOCKER-IN-TERMUX&quot;">
+      <data key="d0">"ORGANIZATION"</data>
+      <data key="d1">"cyberkernelofficial/docker-in-termux is an organization known for sharing guides on running Docker within the context of Termux."</data>
+      <data key="d2">chunk-456a0a486b95b3df18e12a4457464d4e</data>
+    </node>
+    <node id="&quot;ALPINE LINUX SETUP&quot;">
+      <data key="d2">chunk-bc0340ecfc8ebb3292fe95e1d1e1e486</data>
+      <data key="d1">"Docker is set up inside an Alpine Linux virtual machine as part of the setup process."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;ELIRANWONG/LETMEDOIT/WIKI/HOW-TO-WRITE-A-CUSTOM-PLUGIN&quot;">
+      <data key="d0">"EVENT"</data>
+      <data key="d1">"This event refers to a specific document or guide, likely related to writing custom plugins for LetMeDoIt AI."</data>
+      <data key="d2">chunk-46281d2e68eeda94d6ab62fb22bac2fe</data>
+    </node>
+    <node id="&quot;INSTALL PACKAGE PLUGIN&quot;">
+      <data key="d0">"PLUGIN"</data>
+      <data key="d1">"The 'install python package' is a simple example of a plugin that installs Python packages within LetMeDoIt AI environment."</data>
+      <data key="d2">chunk-46281d2e68eeda94d6ab62fb22bac2fe</data>
+    </node>
+    <node id="&quot;EDIT TEXT PLUGIN&quot;">
+      <data key="d0">"PLUGIN"</data>
+      <data key="d1">"The 'edit text' plugin is described in the documentation, focusing on editing text files using shared utilities and possibly a custom text editor."</data>
+      <data key="d2">chunk-46281d2e68eeda94d6ab62fb22bac2fe</data>
+    </node>
+    <node id="&quot;PERSISTENTCONFIGS&quot;">
+      <data key="d0">"CONCEPT"</data>
+      <data key="d1">"PersistentConfigs is a placeholder or configuration variable used in the code, indicating its role as a concept rather than an entity with specific attributes."</data>
+      <data key="d2">chunk-71dca6296e35b426fb6965e5d82c241e</data>
+    </node>
+    <node id="&quot;RE.SUB&quot;">
+      <data key="d0">"FUNCTION"</data>
+      <data key="d1">"re.sub is a built-in Python function for performing substring replacement. It operates on strings and does not represent a person, organization, geo, event, or location in the given context."</data>
+      <data key="d2">chunk-71dca6296e35b426fb6965e5d82c241e</data>
+    </node>
+    <node id="&quot;SHAREDUTIL&quot;">
+      <data key="d0">"LIBRARY"</data>
+      <data key="d1">"SharedUtil is likely a library or utility class used within the codebase to provide shared functionality."</data>
+      <data key="d2">chunk-71dca6296e35b426fb6965e5d82c241e</data>
+    </node>
+    <node id="&quot;CONFIG.CUSTOMTEXTEDITOR&quot;">
+      <data key="d0">"VARIABLE"</data>
+      <data key="d1">"This variable represents an option for custom text editor settings in the configuration, possibly not representing a specific entity type like person, organization, geo, event, etc."</data>
+      <data key="d2">chunk-71dca6296e35b426fb6965e5d82c241e</data>
+    </node>
+    <node id="&quot;SHAREDUTIL.ISPACKAGEINSTALLED&quot;">
+      <data key="d0">"FUNCTION"</data>
+      <data key="d1">"isPackageInstalled is likely a utility function within SharedUtil used to check if a package is installed, represented as a function rather than an entity type."</data>
+      <data key="d2">chunk-71dca6296e35b426fb6965e5d82c241e</data>
+    </node>
+    <node id="&quot;OS.PATH.JOIN(CONFIG.TASKWIZAIFOLDER, 'ETEXTEDIT.PY')&quot;">
+      <data key="d0">"FILE_PATH"</data>
+      <data key="d1">"This represents the file path for a Python script named 'eTextEdit.py' within a folder called 'taskWizAIFolder', not representing a specific entity type like person, organization, geo, event, etc."</data>
+      <data key="d2">chunk-71dca6296e35b426fb6965e5d82c241e</data>
+    </node>
+    <node id="&quot;OS.SYSTEM(F&quot;&quot;&quot;{CONFIG.OPEN} {FILENAME}&quot;&quot;&quot;)&quot;">
+      <data key="d0">"FUNCTION"</data>
+      <data key="d1">"This is likely part of the system command to open files or directories in an operating system environment. It represents functionality rather than a specific entity type like person, organization, geo, event, etc."</data>
+      <data key="d2">chunk-71dca6296e35b426fb6965e5d82c241e</data>
+    </node>
+    <node id="&quot;SHAREDUTIL.OPENURL&quot;">
+      <data key="d0">"FUNCTION"</data>
+      <data key="d1">"openURL is likely a utility function within SharedUtil used to open URLs, represented as a function rather than an entity type."</data>
+      <data key="d2">chunk-71dca6296e35b426fb6965e5d82c241e</data>
+    </node>
+    <node id="&quot;DATETIME_TO_ISO8601(&quot;">
+      <data key="d0">"FUNCTION"</data>
+      <data key="d1">"datetime_to_ISO8601 is likely part of the functionality used in the code for converting datetime objects to ISO 8601 format, represented as a function rather than an entity type."</data>
+      <data key="d2">chunk-71dca6296e35b426fb6965e5d82c241e</data>
+    </node>
+    <node id="&quot;SHAREDUTIL.OPENURL(GETOUTLOOKLINK() IF CALENDAR == &quot;OUTLOOK&quot; ELSE GETGOOGLELINK())&quot;">
+      <data key="d0">"FUNCTION_CALL"</data>
+      <data key="d1">"This represents a combination of functions (openURL and getGoogleLink or getOutlookLink) being called based on the value of 'calendar', representing functionality rather than an entity type."&lt;SEP&gt;"openURL is likely a utility function within SharedUtil used to open URLs. This represents functionality rather than a specific entity type like person, organization, geo, event, etc."</data>
+      <data key="d2">chunk-71dca6296e35b426fb6965e5d82c241e</data>
+    </node>
+    <node id="&quot;ADD CALENDAR EVENT&quot;">
+      <data key="d0">"FUNCTION"</data>
+      <data key="d1">"The function is used to add an event to a calendar. The provided arguments are `calendar`, `title`, `description`, `url` (optional), `start_time`, and `end_time` (optional)."</data>
+      <data key="d2">chunk-0d7a78fab7e8668a408d1426e9cd18b1</data>
+    </node>
+    <node id="&quot;FUNCTION CALLING FEATURES OF CHATGPT IN LETMEDOIT AI&quot;">
+      <data key="d2">chunk-46281d2e68eeda94d6ab62fb22bac2fe</data>
+      <data key="d1">"The 'install python package' is an example that showcases the function calling capabilities enabled by ChatGPT within LetMeDoIt AI."</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;SEARCH NEWS&quot;">
+      <data key="d2">chunk-0d7a78fab7e8668a408d1426e9cd18b1</data>
+      <data key="d1">"The search_news function is triggered after adding an event to check or gather related information, such as headlines about the event being added. "</data>
+      <data key="d0">"UNKNOWN"</data>
+    </node>
+    <node id="&quot;GITHUB &quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"GitHub is a website where Ollama's documentation can be found."&lt;SEP&gt;"GitHub is the geographical location where Ollama's documentation can be found."</data>
+      <data key="d2">chunk-0eb61cb4713b99e844cf89f16fd9e657</data>
+    </node>
+    <node id="&quot;UBUNTU&quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"Ubuntu is associated with server configurations and user guides provided by Ollama."</data>
+      <data key="d2">chunk-0eb61cb4713b99e844cf89f16fd9e657</data>
+    </node>
+    <node id="&quot;UBUNTU &quot;">
+      <data key="d0">"GEO"</data>
+      <data key="d1">"Ubuntu is a geographical location or distribution of Linux, mentioned in the context of Ollama's server configurations."</data>
+      <data key="d2">chunk-0eb61cb4713b99e844cf89f16fd9e657</data>
+    </node>
+    <edge source="&quot;.SPEECHRECOGNITION&quot;" target="&quot;CONFIGURATION&quot;">
+      <data key="d3">2.0</data>
+      <data key="d4">".speechrecognition is used for configuring settings related to speech recognition."</data>
+      <data key="d5">"uses, configuration"</data>
+      <data key="d6">chunk-60d58b7ce45cfee61330ecc133c0504d</data>
+    </edge>
+    <edge source="&quot;.SPEECHGENERATION&quot;" target="&quot;CONFIGURATION&quot;">
+      <data key="d3">3.0</data>
+      <data key="d4">".speechgeneration is used for configuring settings related to speech generation."</data>
+      <data key="d5">"uses, configuration"</data>
+      <data key="d6">chunk-60d58b7ce45cfee61330ecc133c0504d</data>
+    </edge>
+    <edge source="&quot;FFMPEG&quot;" target="&quot;LINUX&quot;">
+      <data key="d3">5.0</data>
+      <data key="d4">"On Linux, 'ffmpeg' can be installed using the command: &gt; sudo apt install ffmpeg."</data>
+      <data key="d5">"installation method, software dependency"</data>
+      <data key="d6">chunk-56777ce328a2ecdf2846a29756d6b7e4</data>
+    </edge>
+    <edge source="&quot;FFMPEG&quot;" target="&quot;WINDOWS&quot;">
+      <data key="d3">6.0</data>
+      <data key="d4">"For Windows users, a prerequisite step is to install 'chocolatey', followed by running the command: &gt; choco install ffmpeg."</data>
+      <data key="d5">"installation method, software dependency"</data>
+      <data key="d6">chunk-56777ce328a2ecdf2846a29756d6b7e4</data>
+    </edge>
+    <edge source="&quot;FFMPEG&quot;" target="&quot;MACOS&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"To install 'ffmpeg' on macOS, first ensure 'homebrew' is installed via: &gt; brew install ffmpeg."</data>
+      <data key="d5">"installation method, software dependency"</data>
+      <data key="d6">chunk-56777ce328a2ecdf2846a29756d6b7e4</data>
+    </edge>
+    <edge source="&quot;TOOLMATE V0.2.42+ &quot;" target="&quot;WSAY &quot;">
+      <data key="d3">6.0</data>
+      <data key="d4">"ToolMate v0.2.42+ integrates wsay for text-to-speech feature."</data>
+      <data key="d5">"integration, technology integration"</data>
+      <data key="d6">chunk-fb3f71c5dc50e2ed48684a953a02ae59</data>
+    </edge>
+    <edge source="&quot;V1.6.2 &quot;" target="&quot;TOOLMATE AI V0.2.61 &quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"The current code install of ToolMate AI v0.2.61 uses version 1.6.2 of wsay."</data>
+      <data key="d5">"version, compatibility"</data>
+      <data key="d6">chunk-fb3f71c5dc50e2ed48684a953a02ae59</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI V0.2.61 &quot;" target="&quot;WSAY.EXE &quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"When using ToolMate AI v0.2.61, 'wsay.exe' is automatically downloaded and installed in the '~\\toolmate' directory."</data>
+      <data key="d5">"installation, automation"</data>
+      <data key="d6">chunk-fb3f71c5dc50e2ed48684a953a02ae59</data>
+    </edge>
+    <edge source="&quot;WSAY.EXE &quot;" target="&quot;INPUT AUDIO &quot;">
+      <data key="d3">3.0</data>
+      <data key="d4">"To enable input text reading on Windows with 'wsay.exe', one must select the "toggle input audio" option from the action menu."</data>
+      <data key="d5">"enablement, user interaction"</data>
+      <data key="d6">chunk-fb3f71c5dc50e2ed48684a953a02ae59</data>
+    </edge>
+    <edge source="&quot;WSAY.EXE &quot;" target="&quot;OUTPUT AUDIO &quot;">
+      <data key="d3">4.0</data>
+      <data key="d4">"Similarly, to enable output text reading, one must select the "toggle output audio" option from the action menu."</data>
+      <data key="d5">"enablement, user interaction"</data>
+      <data key="d6">chunk-fb3f71c5dc50e2ed48684a953a02ae59</data>
+    </edge>
+    <edge source="&quot;DRINKING WINE&quot;" target="&quot;PERSONAL PREFERENCES&quot;">
+      <data key="d3">10.0</data>
+      <data key="d4">"Personal preferences should be considered when deciding the time to drink wine for relaxation."</data>
+      <data key="d5">"individual considerations, moderation"</data>
+      <data key="d6">chunk-b245ed81d791c10dab089d8529e31525</data>
+    </edge>
+    <edge source="&quot;DRINKING WINE&quot;" target="&quot;STUDIES&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"Some studies suggest drinking wine during meals may have additional benefits such as aiding digestion and nutrient absorption."</data>
+      <data key="d5">"research findings, potential benefits"</data>
+      <data key="d6">chunk-b245ed81d791c10dab089d8529e31525</data>
+    </edge>
+    <edge source="&quot;USER&quot;" target="&quot;.EDITCONFIGS&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"A `.editconfigs` event triggers the action of a User editing the `config.py` file."</data>
+      <data key="d5">"interaction, modification"</data>
+      <data key="d6">chunk-a5078e9e86ba4cecbc3efeb6fa89a54a</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI PROMPT&quot;" target="&quot;TOOLMATE AI PROMPT&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"The Toolmate AI prompt provides instructions to enter `.model` in ToolMate AI, guiding users on how to change backends and models."</data>
+      <data key="d5">"instruction, guidance"</data>
+      <data key="d6">chunk-a115146372569d0e13825dac3d3ab3a4</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI PROMPT&quot;" target="&quot;.LLAMA-CPP-TOOL-MODEL_MODEL_PATH&quot;">
+      <data key="d3">6.0</data>
+      <data key="d4">"Users may specify `.model` in Toolmate AI to change backends or models by referring to their config.py file."</data>
+      <data key="d5">"configuration, reference"</data>
+      <data key="d6">chunk-a115146372569d0e13825dac3d3ab3a4</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;.NEW&quot;">
+      <data key="d3">10.0</data>
+      <data key="d4">"Entering '.new' directly starts a new chat session via ToolMate AI.&lt;SEP&gt;"Entering '.new' starts a new chat session via ToolMate AI."</data>
+      <data key="d5">"quick action, initiating chat"</data>
+      <data key="d6">chunk-553045fd78498fa25ba7b348b3528cdf</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;.EXIT&quot;">
+      <data key="d3">4.0</data>
+      <data key="d4">"Exiting the current feature or app using the quick action '.exit'.</data>
+      <data key="d5">"feature exit, user interaction"</data>
+      <data key="d6">chunk-553045fd78498fa25ba7b348b3528cdf</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;.KEYS&quot;">
+      <data key="d3">6.0</data>
+      <data key="d4">"Displaying key bindings for quick actions with '.keys' via ToolMate AI."</data>
+      <data key="d5">"key binding display, interactive"</data>
+      <data key="d6">chunk-553045fd78498fa25ba7b348b3528cdf</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;.OPEN&quot;">
+      <data key="d3">5.0</data>
+      <data key="d4">"Opening a saved conversation using the quick action '.open'.</data>
+      <data key="d5">"conversation opening, user interaction"</data>
+      <data key="d6">chunk-553045fd78498fa25ba7b348b3528cdf</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;.SAVEAS&quot;">
+      <data key="d3">4.0</data>
+      <data key="d4">"Saving current conversation as new via the quick action '.saveas'.</data>
+      <data key="d5">"saved conversation, user interaction"</data>
+      <data key="d6">chunk-553045fd78498fa25ba7b348b3528cdf</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;FABRIC INTEGRATION&quot;">
+      <data key="d3">9.0</data>
+      <data key="d4">"Fabric integration in ToolMate AI is facilitated by tool commands like `@command fabric` or `@append_command fabric`, suggesting their interoperability and the integration's role in executing fabric commands."</data>
+      <data key="d5">"interoperability, execution"</data>
+      <data key="d6">chunk-60036d0b640ad5bcf69605ca865480fc</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;FREGENIUS AI&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"ToolMate AI is described as an AI tool that integrates with fabric, which FreGenius AI provides visual text output and pattern suggestions, indicating a complementary relationship."</data>
+      <data key="d5">"complementary tools, integration"</data>
+      <data key="d6">chunk-60036d0b640ad5bcf69605ca865480fc</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;WORKFLOW TOOLMATE AI&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"The workflow service provided by ToolMate AI is used through the '@workflow' command in Workflow ToolMate AI, a tool within the organization."</data>
+      <data key="d5">"service integration, collaboration"</data>
+      <data key="d6">chunk-c50af8283bd4051d75176ccdda0b2c21</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;TOOLMATE AI PLUGINS&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"ToolMate AI Plugins are used by the user to achieve a variety of tasks as requested."|&gt;technology usage relationship</data>
+      <data key="d5">8</data>
+      <data key="d6">chunk-eba52398f6766e0a128b55af166a6bf8</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;.EDITCONFIGS&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"The `.editconfigs` event allows users to manually edit `config.py`, located in the ToolMate AI directory."</data>
+      <data key="d5">"configuration editing, interaction"</data>
+      <data key="d6">chunk-a5078e9e86ba4cecbc3efeb6fa89a54a</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;ADDITIONAL CHAT MODEL&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"ToolMate AI utilizes the Additional Chat Model, enabling it to provide more tailored and diverse responses when using plugins like `ask ollama`, `ask llamacppserver` among others."</data>
+      <data key="d5">"integration, enhanced functionality"</data>
+      <data key="d6">chunk-aca3060dd803974c1b7662f780fc795b</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;TOOLMATE GUI&quot;">
+      <data key="d3">14.0</data>
+      <data key="d4">"The inclusion of the toolmate_gui module in the installation process highlights the importance of a graphical user interface (GUI) for ToolMate AI."|"GUI system tray, experimental desktop assistant"&lt;SEP&gt;"The inclusion of the toolmate_gui module in the installation process highlights the importance of a graphical user interface (GUI) for Toolmate AI."|"GUI system tray, experimental desktop assistant"</data>
+      <data key="d5">7</data>
+      <data key="d6">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;TOOLMATE AI USER&quot;">
+      <data key="d3">16.0</data>
+      <data key="d4">"The user interacts with ToolMate AI to download LLMs and configure them, indicating the dependency between user actions and the tool itself."&lt;SEP&gt;"Users interact with ToolMate AI to download and configure their own models."</data>
+      <data key="d5">"usage, configuration"</data>
+      <data key="d6">chunk-28464f4aa1c6b9278b4f0f8e34f2bbf8</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;INSTALLATION&quot;">
+      <data key="d3">5.0</data>
+      <data key="d4">"The Installation process involves downloading and setting up ToolMate AI, with instructions provided in the Quick Guide."</data>
+      <data key="d5">"installation process"</data>
+      <data key="d6">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;FIRST LAUNCH&quot;">
+      <data key="d3">16.0</data>
+      <data key="d4">"ToolMate AI will download and configure necessary large language models during its initial launch."</data>
+      <data key="d5">"initial deployment, automatic configuration"</data>
+      <data key="d6">chunk-d624e06bb668cd8e8d75854e9a597164</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;ALL CONVERSATION RECORDS&quot;">
+      <data key="d3">9.0</data>
+      <data key="d4">"ToolMate AI manages and organizes all conversation records, demonstrating its role as the central hub for managing these records."</data>
+      <data key="d5">"management, organization"</data>
+      <data key="d6">chunk-f50283466db39cca794aea33c114b955</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;AUTO SAVING&quot;">
+      <data key="d3">9.0</data>
+      <data key="d4">"ToolMate AI manages the auto-saving of conversation records, demonstrating its role as the central hub for such features."</data>
+      <data key="d5">"management, automation"</data>
+      <data key="d6">chunk-f50283466db39cca794aea33c114b955</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;MANUAL SAVING&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"Users manually save their conversations using commands or menus provided by ToolMate AI, which is then managed and stored by ToolMate AI."</data>
+      <data key="d5">"user-initiated action, management"</data>
+      <data key="d6">chunk-f50283466db39cca794aea33c114b955</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;GROQ CLOUD API KEY&quot;">
+      <data key="d3">27.0</data>
+      <data key="d4">"ToolMate AI leverages the Groq Cloud API Key to provide access to selected open source LLMs."</data>
+      <data key="d5">"access, integration"</data>
+      <data key="d6">chunk-9a7a626018212a6f7f1f885b79ab5ee3</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;LLAMA.CPP SERVER&quot;">
+      <data key="d3">16.0</data>
+      <data key="d4">"The LLaMa.cpp Server is configured and controlled through ToolMate AI, showcasing how users interact with and customize it for various purposes."</data>
+      <data key="d5">"interaction, customization"</data>
+      <data key="d6">chunk-176af1443a44c73060d94e2882e81ef7</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;TAVILY&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"Tavily provides the API key setup instructions for ToolMate AI."</data>
+      <data key="d5">"service provider, tool integration"</data>
+      <data key="d6">chunk-d61135b74eb809643c99a0be3a5586a8</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;LLAMACPP&quot;">
+      <data key="d3">16.0</data>
+      <data key="d4">"ToolMate AI supports llamacpp, which combines Llama.cpp models and Hugging Face models."</data>
+      <data key="d5">"interface support, technology integration"</data>
+      <data key="d6">chunk-59bcb3c8a095b78015ffb20b8805913d</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;OLLAMA&quot;">
+      <data key="d3">14.0</data>
+      <data key="d4">"ToolMate AI also supports ollama, incorporating hosted Ollama models."</data>
+      <data key="d5">"interface support, technology integration"</data>
+      <data key="d6">chunk-59bcb3c8a095b78015ffb20b8805913d</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;GEMINI&quot;">
+      <data key="d3">18.0</data>
+      <data key="d4">"ToolMate AI integrates gemini, which includes both Google Vertex AI and Gemini Pro &amp; Gemini Pro Vision models."</data>
+      <data key="d5">"technology integration, geolocation"</data>
+      <data key="d6">chunk-59bcb3c8a095b78015ffb20b8805913d</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;CHATGPT&quot;">
+      <data key="d3">16.0</data>
+      <data key="d4">"ToolMate AI supports chatgpt, featuring OpenAI API and ChatGPT models."</data>
+      <data key="d5">"interface support, technology integration"</data>
+      <data key="d6">chunk-59bcb3c8a095b78015ffb20b8805913d</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;LETMEDOIT&quot;">
+      <data key="d3">12.0</data>
+      <data key="d4">"ToolMate AI offers LetMeDoIt mode, allowing users to use ChatGPT models in this mode."</data>
+      <data key="d5">"mode availability, user interface"</data>
+      <data key="d6">chunk-59bcb3c8a095b78015ffb20b8805913d</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;ALEX&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"Alex may use ToolMate AI plugins such as 'search perplexica' and 'search searxng'. "</data>
+      <data key="d5">"application integration, tool compatibility"</data>
+      <data key="d6">chunk-bc0340ecfc8ebb3292fe95e1d1e1e486</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI&quot;" target="&quot;PERPLEXICA&quot;">
+      <data key="d3">14.0</data>
+      <data key="d4">"The setup instructions indicate Perplexica and ToolMate AI are potentially integrated or co-located, implying one might use both in the same environment for a comprehensive AI experience."</data>
+      <data key="d5">"integration, platform"</data>
+      <data key="d6">chunk-456a0a486b95b3df18e12a4457464d4e</data>
+    </edge>
+    <edge source="TOOLMATE" target="PIPER-TTS">
+      <data key="d3">18.0</data>
+      <data key="d4">"ToolMate integrates Piper-tts for Linux, providing a seamless offline text-to-speech feature."</data>
+      <data key="d5">"integration, functionality extension"</data>
+      <data key="d6">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </edge>
+    <edge source="TOOLMATE" target="&quot;CHANGE_TEXT_TO_SPEECH_CONFIG&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"ToolMate integrates the change text-to-speech configuration action."</data>
+      <data key="d5">"configuration management, integration"</data>
+      <data key="d6">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </edge>
+    <edge source="PIPER-TTS" target="SELECT_PIPER_TTS_OPTION">
+      <data key="d3">8.0</data>
+      <data key="d4">"After selecting Piper-tss as an option, users can choose from available voice models."</data>
+      <data key="d5">"option selection, voice model choice"</data>
+      <data key="d6">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </edge>
+    <edge source="CHANGE_TEXT_TO_SPEECH_CONFIG" target="SELECT_PIPER_TTS_OPTION">
+      <data key="d3">6.0</data>
+      <data key="d4">"The 'change text-to-speech config' action is a step that precedes selecting Piper-tss as an option."</data>
+      <data key="d5">"sequential steps, configuration selection"</data>
+      <data key="d6">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </edge>
+    <edge source="PIPER_VOICE_MODEL" target="SELECT_PIPER_TTS_OPTION">
+      <data key="d3">7.0</data>
+      <data key="d4">"After selecting Piper-tss as an option, users can choose from available voice models."</data>
+      <data key="d5">"option selection, voice model choice"</data>
+      <data key="d6">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </edge>
+    <edge source="VOICE_SPEED" target="SELECT_PIPER_TTS_OPTION">
+      <data key="d3">5.0</data>
+      <data key="d4">"Users can optionally specify voice speed if they have VLC player or cvlc command installed, to control the reading output text."</data>
+      <data key="d5">"optional configuration, playback control"</data>
+      <data key="d6">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </edge>
+    <edge source="TOGGLE_INPUT_AUDIO" target="SELECT_PIPER_TTS_OPTION">
+      <data key="d3">9.0</data>
+      <data key="d4">"After selecting Piper-tss as an option, users can enable or disable input audio reading."&lt;SEP&gt;"After selecting Piper-tss as an option, users enable or disable input audio reading."</data>
+      <data key="d5">"sequential steps, input control"</data>
+      <data key="d6">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </edge>
+    <edge source="TOGGLE_INPUT_AUDIO" target="&quot;SELECT_PIPER_TTS_OPTION&quot;">
+      <data key="d3">5.0</data>
+      <data key="d4">"After selecting Piper-tss as an option, users enable or disable input audio reading."</data>
+      <data key="d5">"sequential steps, input control"</data>
+      <data key="d6">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </edge>
+    <edge source="TOGGLE_OUTPUT_AUDIO" target="SELECT_PIPER_TTS_OPTION">
+      <data key="d3">9.0</data>
+      <data key="d4">"After selecting Piper-tss as an option, users can enable or disable output text reading."</data>
+      <data key="d5">"sequential steps, output control"</data>
+      <data key="d6">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </edge>
+    <edge source="TOGGLE_OUTPUT_AUDIO" target="&quot;SELECT_PIPER_TTS_OPTION&quot;">
+      <data key="d3">5.0</data>
+      <data key="d4">"After selecting Piper-tss as an option, users can enable or disable output text reading."</data>
+      <data key="d5">"sequential steps, output control"</data>
+      <data key="d6">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </edge>
+    <edge source="DOWNLOAD_MORE_VOICES" target="USER_ACTION">
+      <data key="d3">8.0</data>
+      <data key="d4">"Users can manually download additional piper voices from their GitHub repository, expanding the available selection of speech synthesis options."</data>
+      <data key="d5">"manual action, expansion of options"</data>
+      <data key="d6">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </edge>
+    <edge source="DOWNLOAD_MORE_VOICES" target="&quot;PIPER_VOICE_STORAGE&quot;">
+      <data key="d3">9.0</data>
+      <data key="d4">"Users manually download more piper voices from GitHub and place them in the specified folder.'&lt;|"manual action, expansion of options"</data>
+      <data key="d5">9</data>
+      <data key="d6">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </edge>
+    <edge source="PIPER_VOICE_STORAGE" target="USER_ACTION">
+      <data key="d3">9.0</data>
+      <data key="d4">"Users can manually download additional piper voices from their GitHub repository, expanding the available selection of speech synthesis options."</data>
+      <data key="d5">"manual action, expansion of options"</data>
+      <data key="d6">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </edge>
+    <edge source="&quot;SELECT_PIPER_TTS_OPTION&quot;" target="PIPER_TTS">
+      <data key="d3">6.0</data>
+      <data key="d4">"Piper-tss is selected as an option after changing the text-to-speech configuration."</data>
+      <data key="d5">"option selection, configuration choice"</data>
+      <data key="d6">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </edge>
+    <edge source="PIPER_TTS" target="&quot;PIPER_VOICE_MODEL&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"Users can choose from available Piper voice models after selecting Piper-tss as an option."</data>
+      <data key="d5">"voice model selection, configuration control"</data>
+      <data key="d6">chunk-8bf45d78cbe1a36e98504649363c4920</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI ANDROID VERSION&quot;" target="&quot;TOOLMATE AI ANDROID VERSION&quot;">
+      <data key="d3">9.0</data>
+      <data key="d4">"The Android version of ToolMate AI relies on the Termux API to function within the Android environment."</data>
+      <data key="d5">"integration, platform support"</data>
+      <data key="d6">chunk-d0c0c1b2598b2aca2f391acf07d5ecad</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI ANDROID VERSION&quot;" target="&quot;TERMUX&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"Both the Android version of ToolMate AI and Termux are used together for setting up a Linux-like environment in an Android device."</data>
+      <data key="d5">"dependency, integration"</data>
+      <data key="d6">chunk-d0c0c1b2598b2aca2f391acf07d5ecad</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI ANDROID VERSION&quot;" target="&quot;UBUNTU IN TERMUX&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"Ubuntu in Termux is run within the installed toolmate environment created by the Android version of ToolMate AI."</data>
+      <data key="d5">"integration, execution"</data>
+      <data key="d6">chunk-d0c0c1b2598b2aca2f391acf07d5ecad</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI LINUX VERSION&quot;" target="&quot;TERMUX&quot;">
+      <data key="d3">9.0</data>
+      <data key="d4">"The Linux version of ToolMate AI requires Termux as a base to run its setup and installation instructions."</data>
+      <data key="d5">"platform dependency, integration"</data>
+      <data key="d6">chunk-d0c0c1b2598b2aca2f391acf07d5ecad</data>
+    </edge>
+    <edge source="&quot;TERMUX&quot;" target="&quot;ALEX&quot;">
+      <data key="d3">10.0</data>
+      <data key="d4">"Alex is using Termux as a platform for setting up Docker. "</data>
+      <data key="d5">"tool usage, operating system support"</data>
+      <data key="d6">chunk-bc0340ecfc8ebb3292fe95e1d1e1e486</data>
+    </edge>
+    <edge source="&quot;TERMUX&quot;" target="&quot;ALPINE LINUX SETUP&quot;">
+      <data key="d3">14.0</data>
+      <data key="d4">"Termux is used to prepare for and run Alpine Linux within it as part of the setup process."</data>
+      <data key="d5">"tool usage, nested environment"</data>
+      <data key="d6">chunk-bc0340ecfc8ebb3292fe95e1d1e1e486</data>
+    </edge>
+    <edge source="&quot;TERMUX&quot;" target="&quot;PERPLEXICA&quot;">
+      <data key="d3">12.0</data>
+      <data key="d4">"Termux is used to run Perplexica, indicating the setup process involves launching and managing the virtual machine."</data>
+      <data key="d5">"setup, integration"</data>
+      <data key="d6">chunk-456a0a486b95b3df18e12a4457464d4e</data>
+    </edge>
+    <edge source="&quot;TERMUX&quot;" target="&quot;SEARXNG&quot;">
+      <data key="d3">10.0</data>
+      <data key="d4">"Termux is also used for running SearXNG, suggesting it's a versatile tool used to access various services."</data>
+      <data key="d5">"integration, utility"</data>
+      <data key="d6">chunk-456a0a486b95b3df18e12a4457464d4e</data>
+    </edge>
+    <edge source="&quot;FABRIC INTEGRATION&quot;" target="&quot;FREEGENIUS_AI&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"FreGenius AI offers input suggestions for selecting fabric patterns, suggesting that Fabric Integration benefits from the interface provided by FreGenius AI."</data>
+      <data key="d5">"pattern selection, interoperability"</data>
+      <data key="d6">chunk-60036d0b640ad5bcf69605ca865480fc</data>
+    </edge>
+    <edge source="&quot;LETMEDOIT AI&quot;" target="&quot;11TENSORS&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"Eliran W. is involved in LetMeDoIt AI and 11tensors projects, indicating a connection between these organizations or individuals."</data>
+      <data key="d5">"project collaboration, involvement"</data>
+      <data key="d6">chunk-ba0989f99f67e36841d81256bd100791</data>
+    </edge>
+    <edge source="&quot;LETMEDOIT AI&quot;" target="&quot;OPENAI FUNCTION CALLING FEATURES&quot;">
+      <data key="d3">16.0</data>
+      <data key="d4">"LetMeDoIt AI relies on the strengths of OpenAI Function Calling Features for their services."</data>
+      <data key="d5">"rely, advanced capabilities"</data>
+      <data key="d6">chunk-ba0989f99f67e36841d81256bd100791</data>
+    </edge>
+    <edge source="&quot;LETMEDOIT AI&quot;" target="&quot;ELIRANWONG&quot;">
+      <data key="d3">9.0</data>
+      <data key="d4">"Eliranwong is a member or creator of the LetMeDoIt AI organization, developing its plugins."</data>
+      <data key="d5">"creator, development"&lt;SEP&gt;"creator, development" |COMPLETE|</data>
+      <data key="d6">chunk-091fd1c2512aeedbb720eae6434cc6cb</data>
+    </edge>
+    <edge source="&quot;LETMEDOIT AI&quot;" target="&quot;CHATGPT MODEL&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"The LetMeDoIt AI platform uses ChatGPT Model to support function calling functionality in the development of custom plugins like the LetMeDoItAI plugin."|&gt;concept integration, model utilization</data>
+      <data key="d5">8</data>
+      <data key="d6">chunk-db0dfa801fe7705dab74e3f34c41b22a</data>
+    </edge>
+    <edge source="&quot;LETMEDOIT AI&quot;" target="&quot;LETMEDOITPLUGIN&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"The LetMeDoIt AI platform integrates and supports the LetMeDoItAI Plugin for function calling tasks."|&gt;platform support, integration</data>
+      <data key="d5">7</data>
+      <data key="d6">chunk-db0dfa801fe7705dab74e3f34c41b22a</data>
+    </edge>
+    <edge source="&quot;LETMEDOIT AI&quot;" target="&quot;PYTHON PLUGINS&quot;">
+      <data key="d3">16.0</data>
+      <data key="d4">"LetMeDoIt AI uses Python Plugins for additional functionalities."</data>
+      <data key="d5">"integration, external service"</data>
+      <data key="d6">chunk-93ddd8ad41905bb4e11714d30ecf4b1e</data>
+    </edge>
+    <edge source="&quot;LETMEDOIT AI&quot;" target="&quot;PLUGINS OVERVIEW&quot;">
+      <data key="d3">12.0</data>
+      <data key="d4">"Users learn about Plugins Overview at the event where LetMeDoIt AI can be tailored with Python plugins."</data>
+      <data key="d5">"event participation, knowledge sharing"</data>
+      <data key="d6">chunk-93ddd8ad41905bb4e11714d30ecf4b1e</data>
+    </edge>
+    <edge source="&quot;LETMEDOIT AI&quot;" target="&quot;CHATGPT&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"ChatGPT's function calling features are integrated into LetMeDoIt AI to enhance its capabilities."</data>
+      <data key="d5">"integrated functionality, enhancement"</data>
+      <data key="d6">chunk-46281d2e68eeda94d6ab62fb22bac2fe</data>
+    </edge>
+    <edge source="&quot;LETMEDOIT AI&quot;" target="&quot;ELIRANWONG/LETMEDOIT/WIKI/HOW-TO-WRITE-A-CUSTOM-PLUGIN&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"This document provides guidance on writing custom plugins for LetMeDoIt AI to extend its functionalities."</data>
+      <data key="d5">"documentation, extension"</data>
+      <data key="d6">chunk-46281d2e68eeda94d6ab62fb22bac2fe</data>
+    </edge>
+    <edge source="&quot;LETMEDOIT AI&quot;" target="&quot;INSTALL PACKAGE PLUGIN&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"The 'install python package' example shows how function calling can be used within LetMeDoIt AI to install Python packages."</data>
+      <data key="d5">"integration, demonstration"</data>
+      <data key="d6">chunk-46281d2e68eeda94d6ab62fb22bac2fe</data>
+    </edge>
+    <edge source="&quot;LETMEDOIT AI&quot;" target="&quot;EDIT TEXT PLUGIN&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"The 'edit text' plugin is a practical example that illustrates the application of function calling in LetMeDoIt AI for text editing tasks."</data>
+      <data key="d5">"integration, demonstration"</data>
+      <data key="d6">chunk-46281d2e68eeda94d6ab62fb22bac2fe</data>
+    </edge>
+    <edge source="&quot;OPENAI FUNCTION CALLING FEATURES&quot;" target="&quot;GEMINI PRO&quot;">
+      <data key="d3">18.0</data>
+      <data key="d4">"Gemini Pro is often used as a comparison point for OpenAI's advanced capabilities in function calling."&lt;SEP&gt;"Gemini Pro offers function calling features with limited capacity compared to OpenAI's capabilities."</data>
+      <data key="d5">"comparison, advanced capability"&lt;SEP&gt;"comparison, capability difference"</data>
+      <data key="d6">chunk-ba0989f99f67e36841d81256bd100791</data>
+    </edge>
+    <edge source="&quot;WORKFLOW&quot;" target="&quot;WORKFLOW TOOLMATE AI&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"Workflows are designed and managed through Workflow ToolMate AI, a tool provided by the organization."</data>
+      <data key="d5">"service integration, collaboration"</data>
+      <data key="d6">chunk-c50af8283bd4051d75176ccdda0b2c21</data>
+    </edge>
+    <edge source="&quot;ELIRANWONG&quot;" target="&quot;INPUT SUGGESTIONS PLUGIN&quot;">
+      <data key="d3">18.0</data>
+      <data key="d4">"The InputSuggestions plugin was created and customized by EliranWong."</data>
+      <data key="d5">"creation, customization"</data>
+      <data key="d6">chunk-6195ae51400d4ac8d053d22857a76ba0</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI PLUGINS&quot;" target="&quot;GOOGLE PALM 2&quot;">
+      <data key="d3">14.0</data>
+      <data key="d4">"ToolMate AI Plugins integrate Google PaLM 2 for more advanced natural language processing tasks."|&gt;technological integration</data>
+      <data key="d5">7</data>
+      <data key="d6">chunk-eba52398f6766e0a128b55af166a6bf8</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI PLUGINS&quot;" target="&quot;CODEY&quot;">
+      <data key="d3">12.0</data>
+      <data key="d4">"ToolMate AI Plugins use Codey to demonstrate the use of decorators in Python programming."|&gt;tool usage relationship</data>
+      <data key="d5">6</data>
+      <data key="d6">chunk-eba52398f6766e0a128b55af166a6bf8</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI PLUGINS&quot;" target="&quot;VLC PLAYER&quot;">
+      <data key="d3">10.0</data>
+      <data key="d4">"VLC player is used with ToolMate AI Plugins for multimedia content playback as requested by the user."|&gt;media consumption relationship</data>
+      <data key="d5">5</data>
+      <data key="d6">chunk-eba52398f6766e0a128b55af166a6bf8</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI PLUGINS&quot;" target="&quot;GOOGLE CALENDAR&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"The user schedules events in their Google Calendar using ToolMate AI Plugins."|&gt;event scheduling relationship</data>
+      <data key="d5">4</data>
+      <data key="d6">chunk-eba52398f6766e0a128b55af166a6bf8</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI PLUGINS&quot;" target="&quot;OUTLOOK CALENDAR&quot;">
+      <data key="d3">6.0</data>
+      <data key="d4">"Outlook Calendar is used by the user for event management and reminders, integrating with ToolMate AI Plugins."|&gt;calendar integration relationship</data>
+      <data key="d5">3</data>
+      <data key="d6">chunk-eba52398f6766e0a128b55af166a6bf8</data>
+    </edge>
+    <edge source="&quot;@ASK_O1_MINI&quot;" target="&quot;MESSAGE&quot;">
+      <data key="d3">16.0</data>
+      <data key="d4">"The user command @ask_o1_mini requests information from reasoning model o1-mini, who then provides it."</data>
+      <data key="d5">"communication, request-response"</data>
+      <data key="d6">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </edge>
+    <edge source="&quot;@ASK_PALM2&quot;" target="&quot;CODE&quot;">
+      <data key="d3">18.0</data>
+      <data key="d4">"The user command @ask_palm2 asks PaLM 2 for code execution, likely leading to a response that includes the requested functionality." &lt;|"interaction, information retrieval"</data>
+      <data key="d5">9</data>
+      <data key="d6">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </edge>
+    <edge source="&quot;SHOW BIBLE VERSES CONTENT&quot;" target="&quot;MESSAGE&quot;">
+      <data key="d3">14.0</data>
+      <data key="d4">"This command is for showing Bible verses, which are considered content from divine sources." &lt;|"content display, access to religious texts"</data>
+      <data key="d5">7</data>
+      <data key="d6">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </edge>
+    <edge source="&quot;BUILD A GROUP OF AI ASSISTANTS OR AGENTS&quot;" target="&quot;CODE&quot;">
+      <data key="d3">16.0</data>
+      <data key="d4">"The process involves writing and executing code that configures AI models to work collaboratively on complex tasks." &lt;|"code execution, collaboration"</data>
+      <data key="d5">8</data>
+      <data key="d6">chunk-995976c7c3b43e361fe960f032aa13c9</data>
+    </edge>
+    <edge source="&quot;SEARCH_CONVERSATIONS&quot;" target="&quot;SEARCH_MEMORY&quot;">
+      <data key="d3">14.0</data>
+      <data key="d4">"Conversations are recalled from the past as a reference for ongoing conversations."</data>
+      <data key="d5">"reference, recall"</data>
+      <data key="d6">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </edge>
+    <edge source="&quot;SEARCH_FINANCE&quot;" target="&quot;SEARCH_GOOGLE_NEWS&quot;">
+      <data key="d3">16.0</data>
+      <data key="d4">"Financial data analysis often involves searching news and updates to understand current market trends."</data>
+      <data key="d5">"market trend analysis, financial insights"</data>
+      <data key="d6">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
+    </edge>
+    <edge source="&quot;.EDITCONFIGS&quot;" target="&quot;TOOLMATE AI DIRECTORY&quot;">
+      <data key="d3">6.0</data>
+      <data key="d4">"A `.editconfigs` event involves editing within the specified ToolMate AI directory."</data>
+      <data key="d5">"location, interaction"</data>
+      <data key="d6">chunk-a5078e9e86ba4cecbc3efeb6fa89a54a</data>
+    </edge>
+    <edge source="&quot;.EDITCONFIGS&quot;" target="&quot;TEXT2ART_FONT1&quot;">
+      <data key="d3">6.0</data>
+      <data key="d4">"The .editconfigs command allows the user to set the text2art_font1, indicating their relationship as an instruction and its output."</data>
+      <data key="d5">"command and setting", "configuration process"</data>
+      <data key="d6">chunk-dc1d20d6cb489144b9f62fd9387d69e9</data>
+    </edge>
+    <edge source="&quot;CHATGPT&quot;" target="&quot;ME&quot;">
+      <data key="d3">12.0</data>
+      <data key="d4">"I requested information about ChatGPT, indicating my interest or need for information related to this technology."&lt;SEP&gt;"I requested the latest news about ChatGPT, indicating my interest or need for information related to this technology."</data>
+      <data key="d5">"information-seeking relationship"</data>
+      <data key="d6">chunk-c2b8662b6e049993320b2d9284ad691e</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI BIBLE SUPPORT&quot;" target="&quot;BIBLE USERS&quot;">
+      <data key="d3">6.0</data>
+      <data key="d4">"The toolmate_bible support feature allows users who engage with biblical tools to use ToolMate AI effectively."</data>
+      <data key="d5">"bible integration, user support"</data>
+      <data key="d6">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+    </edge>
+    <edge source="&quot;ANDROID USERS&quot;" target="&quot;TOOLMATE ANDROID&quot;">
+      <data key="d3">16.0</data>
+      <data key="d4">"For Android users, Toolmate AI provides specific instructions and documentation for setting up on their devices."</data>
+      <data key="d5">"platform-specific installation guide, user support"</data>
+      <data key="d6">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+    </edge>
+    <edge source="&quot;TOOLMATE ANDROID&quot;" target="&quot;TOOLMATE AI USERS&quot;">
+      <data key="d3">10.0</data>
+      <data key="d4">"Android users have a dedicated installation guide provided by Toolmate AI for setting up their devices."</data>
+      <data key="d5">"user-specific instructions, platform adaptation"</data>
+      <data key="d6">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+    </edge>
+    <edge source="&quot;TOOLMATE GUI&quot;" target="&quot;TOOLMATE AI USERS&quot;">
+      <data key="d3">18.0</data>
+      <data key="d4">"For all users, the availability of a gui module is considered essential for providing an integrated and user-friendly experience with ToolMate AI."|"essential feature, integrated experience"</data>
+      <data key="d5">9</data>
+      <data key="d6">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+    </edge>
+    <edge source="&quot;LINUX USERS&quot;" target="&quot;TOOLMATE LINUX&quot;">
+      <data key="d3">20.0</data>
+      <data key="d4">"For Linux users, additional packages like flaml[automl], piper-tts, and pyautogen[autobuild] are recommended to enhance the user experience with ToolMate AI."|"enhanced functionality, library support"&lt;SEP&gt;"The inclusion of toolmate_linux in the installation process indicates that Linux users can benefit from additional packages to improve their experience with ToolMate AI."|"platform-specific guidance, library support"</data>
+      <data key="d5">4&lt;SEP&gt;6</data>
+      <data key="d6">chunk-d8ead668718b74679a8edf65563b0c9a</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI USER&quot;" target="&quot;HUGGINGFACE CO&quot;">
+      <data key="d3">21.0</data>
+      <data key="d4">"Users can directly access HuggingFace CO for GGUF format models through ToolMate AI."&lt;SEP&gt;"Users of ToolMate AI can directly download from HuggingFace CO for GGUF format models."</data>
+      <data key="d5">"model availability, direct access"</data>
+      <data key="d6">chunk-28464f4aa1c6b9278b4f0f8e34f2bbf8</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI USER&quot;" target="&quot;OLLAMA&quot;">
+      <data key="d3">18.0</data>
+      <data key="d4">"Users may use Ollama to pull specific models like the Whisper model for offline transcription in ToolMate AI."</data>
+      <data key="d5">"model customization, indirect download"</data>
+      <data key="d6">chunk-28464f4aa1c6b9278b4f0f8e34f2bbf8</data>
+    </edge>
+    <edge source="&quot;OLLAMA&quot;" target="&quot;GITHUB &quot;">
+      <data key="d3">25.0</data>
+      <data key="d4">"Ollama provides documentation for its service including configuration guides and Ubuntu server configurations."&lt;SEP&gt;"Ollama provides documentation on its service, including a configuration guide for Ubuntu servers."</data>
+      <data key="d5">"documentation, service support"&lt;SEP&gt;"documentation, support"</data>
+      <data key="d6">chunk-0eb61cb4713b99e844cf89f16fd9e657</data>
+    </edge>
+    <edge source="&quot;TOOLMATE CLI&quot;" target="&quot;LAUNCH TOOLMATE AI&quot;">
+      <data key="d3">6.0</data>
+      <data key="d4">"Users launch ToolMate AI by double-clicking the desktop shortcut or running it via terminal commands."</data>
+      <data key="d5">"launch method"</data>
+      <data key="d6">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+    </edge>
+    <edge source="&quot;TOOLMATE ACTION MENU&quot;" target="&quot;ACTION MENU&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"The Action Menu is a part of the platform where users find information on how to work with different features and functionalities."</data>
+      <data key="d5">"feature reference"</data>
+      <data key="d6">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+    </edge>
+    <edge source="&quot;PROMPT INTERFACE&quot;" target="&quot;TOOLMATE PROMPT INTERFACE&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"The Prompt Interface is where users input their requests, displayed with a visual example of the interface."</data>
+      <data key="d5">"user interaction"</data>
+      <data key="d6">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+    </edge>
+    <edge source="&quot;CLI OPTIONS&quot;" target="&quot;TOOLMATE CLI OPTIONS&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"Users can see CLI options by running 'toolmate -h' in terminal."</data>
+      <data key="d5">"command-line instructions"</data>
+      <data key="d6">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+    </edge>
+    <edge source="&quot;QUICK ACTIONS&quot;" target="&quot;TOOLMATE QUICK ACTIONS&quot;">
+      <data key="d3">9.0</data>
+      <data key="d4">"The Quick Actions include menu changes, cancellation, quitting the app or feature, and showing keyboard shortcuts."</data>
+      <data key="d5">"quick actions list"</data>
+      <data key="d6">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+    </edge>
+    <edge source="&quot;MULTILINE INPUT&quot;" target="&quot;TOOLMATE MULTILINE INPUT&quot;">
+      <data key="d3">6.0</data>
+      <data key="d4">"Users can toggle between single-line and multi-line input modes in ToolMate, with specific key presses to complete entries."</data>
+      <data key="d5">"input modes selection"</data>
+      <data key="d6">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+    </edge>
+    <edge source="&quot;CHANGE AI BACKENDS AND MODELS PAGE&quot;" target="&quot;HOW TO CHANGE AI BACKENDS AND MODELS? &quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"Users can learn about changing AI backends and models, including the process and necessary steps."</data>
+      <data key="d5">"AI backend change instructions"</data>
+      <data key="d6">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+    </edge>
+    <edge source="&quot;DEVELOPER MODE DOCUMENTATION&quot;" target="&quot;DEVELOPER MODE EVENT&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"The Developer Mode documentation provides details on how to access developer options for advanced users."</data>
+      <data key="d5">"developer documentation access"</data>
+      <data key="d6">chunk-9a982ed63e47fd8c67dd946baa60e0a0</data>
+    </edge>
+    <edge source="&quot;CONFIG.PREDEFINEDCONTEXTS&quot;" target="&quot;INTRODUCTION&quot;">
+      <data key="d3">9.0</data>
+      <data key="d4">"The Introduction context uses content provided by config.predefinedContexts."</data>
+      <data key="d5">"context usage"</data>
+      <data key="d6">chunk-00384cff71b1ae137fc155ff097fc80a</data>
+    </edge>
+    <edge source="&quot;CONFIG.PREDEFINEDCONTEXTS&quot;" target="&quot;SUMMARY&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"The Summary context uses content from config.predefinedContexts."</data>
+      <data key="d5">"context usage"</data>
+      <data key="d6">chunk-00384cff71b1ae137fc155ff097fc80a</data>
+    </edge>
+    <edge source="&quot;CONFIG.PREDEFINEDCONTEXTS&quot;" target="&quot;ENGLISH TRANSLATOR AND IMPROVER&quot;">
+      <data key="d3">30.0</data>
+      <data key="d4">"This plugin is configured by adding the predefined context to config.predefinedContexts."</data>
+      <data key="d5">"plugin configuration"</data>
+      <data key="d6">chunk-00384cff71b1ae137fc155ff097fc80a</data>
+    </edge>
+    <edge source="&quot;CONFIG.PREDEFINEDCONTEXTS&quot;" target="&quot;SPOKEN ENGLISH TEACHER&quot;">
+      <data key="d3">21.0</data>
+      <data key="d4">"The Spoken English Teacher plugin uses content from config.predefinedContexts for teaching purposes."</data>
+      <data key="d5">"plugin usage"</data>
+      <data key="d6">chunk-00384cff71b1ae137fc155ff097fc80a</data>
+    </edge>
+    <edge source="&quot;CONFIG.PREDEFINEDCONTEXTS&quot;" target="&quot;BIBLICAL TRANSLATOR&quot;">
+      <data key="d3">18.0</data>
+      <data key="d4">"The Biblical Translator plugin is part of the configurations in config.predefinedContexts."</data>
+      <data key="d5">"plugin inclusion"</data>
+      <data key="d6">chunk-00384cff71b1ae137fc155ff097fc80a</data>
+    </edge>
+    <edge source="&quot;INTRODUCTION&quot;" target="&quot;LETMEDOIT.CONFIG.PREDEFINEDCONTEXTS&quot;">
+      <data key="d3">18.0</data>
+      <data key="d4">"The Introduction context uses content provided by config.predefinedContexts."</data>
+      <data key="d5">"context usage"</data>
+      <data key="d6">chunk-00384cff71b1ae137fc155ff097fc80a</data>
+    </edge>
+    <edge source="&quot;SUMMARY&quot;" target="&quot;LETMEDOIT.CONFIG.PREDEFINEDCONTEXTS&quot;">
+      <data key="d3">16.0</data>
+      <data key="d4">"The Summary context uses content from config.predefinedContexts."</data>
+      <data key="d5">"context usage"</data>
+      <data key="d6">chunk-00384cff71b1ae137fc155ff097fc80a</data>
+    </edge>
+    <edge source="&quot;TOOLMATE&quot;" target="&quot;-H&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"toolmate is the main entity and -h is a common argument to get help, indicating a relationship between them as a command-line interface interaction."</data>
+      <data key="d5">"command-line interaction, help request"</data>
+      <data key="d6">chunk-3a70ca192bc2713104ce41948a517ec8</data>
+    </edge>
+    <edge source="&quot;ALL CONVERSATION RECORDS&quot;" target="&quot;AUTO SAVING&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"The process of auto-saving conversation records is initiated by ToolMate AI, ensuring that these records are automatically saved in plain text formats when needed."</data>
+      <data key="d5">"initiation, automation"</data>
+      <data key="d6">chunk-f50283466db39cca794aea33c114b955</data>
+    </edge>
+    <edge source="&quot;ALL CONVERSATION RECORDS&quot;" target="&quot;MANUAL SAVING&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"Users manually save their conversations using commands or menus provided by ToolMate AI, which is then managed and stored by ToolMate AI."</data>
+      <data key="d5">"user-initiated action, management"</data>
+      <data key="d6">chunk-f50283466db39cca794aea33c114b955</data>
+    </edge>
+    <edge source="&quot;ALL CONVERSATION RECORDS&quot;" target="&quot;SEARCH PREVIOUS CONVERSATIONS&quot;">
+      <data key="d3">10.0</data>
+      <data key="d4">"Old chat records are automatically saved in a vector database format alongside plain text formats for easier search and load operations, which can be accessed through the 'Search Previous Conversations' feature."</data>
+      <data key="d5">"complementarity, accessibility"</data>
+      <data key="d6">chunk-f50283466db39cca794aea33c114b955</data>
+    </edge>
+    <edge source="&quot;ALL CONVERSATION RECORDS&quot;" target="&quot;SHARE CONVERSATIONS&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"Conversations are shared with others in plain text format, allowing them to resume using ToolMate AI, demonstrating how these records can be used for both management and external use."</data>
+      <data key="d5">"external use, sharing"</data>
+      <data key="d6">chunk-f50283466db39cca794aea33c114b955</data>
+    </edge>
+    <edge source="&quot;ALL CONVERSATION RECORDS&quot;" target="&quot;KEEP A READABLE COPY&quot;">
+      <data key="d3">6.0</data>
+      <data key="d4">"Readable copies of conversation records are saved in plain text format, providing users with an accessible way to review their chat history without the need for complex searches or vector database formats."</data>
+      <data key="d5">"readability improvement, accessibility"</data>
+      <data key="d6">chunk-f50283466db39cca794aea33c114b955</data>
+    </edge>
+    <edge source="&quot;SAVE AS ...&quot;" target="&quot;OPEN A SAVED CONVERSATION&quot;">
+      <data key="d3">12.0</data>
+      <data key="d4">"The concept of saving conversations with custom names and locations can be used to open specific saved conversations, demonstrating the interconnectivity between these two processes."</data>
+      <data key="d5">"intermediary, access control"</data>
+      <data key="d6">chunk-f50283466db39cca794aea33c114b955</data>
+    </edge>
+    <edge source="&quot;TEXT-TO-SPEECH FEATURE&quot;" target="&quot;TTSUTIL&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"The Text-to-speech feature is implemented using TTSUtil, a function provided by letmedoit/utils/tts_utils.py."</data>
+      <data key="d5">"integration, functionality"</data>
+      <data key="d6">chunk-46dc95c8f139e15b02c4f72336590a07</data>
+    </edge>
+    <edge source="&quot;TOOLMATE AI SUPPORT MULTI-API KEY USAGE&quot;" target="&quot;TOOLMATE AI SUPPORT MULTI-API KEY USAGE&quot;">
+      <data key="d3">16.0</data>
+      <data key="d4">"ToolMate AI supports use of multiple groq API keys for running inference."</data>
+      <data key="d5">"multiple API support, usage flexibility"</data>
+      <data key="d6">chunk-9a7a626018212a6f7f1f885b79ab5ee3</data>
+    </edge>
+    <edge source="&quot;AYERS&quot;" target="&quot;~/MODELS/WIZARDLM2.GGUF&quot;">
+      <data key="d3">12.0</data>
+      <data key="d4">"Ayers uses wizardlm2.gguf as part of their command line for running Llama.cpp server."</data>
+      <data key="d5">"model usage, script execution"</data>
+      <data key="d6">chunk-6484d1e47218253a33bb3a1d058fe878</data>
+    </edge>
+    <edge source="&quot;CONFIG.ALIASES&quot;" target="&quot;!ETEXTEDIT&quot;">
+      <data key="d3">9.0</data>
+      <data key="d4">"The !etextedit alias refers to the eTextEdit.py script defined in config.aliases."</data>
+      <data key="d5">"command alias, functionality"</data>
+      <data key="d6">chunk-95085e367fcd9e0a48c3c41642cf5c1a</data>
+    </edge>
+    <edge source="&quot;CONFIG.ALIASES&quot;" target="&quot;CONFIG.INPUTSUGGESTIONS&quot;">
+      <data key="d3">14.0</data>
+      <data key="d4">"Both config.aliases and config.inputSuggestions are used in LetMeDoIt AI's plugins for generating input suggestions."</data>
+      <data key="d5">"functional extension, synergy"</data>
+      <data key="d6">chunk-93ddd8ad41905bb4e11714d30ecf4b1e</data>
+    </edge>
+    <edge source="&quot;THE TOOL'S CONFIGURATION CHANGE OPTION IS PROVIDED THROUGH THE 'CHANGE TEXT-TO-SPEECH CONFIG' ACTION.&quot;" target="&quot;TOOLMATE V0.2.42+&quot;&lt;/|&gt;&quot;CHANGE TEXT-TO-SPEECH CONFIG&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"tool feature, configuration interaction"</data>
+      <data key="d5">8</data>
+      <data key="d6">chunk-6da1144b98798d92d4d6efc29226e96a</data>
+    </edge>
+    <edge source="&quot;LETMEDOIT AI MAIN UI&quot;" target="&quot;FUNCTION CALLS IN PLUGINS&quot;">
+      <data key="d3">18.0</data>
+      <data key="d4">"The LetMeDoIt AI main interface utilizes function calls to work with non-conversational models such as DALL-E-3."&lt;SEP&gt;"The main user interface interacts with function calls to integrate non-conversational models like DALL-E-3."</data>
+      <data key="d5">"integration, advanced features"&lt;SEP&gt;"integration, functionality expansion"</data>
+      <data key="d6">chunk-539d4b679f0f83e910ef48330bd6c9be</data>
+    </edge>
+    <edge source="&quot;FUNCTION CALLS IN PLUGINS&quot;" target="&quot;ANALYZING IMAGE EVENT&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"The function calls in plugins enable an event that analyzes images."</data>
+      <data key="d5">"integration, tool development"</data>
+      <data key="d6">chunk-539d4b679f0f83e910ef48330bd6c9be</data>
+    </edge>
+    <edge source="&quot;DALL-E-3&quot;" target="&quot;ANALYZE IMAGES PLUGIN&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"DALL-E-3 is the model used within the Analyze Images plugin for image analysis."</data>
+      <data key="d5">"model integration, functionality expansion"</data>
+      <data key="d6">chunk-539d4b679f0f83e910ef48330bd6c9be</data>
+    </edge>
+    <edge source="&quot;NASA&quot;" target="&quot;ISS&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"NASA manages the ISS crew rotations, including the announcement of Mark Kimura joining the station."</data>
+      <data key="d5">"management, coordination"</data>
+      <data key="d6">chunk-349f3f506b05439b404d6eb6c632e347</data>
+    </edge>
+    <edge source="&quot;MARK KIMURA&quot;" target="&quot;ISS&quot;">
+      <data key="d3">6.0</data>
+      <data key="d4">"Mark Kimura is replacing Olivia Chen on the ISS, showing a continuity in station operations."</data>
+      <data key="d5">"replacement, continuation"</data>
+      <data key="d6">chunk-349f3f506b05439b404d6eb6c632e347</data>
+    </edge>
+    <edge source="&quot;INPUT SUGGESTIONS PLUGIN&quot;" target="&quot;LETMEDOIT AI PLUGINS&quot;">
+      <data key="d3">16.0</data>
+      <data key="d4">"Input Suggestions Plugin is a specific feature within the broader LetMeDoIt AI Plugins category."</data>
+      <data key="d5">"category membership, plugin type"</data>
+      <data key="d6">chunk-6195ae51400d4ac8d053d22857a76ba0</data>
+    </edge>
+    <edge source="&quot;DOCKER&quot;" target="&quot;ALEX&quot;">
+      <data key="d3">18.0</data>
+      <data key="d4">"Alex uses Docker technology described in the setup guide."</data>
+      <data key="d5">"docker usage, installation process"</data>
+      <data key="d6">chunk-bc0340ecfc8ebb3292fe95e1d1e1e486</data>
+    </edge>
+    <edge source="&quot;DOCKER&quot;" target="&quot;ALPINE LINUX SETUP&quot;">
+      <data key="d3">16.0</data>
+      <data key="d4">"Docker is set up inside an Alpine Linux virtual machine as part of the setup process."</data>
+      <data key="d5">"docker in vm, nested technology"</data>
+      <data key="d6">chunk-bc0340ecfc8ebb3292fe95e1d1e1e486</data>
+    </edge>
+    <edge source="&quot;PERPLEXICA&quot;" target="&quot;SEARXNG&quot;">
+      <data key="d3">6.0</data>
+      <data key="d4">"Both are mentioned in the context of setting up Docker on Android via Termux."</data>
+      <data key="d5">"co-occurrence, related topics"</data>
+      <data key="d6">chunk-bc0340ecfc8ebb3292fe95e1d1e1e486</data>
+    </edge>
+    <edge source="&quot;INSTALL PACKAGE PLUGIN&quot;" target="&quot;FUNCTION CALLING FEATURES OF CHATGPT IN LETMEDOIT AI&quot;">
+      <data key="d3">9.0</data>
+      <data key="d4">"The 'install python package' is an example that showcases the function calling capabilities enabled by ChatGPT within LetMeDoIt AI."</data>
+      <data key="d5">"integration, demonstration"</data>
+      <data key="d6">chunk-46281d2e68eeda94d6ab62fb22bac2fe</data>
+    </edge>
+    <edge source="&quot;EDIT TEXT PLUGIN&quot;" target="&quot;FUNCTION CALLING FEATURES OF CHATGPT IN LETMEDOIT AI&quot;">
+      <data key="d3">8.0</data>
+      <data key="d4">"The 'edit text' plugin is a simple example that demonstrates how function calling can be used to integrate external tools and utilities into LetMeDoIt AI."</data>
+      <data key="d5">"integration, demonstration"</data>
+      <data key="d6">chunk-46281d2e68eeda94d6ab62fb22bac2fe</data>
+    </edge>
+    <edge source="&quot;ADD CALENDAR EVENT&quot;" target="&quot;SEARCH NEWS&quot;">
+      <data key="d3">7.0</data>
+      <data key="d4">"The search_news function is triggered after adding an event to check or gather related information, such as headlines about the event being added. "</data>
+      <data key="d5">"event correlation, context relevance"</data>
+      <data key="d6">chunk-0d7a78fab7e8668a408d1426e9cd18b1</data>
+    </edge>
+    <edge source="&quot;GITHUB &quot;" target="&quot;UBUNTU &quot;">
+      <data key="d3">15.0</data>
+      <data key="d4">"The official guide for Ubuntu server configurations is available on GitHub."</data>
+      <data key="d5">"official content, geographical location"&lt;SEP&gt;"official guide, geographical location"</data>
+      <data key="d6">chunk-0eb61cb4713b99e844cf89f16fd9e657</data>
+    </edge>
+  </graph>
+</graphml>

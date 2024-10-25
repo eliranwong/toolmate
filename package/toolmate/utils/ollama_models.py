@@ -1,4 +1,12 @@
 ollama_models = (
+    "granite3-moe",
+    "granite3-moe:1b",
+    "granite3-moe:3b",
+    "granite3-dense",
+    "granite3-dense:2b",
+    "granite3-dense:8b",
+    "nemotron",
+    "nemotron:70b",
     "shieldgemma",
     "shieldgemma:2b",
     "shieldgemma:9b",

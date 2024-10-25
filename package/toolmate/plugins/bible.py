@@ -2,17 +2,6 @@
 This plugin works with optional module `bible`, install it by:
 
 > pip install toolmate[bible]
-
-Notes about alternate options via API:
-
-CUV Bible
-Reference: https://bible.fhl.net/json
-cuv = requests.get("https://bible.fhl.net/json/qb.php?gb=0&chap=3&sec=6&chineses=出")
-cuv.text.encode().decode('unicode_escape')
-
-NET Bible
-Reference: https://labs.bible.org/
-https://labs.bible.org/api/?passage=John+3:16-17;%20Deut%206:4
 """
 
 try:
@@ -41,7 +30,7 @@ try:
     config.uniquebible_localCliHandler = LocalCliHandler()
     os.chdir(cwd)
 
-    """ available resource:
+    """ available resources:
     config.uniquebible_platform.textList
     config.uniquebible_platform.textFullNameList
     config.uniquebible_platform.strongBibles
@@ -71,9 +60,7 @@ try:
         print2("```")
         return ""
     functionSignature = {
-        "examples": [
-            "Extract Bible references",
-        ],
+        "examples": [],
         "name": "extract_bible_references",
         "description": "Extract Bible references from a block of text",
         "parameters": {
@@ -88,9 +75,17 @@ try:
     # Tool: @bible
     def bible(function_args):
         stopSpinning()
-        def displayBibleVerses(verseList, text=None):
+        def displayBibleVerses(verseList, text=None, searchString=""):
             bible = Bible(text=text)
-            fullVerseList = bible.getEverySingleVerseList(verseList)
+            if searchString and not verseList:
+                # perform a plain text search if no bible reference is found
+                # use tools @search_bible or @search_bible_paragraphs for more advanced searches
+                query = "SELECT Book, Chapter, Verse FROM Verses WHERE (Scripture LIKE ?)"
+                binding = (f"%{searchString}%",)
+                fullVerseList = bible.getSearchVerses(query, binding)
+            else:
+                # include all verses within a range
+                fullVerseList = bible.getEverySingleVerseList(verseList)
             for verse in fullVerseList:
                 b, c, v, verseText = bible.readTextVerse(*verse, noAudioTag=True)
                 verseText = re.sub("<[^<>]*?>", "", verseText)
@@ -104,6 +99,7 @@ try:
         # change to uniquebible app directory temporarily
         cwd = os.getcwd()
         os.chdir(config.uniquebible_path)
+
         # display verses
         config.toolTextOutput = ""
         content = config.currentMessages[-1]["content"]
@@ -116,14 +112,16 @@ try:
         bibles = removeDuplicatedListItems(keyword_processor.extract_keywords(content))
         if not bibles:
             bibles = [f"`{bibleconfig.mainText}`"]
-
+        if not verseList:
+            content = re.sub("|".join(bibles), "", content)
+            content = re.sub(" [ ]+?([^ ])", r" \1", content).rstrip()
         for i in bibles:
             i = i[1:-1]
             heading = f"# Bible: {i}"
             config.toolTextOutput += f"\n{heading}\n\n"
             print()
             print2(heading)
-            displayBibleVerses(verseList, text=i)
+            displayBibleVerses(verseList, text=i, searchString="" if verseList else content)
 
         config.toolTextOutput = config.toolTextOutput.strip()
 
@@ -132,10 +130,14 @@ try:
         return ""
     functionSignature = {
         "examples": [
-            "Show bible verses",
+            "John 3:16-18", # provide a single reference; use default bible version if bible version is not given
+            "`NIV` John 3:16-18; Deu 6:4", # specify a bible version and multiple references
+            "`NIV` `ESV` John 3:16-18; Deu 6:4", # specify multiple bible versions and multiple references
+            "Jesus love", # perform a plain text search
+            "`NET` apostle of Christ", # search for 'apostle of Christ' in NET bible
         ],
         "name": "bible",
-        "description": "Retrieve bible verses",
+        "description": "Retrieve Bible verses based on given references or perform a plain text search",
         "parameters": {
             "type": "object",
             "properties": {},
@@ -276,9 +278,77 @@ try:
             commentarySuggestions[i] = bookSuggestions[i]
         config.inputSuggestions.append({"@bible_commentary": commentarySuggestions})
 
+    # searchbible.ai
+    try:
+        config.searchbible_path = str(importlib.resources.files("searchbible"))
+        config.searchbible_path = re.sub(r"MultiplexedPath\('(.*?)'\)$", r"\1", config.searchbible_path)
+        cwd = os.getcwd()
+        os.chdir(config.searchbible_path)
+        from searchbible.searchbible import search
+        os.chdir(cwd)
+    except:
+        config.searchbible_path = ""
+
+    if config.searchbible_path:
+        # Tool: @search_bible
+        def search_bible(function_args):
+            stopSpinning()
+            content = config.currentMessages[-1]["content"]
+            print2("\n```search_bible")
+            config.toolTextOutput = "```search_bible\n" + search(simpleSearch="" if content == "[NONE]" else content) + "\n```"
+            print2("```")
+            return ""
+        functionSignature = {
+            "examples": [
+                "@search_bible David fled", # perform a simple similarity search for 'David fled'
+                "@search_bible", # when search item is not specified, users are prompted to customise available search parameters.
+            ],
+            "name": "search_bible",
+            "description": "Perform similarity search for verses in the bible",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
+        }
+        config.addFunctionCall(signature=functionSignature, method=search_bible)
+
+        # Tool: @search_bible_paragraphs
+        def search_bible_paragraphs(function_args):
+            stopSpinning()
+            content = config.currentMessages[-1]["content"]
+            print2("\n```search_bible_paragraphs")
+            config.toolTextOutput = "```search_bible_paragraphs\n" + search(simpleSearch="" if content == "[NONE]" else content) + "\n```"
+            print2("```")
+            return ""
+        functionSignature = {
+            "examples": [],
+            "name": "search_bible_paragraphs",
+            "description": "Perform similarity search for paragraphs in the bible",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
+        }
+        config.addFunctionCall(signature=functionSignature, method=search_bible_paragraphs)
+
     # Predefined System Messages
     config.predefinedChatSystemMessages["Billy Graham"] = "I want you to speak like Billy Graham, the Amercian evangelist. Please incorporate his speaking style, values, and thoughts in our interaction."
 
 except:
     print(traceback.format_exc())
     pass
+
+"""
+Notes about alternate options via API:
+
+CUV Bible
+Reference: https://bible.fhl.net/json
+cuv = requests.get("https://bible.fhl.net/json/qb.php?gb=0&chap=3&sec=6&chineses=出")
+cuv.text.encode().decode('unicode_escape')
+
+NET Bible
+Reference: https://labs.bible.org/
+https://labs.bible.org/api/?passage=John+3:16-17;%20Deut%206:4
+"""

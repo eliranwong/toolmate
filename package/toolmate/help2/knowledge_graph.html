@@ -1,0 +1,155 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 600px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#e449c0", "description": "\".speechrecognition is used to configure the settings for speech recognition.\"", "entity_type": "\"ACTION\"", "id": "\".SPEECHRECOGNITION\"", "label": "\".SPEECHRECOGNITION\"", "shape": "dot", "size": 10, "source_id": "chunk-60d58b7ce45cfee61330ecc133c0504d"}, {"color": "#d74fe7", "description": "\".speechrecognition is used for configuring settings related to speech recognition.\"", "entity_type": "\"UNKNOWN\"", "id": "\"CONFIGURATION\"", "label": "\"CONFIGURATION\"", "shape": "dot", "size": 10, "source_id": "chunk-60d58b7ce45cfee61330ecc133c0504d"}, {"color": "#0fd925", "description": "\".speechgeneration is used to configure the settings for speech generation.\"", "entity_type": "\"ACTION\"", "id": "\".SPEECHGENERATION\"", "label": "\".SPEECHGENERATION\"", "shape": "dot", "size": 10, "source_id": "chunk-60d58b7ce45cfee61330ecc133c0504d"}, {"color": "#24d438", "description": "\"ToolMate v0.2.42+ is a version of the ToolMate organization\u0027s AI software.\"|", "entity_type": "\"ORGANIZATION\"", "id": "\"TOOLMATE V0.2.42+ \"", "label": "\"TOOLMATE V0.2.42+ \"", "shape": "dot", "size": 10, "source_id": "chunk-fb3f71c5dc50e2ed48684a953a02ae59"}, {"color": "#0e02f1", "description": "\"ToolMate v0.2.42+ integrates wsay for text-to-speech feature.\"", "entity_type": "\"UNKNOWN\"", "id": "\"WSAY \"", "label": "\"WSAY \"", "shape": "dot", "size": 10, "source_id": "chunk-fb3f71c5dc50e2ed48684a953a02ae59"}, {"color": "#878393", "description": "\"v1.6.2 refers to the specific version of wsay used in current code install.\"|", "entity_type": "\"TECHNOLOGY\"", "id": "\"V1.6.2 \"", "label": "\"V1.6.2 \"", "shape": "dot", "size": 10, "source_id": "chunk-fb3f71c5dc50e2ed48684a953a02ae59"}, {"color": "#7b7155", "description": "\"When using ToolMate AI v0.2.61, \u0027wsay.exe\u0027 is automatically downloaded and installed in the \u0027~\\\\toolmate\u0027 directory.\"", "entity_type": "\"UNKNOWN\"", "id": "\"TOOLMATE AI V0.2.61 \"", "label": "\"TOOLMATE AI V0.2.61 \"", "shape": "dot", "size": 10, "source_id": "chunk-fb3f71c5dc50e2ed48684a953a02ae59"}, {"color": "#f3d2da", "description": "\"When using ToolMate AI v0.2.61, \u0027wsay.exe\u0027 is automatically downloaded and installed in the \u0027~\\\\toolmate\u0027 directory.\"", "entity_type": "\"UNKNOWN\"", "id": "\"WSAY.EXE \"", "label": "\"WSAY.EXE \"", "shape": "dot", "size": 10, "source_id": "chunk-fb3f71c5dc50e2ed48684a953a02ae59"}, {"color": "#47d205", "description": "\"To enable input text reading on Windows with \u0027wsay.exe\u0027, one must select the \"toggle input audio\" option from the action menu.\"", "entity_type": "\"UNKNOWN\"", "id": "\"INPUT AUDIO \"", "label": "\"INPUT AUDIO \"", "shape": "dot", "size": 10, "source_id": "chunk-fb3f71c5dc50e2ed48684a953a02ae59"}, {"color": "#79b199", "description": "\"Similarly, to enable output text reading, one must select the \"toggle output audio\" option from the action menu.\"", "entity_type": "\"UNKNOWN\"", "id": "\"OUTPUT AUDIO \"", "label": "\"OUTPUT AUDIO \"", "shape": "dot", "size": 10, "source_id": "chunk-fb3f71c5dc50e2ed48684a953a02ae59"}, {"color": "#40394a", "description": "\"Drinking wine in the evening is considered an event that promotes relaxation.\"", "entity_type": "\"EVENT\"", "id": "\"DRINKING WINE\"", "label": "\"DRINKING WINE\"", "shape": "dot", "size": 10, "source_id": "chunk-b245ed81d791c10dab089d8529e31525"}, {"color": "#0f8c58", "description": "\"Personal preferences should be considered when deciding the time to drink wine for relaxation.\"", "entity_type": "\"UNKNOWN\"", "id": "\"PERSONAL PREFERENCES\"", "label": "\"PERSONAL PREFERENCES\"", "shape": "dot", "size": 10, "source_id": "chunk-b245ed81d791c10dab089d8529e31525"}, {"color": "#f5b6bf", "description": "\"Some studies suggest drinking wine during meals may have additional benefits such as aiding digestion and nutrient absorption.\"", "entity_type": "\"UNKNOWN\"", "id": "\"STUDIES\"", "label": "\"STUDIES\"", "shape": "dot", "size": 10, "source_id": "chunk-b245ed81d791c10dab089d8529e31525"}, {"color": "#1415fb", "description": "\"ffmpeg is a media processing tool that needs to be installed for working with the plugin \u0027download youtube media\u0027.\"", "entity_type": "\"TECHNOLOGY\"", "id": "\"FFMPEG\"", "label": "\"FFMPEG\"", "shape": "dot", "size": 10, "source_id": "chunk-56777ce328a2ecdf2846a29756d6b7e4"}, {"color": "#4b6840", "description": "\"Evening is a specific time frame during which drinking wine may be most suitable for promoting relaxation.\"", "entity_type": "\"GEO\"", "id": "\"EVENING\"", "label": "\"EVENING\"", "shape": "dot", "size": 10, "source_id": "chunk-b245ed81d791c10dab089d8529e31525"}, {"color": "#38e342", "description": "\"The body is the recipient of the effects associated with drinking wine in the evening.\"", "entity_type": "\"GEO\"", "id": "\"BODY\"", "label": "\"BODY\"", "shape": "dot", "size": 10, "source_id": "chunk-b245ed81d791c10dab089d8529e31525"}, {"color": "#64ab5c", "description": "\"Moderation is a concept that should be considered when drinking wine in the evening for its relaxing effects.\"", "entity_type": "\"CONCEPT\"", "id": "\"MODERATION\"", "label": "\"MODERATION\"", "shape": "dot", "size": 10, "source_id": "chunk-b245ed81d791c10dab089d8529e31525"}, {"color": "#e8ddaf", "description": "\"Workflows are designed to save users from repetitive actions and are used for sharing frequently performed tasks with collaborators or increasing portability.\"", "entity_type": "\"CONCEPT\"", "id": "\"WORKFLOWS\"", "label": "\"WORKFLOWS\"", "shape": "dot", "size": 10, "source_id": "chunk-c50af8283bd4051d75176ccdda0b2c21"}, {"color": "#cf2f64", "description": "\"The `@workflow` command is a tool used to execute workflows defined in plain text files.\"", "entity_type": "\"TECHNOLOGY\"", "id": "\"TOOL WORKFLOW\"", "label": "\"TOOL WORKFLOW\"", "shape": "dot", "size": 10, "source_id": "chunk-c50af8283bd4051d75176ccdda0b2c21"}, {"color": "#42a0ab", "description": "\"Users save their frequently used actions in plain text files and use the `@workflow` command to run these workflows within ToolMate AI.\"\u0027", "entity_type": "\"PERSON\"", "id": "\"USER\"", "label": "\"USER\"", "shape": "dot", "size": 10, "source_id": "chunk-c50af8283bd4051d75176ccdda0b2c21"}, {"color": "#54ecf1", "description": "\"The home directory is where users save their workflows, such as the `my_workflow` example provided.\"\u0027", "entity_type": "\"GEO\"", "id": "\"HOME DIRECTORY\"", "label": "\"HOME DIRECTORY\"", "shape": "dot", "size": 10, "source_id": "chunk-c50af8283bd4051d75176ccdda0b2c21"}, {"color": "#e25eae", "description": "\"ToolMate AI prompts are used in conjunction with the `@workflow` command to run saved workflows.\"", "entity_type": "\"EVENT\"", "id": "\"TOOLMATE AI PROMPT\"", "label": "\"TOOLMATE AI PROMPT\"", "shape": "dot", "size": 10, "source_id": "chunk-c50af8283bd4051d75176ccdda0b2c21"}, {"color": "#20f8b4", "description": "\"Users can insert nested workflows within other workflows for more complex tasks.\"\u0027", "entity_type": "\"EVENT\"", "id": "\"NESTED WORKFLOWS\"", "label": "\"NESTED WORKFLOWS\"", "shape": "dot", "size": 10, "source_id": "chunk-c50af8283bd4051d75176ccdda0b2c21"}, {"color": "#7f3181", "description": "\"Workflow files are plain text documents containing instructions for specific tasks or processes.\"\u0027", "entity_type": "\"CONCEPT\"", "id": "\"WORKFLOW FILES\"", "label": "\"WORKFLOW FILES\"", "shape": "dot", "size": 10, "source_id": "chunk-c50af8283bd4051d75176ccdda0b2c21"}, {"color": "#51b657", "description": "\"The home directory is where users store their workflow files, such as `my_workflow.txt`.\"\u0027", "entity_type": "\"GEO\"", "id": "\"HOME DIRECTORY \"", "label": "\"HOME DIRECTORY \"", "shape": "dot", "size": 10, "source_id": "chunk-c50af8283bd4051d75176ccdda0b2c21"}, {"color": "#ea29fe", "description": "\"Users can incorporate nested workflows within other workflows for handling complex tasks and processes.\"\u0027", "entity_type": "\"EVENT\"", "id": "\"NESTED WORK FLOWS \"", "label": "\"NESTED WORK FLOWS \"", "shape": "dot", "size": 10, "source_id": "chunk-c50af8283bd4051d75176ccdda0b2c21"}, {"color": "#5abae8", "description": "\"ToolMate AI is a geographical entity referring to the location or context where `config.py` is managed and edited.\"", "entity_type": "\"GEO\"", "id": "\"TOOLMATE AI\"", "label": "\"TOOLMATE AI\"", "shape": "dot", "size": 10, "source_id": "chunk-a5078e9e86ba4cecbc3efeb6fa89a54a"}, {"color": "#d2accd", "description": "\"Users are persons who can manually edit the `config.py` file located in ToolMate AI directory.\"|", "entity_type": "\"PERSON\"", "id": "\"PERSON\"", "label": "\"PERSON\"", "shape": "dot", "size": 10, "source_id": "chunk-a5078e9e86ba4cecbc3efeb6fa89a54a"}]);
+                  edges = new vis.DataSet([{"description": "\".speechrecognition is used for configuring settings related to speech recognition.\"", "from": "\".SPEECHRECOGNITION\"", "keywords": "\"uses, configuration\"", "source_id": "chunk-60d58b7ce45cfee61330ecc133c0504d", "to": "\"CONFIGURATION\"", "width": 2.0}, {"description": "\".speechgeneration is used for configuring settings related to speech generation.\"", "from": "\".SPEECHGENERATION\"", "keywords": "\"uses, configuration\"", "source_id": "chunk-60d58b7ce45cfee61330ecc133c0504d", "to": "\"CONFIGURATION\"", "width": 3.0}, {"description": "\"ToolMate v0.2.42+ integrates wsay for text-to-speech feature.\"", "from": "\"TOOLMATE V0.2.42+ \"", "keywords": "\"integration, technology integration\"", "source_id": "chunk-fb3f71c5dc50e2ed48684a953a02ae59", "to": "\"WSAY \"", "width": 6.0}, {"description": "\"The current code install of ToolMate AI v0.2.61 uses version 1.6.2 of wsay.\"", "from": "\"V1.6.2 \"", "keywords": "\"version, compatibility\"", "source_id": "chunk-fb3f71c5dc50e2ed48684a953a02ae59", "to": "\"TOOLMATE AI V0.2.61 \"", "width": 8.0}, {"description": "\"When using ToolMate AI v0.2.61, \u0027wsay.exe\u0027 is automatically downloaded and installed in the \u0027~\\\\toolmate\u0027 directory.\"", "from": "\"TOOLMATE AI V0.2.61 \"", "keywords": "\"installation, automation\"", "source_id": "chunk-fb3f71c5dc50e2ed48684a953a02ae59", "to": "\"WSAY.EXE \"", "width": 7.0}, {"description": "\"To enable input text reading on Windows with \u0027wsay.exe\u0027, one must select the \"toggle input audio\" option from the action menu.\"", "from": "\"WSAY.EXE \"", "keywords": "\"enablement, user interaction\"", "source_id": "chunk-fb3f71c5dc50e2ed48684a953a02ae59", "to": "\"INPUT AUDIO \"", "width": 3.0}, {"description": "\"Similarly, to enable output text reading, one must select the \"toggle output audio\" option from the action menu.\"", "from": "\"WSAY.EXE \"", "keywords": "\"enablement, user interaction\"", "source_id": "chunk-fb3f71c5dc50e2ed48684a953a02ae59", "to": "\"OUTPUT AUDIO \"", "width": 4.0}, {"description": "\"Personal preferences should be considered when deciding the time to drink wine for relaxation.\"", "from": "\"DRINKING WINE\"", "keywords": "\"individual considerations, moderation\"", "source_id": "chunk-b245ed81d791c10dab089d8529e31525", "to": "\"PERSONAL PREFERENCES\"", "width": 10.0}, {"description": "\"Some studies suggest drinking wine during meals may have additional benefits such as aiding digestion and nutrient absorption.\"", "from": "\"DRINKING WINE\"", "keywords": "\"research findings, potential benefits\"", "source_id": "chunk-b245ed81d791c10dab089d8529e31525", "to": "\"STUDIES\"", "width": 8.0}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>

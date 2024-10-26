@@ -143,7 +143,7 @@ However, remember, I want you not to quote the whole verse word by word, especia
     # Content
 """
 
-    config.predefinedContexts["Old Testament Highlights"] = """Bible Highlights in an Old Testament passage in the bible.
+    config.predefinedContexts["Bible OT Highlights"] = """Bible Highlights in an Old Testament passage in the bible.
 Can you give me a detailed summary of this passage?
 How can the meaning of the biblical Hebrew words in this passage provide insights that aid our understanding? Explain the insights with examples.
 What are the key words and phrases used in this passage, and how do they contribute to its meaning?
@@ -157,7 +157,7 @@ Please write in detail pertaining to the following passage:
     # Passage
 """
 
-    config.predefinedContexts["New Testament Highlights"] = """Bible Highlights in a New Testament passage in the bible.
+    config.predefinedContexts["Bible NT Highlights"] = """Bible Highlights in a New Testament passage in the bible.
 Can you give me a detailed summary of this passage?
 How can the meaning of the biblical Greek words in this passage provide insights that aid our understanding? Explain the insights with examples.
 What are the key words and phrases used in this passage, and how do they contribute to its meaning?
@@ -171,7 +171,7 @@ Please write in detail pertaining to the following passage:
     # Passage
 """
 
-    config.predefinedContexts["Old Testament Historical Context"] = """Bible Historical Context of an Old Testament passage in the bible.
+    config.predefinedContexts["Bible OT Historical Context"] = """Bible Historical Context of an Old Testament passage in the bible.
 In what ways does this passage speak to the struggles that Old Testament People faced in the time of its writing, and how does an understanding of its historical and cultural context help us to better interpret its meaning?
 In what ways does a deeper comprehension of the culture of the Ancient Near East aid in our understanding of the passage? Give examples based on the content of the given passage.
 How does comprehending the social, political, and religious environment of the Old Testament era, along with the distinct obstacles that the people of that time may have encountered in their daily lives, contribute to our interpretation of the given passage? Give examples based on the content of the given passage.
@@ -185,7 +185,7 @@ Please write in detail pertaining to the following passage:
     # Passage
 """
 
-    config.predefinedContexts["New Testament Historical Context"] = """Bible Historical Context of a New Testament passage in the bible.
+    config.predefinedContexts["Bible NT Historical Context"] = """Bible Historical Context of a New Testament passage in the bible.
 In what ways does this passage speak to the struggles that early Christians faced in the time of its writing, and how does an understanding of its historical and cultural context help us to better interpret its meaning?
 In what ways does a deeper comprehension of the Jewish culture aid in our understanding of the passage? Give examples based on the content of the given passage.
 How does comprehending the social, political, and religious environment of the New Testament era, along with the distinct obstacles that the people of that time may have encountered in their daily lives, contribute to our interpretation of the given passage? Give examples based on the content of the given passage.
@@ -199,7 +199,22 @@ Please write in detail pertaining to the following passage:
     # Passage
 """
 
-    config.predefinedContexts["Old Testament Themes"] = """Bible Themes in an Old Testament passage.
+    config.predefinedContexts["Bible Themes"] = """Bible Themes in bible passage.
+What are the key themes expressed in this passage?  Please elaborate on each theme in details.  
+Explain how biblical Hebrew studies help us understand each theme.  Povide illustration that aid our understanding, if possible.
+What are the theological implications of this passage, and how does it contribute to our understanding of God's character and plan for humanity?
+How does other passages in the bible contribute to our comprehension of this passage? Give examples and quote related passages.
+How does the message conveyed in this passage impact our connection with God?
+Please answer all relevant questions pertaining to the following passage.
+Do not give me historical context of the passage, as I already know them. 
+Do not give me general information about the passage, as I am seeking specific themes, theological implications and connection with God.
+
+Please answer all relevant questions pertaining to the following passage:
+
+    # Passage
+"""
+
+    config.predefinedContexts["Bible OT Themes"] = """Bible Themes in an Old Testament passage.
 What are the key themes expressed in this passage?  Please elaborate on each theme in details.  
 Explain how biblical Hebrew studies help us understand each theme.  Povide illustration that aid our understanding, if possible.
 What are the theological implications of this passage, and how does it contribute to our understanding of God's character and plan for humanity?
@@ -214,7 +229,7 @@ Please answer all relevant questions pertaining to the following passage:
     # Passage
 """
 
-    config.predefinedContexts["New Testament Themes"] = """Bible Themes in a New Testament passage.
+    config.predefinedContexts["Bible NT Themes"] = """Bible Themes in a New Testament passage.
 What are the key themes expressed in this passage?  Please elaborate on each theme in details.  
 Explain how biblical Greek studies help us understand each theme.  Povide illustration that aid our understanding, if possible.
 What are the theological implications of this passage, and how does it contribute to our understanding of God's character and plan for humanity?

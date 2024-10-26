@@ -3,6 +3,7 @@ from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
 import sys, os, html, geocoder, platform, socket, geocoder, datetime, requests, getpass, pkg_resources, webbrowser, unicodedata
 import traceback, uuid, re, textwrap, signal, wcwidth, shutil, threading, time, subprocess, json, base64, html2text, pydoc, codecs, psutil
 from packaging import version
+import importlib.resources
 import pygments
 from pygments.lexers.python import PythonLexer
 from pygments.styles import get_style_by_name
@@ -1216,15 +1217,32 @@ def print1(content):
         print(content)
 
 def print2(content):
-    print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>{content}</{config.terminalPromptIndicatorColor2}>"))
+    try:
+        print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>{content}</{config.terminalPromptIndicatorColor2}>"))
+    except:
+        print(content)
 
 def print3(content):
-    splittedContent = content.split(": ", 1)
-    if len(splittedContent) == 2:
-        key, value = splittedContent
-        print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>{key}:</{config.terminalPromptIndicatorColor2}> {value}"))
-    else:
-        print2(splittedContent)
+    try:
+        splittedContent = content.split(": ", 1)
+        if len(splittedContent) == 2:
+            key, value = splittedContent
+            print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>{key}:</{config.terminalPromptIndicatorColor2}> {value}"))
+        else:
+            print2(splittedContent)
+    except:
+        print(content)
+
+def print4(content):
+    try:
+        splittedContent = content.split(") ", 1)
+        if len(splittedContent) == 2:
+            key, value = splittedContent
+            print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>{key})</{config.terminalPromptIndicatorColor2}> {value}"))
+        else:
+            print2(splittedContent)
+    except:
+        print(content)
 
 def getStringWidth(text):
     width = 0
@@ -1638,6 +1656,11 @@ def restartApp():
     exit(0)
 
 def updateApp():
+    try:
+        ubaPath = str(importlib.resources.files("uniquebible"))
+        bible = True if ubaPath else False
+    except:
+        bible = False
     package = os.path.basename(config.toolMateAIFolder)
     thisPackage = f"{package}_android" if config.isTermux else package
     print(f"Checking '{thisPackage}' version ...")
@@ -1658,7 +1681,7 @@ def updateApp():
             else:
                 try:
                     # upgrade package
-                    installPipPackage(f"--upgrade {thisPackage}")
+                    installPipPackage(f"--upgrade {thisPackage}{'[bible]' if bible else ''}")
                     restartApp()
                 except:
                     if config.developer:

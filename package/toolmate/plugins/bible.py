@@ -14,7 +14,7 @@ try:
     from uniquebible.db.BiblesSqlite import Bible
     from uniquebible.db.ToolsSqlite import Commentary
     from uniquebible import config as bibleconfig
-    from toolmate import config, print1, print2, print3, removeDuplicatedListItems, stopSpinning
+    from toolmate import config, print1, print2, print3, print4, removeDuplicatedListItems, stopSpinning
     from toolmate.utils.text_utils import TextUtil
     from toolmate.utils.regex_search import RegexSearch
     from flashtext import KeywordProcessor
@@ -60,7 +60,9 @@ try:
         print2("```")
         return ""
     functionSignature = {
-        "examples": [],
+        "examples": [
+            "@extract_bible_references I like John 3:16",
+        ],
         "name": "extract_bible_references",
         "description": "Extract Bible references from a block of text",
         "parameters": {
@@ -90,10 +92,7 @@ try:
                 b, c, v, verseText = bible.readTextVerse(*verse, noAudioTag=True)
                 verseText = re.sub("<[^<>]*?>", "", verseText)
                 verseText = f"({parser.bcvToVerseReference(b, c, v)}) {verseText}"
-                try:
-                    print1(verseText)
-                except:
-                    print(verseText)
+                print4(verseText)
                 config.toolTextOutput += f"{verseText}\n"
 
         # change to uniquebible app directory temporarily
@@ -130,11 +129,11 @@ try:
         return ""
     functionSignature = {
         "examples": [
-            "John 3:16-18", # provide a single reference; use default bible version if bible version is not given
-            "`NIV` John 3:16-18; Deu 6:4", # specify a bible version and multiple references
-            "`NIV` `ESV` John 3:16-18; Deu 6:4", # specify multiple bible versions and multiple references
-            "Jesus love", # perform a plain text search
-            "`NET` apostle of Christ", # search for 'apostle of Christ' in NET bible
+            "@bible John 3:16-18", # provide a single reference; use default bible version if bible version is not given
+            "@bible `NIV` John 3:16-18; Deu 6:4", # specify a bible version and multiple references
+            "@bible `NIV` `ESV` John 3:16-18; Deu 6:4", # specify multiple bible versions and multiple references
+            "@bible Jesus love", # perform a plain text search
+            "@bible `NET` apostle of Christ", # search for 'apostle of Christ' in NET bible
         ],
         "name": "bible",
         "description": "Retrieve Bible verses based on given references or perform a plain text search",
@@ -176,7 +175,10 @@ try:
         print2("```")
         return ""
     functionSignature = {
-        "examples": [],
+        "examples": [
+            "@uniquebible BIBLE:::NET:::John 3:16",
+            "@uniquebible CROSSREFERENCE:::John 3:16",
+        ],
         "name": "uniquebible",
         "description": "Run UniqueBible App commands to retrieve bible data",
         "parameters": {
@@ -259,7 +261,10 @@ try:
             os.chdir(cwd)
             return ""
         functionSignature = {
-            "examples": [],
+            "examples": [
+                "@bible_commentary John 3:16",
+                "@bible_commentary `CBSC` `BKC` John 3:16-18; Deu 6:4",
+            ],
             "name": "bible_commentary",
             "description": "Retrieve bible commentary",
             "parameters": {
@@ -322,7 +327,10 @@ try:
             print2("```")
             return ""
         functionSignature = {
-            "examples": [],
+            "examples": [
+                "@search_bible_paragraphs David fled", # perform a simple similarity search for 'David fled'
+                "@search_bible_paragraphs", # when search item is not specified, users are prompted to customise available search parameters.
+            ],
             "name": "search_bible_paragraphs",
             "description": "Perform similarity search for paragraphs in the bible",
             "parameters": {

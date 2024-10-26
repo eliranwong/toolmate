@@ -5,6 +5,20 @@ This plugin works with optional module `bible`, install it by:
 """
 
 try:
+    from toolmate import config, print1, print2, print3, print4, removeDuplicatedListItems, stopSpinning
+    from toolmate.utils.text_utils import TextUtil
+    from toolmate.utils.regex_search import RegexSearch
+    from flashtext import KeywordProcessor
+    import traceback, re
+    import importlib.resources
+
+    # load resources information
+    cwd = os.getcwd()
+
+    ubaUserDir = os.path.join(os.path.expanduser("~"), "UniqueBible")
+    config.uniquebible_path = str(importlib.resources.files("uniquebible"))
+    os.chdir(ubaUserDir if os.path.isdir(ubaUserDir) else config.uniquebible_path)
+
     from uniquebible.util.ConfigUtil import ConfigUtil
     ConfigUtil.setup(noQt=True, runMode="terminal")
     from uniquebible.util.BibleBooks import BibleBooks
@@ -14,17 +28,7 @@ try:
     from uniquebible.db.BiblesSqlite import Bible
     from uniquebible.db.ToolsSqlite import Commentary
     from uniquebible import config as bibleconfig
-    from toolmate import config, print1, print2, print3, print4, removeDuplicatedListItems, stopSpinning
-    from toolmate.utils.text_utils import TextUtil
-    from toolmate.utils.regex_search import RegexSearch
-    from flashtext import KeywordProcessor
-    import traceback, re
-    import importlib.resources
 
-    config.uniquebible_path = str(importlib.resources.files("uniquebible"))
-    # load resources information
-    cwd = os.getcwd()
-    os.chdir(config.uniquebible_path)
     config.uniquebible_platform = CrossPlatform()
     config.uniquebible_platform.setupResourceLists()
     config.uniquebible_localCliHandler = LocalCliHandler()
@@ -80,11 +84,18 @@ try:
         def displayBibleVerses(verseList, text=None, searchString=""):
             bible = Bible(text=text)
             if searchString and not verseList:
-                # perform a plain text search if no bible reference is found
+                # perform a regex / plain text search if no bible reference is found
                 # use tools @search_bible or @search_bible_paragraphs for more advanced searches
-                query = "SELECT Book, Chapter, Verse FROM Verses WHERE (Scripture LIKE ?)"
-                binding = (f"%{searchString}%",)
-                fullVerseList = bible.getSearchVerses(query, binding)
+                try:
+                    # regex search
+                    query = "SELECT Book, Chapter, Verse FROM Verses WHERE (Scripture REGEXP ?)"
+                    binding = (searchString,)
+                    fullVerseList = bible.getSearchVerses(query, binding)
+                except:
+                    # plain text search, in case an invalid regex pattern is given
+                    query = "SELECT Book, Chapter, Verse FROM Verses WHERE (Scripture LIKE ?)"
+                    binding = (f"%{searchString}%",)
+                    fullVerseList = bible.getSearchVerses(query, binding)
             else:
                 # include all verses within a range
                 fullVerseList = bible.getEverySingleVerseList(verseList)
@@ -121,6 +132,9 @@ try:
             print()
             print2(heading)
             displayBibleVerses(verseList, text=i, searchString="" if verseList else content)
+        # save the last opened bible as the default bible
+        bibleconfig.mainText = bibles[-1][1:-1]
+        ConfigUtil.save()
 
         config.toolTextOutput = config.toolTextOutput.strip()
 
@@ -169,7 +183,9 @@ try:
     def uniquebible(function_args):
         stopSpinning()
         command = config.currentMessages[-1]["content"].replace('"', '\\"')
-        config.toolTextOutput = subprocess.run(f'''uniquebible stream "{command}"''', shell=True, capture_output=True, text=True).stdout.strip()
+        config.toolTextOutput = config.uniquebible_localCliHandler.getContent(command, False).strip()
+        # alternative: loading stream mode; slower
+        #config.toolTextOutput = subprocess.run(f'''uniquebible stream "{command}"''', shell=True, capture_output=True, text=True).stdout.strip()
         print2("\n```UniqueBible App")
         print1(config.toolTextOutput)
         print2("```")
@@ -254,6 +270,9 @@ try:
                             print1(content)
                         except:
                             print(content)
+            # save the last opened commentary as the default commentary
+            bibleconfig.commentaryText = commentaries[-1][1:-1]
+            ConfigUtil.save()
 
             config.toolTextOutput = config.toolTextOutput.strip()
 

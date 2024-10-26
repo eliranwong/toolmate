@@ -15,9 +15,10 @@ try:
     # load resources information
     cwd = os.getcwd()
 
-    ubaUserDir = os.path.join(os.path.expanduser("~"), "UniqueBible")
-    config.uniquebible_path = str(importlib.resources.files("uniquebible"))
-    os.chdir(ubaUserDir if os.path.isdir(ubaUserDir) else config.uniquebible_path)
+    uniquebible_package_dir = str(importlib.resources.files("uniquebible"))
+
+    config.uniquebible_path = os.path.join(os.path.expanduser("~"), "UniqueBible")
+    os.chdir(config.uniquebible_path)
 
     from uniquebible.util.ConfigUtil import ConfigUtil
     ConfigUtil.setup(noQt=True, runMode="terminal")

@@ -1,3 +1,11 @@
+# 0.4.68-69
+
+* support api to retrieve bible data
+
+...
+...
+...
+
 # 0.4.45
 
 * fixed loading agents with Ollama and Llama.cpp

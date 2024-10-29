@@ -43,7 +43,7 @@ open(os.path.join(package, "config.py"), "w").close()
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name=package,
-    version="0.4.62",
+    version="0.4.69",
     python_requires=">=3.8, <3.13",
     description=f"ToolMate AI, developed by Eliran Wong, is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. Supports custom workflow and plugins to automate multi-step actions.",
     long_description=long_description,
@@ -130,7 +130,7 @@ setup(
     extras_require={
         'linux': ["flaml[automl]", "piper-tts", "pyautogen[autobuild]>=0.3.1"],  # Dependencies for the linux module
         'gui': ["PySide6"],  # Dependencies for the gui module
-        'bible': ["uniquebible>=0.1.23", "searchbible>=0.1.2"],  # Dependencies for the bible module
+        'bible': ["uniquebible>=0.1.34", "searchbible>=0.1.4"],  # Dependencies for the bible module
     },
     entry_points={
         "console_scripts": [

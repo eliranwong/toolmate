@@ -2923,27 +2923,30 @@ Acess the risk level of the following `{target.capitalize()}`:
                     description = f"{description} {assistantPreviousResponse}"
                 if description.strip():
                     def displayActionMessage(message):
-                        try:
-                            print3(message)
-                        except:
-                            print(message)
+                        displayMessage = message[:50]
+                        if len(message) > 50:
+                            displayMessage += " ..."
+                        print()
+                        print2("```request")
+                        print3(displayMessage)
+                        print2("```")
                     if action == "deep_reflection":
                         # think
                         description = f'''`Think` {description}'''
-                        message = f'''\n@chat: {description}\n'''
+                        message = f'''@chat: {description}\n'''
                         displayActionMessage(message)
                         complete = self.runSingleAction("chat", description, gui)
                         if not complete:
                             return False
                         # review
-                        message = '''\n@chat: Review, evaluate, and reflect ...\n'''
+                        message = '''@chat: Review, evaluate, and reflect ...\n'''
                         displayActionMessage(message)
                         description = config.predefinedContexts["Review"][6:]
                         complete = self.runSingleAction("chat", description, gui)
                         if not complete:
                             return False
                         # refine
-                        message = '''\n@chat: Refine ...\n'''
+                        message = '''@chat: Refine ...\n'''
                         displayActionMessage(message)
                         description = config.predefinedContexts["Refine"][21:]
                         complete = self.runSingleAction("chat", description, gui)
@@ -2963,7 +2966,7 @@ Acess the risk level of the following `{target.capitalize()}`:
                         else:
                             print2("Workflow file invalid!")
                     else:
-                        message = f'''\n@{action}: {description}'''
+                        message = f'''@{action}: {description}'''
                         displayActionMessage(message)
                         complete = self.runSingleAction(action, description, gui)
                         if not complete:

@@ -302,8 +302,6 @@ temporaryConfigs = [
     "deviceInfoPlugins",
     "datetimeSensitivePlugins",
     "tempChatSystemMessage",
-    "uniquebible_path",
-    "uniquebible_platform",
     "allEnabledTools",
     "toolmate",
     "chatGui",

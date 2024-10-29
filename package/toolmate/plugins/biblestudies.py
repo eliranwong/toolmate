@@ -1,6 +1,6 @@
 from toolmate import config
 
-if config.uniquebible_path:
+if config.uniquebible:
     # Predefined Contexts
 
     config.predefinedContexts["Bible Topic"] = """Write about the following topic in reference to the Bible.
@@ -40,7 +40,7 @@ Remember, do not give parsing information, explanation or repeat the bible refer
 
 I am giving you the Hebrew verse text below:
 
-    # Hebrew verse
+# Hebrew verse
 """
 
     config.predefinedContexts["Bible Greek Verse Translation"] = """I would like to request your assistance as a bible translator.
@@ -55,7 +55,7 @@ Remember, do not give parsing information, explanation or repeat the bible refer
 
 I am giving you the Greek verse text below:
 
-    # Greek verse
+# Greek verse
 """
 
     # Book Features
@@ -74,7 +74,7 @@ I want the introduction to be comprehensive and informative.
 When you explain, quote specific words or phases from relevant bible verses, if any.
 Answer all these relevant questions mentioned above, in the introduction, pertaining to the following bible book.
 
-    # Bible book name
+# Bible book name
 """
 
     config.predefinedContexts["Bible Outline"] = """I am currently studying the following bible book and chapters and would appreciate it if you could provide me with a detailed outline for it.
@@ -85,7 +85,7 @@ Additionally, kindly provide a title for each passage.
 Remember, use your own analysis based on the bible text instead of copying a published outline.
 If chapters are not specified, provide an outline to cover all chapters of the bible book given.
 
-    # Bible reference
+# Bible reference
 """
 
     # Chapter Features
@@ -104,7 +104,7 @@ I want your interpretation to be comprehensive and informative.
 When you explain, quote specific words or phases from relevant bible verses, if any.
 Answer all these relevant questions mentioned above, in the interpretation, pertaining to the following bible chapter.
 
-    # Bible chapter
+# Bible chapter
 """
 
     # Verse Features
@@ -112,35 +112,35 @@ Answer all these relevant questions mentioned above, in the interpretation, pert
 I want your interpretation to be comprehensive and informative.  When you explain, quote specific words or phases from the verse.
 However, remember, I want you not to quote the whole verse word by word, especially in the beginning of your response, as I already know its content.
 
-    # Bible verse
+# Bible verse
 """
 
     config.predefinedContexts["Bible NT Verse Interpretation"] = """Interpret the following verse in the light of its context, together with insights of biblical Greek studies.
 I want your interpretation to be comprehensive and informative.  When you explain, quote specific words or phases from the verse.
 However, remember, I want you not to quote the whole verse word by word, especially in the beginning of your response, as I already know its content.
 
-    # Bible verse
+# Bible verse
 """
 
     config.predefinedContexts["Bible Insights"] = """Give me exegetical insights in detail on the following bible verses:
 
-    # Verses
+# Verses
 """
 
     # Studies
     config.predefinedContexts["Bible Perspective"] = """Tell me how we should understand the content given below, according to biblical perspectives and principles:
 
-    # Content
+# Content
 """
 
     config.predefinedContexts["Bible Meaning"] = """Explain the meaning of the content given below in reference to the Bible:
 
-    # Content
+# Content
 """
 
     config.predefinedContexts["Bible Summary"] = """Write a summary on the content given below in reference to the Bible:
 
-    # Content
+# Content
 """
 
     config.predefinedContexts["Bible OT Highlights"] = """Bible Highlights in an Old Testament passage in the bible.
@@ -154,7 +154,7 @@ I want your response focus on my questions.  However, do not repeat my questions
 
 Please write in detail pertaining to the following passage:
 
-    # Passage
+# Passage
 """
 
     config.predefinedContexts["Bible NT Highlights"] = """Bible Highlights in a New Testament passage in the bible.
@@ -168,7 +168,7 @@ I want your response focus on my questions.  However, do not repeat my questions
 
 Please write in detail pertaining to the following passage:
 
-    # Passage
+# Passage
 """
 
     config.predefinedContexts["Bible OT Historical Context"] = """Bible Historical Context of an Old Testament passage in the bible.
@@ -182,7 +182,7 @@ Do not give me summary of the passage that is not relevant to the struggling or 
 
 Please write in detail pertaining to the following passage:
 
-    # Passage
+# Passage
 """
 
     config.predefinedContexts["Bible NT Historical Context"] = """Bible Historical Context of a New Testament passage in the bible.
@@ -196,12 +196,12 @@ Do not give me summary of the passage that is not relevant to the struggling or 
 
 Please write in detail pertaining to the following passage:
 
-    # Passage
+# Passage
 """
 
     config.predefinedContexts["Bible Themes"] = """Bible Themes in bible passage.
 What are the key themes expressed in this passage?  Please elaborate on each theme in details.  
-Explain how biblical Hebrew studies help us understand each theme.  Povide illustration that aid our understanding, if possible.
+Explain how Hebrew or Greek word studies help us understand each theme.  Povide illustration that aid our understanding, if possible.
 What are the theological implications of this passage, and how does it contribute to our understanding of God's character and plan for humanity?
 How does other passages in the bible contribute to our comprehension of this passage? Give examples and quote related passages.
 How does the message conveyed in this passage impact our connection with God?
@@ -211,7 +211,7 @@ Do not give me general information about the passage, as I am seeking specific t
 
 Please answer all relevant questions pertaining to the following passage:
 
-    # Passage
+# Passage
 """
 
     config.predefinedContexts["Bible OT Themes"] = """Bible Themes in an Old Testament passage.
@@ -226,7 +226,7 @@ Do not give me general information about the passage, as I am seeking specific t
 
 Please answer all relevant questions pertaining to the following passage:
 
-    # Passage
+# Passage
 """
 
     config.predefinedContexts["Bible NT Themes"] = """Bible Themes in a New Testament passage.
@@ -241,7 +241,7 @@ Do not give me general information about the passage, as I am seeking specific t
 
 Please answer all relevant questions pertaining to the following passage:
 
-    # Passage
+# Passage
 """
 
     config.predefinedContexts["Bible Application"] = """Provide detailed applications of a bible passages, without general introduction or summary.
@@ -254,7 +254,7 @@ Are there any practical steps or behaviors that I can develop or change based on
 
 Please answer all relevant questions pertaining to the following passage:
 
-    # Passage
+# Passage
 """
 
     config.predefinedContexts["Bible Sermon"] = """Write a sermon with the following questions in mind:
@@ -268,7 +268,7 @@ Please answer all relevant questions pertaining to the following passage:
 
 Please write pertaining to the following passage:
 
-    # Passage
+# Passage
 """
 
     config.predefinedContexts["Bible Devotion"] = """Write a devotion on a bible passage, based on the following guidance:
@@ -284,18 +284,18 @@ I want deep insights about devotions.
 
 Please write pertaining to the following passage:
 
-    # Passage
+# Passage
 """
 
     config.predefinedContexts["Bible Prayer"] = """Write a prayer pertaining to the following content in reference to the Bible:
 
-    # Content
+# Content
 """
 
     config.predefinedContexts["Bible Short Prayer"] = """Write a prayer pertaining to the following content in reference to the Bible.
 (Keep the prayer short and do not make it longer than a paragraph.)
 
-    # Content
+# Content
 """
 
     config.predefinedContexts["Bible Review Questions"] = """Assist me to prepare materials for leading a bible study group.
@@ -305,7 +305,7 @@ Remember, I am already familiar with the contents of the passage, please refrain
 
 Please answer all relevant questions pertaining to the following passage:
 
-    # Passage
+# Passage
 """
 
     config.predefinedContexts["Bible Key Words"] = """Identify key words in the content given below.
@@ -313,7 +313,7 @@ Elaborate on their importance in comprehending the context and the bible as a wh
 I want your elaboration to be comprehensive and informative.
 Remember, in your writing, please provide me with concrete examples from the Bible and the bible references from the text you are citing.
 
-    # Content
+# Content
 """
 
     config.predefinedContexts["Bible Key Themes"] = """Identify key themes or key messages in the content given below.
@@ -321,7 +321,7 @@ Elaborate on their importance in comprehending the content given below and the b
 I want your elaboration to be comprehensive and informative.
 Remember, in your writing, please provide me with concrete examples from the Bible and the bible references from the text you are citing.
 
-    # Content
+# Content
 """
 
     config.predefinedContexts["Bible Theology"] = """Please write the theological messages conveyed in the content given below, in reference to the Bible.
@@ -329,24 +329,24 @@ In addition, explain the significance of the theological messages in the bible.
 I want your writing to be comprehensive and informative.
 Remember, in your writing, please provide me with concrete examples from the Bible and the bible references from the text you are citing.
 
-    # Content
+# Content
 """
 
     config.predefinedContexts["Bible Promises"] = """Quote relevant Bible promises in relation to the content given below.
 Explain how these promises are meant to provide comfort, hope, and guidance in my life.
 
-    # Content
+# Content
 """
 
     config.predefinedContexts["Bible Passages"] = """Quote relevant Bible passages in relation to the content given below given below. Explain how these passages are related to the given content.
 
-    # Content
+# Content
 """
 
     config.predefinedContexts["Bible Thought Progression"] = """Bible Thought Progression of a bible book / chapter / passage.
 Provide a detailed overview of the author's thought progression in effectively conveying the key messages of the following book / chapter / passage:
 
-    # Book / Chapter / Passage
+# Book / Chapter / Passage
 """
 
     config.predefinedContexts["Bible Canonical Context"] = """Bible Canonical Context of a bible book / chapter / passage.
@@ -356,7 +356,7 @@ How does this book / chapter / passage fit into the larger Biblical story in lig
                                
 Please answer all relevant questions pertaining to the following book / chapter / passage with concrete examples:
 
-    # Book / Chapter / Passage
+# Book / Chapter / Passage
 """
 
     # Predefined System Messages

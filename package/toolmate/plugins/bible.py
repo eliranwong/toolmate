@@ -4,31 +4,78 @@ This plugin works with optional module `bible`, install it by:
 > pip install toolmate[bible]
 """
 
+from toolmate import config
+from toolmate import print1, print2, print3, print4, removeDuplicatedListItems, stopSpinning
+from toolmate.utils.text_utils import TextUtil
+from toolmate.utils.regex_search import RegexSearch
+from flashtext import KeywordProcessor
+import traceback, re, requests
+
+persistentConfigs = (
+    ("uniquebible_api_endpoint", "https://bible.gospelchurch.uk/plain"),
+    ("uniquebible_api_timeout", 10),
+    ("uniquebible_api_private", ""),
+)
+config.setConfig(persistentConfigs)
+temporaryConfigs = (
+    ("uniquebible", False),
+    ("uniquebible_platform", None),
+)
+config.setConfig(temporaryConfigs, temporary=True)
+
+# Tool: @uniquebible_api @uba_api
+def uniquebible_api(function_args):
+    stopSpinning()
+
+    private = f"private={config.uniquebible_api_private}&" if config.uniquebible_api_private else ""
+    command = config.currentMessages[-1]["content"].replace('"', '\\"')
+
+    url = f"""{config.uniquebible_api_endpoint}?{private}cmd={command}"""
+    response = requests.get(url, timeout=config.uniquebible_api_timeout)
+    response.encoding = "utf-8"
+    config.toolTextOutput = response.text.strip()
+    
+    print2("\n```UniqueBible API")
+    print1(config.toolTextOutput)
+    print2("```")
+
+    return ""
+functionSignature = {
+    "examples": [
+        "@uniquebible_api BIBLE:::NET:::John 3:16",
+        "@uniquebible_api CROSSREFERENCE:::John 3:16",
+    ],
+    "name": "uniquebible_api",
+    "description": "Retrieve bible data with UniqueBible API",
+    "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+    },
+}
+config.addFunctionCall(signature=functionSignature, method=uniquebible_api)
+config.aliases["@uba_api "] = "@uniquebible_api "
+config.builtinTools["uba_api"] = "Retrieve bible data with UniqueBible API"
+
 try:
-    from toolmate import config, print1, print2, print3, print4, removeDuplicatedListItems, stopSpinning
-    from toolmate.utils.text_utils import TextUtil
-    from toolmate.utils.regex_search import RegexSearch
-    from flashtext import KeywordProcessor
-    import traceback, re
     import importlib.resources
 
     # load resources information
     cwd = os.getcwd()
-
-    uniquebible_package_dir = str(importlib.resources.files("uniquebible"))
-
-    config.uniquebible_path = os.path.join(os.path.expanduser("~"), "UniqueBible")
-    os.chdir(config.uniquebible_path)
+    # change to UBA user content directory temporarily
+    ubaUserDir = os.path.join(os.path.expanduser("~"), "UniqueBible")
+    os.chdir(ubaUserDir)
 
     from uniquebible.util.ConfigUtil import ConfigUtil
     ConfigUtil.setup(noQt=True, runMode="terminal")
+    from uniquebible import config as bibleconfig
+    #print(bibleconfig.packageDir, bibleconfig.ubaUserDir)
     from uniquebible.util.BibleBooks import BibleBooks
     from uniquebible.util.CrossPlatform import CrossPlatform
     from uniquebible.util.BibleVerseParser import BibleVerseParser
     from uniquebible.util.LocalCliHandler import LocalCliHandler
     from uniquebible.db.BiblesSqlite import Bible
     from uniquebible.db.ToolsSqlite import Commentary
-    from uniquebible import config as bibleconfig
 
     config.uniquebible_platform = CrossPlatform()
     config.uniquebible_platform.setupResourceLists()
@@ -82,6 +129,10 @@ try:
     # Tool: @bible
     def bible(function_args):
         stopSpinning()
+        # change to uniquebible app directory temporarily
+        cwd = os.getcwd()
+        os.chdir(bibleconfig.ubaUserDir)
+
         def displayBibleVerses(verseList, text=None, searchString=""):
             bible = Bible(text=text)
             if searchString and not verseList:
@@ -106,10 +157,6 @@ try:
                 verseText = f"({parser.bcvToVerseReference(b, c, v)}) {verseText}"
                 print4(verseText)
                 config.toolTextOutput += f"{verseText}\n"
-
-        # change to uniquebible app directory temporarily
-        cwd = os.getcwd()
-        os.chdir(config.uniquebible_path)
 
         # display verses
         config.toolTextOutput = ""
@@ -183,13 +230,23 @@ try:
     # Tool: @uniquebible @uba
     def uniquebible(function_args):
         stopSpinning()
+        # change to uniquebible app directory temporarily
+        cwd = os.getcwd()
+        os.chdir(bibleconfig.ubaUserDir)
+
         command = config.currentMessages[-1]["content"].replace('"', '\\"')
+
+        addFavouriteToMultiRef = bibleconfig.addFavouriteToMultiRef
+        bibleconfig.addFavouriteToMultiRef = False # disable addFavouriteToMultiRef for the output
         config.toolTextOutput = config.uniquebible_localCliHandler.getContent(command, False).strip()
+        bibleconfig.addFavouriteToMultiRef = addFavouriteToMultiRef
         # alternative: loading stream mode; slower
         #config.toolTextOutput = subprocess.run(f'''uniquebible stream "{command}"''', shell=True, capture_output=True, text=True).stdout.strip()
         print2("\n```UniqueBible App")
         print1(config.toolTextOutput)
         print2("```")
+        
+        os.chdir(cwd)
         return ""
     functionSignature = {
         "examples": [
@@ -197,7 +254,7 @@ try:
             "@uniquebible CROSSREFERENCE:::John 3:16",
         ],
         "name": "uniquebible",
-        "description": "Run UniqueBible App commands to retrieve bible data",
+        "description": "Retrieve bible data with UniqueBible App commands",
         "parameters": {
             "type": "object",
             "properties": {},
@@ -205,7 +262,6 @@ try:
         },
     }
     config.addFunctionCall(signature=functionSignature, method=uniquebible)
-    config.inputSuggestions.append("Extract Bible references: ")
     config.aliases["@uba "] = "@uniquebible "
     config.builtinTools["uba"] = "Retrieve bible data with UniqueBible App commands"
 
@@ -213,11 +269,17 @@ try:
     commandCompleterSuggestions = config.uniquebible_localCliHandler.getCommandCompleterSuggestions(textCommandSuggestion=textCommandSuggestion)
     config.inputSuggestions.append({"@uniquebible": commandCompleterSuggestions})
     config.inputSuggestions.append({"@uba": commandCompleterSuggestions})
+    config.inputSuggestions.append({"@uniquebible_api": commandCompleterSuggestions})
+    config.inputSuggestions.append({"@uba_api": commandCompleterSuggestions})
 
     # Tool: @bible_commentary
     if config.uniquebible_platform.commentaryList:
         def bible_commentary(function_args):
             stopSpinning()
+            # change to uniquebible app directory temporarily
+            cwd = os.getcwd()
+            os.chdir(bibleconfig.ubaUserDir)
+
             def getCommentaryContent(module, verse):
                 content = ""
                 commentary = Commentary(module)
@@ -235,10 +297,6 @@ try:
                             content = i
                             break
                 return content
-
-            # change to uniquebible app directory temporarily
-            cwd = os.getcwd()
-            os.chdir(config.uniquebible_path)
             # display verses
             config.toolTextOutput = ""
             content = config.currentMessages[-1]["content"]
@@ -360,13 +418,13 @@ try:
             },
         }
         config.addFunctionCall(signature=functionSignature, method=search_bible_paragraphs)
-
+    config.uniquebible = True
 except:
     #print(traceback.format_exc())
-    config.uniquebible_path = ""
+    config.uniquebible = False
 
 """
-Notes about alternate options via API:
+Notes about other bible-related API:
 
 CUV Bible
 Reference: https://bible.fhl.net/json

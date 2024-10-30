@@ -14,7 +14,7 @@ This page content is generated on 17Sept2024.  For the latest information, simpl
 
 Additional bible tools, if you install optional `bible` module, by running `pip install --upgrade toolmate[bible]`
 
-@bible @bible_commentary @extract_bible_references @search_bible_ @search_bible_paragraphs @uba @uniquebible
+@bible @bible_commentary @extract_bible_references @search_bible_ @search_bible_paragraphs @uba @uniquebible @uba_api @uniquebible_api
 
 # Tips
 

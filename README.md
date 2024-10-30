@@ -63,7 +63,7 @@ Android-only tools:
 
 Additional bible tools, if you install optional `bible` module, by running `pip install --upgrade toolmate[bible]`:
 
-@bible @bible_commentary @extract_bible_references @search_bible_ @search_bible_paragraphs @uba @uniquebible
+@bible @bible_commentary @extract_bible_references @search_bible_ @search_bible_paragraphs @uba @uniquebible @uba_api @uniquebible_api
 
 For those interested in expanding the capabilities of ToolMate AI, [custom tools can be added to the system via plugins](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Plugins%20-%20How%20to%20Write%20a%20Custom%20Plugin.md).
 

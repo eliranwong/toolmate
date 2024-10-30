@@ -1,4 +1,6 @@
-# 0.4.68-69
+# 0.4.68-70
+
+* improved integration with uniquebible app
 
 * support api to retrieve bible data
 

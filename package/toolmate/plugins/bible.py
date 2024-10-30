@@ -236,6 +236,7 @@ try:
 
         command = config.currentMessages[-1]["content"].replace('"', '\\"')
 
+        bibleconfig.plainOutput = True
         addFavouriteToMultiRef = bibleconfig.addFavouriteToMultiRef
         bibleconfig.addFavouriteToMultiRef = False # disable addFavouriteToMultiRef for the output
         config.toolTextOutput = config.uniquebible_localCliHandler.getContent(command, False).strip()
@@ -363,11 +364,10 @@ try:
 
     # searchbible.ai
     try:
-        config.searchbible_path = str(importlib.resources.files("searchbible"))
-        config.searchbible_path = re.sub(r"MultiplexedPath\('(.*?)'\)$", r"\1", config.searchbible_path)
         cwd = os.getcwd()
-        os.chdir(config.searchbible_path)
         from searchbible.searchbible import search
+        from searchbible import config as searchbibleconfig
+        config.searchbible_path = searchbibleconfig.packageFolder
         os.chdir(cwd)
     except:
         config.searchbible_path = ""

@@ -24,38 +24,49 @@ temporaryConfigs = (
 config.setConfig(temporaryConfigs, temporary=True)
 
 # Tool: @uniquebible_api @uba_api
-def uniquebible_api(function_args):
-    stopSpinning()
+try:
 
     private = f"private={config.uniquebible_api_private}&" if config.uniquebible_api_private else ""
-    command = config.currentMessages[-1]["content"].replace('"', '\\"')
+    r = requests.get(f"{config.uniquebible_api_endpoint}?{private}cmd=.suggestions", timeout=config.uniquebible_api_timeout)
+    r.encoding = "utf-8"
+    apiCommandSuggestions = r.json()
 
-    url = f"""{config.uniquebible_api_endpoint}?{private}cmd={command}"""
-    response = requests.get(url, timeout=config.uniquebible_api_timeout)
-    response.encoding = "utf-8"
-    config.toolTextOutput = response.text.strip()
-    
-    print2("\n```UniqueBible API")
-    print1(config.toolTextOutput)
-    print2("```")
+    def uniquebible_api(function_args):
+        stopSpinning()
 
-    return ""
-functionSignature = {
-    "examples": [
-        "@uniquebible_api BIBLE:::NET:::John 3:16",
-        "@uniquebible_api CROSSREFERENCE:::John 3:16",
-    ],
-    "name": "uniquebible_api",
-    "description": "Retrieve bible data with UniqueBible API",
-    "parameters": {
-        "type": "object",
-        "properties": {},
-        "required": [],
-    },
-}
-config.addFunctionCall(signature=functionSignature, method=uniquebible_api)
-config.aliases["@uba_api "] = "@uniquebible_api "
-config.builtinTools["uba_api"] = "Retrieve bible data with UniqueBible API"
+        private = f"private={config.uniquebible_api_private}&" if config.uniquebible_api_private else ""
+        command = config.currentMessages[-1]["content"].replace('"', '\\"')
+
+        url = f"""{config.uniquebible_api_endpoint}?{private}cmd={command}"""
+        response = requests.get(url, timeout=config.uniquebible_api_timeout)
+        response.encoding = "utf-8"
+        config.toolTextOutput = response.text.strip()
+        
+        print2("\n```UniqueBible API")
+        print1(config.toolTextOutput)
+        print2("```")
+
+        return ""
+    functionSignature = {
+        "examples": [
+            "@uniquebible_api BIBLE:::NET:::John 3:16",
+            "@uniquebible_api CROSSREFERENCE:::John 3:16",
+        ],
+        "name": "uniquebible_api",
+        "description": "Retrieve bible data with UniqueBible API",
+        "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+        },
+    }
+    config.addFunctionCall(signature=functionSignature, method=uniquebible_api)
+    config.aliases["@uba_api "] = "@uniquebible_api "
+    config.builtinTools["uba_api"] = "Retrieve bible data with UniqueBible API"
+    config.inputSuggestions.append({"@uniquebible_api": apiCommandSuggestions})
+    config.inputSuggestions.append({"@uba_api": apiCommandSuggestions})
+except:
+    print(f"Failed to connect '{config.uniquebible_api_endpoint}' at the moment!")
 
 try:
     import importlib.resources
@@ -236,11 +247,13 @@ try:
 
         command = config.currentMessages[-1]["content"].replace('"', '\\"')
 
-        bibleconfig.plainOutput = True
+        rawOutput = bibleconfig.rawOutput
+        bibleconfig.rawOutput = True
         addFavouriteToMultiRef = bibleconfig.addFavouriteToMultiRef
         bibleconfig.addFavouriteToMultiRef = False # disable addFavouriteToMultiRef for the output
         config.toolTextOutput = config.uniquebible_localCliHandler.getContent(command, False).strip()
         bibleconfig.addFavouriteToMultiRef = addFavouriteToMultiRef
+        bibleconfig.rawOutput = rawOutput
         # alternative: loading stream mode; slower
         #config.toolTextOutput = subprocess.run(f'''uniquebible stream "{command}"''', shell=True, capture_output=True, text=True).stdout.strip()
         print2("\n```UniqueBible App")
@@ -270,8 +283,6 @@ try:
     commandCompleterSuggestions = config.uniquebible_localCliHandler.getCommandCompleterSuggestions(textCommandSuggestion=textCommandSuggestion)
     config.inputSuggestions.append({"@uniquebible": commandCompleterSuggestions})
     config.inputSuggestions.append({"@uba": commandCompleterSuggestions})
-    config.inputSuggestions.append({"@uniquebible_api": commandCompleterSuggestions})
-    config.inputSuggestions.append({"@uba_api": commandCompleterSuggestions})
 
     # Tool: @bible_commentary
     if config.uniquebible_platform.commentaryList:

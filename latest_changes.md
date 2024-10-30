@@ -1,12 +1,12 @@
-# 0.4.68-70
+# 0.4.68-0.4.72
 
 * improved integration with uniquebible app
 
 * support api to retrieve bible data
 
-...
-...
-...
+# 0.4.46-0.4.67
+
+* improved Android support
 
 # 0.4.45
 

@@ -23,7 +23,7 @@ temporaryConfigs = (
 )
 config.setConfig(temporaryConfigs, temporary=True)
 
-# Tool: @uniquebible_api @uba_api
+# Tool: @uniquebible_api @bapi
 try:
 
     private = f"private={config.uniquebible_api_private}&" if config.uniquebible_api_private else ""
@@ -61,10 +61,10 @@ try:
         },
     }
     config.addFunctionCall(signature=functionSignature, method=uniquebible_api)
-    config.aliases["@uba_api "] = "@uniquebible_api "
-    config.builtinTools["uba_api"] = "Retrieve bible data with UniqueBible API"
+    config.aliases["@bapi "] = "@uniquebible_api "
+    config.builtinTools["bapi"] = "Retrieve bible data with UniqueBible API"
     config.inputSuggestions.append({"@uniquebible_api": apiCommandSuggestions})
-    config.inputSuggestions.append({"@uba_api": apiCommandSuggestions})
+    config.inputSuggestions.append({"@bapi": apiCommandSuggestions})
 except:
     print(f"Failed to connect '{config.uniquebible_api_endpoint}' at the moment!")
 
@@ -111,6 +111,9 @@ try:
     config.uniquebible_platform.pdfList
     config.uniquebible_platform.epubList
     config.uniquebible_platform.docxList
+    config.uniquebible_platform.bibleAudioModules
+    config.uniquebible_platform.dataList
+    config.uniquebible_platform.searchToolList
     """
 
     # Tool: @extract_bible_references
@@ -276,13 +279,13 @@ try:
         },
     }
     config.addFunctionCall(signature=functionSignature, method=uniquebible)
-    config.aliases["@uba "] = "@uniquebible "
-    config.builtinTools["uba"] = "Retrieve bible data with UniqueBible App commands"
+    config.aliases["@b "] = "@uniquebible "
+    config.builtinTools["b"] = "Retrieve bible data with UniqueBible App commands"
 
     textCommandSuggestion = [key + ":::" for key in config.uniquebible_localCliHandler.textCommandParser.interpreters.keys()]
     commandCompleterSuggestions = config.uniquebible_localCliHandler.getCommandCompleterSuggestions(textCommandSuggestion=textCommandSuggestion)
     config.inputSuggestions.append({"@uniquebible": commandCompleterSuggestions})
-    config.inputSuggestions.append({"@uba": commandCompleterSuggestions})
+    config.inputSuggestions.append({"@b": commandCompleterSuggestions})
 
     # Tool: @bible_commentary
     if config.uniquebible_platform.commentaryList:

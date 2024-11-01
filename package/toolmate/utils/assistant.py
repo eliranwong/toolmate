@@ -207,6 +207,7 @@ class ToolMate:
             ".editconfigs": ("edit configuration settings", self.editConfigs),
             # app settings
             ".autoupgrade": ("change automatic upgrade", self.setAutoUpgrade),
+            ".favourite": ("change my favourite string", self.setFavorite_string),
             ".assistantname": ("change assistant name", self.setAssistantName),
             ".storagedirectory": ("change storage directory", self.setStorageDirectory),
             ".systemmessage": ("change system messages", self.setCustomSystemMessage),
@@ -1125,6 +1126,8 @@ class ToolMate:
         if config.tool_selection_agent:
             self.configureToolSelectionRequirements()
             self.configureAutoToolSelection()
+        else:
+            self.setDefaultTool()
 
     def selectLlmPlatform(self):
         instruction = "Select an AI platform:"
@@ -1605,6 +1608,16 @@ class ToolMate:
     def setAutoGenBuilderConfig(self):
         if not config.isTermux:
             AutoGenBuilder().promptConfig()
+
+    def setFavorite_string(self):
+        print2("You can pre-define a favourite string that you use most.")
+        print1(f"It is inserted automatically when you pressing the key combo {str(config.hotkey_insert_favorite_string)}.")
+        print1("Set your favourite string below:")
+        favorite_string = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.favorite_string)
+        if favorite_string and not favorite_string.strip().lower() == config.exit_entry:
+            config.favorite_string = favorite_string
+            config.saveConfig()
+            print3(f"Favourite string changed: {config.favorite_string}")
 
     def setAssistantName(self):
         print1("You may modify my name below:")
@@ -2358,6 +2371,21 @@ class ToolMate:
             config.defaultEntry = config.predefinedInstructions[instruction]
             config.accept_default = True
 
+    def selectTool(self, title="Tools", text="Select a tool:"):
+        #config.allEnabledTools
+        return self.dialogs.getValidOptions(
+            options=sorted(config.allEnabledTools),
+            title=title,
+            default=config.defaultTool,
+            text=text,
+        )
+
+    def setDefaultTool(self):
+        tool = self.selectTool(title="Default", text="Select the default tool:")
+        if tool:
+            config.defaultTool = tool
+            config.saveConfig()
+
     def insertPredefinedContext(self):
         contexts = list(config.predefinedContexts.keys())
         predefinedContext = self.dialogs.getValidOptions(
@@ -2378,27 +2406,6 @@ class ToolMate:
             config.predefinedContext = "custom"
         config.saveConfig()
         config.defaultEntry = f"@chat `{config.predefinedContext}` "
-
-    def changeDefaultContext(self):
-        contexts = list(config.predefinedContexts.keys())
-        predefinedContext = self.dialogs.getValidOptions(
-            options=contexts,
-            title="Default Predefined Contexts",
-            default=config.predefinedContext,
-            text="Select a predefined context to use `@context` without specifying a context name:",
-        )
-        if predefinedContext:
-            config.predefinedContext = predefinedContext
-            if config.predefinedContext == "custom":
-                print1("Edit custom context below:")
-                customContext = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.customPredefinedContext)
-                if customContext and not customContext.strip().lower() == config.exit_entry:
-                    config.customPredefinedContext = customContext.strip()
-        else:
-            # a way to quickly clean up context
-            config.predefinedContext = "custom"
-        config.saveConfig()
-        self.showDefaultContext()
 
     def getDirectoryList(self):
         directoryList = []
@@ -2888,7 +2895,7 @@ Acess the risk level of the following `{target.capitalize()}`:
         
         if not actions:
             if content.strip():
-                action = "recommend_tool" if config.tool_selection_agent else "chat"
+                action = "recommend_tool" if config.tool_selection_agent else config.defaultTool
                 self.workflow.append((action, content))
                 # pass to built-in screening or tool-check operations
                 complete = self.runSingleAction(action, content, gui)

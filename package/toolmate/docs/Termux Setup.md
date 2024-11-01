@@ -32,6 +32,8 @@ We will describe how to install the Termux apk file via Chrome app, but first yo
 
 5. Select "Install"
 
+Extra step for Android 14+ users, read https://github.com/agnostic-apollo/Android-Docs/blob/master/en/docs/apps/processes/phantom-cached-and-empty-processes.md#commands-for-android-14-and-higher
+
 # Install Repositories
 
 Launch Termux and run,

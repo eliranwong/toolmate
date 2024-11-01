@@ -26,6 +26,8 @@ if config.isTermux:
 
 defaultSettings = (
     # unique configs in ToolMate AI
+    ('defaultTool', 'chat'),
+    ('favorite_string', '@chat'),
     ('appName', ''),
     ('text2art_font1', 'cybermedum'),
     ('text2art_font2', 'white_bubble'),
@@ -275,7 +277,7 @@ defaultSettings = (
     ("hotkey_launch_pager_view", ["c-p"]),
     ("hotkey_toggle_developer_mode", ["escape", "d"]),
     ("hotkey_toggle_multiline_entry", ["escape", "l"]),
-    ("hotkey_list_directory_content", ["c-l"]),
+    #("hotkey_list_directory_content", ["c-l"]),
     ("hotkey_launch_system_prompt", ["escape", "t"]),
     ("hotkey_voice_generation_config", ["escape", "v"]),
     ("hotkey_voice_entry", ["c-s"]),
@@ -292,7 +294,8 @@ defaultSettings = (
     ("hotkey_edit_last_response", ["escape", "e"]),
     ("hotkey_swap_text_brightness", ["escape", "b"]),
     ("hotkey_select_plugins", ["escape", "p"]),
-    # ["c-b"]; available
+    ("hotkey_insert_favorite_string", ["c-b"]),
+    # available "c-l"
 )
 
 temporaryConfigs = [

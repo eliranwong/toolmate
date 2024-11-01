@@ -91,12 +91,17 @@ class Prompts:
             config.defaultEntry = buffer.text
             buffer.text = ".plugins"
             buffer.validate_and_handle()
-        @this_key_bindings.add(*config.hotkey_list_directory_content)
+        @this_key_bindings.add(*config.hotkey_insert_favorite_string)
+        def _(event):
+            buffer = event.app.current_buffer
+            buffer.text += config.favorite_string
+            buffer.cursor_position = len(buffer.text)
+        """@this_key_bindings.add(*config.hotkey_list_directory_content)
         def _(event):
             buffer = event.app.current_buffer
             config.defaultEntry = buffer.text
             buffer.text = ".content"
-            buffer.validate_and_handle()
+            buffer.validate_and_handle()"""
         @this_key_bindings.add(*config.hotkey_exit)
         def _(event):
             buffer = event.app.current_buffer
@@ -269,6 +274,7 @@ Available tokens: {estimatedAvailableTokens}
             str(config.hotkey_toggle_response_audio): "toggle response audio",
             str(config.hotkey_toggle_multiline_entry): "toggle multi-line entry",
             str(config.hotkey_toggle_word_wrap): "toggle word wrap",
+            str(config.hotkey_insert_favorite_string): "insert my favourite string",
             str(config.hotkey_insert_filepath): "insert a file or folder path",
             str(config.hotkey_display_device_info): "display device information",
             str(config.hotkey_count_tokens): "count current message tokens",
@@ -277,7 +283,7 @@ Available tokens: {estimatedAvailableTokens}
             str(config.hotkey_launch_system_prompt): "system command prompt",
             str(config.hotkey_swap_text_brightness): "swap text brightness",
             str(config.hotkey_toggle_developer_mode): "swap developer mode",
-            str(config.hotkey_restart_app): "restart letmedoit",
+            str(config.hotkey_restart_app): "restart toolmate",
         }
         textEditor = config.customTextEditor.split(" ", 1)[0]
         bindings[str(config.hotkey_edit_current_entry)] = f"""edit current input with '{config.customTextEditor if textEditor and isCommandInstalled(textEditor) else "eTextEdit"}'"""

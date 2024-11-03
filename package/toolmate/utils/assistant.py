@@ -144,6 +144,9 @@ class ToolMate:
             # session
             ".new": (f"start a new conversation {str(config.hotkey_new)}", None),
             ".open": (f"open a saved conversation {str(config.hotkey_open_chat_records)}", None),
+            ".last": (f"open previous conversation", None),
+            ".edit": (f"edit current conversation {str(config.hotkey_edit_last_response)}", self.editCurrentConversation),
+            ".trim": (f"trim current conversation", self.trimCurrentConversation),
             ".save": ("save current conversation", lambda: self.saveChat(config.currentMessages)),
             ".saveas": ("save current conversation as ...", lambda: self.saveAsChat(config.currentMessages)),
             ".export": (f"export current conversation {str(config.hotkey_export)}", lambda: self.exportChat(config.currentMessages)),
@@ -202,8 +205,7 @@ class ToolMate:
             ".toggleinputaudio": (f"toggle input audio {str(config.hotkey_toggle_input_audio)}", toggleinputaudio),
             ".toggleoutputaudio": (f"toggle output audio {str(config.hotkey_toggle_response_audio)}", toggleoutputaudio),
             # editor
-            ".customtexteditor": ("change custom text editor", self.setCustomTextEditor),
-            ".editresponse": (f"edit the last response {str(config.hotkey_edit_last_response)}", self.editLastResponse),
+            ".editor": ("change custom text editor", self.setCustomTextEditor),
             ".editconfigs": ("edit configuration settings", self.editConfigs),
             # app settings
             ".autoupgrade": ("change automatic upgrade", self.setAutoUpgrade),
@@ -213,8 +215,7 @@ class ToolMate:
             ".systemmessage": ("change system messages", self.setCustomSystemMessage),
             # miscellaneous
             ".system": (f"open system command prompt {str(config.hotkey_launch_system_prompt)}", lambda: SystemCommandPrompt().run(allowPathChanges=True)),
-            ".install": ("install python package", self.installPythonPackage), # TODO: changed to a tool
-            # help
+            #".install": ("install python package", self.installPythonPackage), # changed to a tool
             ".keys": (f"learn about key entries and bindings {str(config.hotkey_display_key_combo)}", config.showKeyBindings),
             ".help": ("open documentations", lambda: openURL('https://github.com/eliranwong/toolmate/wiki')),
             ".donate": ("donate and support ToolMate AI", lambda: openURL('https://www.paypal.com/paypalme/letmedoitai')),
@@ -222,7 +223,7 @@ class ToolMate:
         if config.terminalEnableTermuxAPI:
             self.actions[".timer"] = ("set timer", lambda: subprocess.Popen("am start -a android.intent.action.SET_TIMER", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE))
             self.actions[".alarm"] = ("set alarm", lambda: subprocess.Popen("am start -a android.intent.action.SET_ALARM", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE))
-            self.actions[".shareworkflow"] = ("share current workflow", self.shareCurrentWorkflow),
+            self.actions[".shareworkflow"] = ("share current workflow", self.shareCurrentWorkflow)
 
         config.actionHelp = f"# Quick Actions\n(entries that start with '.')\n"
         for key, value in self.actions.items():
@@ -1002,12 +1003,50 @@ class ToolMate:
         if previousResponse:
             TTSUtil.play(re.sub(config.tts_doNotReadPattern, "", previousResponse))
 
-    def editLastResponse(self):
-        previousResponse, index = getAssistantPreviousResponse()
-        if previousResponse:
-            tempTextFile = os.path.join(config.toolMateAIFolder, "temp", "lastResponse.txt")
+    def trimCurrentConversation(self):
+        def getEditableContent(role, item):
+            content = item.get("content", "")
+            editableContent = f"[{role}] {content}"
+            if len(editableContent) > 50:
+                editableContent = editableContent[:50] + " ..."
+            return editableContent
+        editable = {}
+        lastUserItem = 0
+        editableContent = ""
+        for index, item in enumerate(config.currentMessages):
+            role = item.get("role", "")
+            if role == "user":
+                editableContent = getEditableContent(role, item)
+                lastUserItem = index
+            elif role == "assistant":
+                editableContent += " " + getEditableContent(role, item)
+                editable[f"{lastUserItem}.{index}"] = editableContent
+        if editable:
+            selectedItems = self.dialogs.getMultipleSelection(
+                title="Trim Current Conversation",
+                text="Select the items to be removed:",
+                options=editable.keys(),
+                descriptions=list(editable.values()),
+                default_values=[],
+            )
+            if selectedItems is not None:
+                for i in selectedItems:
+                    user, assistant = i.split(".")
+                    del config.currentMessages[int(assistant)]
+                    del config.currentMessages[int(user)]
+                clear()
+                print2("Reloading conversation ...")
+                print()
+                displayLoadedMessages(config.currentMessages)
+        else:
+            print2("No editable item found!")
+
+    def editCurrentConversation(self):
+        editableContent, editItemIndex = self.getCurrentMessagesItem()
+        if editItemIndex is not None:
+            tempTextFile = os.path.join(config.toolMateAIFolder, "temp", "editableItem.txt")
             # write previous response in a temp file
-            writeTextFile(tempTextFile, previousResponse)
+            writeTextFile(tempTextFile, editableContent)
             # editing
             customTextEditor = config.customTextEditor if config.customTextEditor else f"{sys.executable} {os.path.join(config.toolMateAIFolder, 'eTextEdit.py')}"
             os.system(f"{customTextEditor} {tempTextFile}")
@@ -1015,9 +1054,41 @@ class ToolMate:
             # read edited response
             editedContent = readTextFile(tempTextFile)
             # save changes
-            if not (previousResponse == editedContent):
-                config.currentMessages[index]["content"] = editedContent
-                self.saveChat(config.currentMessages)
+            if not (editableContent == editedContent):
+                config.currentMessages[editItemIndex]["content"] = editedContent
+                #self.saveChat(config.currentMessages)
+                clear()
+                print2("Reloading conversation ...")
+                print()
+                displayLoadedMessages(config.currentMessages)
+
+    def getCurrentMessagesItem(self):
+        editable = {}
+        lastItem = 0
+        for index, item in enumerate(config.currentMessages):
+            role = item.get("role", "")
+            if role in ("user", "assistant"):
+                content = item.get("content", "")
+                editableContent = f"[{role}] {content}"
+                if len(editableContent) > 50:
+                    editableContent = editableContent[:50] + " ..."
+                editable[str(index)] = editableContent
+                lastItem = index
+        if editable:
+            editItem = self.dialogs.getValidOptions(
+                options=editable.keys(),
+                descriptions=list(editable.values()),
+                title="Edit Current Conversation",
+                default=lastItem,
+                text="Select the item to be edited:",
+            )
+            if editItem:
+                editItemIndex = int(editItem)
+                editableContent = config.currentMessages[editItemIndex]["content"]
+                return editableContent, editItemIndex
+        else:
+            print2("No editable item found!")
+        return None, None
 
     # change configs
     def editConfigs(self):
@@ -2247,9 +2318,12 @@ class ToolMate:
                     with open(filePath, "w", encoding="utf-8") as fileObj:
                         fileObj.write(pprint.pformat(messages))
                         print3(f"Conversation saved: {filePath}")
+                        config.last_conversation = filePath
                     with open(workflowPath, "w", encoding="utf-8") as fileObj:
                         fileObj.write(self.getCurrentWorkflow())
                         print3(f"Workflow saved: {workflowPath}")
+                        config.last_workflow = workflowPath
+                    config.saveConfig()
                     if shutil.which("termux-share"):
                         cli = f'''termux-share -a send "{filePath}"'''
                         subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -2260,9 +2334,8 @@ class ToolMate:
                 showErrors()
 
     def saveChat(self, messages):
-        messagesCopy = copy.deepcopy(messages)
-
         if config.conversationStarted:
+            messagesCopy = copy.deepcopy(messages)
             timestamp = getCurrentDateTime()
 
             if hasattr(config, "save_chat_record"):
@@ -2282,10 +2355,13 @@ class ToolMate:
                     with open(chatFile, "w", encoding="utf-8") as fileObj:
                         fileObj.write(pprint.pformat(messagesCopy))
                         print3(f"Conversation saved: {chatFile}")
+                        config.last_conversation = chatFile
                     workflowFile = os.path.join(folderPath, f"{timestamp}_workflow.txt")
                     with open(workflowFile, "w", encoding="utf-8") as fileObj:
                         fileObj.write(self.getCurrentWorkflow())
                         print3(f"Workflow saved: {workflowFile}")
+                        config.last_workflow = workflowFile
+                    config.saveConfig()
             except:
                 print2("Failed to save the conversation!\n")
                 showErrors()
@@ -2996,9 +3072,16 @@ Acess the risk level of the following `{target.capitalize()}`:
             #print1(f"startup directory:\n{storagedirectory}")
             print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>Current Directory:</{config.terminalPromptIndicatorColor2}> {storagedirectory}"))
             print1(self.divider)
-
             config.conversationStarted = False
             return (storagedirectory, messages)
+        def checkDirectory(storagedirectory):
+            currentDirectory = os.getcwd()
+            if not currentDirectory == storagedirectory:
+                #print1(self.divider)
+                print3(f"Current directory: {currentDirectory}")
+                print1(self.divider)
+                return currentDirectory
+            return storagedirectory
         storagedirectory, config.currentMessages = startChat()
         config.multilineInput = False
         while True:
@@ -3007,12 +3090,7 @@ Acess the risk level of the following `{target.capitalize()}`:
             # default toolbar text
             config.dynamicToolBarText = f""" {str(config.hotkey_exit).replace("'", "")} exit {str(config.hotkey_display_key_combo).replace("'", "")} shortcuts """
             # display current directory if changed
-            currentDirectory = os.getcwd()
-            if not currentDirectory == storagedirectory:
-                #print1(self.divider)
-                print3(f"Current directory: {currentDirectory}")
-                print1(self.divider)
-                storagedirectory = currentDirectory
+            storagedirectory = checkDirectory(storagedirectory)
             # default input entry
             accept_default = config.accept_default
             config.accept_default = False
@@ -3120,8 +3198,30 @@ Acess the risk level of the following `{target.capitalize()}`:
             elif userInputLower == ".new":
                 self.saveChat(config.currentMessages)
                 storagedirectory, config.currentMessages = startChat()
+            elif userInputLower == ".last":
+                last_conversation = config.last_conversation
+                if last_conversation:
+                    print3(f"Previous conversation found: {last_conversation}")
+                    if config.conversationStarted:
+                        print2("We are saving the current conversation first ...")
+                        self.saveChat(config.currentMessages)
+                    try:
+                        currentMessages = eval(readTextFile(last_conversation))
+                        storagedirectory, config.currentMessages = startChat()
+                        storagedirectory = checkDirectory(storagedirectory)
+                        displayLoadedMessages(currentMessages)
+                        config.currentMessages = currentMessages
+                    except:
+                        print3(f"Unable to open: {last_conversation}")
+                else:
+                    print2("Previously saved conversation not found!")
             elif userInputLower == ".open":
                 try:
+                    cwd = os.getcwd()
+                    lastConversationDir = os.path.dirname(config.last_conversation)
+                    changeDir = True if config.last_conversation and os.path.isdir(lastConversationDir) and not cwd==lastConversationDir else False
+                    if changeDir:
+                        os.chdir(lastConversationDir)
                     filePath = self.getPath.getFilePath(
                         check_isfile=True,
                         empty_to_cancel=True,
@@ -3130,11 +3230,17 @@ Acess the risk level of the following `{target.capitalize()}`:
                         message=f"{self.divider}\nEnter the file path of the chat records that you would like to open:",
                     )
                     if filePath and os.path.isfile(filePath):
-                        self.saveChat(config.currentMessages)
+                        if config.conversationStarted:
+                            print2("We are saving the current conversation first ...")
+                            self.saveChat(config.currentMessages)
+                        print3(f"Loading: {filePath}")
                         currentMessages = eval(readTextFile(filePath))
                         storagedirectory, config.currentMessages = startChat()
+                        storagedirectory = checkDirectory(storagedirectory)
                         displayLoadedMessages(currentMessages)
                         config.currentMessages = currentMessages
+                    if changeDir:
+                        os.chdir(cwd)
                 except:
                     print2(f"Invalid file path of format!")
             elif userInput and not userInputLower in config.actionKeys:

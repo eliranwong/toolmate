@@ -617,7 +617,6 @@ def removeDuplicatedListItems(lst):
 
 def displayLoadedMessages(messages):
     # display loaded messages
-    print("")
     for index, i in enumerate(messages):
         role = i.get("role", "")
         content = i.get("content", "")
@@ -628,6 +627,7 @@ def displayLoadedMessages(messages):
                 print1(content)
             if role == 'assistant' and not index == len(messages) - 2:
                 print("")
+    print("")
 
 def refinePath(docs_path):
     docs_path = docs_path.strip()
@@ -1656,37 +1656,38 @@ def restartApp():
     exit(0)
 
 def updateApp():
-    try:
-        ubaPath = str(importlib.resources.files("uniquebible"))
-        bible = True if ubaPath else False
-    except:
-        bible = False
-    package = os.path.basename(config.toolMateAIFolder)
-    thisPackage = f"{package}_android" if config.isTermux else package
-    print(f"Checking '{thisPackage}' version ...")
-    installed_version = getPackageInstalledVersion(thisPackage)
-    if installed_version is None:
-        print("Installed version information is not accessible!")
-    else:
-        print(f"Installed version: {installed_version}")
-    latest_version = getPackageLatestVersion(thisPackage)
-    if latest_version is None:
-        print("Latest version information is not accessible at the moment!")
-    elif installed_version is not None:
-        print(f"Latest version: {latest_version}")
-        if latest_version > installed_version:
-            if config.thisPlatform == "Windows":
-                print("Automatic upgrade feature is yet to be supported on Windows!")
-                print(f"Run 'pip install --upgrade {thisPackage}' to manually upgrade this app!")
-            else:
-                try:
-                    # upgrade package
-                    installPipPackage(f"--upgrade {thisPackage}{'[bible]' if bible else ''}")
-                    restartApp()
-                except:
-                    if config.developer:
-                        print(traceback.format_exc())
-                    print(f"Failed to upgrade '{thisPackage}'!")
+    if isServerAlive("8.8.8.8", 53):
+        try:
+            ubaPath = str(importlib.resources.files("uniquebible"))
+            bible = True if ubaPath else False
+        except:
+            bible = False
+        package = os.path.basename(config.toolMateAIFolder)
+        thisPackage = f"{package}_android" if config.isTermux else package
+        print(f"Checking '{thisPackage}' version ...")
+        installed_version = getPackageInstalledVersion(thisPackage)
+        if installed_version is None:
+            print("Installed version information is not accessible!")
+        else:
+            print(f"Installed version: {installed_version}")
+        latest_version = getPackageLatestVersion(thisPackage)
+        if latest_version is None:
+            print("Latest version information is not accessible at the moment!")
+        elif installed_version is not None:
+            print(f"Latest version: {latest_version}")
+            if latest_version > installed_version:
+                if config.thisPlatform == "Windows":
+                    print("Automatic upgrade feature is yet to be supported on Windows!")
+                    print(f"Run 'pip install --upgrade {thisPackage}' to manually upgrade this app!")
+                else:
+                    try:
+                        # upgrade package
+                        installPipPackage(f"--upgrade {thisPackage}{'[bible]' if bible else ''}")
+                        restartApp()
+                    except:
+                        if config.developer:
+                            print(traceback.format_exc())
+                        print(f"Failed to upgrade '{thisPackage}'!")
 
 def installPipPackage(module, update=True):
     #executablePath = os.path.dirname(sys.executable)

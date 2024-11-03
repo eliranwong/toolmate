@@ -26,6 +26,8 @@ if config.isTermux:
 
 defaultSettings = (
     # unique configs in ToolMate AI
+    ('last_conversation', ''),
+    ('last_workflow', ''),
     ('defaultTool', 'chat'),
     ('favorite_string', '@chat'),
     ('appName', ''),

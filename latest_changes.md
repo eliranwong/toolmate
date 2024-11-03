@@ -1,8 +1,18 @@
+# 0.4.81
+
+* change directory to the most recently saved conversations when users run `.open` action.
+
+# 0.4.75-0.4.80
+
+* added action menu item `.last`, to open the previously saved conversation.
+
+* fixed loading action menu on Android
+
 # 0.4.73-0.4.74
 
 * added `my favourite string`, inserted when users press ctrl+b
 
-* added action command `.fvaourite` for users to customise `my favourite string`
+* added action command `.favourite` for users to customise `my favourite string`
 
 * support customisation of the default tool when tool-selection agent is not enabled and a tool is not specified in a request. Enter `.tools` to customise.
 

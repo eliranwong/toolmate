@@ -31,6 +31,8 @@ Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/d
 
 # Distinctive Features
 
+[NEW! Edit Current Conversation](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Edit%20Current%20Conversation.md)
+
 [NEW! Support Android](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Android%20Versions.md)
 
 [NEW! Answer with real-time information via SearXNG](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Perplexica%20and%20SearXNG%20Integration.md#searxng-setup)

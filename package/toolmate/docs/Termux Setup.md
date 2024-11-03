@@ -131,6 +131,8 @@ pkg install golang
 go install github.com/danielmiessler/fabric@latest
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$HOME/.local/bin:$PATH
+echo "export GOPATH=$HOME/go" >> ~/.bashrc
+echo "export PATH=$GOPATH/bin:$HOME/.local/bin:$PATH" >> ~/.bashrc
 fabric --setup
 ```
 

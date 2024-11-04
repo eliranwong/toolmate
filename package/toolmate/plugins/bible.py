@@ -5,16 +5,17 @@ This plugin works with optional module `bible`, install it by:
 """
 
 from toolmate import config
-from toolmate import print1, print2, print3, print4, removeDuplicatedListItems, stopSpinning
+from toolmate import print1, print2, print3, print4, removeDuplicatedListItems, stopSpinning, openURL
 from toolmate.utils.text_utils import TextUtil
 from toolmate.utils.regex_search import RegexSearch
 from flashtext import KeywordProcessor
-import traceback, re, requests
+import traceback, re, requests, os
 
 persistentConfigs = (
     ("uniquebible_api_endpoint", "https://bible.gospelchurch.uk/plain"),
     ("uniquebible_api_timeout", 10),
     ("uniquebible_api_private", ""),
+    ("uniquebible_weburl", "https://bible.gospelchurch.uk/index.html"),
 )
 config.setConfig(persistentConfigs)
 temporaryConfigs = (
@@ -22,6 +23,28 @@ temporaryConfigs = (
     ("uniquebible_platform", None),
 )
 config.setConfig(temporaryConfigs, temporary=True)
+
+# Tool: @uniquebible_web
+def uniquebible_web(_):
+    stopSpinning()
+    command = config.currentMessages[-1]["content"].replace('"', '\\"')
+    url = f"""{config.uniquebible_weburl}?cmd={command}"""
+    openURL(url)
+    return ""
+functionSignature = {
+    "examples": [
+        "@uniquebible_web BIBLE:::NET:::John 3:16",
+        "@uniquebible_web CROSSREFERENCE:::John 3:16",
+    ],
+    "name": "uniquebible_web",
+    "description": "Read bible-related content via UniqueBible web interface",
+    "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+    },
+}
+config.addFunctionCall(signature=functionSignature, method=uniquebible_web)
 
 # Tool: @uniquebible_api @bapi
 try:
@@ -31,7 +54,7 @@ try:
     r.encoding = "utf-8"
     apiCommandSuggestions = r.json()
 
-    def uniquebible_api(function_args):
+    def uniquebible_api(_):
         stopSpinning()
 
         private = f"private={config.uniquebible_api_private}&" if config.uniquebible_api_private else ""
@@ -69,8 +92,6 @@ except:
     print(f"Failed to connect '{config.uniquebible_api_endpoint}' at the moment!")
 
 try:
-    import importlib.resources
-
     # load resources information
     cwd = os.getcwd()
     # change to UBA user content directory temporarily
@@ -117,7 +138,7 @@ try:
     """
 
     # Tool: @extract_bible_references
-    def extract_bible_references(function_args):
+    def extract_bible_references(_):
         stopSpinning()
         content = config.currentMessages[-1]["content"]
         config.toolTextOutput = BibleVerseParser(False).extractAllReferencesReadable(content)
@@ -141,7 +162,7 @@ try:
     config.inputSuggestions.append("Extract Bible references: ")
 
     # Tool: @bible
-    def bible(function_args):
+    def bible(_):
         stopSpinning()
         # change to uniquebible app directory temporarily
         cwd = os.getcwd()
@@ -242,7 +263,7 @@ try:
     config.inputSuggestions.append({"@bible": bibleSuggestions})
 
     # Tool: @uniquebible @uba
-    def uniquebible(function_args):
+    def uniquebible(_):
         stopSpinning()
         # change to uniquebible app directory temporarily
         cwd = os.getcwd()
@@ -289,7 +310,7 @@ try:
 
     # Tool: @bible_commentary
     if config.uniquebible_platform.commentaryList:
-        def bible_commentary(function_args):
+        def bible_commentary(_):
             stopSpinning()
             # change to uniquebible app directory temporarily
             cwd = os.getcwd()
@@ -388,7 +409,7 @@ try:
 
     if config.searchbible_path:
         # Tool: @search_bible
-        def search_bible(function_args):
+        def search_bible(_):
             stopSpinning()
             content = config.currentMessages[-1]["content"]
             print2("\n```search_bible")
@@ -411,7 +432,7 @@ try:
         config.addFunctionCall(signature=functionSignature, method=search_bible)
 
         # Tool: @search_bible_paragraphs
-        def search_bible_paragraphs(function_args):
+        def search_bible_paragraphs(_):
             stopSpinning()
             content = config.currentMessages[-1]["content"]
             print2("\n```search_bible_paragraphs")

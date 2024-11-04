@@ -144,7 +144,8 @@ class ToolMate:
             # session
             ".new": (f"start a new conversation {str(config.hotkey_new)}", None),
             ".open": (f"open a saved conversation {str(config.hotkey_open_chat_records)}", None),
-            ".last": (f"open previous conversation", None),
+            ".last": (f"open previous conversation {str(config.hotkey_open_previous_conversation)}", None),
+            ".read": (f"read current conversation {str(config.hotkey_read_conversation)}", self.readCurrentMessages),
             ".edit": (f"edit current conversation {str(config.hotkey_edit_last_response)}", self.editCurrentConversation),
             ".trim": (f"trim current conversation", self.trimCurrentConversation),
             ".save": ("save current conversation", lambda: self.saveChat(config.currentMessages)),
@@ -194,7 +195,6 @@ class ToolMate:
             # speech
             ".speechrecognition": ("change sppech recognition", self.setSpeechToTextConfig),
             ".speechgeneration": ("change sppech generation", self.setTextToSpeechConfig),
-            ".read": ("read the last response", self.readLastResponse),
             # toggle
             ".toggledeveloper": (f"toggle developer mode {str(config.hotkey_toggle_developer_mode)}", self.toggleDeveloperMode),
             ".togglemultiline": (f"toggle multi-line input {str(config.hotkey_toggle_multiline_entry)}", self.toggleMultiline),
@@ -348,6 +348,20 @@ class ToolMate:
         if option and not option in (config.exit_entry, config.cancel_entry) and option in models:
             config.voskModel = option
 
+    def setAndroidTtsVoice(self):
+        # language
+        self.setGcttsLanguage()
+        # rate
+        print1("Please specify the speech rate:")
+        androidttsRate = self.prompts.simplePrompt(style=self.prompts.promptStyle2, validator=FloatValidator(), default=str(config.androidttsRate))
+        if androidttsRate and not androidttsRate.strip().lower() == config.exit_entry:
+            androidttsRate = float(androidttsRate)
+            if androidttsRate < 0.1:
+                androidttsRate = 0.1
+            elif androidttsRate > 2:
+                androidttsRate = 2
+            config.androidttsRate = round(androidttsRate, 1)
+
     def setEdgeTtsVoice(self):
         edgettsVoice_history = os.path.join(config.localStorage, "history", "edgettsVoice")
         edgettsVoice_session = PromptSession(history=FileHistory(edgettsVoice_history))
@@ -362,6 +376,7 @@ class ToolMate:
         if option and not option in (config.exit_entry, config.cancel_entry) and option in voices:
             config.edgettsVoice = option
         # rate
+        print1("Please specify the speech rate:")
         edgettsRate = self.prompts.simplePrompt(style=self.prompts.promptStyle2, validator=FloatValidator(), default=str(config.edgettsRate))
         if edgettsRate and not edgettsRate.strip().lower() == config.exit_entry:
             edgettsRate = float(edgettsRate)
@@ -432,7 +447,7 @@ class ToolMate:
             default = "en-US"
         # completer
         completer = FuzzyCompleter(WordCompleter(languages, ignore_case=True))
-        print1("Please specify Google Cloud Text-to-Speech language:")
+        print1("Please specify Text-to-Speech language:")
         language = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=default, promptSession=gctts_language_session, completer=completer)
         if language and not language in (config.exit_entry, config.cancel_entry):
             config.gcttsLang = language
@@ -468,7 +483,7 @@ class ToolMate:
             config.gcttsSpeed = round(gcttsSpeed, 1)
             print3(f"Google Cloud Text-to-Speech playback speed: {gcttsSpeed}")
 
-    def setGoogleCredentialsPath():
+    def setGoogleCredentialsPath(self):
         filePath = self.getPath.getFilePath(
             empty_to_cancel=True,
             list_content_on_directory_change=True,
@@ -1003,6 +1018,11 @@ class ToolMate:
         if previousResponse:
             TTSUtil.play(re.sub(config.tts_doNotReadPattern, "", previousResponse))
 
+    def readCurrentMessages(self):
+        editableContent, _ = self.getCurrentMessagesItem()
+        if editableContent:
+            TTSUtil.play(re.sub(config.tts_doNotReadPattern, "", editableContent))
+
     def trimCurrentConversation(self):
         def getEditableContent(role, item):
             content = item.get("content", "")
@@ -1042,7 +1062,7 @@ class ToolMate:
             print2("No editable item found!")
 
     def editCurrentConversation(self):
-        editableContent, editItemIndex = self.getCurrentMessagesItem()
+        editableContent, editItemIndex = self.getCurrentMessagesItem(instruction="Select the item to be edited:")
         if editItemIndex is not None:
             tempTextFile = os.path.join(config.toolMateAIFolder, "temp", "editableItem.txt")
             # write previous response in a temp file
@@ -1062,7 +1082,7 @@ class ToolMate:
                 print()
                 displayLoadedMessages(config.currentMessages)
 
-    def getCurrentMessagesItem(self):
+    def getCurrentMessagesItem(self, instruction="Select an item:"):
         editable = {}
         lastItem = 0
         for index, item in enumerate(config.currentMessages):
@@ -1079,8 +1099,8 @@ class ToolMate:
                 options=editable.keys(),
                 descriptions=list(editable.values()),
                 title="Edit Current Conversation",
-                default=lastItem,
-                text="Select the item to be edited:",
+                default=str(lastItem),
+                text=instruction,
             )
             if editItem:
                 editItemIndex = int(editItem)
@@ -2042,7 +2062,10 @@ class ToolMate:
     def setTextToSpeechConfig(self):
         options = ["edge", "elevenlabs", "custom"] if config.isTermux else ["edge", "google", "googlecloud", "elevenlabs", "custom"]
         descriptions = ["Microsoft Server Text-to-Speech", "ElevenLabs (credentials required)", "Custom Text-to-Speech Command [advanced]"] if config.isTermux else ["Microsoft Server Text-to-Speech", "Google Text-to-Speech (generic)", "Google Text-to-Speech (credentials required)", "ElevenLabs (credentials required)", "Custom Text-to-Speech Command [advanced]"]
-        if config.thisPlatform == "Linux" and not config.isTermux:
+        if config.isTermux and shutil.which("termux-tts-speak"):
+            options.insert(0, "android")
+            descriptions.insert(0, "Android Text-to-Speech")
+        elif config.thisPlatform == "Linux" and not config.isTermux:
             options.insert(0, "piper")
             descriptions.insert(0, "Piper (Offline; Linux Only)")
         elif config.thisPlatform == "macOS":
@@ -2117,6 +2140,8 @@ class ToolMate:
                 self.setElevenlabsVoice()
         elif config.ttsPlatform == "edge":
             self.setEdgeTtsVoice()
+        elif config.ttsPlatform == "android":
+            self.setAndroidTtsVoice()
         elif config.ttsPlatform == "custom":
             self.defineTtsCommand()
         # save configs

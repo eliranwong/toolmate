@@ -124,6 +124,18 @@ class Prompts:
             config.defaultEntry = buffer.text
             buffer.text = ".open"
             buffer.validate_and_handle()
+        @this_key_bindings.add(*config.hotkey_open_previous_conversation)
+        def _(event):
+            buffer = event.app.current_buffer
+            config.defaultEntry = buffer.text
+            buffer.text = ".last"
+            buffer.validate_and_handle()
+        @this_key_bindings.add(*config.hotkey_read_conversation)
+        def _(event):
+            buffer = event.app.current_buffer
+            config.defaultEntry = buffer.text
+            buffer.text = ".read"
+            buffer.validate_and_handle()
         @this_key_bindings.add(*config.hotkey_export)
         def _(event):
             buffer = event.app.current_buffer
@@ -136,27 +148,17 @@ class Prompts:
         @this_key_bindings.add(*config.hotkey_count_tokens)
         def _(event):
             try:
-                try:
-                    encoding = tiktoken.encoding_for_model(config.chatGPTApiModel)
-                except:
-                    encoding = tiktoken.get_encoding("cl100k_base")
+                encoding = tiktoken.get_encoding("cl100k_base")
                 currentInput = event.app.current_buffer.text
-                availableFunctionTokens = count_tokens_from_functions(config.toolFunctionSchemas)
+                #availableFunctionTokens = count_tokens_from_functions(config.toolFunctionSchemas)
                 currentInputTokens = len(encoding.encode(config.addPredefinedContext(currentInput)))
                 loadedMessageTokens = count_tokens_from_messages(config.currentMessages)
-                selectedModelLimit = tokenLimits[config.chatGPTApiModel]
-                estimatedAvailableTokens = selectedModelLimit - availableFunctionTokens - loadedMessageTokens - currentInputTokens
+                #selectedModelLimit = tokenLimits[config.chatGPTApiModel]
+                #estimatedAvailableTokens = selectedModelLimit - availableFunctionTokens - loadedMessageTokens - currentInputTokens
 
-                content = f"""{config.divider}
-# Current model
-{config.chatGPTApiModel}
-# Token Count
-Model limit: {selectedModelLimit}
-Active functions: {availableFunctionTokens}
+                content = f"""# Token Count
 Loaded messages: {loadedMessageTokens}
 Current input: {currentInputTokens}
-{config.divider}
-Available tokens: {estimatedAvailableTokens}
 {config.divider}
 """
             except:
@@ -203,10 +205,10 @@ Available tokens: {estimatedAvailableTokens}
                 config.ttsOutput = not config.ttsOutput
                 config.saveConfig()
                 run_in_terminal(lambda: print3(f"Response Audio: '{'enabled' if config.ttsOutput else 'disabled'}'!"))
-        @this_key_bindings.add(*config.hotkey_restart_app)
-        def _(_):
-            print(f"Restarting {config.toolMateAIName} ...")
-            restartApp()
+        #@this_key_bindings.add(*config.hotkey_restart_app)
+        #def _(_):
+        #    print(f"Restarting {config.toolMateAIName} ...")
+        #    restartApp()
         @this_key_bindings.add(*config.hotkey_toggle_input_improvement)
         def _(_):
             config.improveInputEntry = not config.improveInputEntry
@@ -262,8 +264,12 @@ Available tokens: {estimatedAvailableTokens}
             "[escape, a]": "move cursor to entry beginning",
             "[escape, z]": "move cursor to entry end",
             "[c-r]": "reverse-i-search",
-            str(config.hotkey_new): "new chat",
-            str(config.hotkey_export): "export chat",
+            str(config.hotkey_new): "new conversation",
+            str(config.hotkey_open_chat_records): "open conversation",
+            str(config.hotkey_open_previous_conversation): "open previous conversation",
+            str(config.hotkey_read_conversation): "read current conversation",
+            str(config.hotkey_edit_last_response): "edit current conversation",
+            str(config.hotkey_export): "export conversation",
             #str(config.hotkey_select_context): "change predefined context",
             #str(config.hotkey_remove_context_temporarily): "remove context temporarily",
             str(config.hotkey_launch_pager_view): "launch pager view",
@@ -287,7 +293,7 @@ Available tokens: {estimatedAvailableTokens}
         }
         textEditor = config.customTextEditor.split(" ", 1)[0]
         bindings[str(config.hotkey_edit_current_entry)] = f"""edit current input with '{config.customTextEditor if textEditor and isCommandInstalled(textEditor) else "eTextEdit"}'"""
-        bindings[str(config.hotkey_edit_last_response)] = f"""edit the previous response with '{config.customTextEditor if textEditor and isCommandInstalled(textEditor) else "eTextEdit"}'"""
+        #bindings[str(config.hotkey_edit_last_response)] = f"""edit the previous response with '{config.customTextEditor if textEditor and isCommandInstalled(textEditor) else "eTextEdit"}'"""
         multilineBindings = {
             "[enter]": "new line",
             "[escape, enter]": "complete entry",

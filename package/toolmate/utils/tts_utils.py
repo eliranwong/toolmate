@@ -29,8 +29,11 @@ class TTSUtil:
     def play(content, language=""):
         if config.tts and content.strip():
             try:
-                # official google-cloud-texttospeech
-                if config.ttsPlatform == "googlecloud" and os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Text-to-Speech" in config.enabledGoogleAPIs:
+                if config.ttsPlatform == "android":
+                    content = content.replace('"', '\\"')
+                    os.system(f'''termux-tts-speak -l {config.gcttsLang} -r {config.androidttsRate} "{content}"''')
+                elif config.ttsPlatform == "googlecloud" and os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Text-to-Speech" in config.enabledGoogleAPIs:
+                    # official google-cloud-texttospeech
                     audioFile = os.path.join(config.toolMateAIFolder, "temp", "gctts.mp3")
                     if not language:
                         language = config.gcttsLang

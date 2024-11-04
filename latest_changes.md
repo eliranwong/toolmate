@@ -1,6 +1,10 @@
-# 0.4.81
+# 0.4.81-0.4.84
+
+* added support using Android built-in text-to-speech
 
 * change directory to the most recently saved conversations when users run `.open` action.
+
+* added tool `@uniquebible_web`
 
 # 0.4.75-0.4.80
 

@@ -243,6 +243,7 @@ defaultSettings = (
     ('vlcSpeed', 1.0),
     ('edgettsVoice', "en-GB-SoniaNeural"),
     ('edgettsRate', 1.0), # "+0%"
+    ('androidttsRate', 1.0),
     ('gcttsLang', "en-US"), # https://cloud.google.com/text-to-speech/docs/voices
     ('gcttsSpeed', 1.0),
     ('gttsLang', "en"), # gTTS is used by default if ttsCommand is not given
@@ -273,7 +274,8 @@ defaultSettings = (
     ("hotkey_insert_filepath", ["c-f"]),
     ("hotkey_insert_newline", ["c-i"]),
     ("hotkey_open_chat_records", ["c-o"]),
-    ("hotkey_open_plain_text_file", ["escape", "o"]),
+    #("hotkey_open_plain_text_file", ["escape", "o"]),
+    ("hotkey_open_previous_conversation", ["escape", "o"]),
     ("hotkey_export", ["c-g"]),
     ("hotkey_count_tokens", ["escape", "c"]),
     ("hotkey_launch_pager_view", ["c-p"]),
@@ -288,7 +290,8 @@ defaultSettings = (
     ("hotkey_display_device_info", ["escape", "k"]),
     ("hotkey_toggle_response_audio", ["c-y"]),
     ("hotkey_toggle_input_audio", ["escape", "y"]),
-    ("hotkey_restart_app", ["escape", "r"]),
+    #("hotkey_restart_app", ["escape", "r"]),
+    ("hotkey_read_conversation", ["escape", "r"]),
     ("hotkey_toggle_input_improvement", ["escape", "w"]),
     ("hotkey_toggle_word_wrap", ["c-w"]),
     ("hotkey_toggle_mouse_support", ["escape", "m"]),
@@ -298,6 +301,7 @@ defaultSettings = (
     ("hotkey_select_plugins", ["escape", "p"]),
     ("hotkey_insert_favorite_string", ["c-b"]),
     # available "c-l"
+    # available "escape", "o"
 )
 
 temporaryConfigs = [

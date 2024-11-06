@@ -105,9 +105,9 @@ exit
 Restart:
 
 ```
-cd
-cd alpine
-qemu-system-x86_64 -m 512 -netdev user,id=n1,hostfwd=tcp::2222-:22,hostfwd=tcp::4000-:4000,hostfwd=tcp::3000-:3000,hostfwd=tcp::3001-:3001 -device virtio-net,netdev=n1 -nographic alpine.qcow2
+echo "alias docker=\"printf '\033]0;Docker\007' && cd ~/alpine && qemu-system-x86_64 -netdev user,id=n1,hostfwd=tcp::2222-:22,hostfwd=tcp::4000-:4000,hostfwd=tcp::3000-:3000,hostfwd=tcp::3001-:3001 -device virtio-net,netdev=n1 -nographic alpine.qcow2 -m 512\"" >> ~/.bashrc
+source ~/.bashrc
+docker
 ```
 
 Remarks: Please note that the command line here does not contain `-cdrom alpine-virt-*.iso`.

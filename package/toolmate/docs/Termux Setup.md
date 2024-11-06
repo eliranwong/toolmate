@@ -70,7 +70,11 @@ Read more at https://wiki.termux.com/wiki/Sharing_Data
 
 # Install Basic Packages
 
-> pkg install python git binutils libjpeg-turbo libpng build-essential clang make pkg-config curl wget lynx w3m elinks vlc xclip xsel vim libxml2 libxslt python-apsw which libzmq libsodium libgmp libmpc libmpfr python-lxml which micro nano rust proot python-torch python-torchaudio python-torchvision
+```
+pkg install which python golang git binutils libjpeg-turbo libpng build-essential clang make cmake pkg-config curl wget lynx w3m elinks vlc xclip xsel vim libxml2 libxslt python-apsw libzmq libsodium libgmp libmpc libmpfr python-lxml micro nano rust proot python-torch python-torchaudio python-torchvision
+echo 'alias micro="micro -softwrap true -wordwrap true"' >> ~/.bashrc
+source ~/.bashrc
+```
 
 Remarks:
 
@@ -107,6 +111,7 @@ Install Ollama:
 pkg install git cmake golang
 git clone --depth 1 https://github.com/ollama/ollama.git
 cd ollama
+sed -i "s/-D__ARM_FEATURE_MATMUL_INT8//g" llama/llama.go
 go generate ./...
 go build .
 cp ollama /data/data/com.termux/files/usr/bin/
@@ -246,6 +251,8 @@ apt install golang-go
 # install rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 export PATH=$HOME/.cargo/bin:$PATH
+# install ollama
+curl -fsSL https://ollama.com/install.sh | sh
 # install fabric
 mkdir -p .local/bin
 echo "export PATH=$HOME/.local/bin:$PATH" >> ~/.bashrc

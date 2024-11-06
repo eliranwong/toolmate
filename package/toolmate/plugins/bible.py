@@ -24,28 +24,6 @@ temporaryConfigs = (
 )
 config.setConfig(temporaryConfigs, temporary=True)
 
-# Tool: @uniquebible_web
-def uniquebible_web(_):
-    stopSpinning()
-    command = config.currentMessages[-1]["content"].replace('"', '\\"')
-    url = f"""{config.uniquebible_weburl}?cmd={command}"""
-    openURL(url)
-    return ""
-functionSignature = {
-    "examples": [
-        "@uniquebible_web BIBLE:::NET:::John 3:16",
-        "@uniquebible_web CROSSREFERENCE:::John 3:16",
-    ],
-    "name": "uniquebible_web",
-    "description": "Read bible-related content via UniqueBible web interface",
-    "parameters": {
-        "type": "object",
-        "properties": {},
-        "required": [],
-    },
-}
-config.addFunctionCall(signature=functionSignature, method=uniquebible_web)
-
 # Tool: @uniquebible_api @bapi
 try:
 
@@ -58,7 +36,7 @@ try:
         stopSpinning()
 
         private = f"private={config.uniquebible_api_private}&" if config.uniquebible_api_private else ""
-        command = config.currentMessages[-1]["content"].replace('"', '\\"')
+        command = config.currentMessages[-1]["content"] #.replace('"', '\\"')
 
         url = f"""{config.uniquebible_api_endpoint}?{private}cmd={command}"""
         response = requests.get(url, timeout=config.uniquebible_api_timeout)
@@ -88,6 +66,30 @@ try:
     config.builtinTools["bapi"] = "Retrieve bible data with UniqueBible API"
     config.inputSuggestions.append({"@uniquebible_api": apiCommandSuggestions})
     config.inputSuggestions.append({"@bapi": apiCommandSuggestions})
+
+    # Tool: @uniquebible_web
+    def uniquebible_web(_):
+        stopSpinning()
+        command = config.currentMessages[-1]["content"].replace('"', '\\"')
+        url = f"""{config.uniquebible_weburl}?cmd={command}"""
+        openURL(url)
+        return ""
+    functionSignature = {
+        "examples": [
+            "@uniquebible_web BIBLE:::NET:::John 3:16",
+            "@uniquebible_web CROSSREFERENCE:::John 3:16",
+        ],
+        "name": "uniquebible_web",
+        "description": "Read bible-related content via UniqueBible web interface",
+        "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+        },
+    }
+    config.addFunctionCall(signature=functionSignature, method=uniquebible_web)
+    config.inputSuggestions.append({"@uniquebible_web": apiCommandSuggestions})
+
 except:
     print(f"Failed to connect '{config.uniquebible_api_endpoint}' at the moment!")
 

@@ -344,7 +344,7 @@ Current input: {currentInputTokens}
         else:
             print(keyHelp)
 
-    def simplePrompt(self, numberOnly=False, validator=None, inputIndicator="", default="", accept_default=False, completer=None, promptSession=None, style=None, is_password=False, bottom_toolbar=None):
+    def simplePrompt(self, numberOnly=False, validator=None, inputIndicator="", default="", accept_default=False, completer=None, complete_in_thread=None, promptSession=None, style=None, is_password=False, bottom_toolbar=None):
         config.selectAll = False
         inputPrompt = promptSession.prompt if promptSession is not None else prompt
         if not inputIndicator:
@@ -363,6 +363,7 @@ Current input: {currentInputTokens}
             default=default,
             accept_default=accept_default,
             completer=completer,
+            complete_in_thread=complete_in_thread,
             is_password=is_password,
             mouse_support=Condition(lambda: config.mouseSupport),
             clipboard=config.clipboard,

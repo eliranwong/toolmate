@@ -1,4 +1,4 @@
-# 0.4.81-0.4.84
+# 0.4.81-0.4.87
 
 * added support using Android built-in text-to-speech
 

@@ -1,3 +1,11 @@
+# 0.4.89-0.4.93
+
+* added support of Mistral AI API Keys, read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Mistral%20API%20Setup.md
+
+# 0.4.88
+
+* added support of using Grop cloud API keys for running tool `@ask_perplexica`
+
 # 0.4.81-0.4.87
 
 * added support using Android built-in text-to-speech

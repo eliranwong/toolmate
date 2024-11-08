@@ -33,7 +33,7 @@ defaultSettings = (
     ('appName', ''),
     ('text2art_font1', 'cybermedum'),
     ('text2art_font2', 'white_bubble'),
-    ('llmInterface', ""), # "llamacpp", "llamacppserver", "ollama", "gemini", "chatgpt", "letmedoit", "groq"
+    ('llmInterface', ""), # "llamacpp", "llamacppserver", "ollama", "gemini", "chatgpt", "letmedoit", "groq", "mistral"
     ('tool_selection_agent', False), # automatically screens user request and recommend tools, can also be manually triggered by tool `@recommend_tool`
     ('tool_selection_requirements', False), # convey each tool's requirements to the tool selection agent for the tool selection process.
     ('auto_tool_selection', False), # apply only if tool_selection_agent is set to True
@@ -157,6 +157,7 @@ defaultSettings = (
     ('systemMessage_tool', ''), # letmedoit system message
     ('systemMessage_ollama', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone ollama chatbot
     ('systemMessage_groq', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone groq chatbot
+    ('systemMessage_mistral', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone mistral chatbot
     ('systemMessage_llamacpp', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone llamacpp chatbot
     ('systemMessage_llamacppserver', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone llamacppserver chatbot
     ('systemMessage_chatgpt', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone chatgpt chatbot
@@ -198,10 +199,17 @@ defaultSettings = (
     ('groqApi_key', ''),
     ('groqApi_tool_model', 'mixtral-8x7b-32768'),
     ('groqApi_tool_model_additional_chat_options', {}),
-    ('groqApi_chat_model', 'llama3-70b-8192'),
+    ('groqApi_chat_model', 'llama-3.1-70b-versatile'),
     ('groqApi_chat_model_additional_chat_options', {}),
     ('groqApi_tool_model_max_tokens', 2048),
     ('groqApi_chat_model_max_tokens', 2048),
+    ('mistralApi_key', ''),
+    ('mistralApi_tool_model', 'mistral-large-latest'),
+    ('mistralApi_tool_model_additional_chat_options', {}),
+    ('mistralApi_chat_model', 'mistral-large-latest'),
+    ('mistralApi_chat_model_additional_chat_options', {}),
+    ('mistralApi_tool_model_max_tokens', 2048),
+    ('mistralApi_chat_model_max_tokens', 2048),
     ('openaiApiKey', ''),
     ('openaiApiOrganization', ''),
     ('loadingInternetSearches', "auto"),

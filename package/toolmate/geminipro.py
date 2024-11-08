@@ -183,7 +183,7 @@ class GeminiPro:
 
                 try:
                     if not hasattr(config, "currentMessages") and config.systemMessage_gemini and justStarted:
-                        prompt = f"{config.systemMessage_gemini}\n{prompt}"
+                        prompt = f"# Your role\n\n{config.systemMessage_gemini}\n\n# My Inquiry\n\n{prompt}"
                         justStarted = False
                     # https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini
                     # Note: At the time of writing, function call feature with Gemini Pro is very weak, compared with the function call feature offerred by ChatGPT:

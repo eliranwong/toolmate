@@ -43,7 +43,7 @@ open(os.path.join(package, "config.py"), "w").close()
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name=package,
-    version="0.4.87",
+    version="0.4.93",
     python_requires=">=3.8, <3.13",
     description=f"ToolMate AI, developed by Eliran Wong, is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. Supports custom workflow and plugins to automate multi-step actions.",
     long_description=long_description,
@@ -130,7 +130,7 @@ setup(
     extras_require={
         'linux': ["flaml[automl]", "piper-tts", "pyautogen[autobuild]>=0.3.1"],  # Dependencies for the linux module
         'gui': ["PySide6"],  # Dependencies for the gui module
-        'bible': ["uniquebible>=0.1.64", "searchbible>=0.1.5"],  # Dependencies for the bible module
+        'bible': ["uniquebible>=0.1.65", "searchbible>=0.1.5"],  # Dependencies for the bible module
     },
     entry_points={
         "console_scripts": [
@@ -156,20 +156,16 @@ setup(
             f"palm2={package}.palm2:main",
             f"codey={package}.codey:main",
             f"groqchat={package}.groqchat:main",
+            f"mistralchat={package}.mistralchat:main",
             f"chatgpt={package}.chatgpt:main",
             f"llamacpp={package}.llamacpp:main",
             f"llamacppserver={package}.llamacppserver:main",
             f"ollamachat={package}.ollamachat:main",
-            f"mistral={package}.ollamachat:mistral",
-            f"mixtral={package}.ollamachat:mixtral",
-            f"llama3={package}.ollamachat:llama3",
-            f"llama370b={package}.ollamachat:llama370b",
             f"gemma2b={package}.ollamachat:gemma2b",
             f"gemma7b={package}.ollamachat:gemma7b",
             f"llava={package}.ollamachat:llava",
             f"phi3={package}.ollamachat:phi3",
             f"vicuna={package}.ollamachat:vicuna",
-            f"codellama={package}.ollamachat:codellama",
             f"starlinglm={package}.ollamachat:starlinglm",
             f"orca2={package}.ollamachat:orca2",
             f"wizardlm2={package}.ollamachat:wizardlm2",

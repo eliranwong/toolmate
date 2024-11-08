@@ -31,6 +31,8 @@ Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/d
 
 # Distinctive Features
 
+[NEW! Support Mistral API Keys](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Mistral%20API%20Setup.md)
+
 [NEW! Edit Current Conversation](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Edit%20Current%20Conversation.md)
 
 [NEW! Support Android](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Android%20Versions.md)

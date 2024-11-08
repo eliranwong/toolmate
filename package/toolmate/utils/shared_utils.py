@@ -18,6 +18,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import quote
 from typing import Union
 from groq import Groq
+from mistralai import Mistral
 from ollama import Client
 import speech_recognition as sr
 import zipfile
@@ -356,6 +357,27 @@ def getGroqApi_key():
 
 def getGroqClient():
     return Groq(api_key=getGroqApi_key())
+
+def getMistralApi_key():
+    '''
+    support multiple mistral api keys
+    User can manually edit config to change the value of config.mistralApi_key to a list of multiple api keys instead of a string of a single api key
+    '''
+    if config.mistralApi_key:
+        if isinstance(config.mistralApi_key, str):
+            return config.mistralApi_key
+        elif isinstance(config.mistralApi_key, list):
+            if len(config.mistralApi_key) > 1:
+                # rotate multiple api keys
+                config.mistralApi_key = config.mistralApi_key[1:] + [config.mistralApi_key[0]]
+            return config.mistralApi_key[0]
+        else:
+            return ""
+    else:
+        return ""
+
+def getMistralClient():
+    return Mistral(api_key=getMistralApi_key())
 
 def downloadStableDiffusionFiles():
     # llm directory
@@ -1028,24 +1050,35 @@ def toChatml(messages: dict=[], use_system_message=True) -> str:
             messages_str += roles[role].format(content=content)
     return messages_str.rstrip()
 
-def useChatSystemMessage(messages: dict) -> dict:
-    for i in messages:
+def useChatSystemMessage(messages: dict, mergeSystemIntoUserMessage=False) -> dict:
+    #for i in messages:
+    for index, i in enumerate(reversed(messages)):
         if i.get("role", "") == "system":
+            originalIndex = len(messages) - index - 1
             if config.tempChatSystemMessage:
-                i["content"] = config.tempChatSystemMessage
+                messages[originalIndex]["content"] = config.tempChatSystemMessage
                 config.tempChatSystemMessage = ""
             elif config.llmInterface == "ollama":
-                i["content"] = config.systemMessage_ollama
+                messages[originalIndex]["content"] = config.systemMessage_ollama
             elif config.llmInterface == "groq":
-                i["content"] = config.systemMessage_groq
+                messages[originalIndex]["content"] = config.systemMessage_groq
+            elif config.llmInterface == "mistral":
+                messages[originalIndex]["content"] = config.systemMessage_mistral
             elif config.llmInterface == "llamacppserver":
-                i["content"] = config.systemMessage_llamacppserver
+                messages[originalIndex]["content"] = config.systemMessage_llamacppserver
             elif config.llmInterface == "llamacpp":
-                i["content"] = config.systemMessage_llamacpp
+                messages[originalIndex]["content"] = config.systemMessage_llamacpp
             elif config.llmInterface == "gemini":
-                i["content"] = config.systemMessage_gemini
-            elif config.llmInterface == "chatgpt":
-                i["content"] = config.systemMessage_chatgpt
+                messages[originalIndex]["content"] = config.systemMessage_gemini
+            elif config.llmInterface in ("chatgpt", "letmedoit"):
+                messages[originalIndex]["content"] = config.systemMessage_chatgpt
+            # merge system message
+            if mergeSystemIntoUserMessage and messages[-1].get("role", "") == "user":
+                systemItem = messages.pop(originalIndex)
+                systemMessage = systemItem.get("content", "").strip()
+                userMessage = messages[-1].get("content", "").strip()
+                if systemMessage and userMessage:
+                    messages[-1]["content"] = f"""# Your role\n\n{systemMessage}\n\n# My Inquiry\n\n{userMessage}"""
             # assume only one system message in the message chain
             break
     return messages

@@ -66,5 +66,3 @@ if not config.isTermux:
     }
 
     config.addFunctionCall(signature=functionSignature, method=analyze_images_gemini)
-    config.inputSuggestions.append("Describe this image in detail: ")
-    config.inputSuggestions.append("Extract text from this image: ")

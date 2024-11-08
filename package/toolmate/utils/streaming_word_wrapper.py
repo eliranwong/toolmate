@@ -112,7 +112,12 @@ class StreamingWordWrapper:
                 if openai:
                     # openai
                     # when open api key is invalid for some reasons, event response in string
-                    answer = event if isinstance(event, str) else event.choices[0].delta.content
+                    if isinstance(event, str):
+                        answer = event
+                    elif hasattr(event, "data"): # mistralai
+                        answer = event.data.choices[0].delta.content
+                    else: # openai, groq
+                        answer = event.choices[0].delta.content
                 elif isinstance(event, dict):
                     if "message" in event:
                         # ollama chat

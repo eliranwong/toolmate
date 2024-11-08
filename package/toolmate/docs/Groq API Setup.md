@@ -24,7 +24,7 @@ At the time of writing, use of Groq Cloud API is FREE.
 
 1. Enter ".apikeys" in ToolMate AI prompt
 
-2. Follow the dialog and enter your Groq API key(s)
+2. Follow the prompts and enter your Groq API key(s)
 
 # Support Mulitple Groq API Keys
 
@@ -35,3 +35,7 @@ To use multiple groq API keys, when you prompts entering Groq API key, enter a l
 ```
 ["groq_api_key_1", "groq_api_key_2", "groq_api_key_3"]
 ```
+
+# Related Wiki Page
+
+[Mistral API Key Setup](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Mistral%20API%20Setup.md)

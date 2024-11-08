@@ -50,7 +50,7 @@ def analyze_images_groq(function_args):
         content.insert(0, {"type": "text", "text": query,})
 
         completion = getGroqClient().chat.completions.create(
-            model="llama-3.2-11b-vision-preview",
+            model="llama-3.2-90b-vision-preview",
             messages=[
                 {
                 "role": "user",
@@ -77,7 +77,7 @@ functionSignature = {
         "analyze image",
     ],
     "name": "analyze_images_groq",
-    "description": "Describe or compare images with ChatGPT",
+    "description": "Describe or compare images with Llama 3.2 Vision",
     "parameters": {
         "type": "object",
         "properties": {

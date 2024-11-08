@@ -2,7 +2,7 @@ wheel
 setuptools
 pipdeptree
 #chromadb==0.5.15
-mistralai==1.1.0
+mistralai>=1.2.0
 #scikit-image==0.24.0
 #scikit-learn==1.5.2
 sqlmodel==0.0.22

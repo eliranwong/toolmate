@@ -34,6 +34,7 @@ from toolmate.utils.streaming_word_wrapper import StreamingWordWrapper
 from toolmate.utils.text_utils import TextUtil
 from toolmate.utils.sttLanguages import googleSpeeckToTextLanguages, whisperSpeeckToTextLanguages
 from toolmate.groqchat import GroqChatbot
+from toolmate.mistralchat import MistralChatbot
 from toolmate.ollamachat import OllamaChat
 from elevenlabs.client import ElevenLabs
 if not config.isTermux:
@@ -117,10 +118,12 @@ class ToolMate:
             config.saveConfig()
 
         # check availability of api keys
-        if not config.groqApi_key:
-            self.changeGroqApi()
         if not config.openaiApiKey:
             self.changeChatGPTAPIkey()
+        if not config.groqApi_key:
+            self.changeGroqApi()
+        if not config.mistralApi_key:
+            self.changeMistralApi()
         if not config.openweathermapApi:
             self.changeOpenweathermapApi()
         if not config.elevenlabsApi:
@@ -568,8 +571,9 @@ class ToolMate:
             return False
 
     def changeAPIkeys(self):
-        self.changeGroqApi()
         self.changeChatGPTAPIkey()
+        self.changeGroqApi()
+        self.changeMistralApi()
         if not config.isTermux:
             self.setAutoGenBuilderConfig()
         self.changeOpenweathermapApi()
@@ -636,6 +640,25 @@ class ToolMate:
         config.saveConfig()
         print2("Configurations updated!")
 
+    def changeMistralApi(self):
+        print3("# Mistral AI API Key: allows access to Mistral AI hosted LLMs")
+        print1("To set up Mistral AI API Key, visit:\nhttps://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Mistral%20API%20Setup.md\n")
+        print1("Enter a single or a list of multiple Mistral AI API Key(s) [optional]:")
+        print1("(To enter multiple keys, use the following format: ['api_key_1', 'api_key_2', 'api_key_3'])")
+        print()
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=str(config.mistralApi_key), is_password=True)
+        if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+            try:
+                if isinstance(eval(apikey), list):
+                    config.mistralApi_key = eval(apikey)
+            except:
+                config.mistralApi_key = apikey
+            CallLLM.checkCompletion()
+        else:
+            config.mistralApi_key = "toolmate"
+        config.saveConfig()
+        print2("Configurations updated!")
+
     def changeOpenweathermapApi(self):
         print3("# OpenWeatherMap API Key: allows access to real-time weather information")
         print1("To set up OpenWeatherMap API Key, read:\nhttps://github.com/eliranwong/letmedoit/wiki/OpenWeatherMap-API-Setup\n")
@@ -691,7 +714,7 @@ class ToolMate:
 
     # update system message
     def updateSystemMessage(self, messages):
-        for index, message in enumerate(messages):
+        for index, message in enumerate(reversed(messages)):
             try:
                 if message.get("role", "") == "system":
                     # update system mess
@@ -702,11 +725,12 @@ class ToolMate:
                         message["content"],
                         flags=re.M,
                     )
-                    messages[index] = message
+                    originalIndex = len(messages) - index - 1
+                    messages[originalIndex] = message
                     # in a long conversation, ChatGPT often forgets its system message
                     # move forward if conversation have started, to enhance system message
-                    if config.conversationStarted and not index == len(messages) - 1:
-                        item = messages.pop(index)
+                    if not config.llmInterface == "mistral" and config.conversationStarted and not originalIndex == len(messages) - 1:
+                        item = messages.pop(originalIndex)
                         messages.append(item)
                     break
             except:
@@ -1226,6 +1250,7 @@ class ToolMate:
         options = {
             "ollama": "Ollama",
             "groq": "Groq Cloud API",
+            "mistral": "Mistral AI API",
             "chatgpt": "OpenAI ChatGPT [Paid online service]",
             "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",
         } if config.isTermux else {
@@ -1233,6 +1258,7 @@ class ToolMate:
             "llamacppserver": "Llama.cpp server [advanced]",
             "ollama": "Ollama",
             "groq": "Groq Cloud API",
+            "mistral": "Mistral AI API",
             "gemini": "Google Gemini [Paid online service]",
             "chatgpt": "OpenAI ChatGPT [Paid online service]",
             "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",
@@ -1314,6 +1340,16 @@ class ToolMate:
             if askAdditionalChatModel():
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_groq("chat")
+                self.setMaxTokens(feature="chat")
+        elif config.llmInterface == "mistral":
+            if not config.mistralApi_key or config.mistralApi_key == "toolmate":
+                self.changeMistralApi()
+            print2("# Tool Model - for both task execution and conversation")
+            self.setLlmModel_mistral()
+            self.setMaxTokens(feature="default")
+            if askAdditionalChatModel():
+                print2("# Chat Model - for conversation only")
+                self.setLlmModel_mistral("chat")
                 self.setMaxTokens(feature="chat")
         elif config.llmInterface == "gemini":
             self.setLlmModel_gemini()
@@ -1577,10 +1613,10 @@ class ToolMate:
                 "mixtral-8x7b-32768",
                 "gemma2-9b-it",
                 "gemma-7b-it",
-                #"llama-3.2-90b-vision-preview",
+                "llama-3.2-90b-vision-preview",
                 "llama-3.2-11b-vision-preview",
-                "llama-3.2-3b-preview",
-                "llama-3.2-1b-preview",
+                "llama-3.2-3b",
+                "llama-3.2-1b",
                 #"llama-3.1-405b-reasoning",
                 "llama-3.1-70b-versatile",
                 "llama-3.1-8b-instant",
@@ -1590,7 +1626,7 @@ class ToolMate:
                 "llama3-groq-70b-8192-tool-use-preview",
                 "llama3-groq-8b-8192-tool-use-preview",
             ),
-            title="Groq Model",
+            title="Groq Cloud Models",
             default=config.groqApi_chat_model if feature == "chat" else config.groqApi_tool_model,
             text=f"Select a {'chat' if feature=='chat' else 'tool'} call model:\n(for {'conversations only' if feature=='chat' else 'both chat and task execution'})",
         )
@@ -1600,6 +1636,29 @@ class ToolMate:
             elif feature == "chat":
                 config.groqApi_chat_model = model
             print3(f"Groq model: {model}")
+
+    def setLlmModel_mistral(self, feature="default"):
+        model = self.dialogs.getValidOptions(
+            options=(
+                "mistral-large-latest",
+                "mistral-small-latest",
+                "codestral-latest",
+                "ministral-8b-latest",
+                "ministral-3b-latest",
+                "pixtral-12b-2409",
+                "open-mixtral-8x22b",
+                "open-mistral-nemo",
+            ),
+            title="Mistral AI Models",
+            default=config.mistralApi_chat_model if feature == "chat" else config.mistralApi_tool_model,
+            text=f"Select a {'chat' if feature=='chat' else 'tool'} call model:\n(for {'conversations only' if feature=='chat' else 'both chat and task execution'})",
+        )
+        if model:
+            if feature == "default":
+                config.mistralApi_tool_model = model
+            elif feature == "chat":
+                config.mistralApi_chat_model = model
+            print3(f"Mistral model: {model}")
 
     def setLlmModel_gemini(self):
         models = ["gemini-1.5-pro-001", "gemini-1.5-flash-001", "gemini-1.0-pro-002", "gemini-1.0-pro-001"]
@@ -1730,13 +1789,15 @@ class ToolMate:
             systemMessage_chat = config.systemMessage_ollama
         elif config.llmInterface == "groq":
             systemMessage_chat = config.systemMessage_groq
+        elif config.llmInterface == "mistral":
+            systemMessage_chat = config.systemMessage_mistral
         elif config.llmInterface == "llamacppserver":
             systemMessage_chat = config.systemMessage_llamacppserver
         elif config.llmInterface == "llamacpp":
             systemMessage_chat = config.systemMessage_llamacpp
         elif config.llmInterface == "gemini":
             systemMessage_chat = config.systemMessage_gemini
-        elif config.llmInterface == "chatgpt":
+        elif config.llmInterface in ("chatgpt", "letmedoit"):
             systemMessage_chat = config.systemMessage_chatgpt
 
         suggestions = [
@@ -1750,13 +1811,15 @@ class ToolMate:
                 config.systemMessage_ollama = message
             elif config.llmInterface == "groq":
                 config.systemMessage_groq = message
+            elif config.llmInterface == "mistral":
+                config.systemMessage_mistral = message
             elif config.llmInterface == "llamacppserver":
                 config.systemMessage_llamacppserver = message
             elif config.llmInterface == "llamacpp":
                 config.systemMessage_llamacpp = message
             elif config.llmInterface == "gemini":
                 config.systemMessage_gemini = message
-            elif config.llmInterface == "chatgpt":
+            elif config.llmInterface in ("chatgpt", "letmedoit"):
                 config.systemMessage_chatgpt = message
             config.saveConfig()
             print3(f"Custom chat system message: {config.toolMateAIName}")
@@ -1905,15 +1968,20 @@ class ToolMate:
             print3(f"Context Window Size: {contextWindowSize}")
 
     def setMaxTokens_non_chatgpt(self, feature="default"):
-        print1("Please specify maximum output tokens below:")
         if config.llmInterface == "gemini":
+            print1("Visit https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models to read about tokens limits")
             default = config.gemini_max_output_tokens
         elif config.llmInterface in ("llamacpp", "llamacppserver"):
             default = config.llamacppChatModel_max_tokens if feature == "chat" else config.llamacppToolModel_max_tokens
         elif config.llmInterface == "ollama":
             default = config.ollamaChatModel_num_predict if feature == "chat" else config.ollamaToolModel_num_predict
         elif config.llmInterface == "groq":
+            print1("Visit https://console.groq.com/docs/models to read about tokens limits")
             default = config.groqApi_chat_model_max_tokens if feature == "chat" else config.groqApi_tool_model_max_tokens
+        elif config.llmInterface == "mistral":
+            print1("Visit https://console.mistral.ai/limits/ to read about tokens limits")
+            default = config.mistralApi_chat_model_max_tokens if feature == "chat" else config.mistralApi_tool_model_max_tokens
+        print1("Please specify maximum output tokens below:")
         maxtokens = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(default))
         if maxtokens and not maxtokens.strip().lower() == config.exit_entry and int(maxtokens) >= -1:
             maxtokens = int(maxtokens)
@@ -1934,6 +2002,11 @@ class ToolMate:
                     config.groqApi_chat_model_max_tokens = maxtokens
                 else:
                     config.groqApi_tool_model_max_tokens = maxtokens
+            elif config.llmInterface == "mistral":
+                if feature == "chat":
+                    config.mistralApi_chat_model_max_tokens = maxtokens
+                else:
+                    config.mistralApi_tool_model_max_tokens = maxtokens
             config.saveConfig()
             print3(f"Maximum output tokens: {maxtokens}")
 
@@ -1950,6 +2023,7 @@ class ToolMate:
         else:
             print1(self.divider)
             print1("GPT and embeddings models process text in chunks called tokens. As a rough rule of thumb, 1 token is approximately 4 characters or 0.75 words for English text. One limitation to keep in mind is that for a GPT model the prompt and the generated output combined must be no more than the model's maximum context length.")
+            print1("Visit https://platform.openai.com/docs/models to read about tokens limits")
             print3(f"Current GPT model: {config.chatGPTApiModel}")
             print3(f"Maximum context length: {contextWindowLimit}")
             print3(f"Current function tokens: {functionTokens}")
@@ -2970,7 +3044,7 @@ Acess the risk level of the following `{target.capitalize()}`:
         if gui is None:
             gui = True if hasattr(config, "desktopAssistant") else False
         if openai is None:
-            openai = True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False
+            openai = True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "mistral", "llamacppserver") else False
         try:
             if gui:
                 QtResponseStreamer(config.desktopAssistant).workOnCompletion(completion, openai)
@@ -3302,6 +3376,7 @@ Acess the risk level of the following `{target.capitalize()}`:
             "llamacppserver": lambda: LlamacppServerChat().run(userInput),
             "ollama": lambda: OllamaChat().run(userInput, model=config.ollamaChatModel if config.useAdditionalChatModel else config.ollamaToolModel),
             "groq": lambda: GroqChatbot().run(userInput),
+            "mistral": lambda: MistralChatbot().run(userInput),
             "chatgpt": lambda: ChatGPT().run(userInput),
             "letmedoit": lambda: ChatGPT().run(userInput),
             "gemini": lambda: GeminiPro(temperature=config.llmTemperature).run(userInput),

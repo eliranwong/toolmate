@@ -2,6 +2,7 @@ from typing import Optional
 from toolmate import config, getDeviceInfo, toGeminiMessages, useChatSystemMessage
 from toolmate.utils.call_ollama import CallOllama
 from toolmate.utils.call_groq import CallGroq
+from toolmate.utils.call_mistral import CallMistral
 from toolmate.utils.call_chatgpt import CallChatGPT, CallLetMeDoIt
 import copy
 if not config.isTermux:
@@ -58,6 +59,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallOllama.checkCompletion()
         elif config.llmInterface == "groq":
             return CallGroq.checkCompletion()
+        elif config.llmInterface == "mistral":
+            return CallMistral.checkCompletion()
         elif config.llmInterface == "llamacppserver":
             return CallLlamaCppServer.checkCompletion()
         elif config.llmInterface == "llamacpp":
@@ -75,6 +78,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallOllama.autoCorrectPythonCode(code, trace)
         elif config.llmInterface == "groq":
             return CallGroq.autoCorrectPythonCode(code, trace)
+        elif config.llmInterface == "mistral":
+            return CallMistral.autoCorrectPythonCode(code, trace)
         elif config.llmInterface == "llamacppserver":
             return CallLlamaCppServer.autoCorrectPythonCode(code, trace)
         elif config.llmInterface == "llamacpp":
@@ -92,6 +97,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallOllama.runSingleFunctionCall(messages, function_name)
         elif config.llmInterface == "groq":
             return CallGroq.runSingleFunctionCall(messages, function_name)
+        elif config.llmInterface == "mistral":
+            return CallMistral.runSingleFunctionCall(messages, function_name)
         elif config.llmInterface == "llamacppserver":
             return CallLlamaCppServer.runSingleFunctionCall(messages, function_name)
         elif config.llmInterface == "llamacpp":
@@ -110,6 +117,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallOllama.regularCall(chatMessages)
         elif config.llmInterface == "groq":
             return CallGroq.regularCall(chatMessages)
+        elif config.llmInterface == "mistral":
+            return CallMistral.regularCall(chatMessages)
         elif config.llmInterface == "llamacppserver":
             return CallLlamaCppServer.regularCall(chatMessages)
         elif config.llmInterface == "llamacpp":
@@ -128,6 +137,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallOllama.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop)
         elif config.llmInterface == "groq":
             return CallGroq.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop)
+        elif config.llmInterface == "mistral":
+            return CallMistral.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop)
         elif config.llmInterface == "llamacppserver":
             return CallLlamaCppServer.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature)
         elif config.llmInterface == "llamacpp":
@@ -148,6 +159,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallOllama.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmInterface == "groq":
             return CallGroq.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
+        elif config.llmInterface == "mistral":
+            return CallMistral.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmInterface == "llamacppserver":
             return CallLlamaCppServer.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmInterface == "llamacpp":
@@ -165,6 +178,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallOllama.runToolCall(messages)
         elif config.llmInterface == "groq":
             return CallGroq.runToolCall(messages)
+        elif config.llmInterface == "mistral":
+            return CallMistral.runToolCall(messages)
         elif config.llmInterface == "llamacppserver":
             return CallLlamaCppServer.runToolCall(messages)
         elif config.llmInterface == "llamacpp":

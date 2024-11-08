@@ -1,40 +1,20 @@
 """
-ToolMate AI Plugin - analyze images
+ToolMate AI Plugin - analyze images with Mistral
 
-analyze images
+analyze images with Mistral
 
-Platform: llamacpp, ollama
-Model: llava <- customizable
-To customise:
-Change in config.py:
-llamacppVisionModel_model_path
-llamacppVisionModel_clip_model_path
-ollamaVisionModel
-
-Platform: gemini
-Model: Gemini Pro Vision
-
-Platform: chaptgpt, letmedoit
-Model "gpt-4o"
-Reference: https://platform.openai.com/docs/guides/vision
+Reference: https://console.mistral.com/docs/vision
 
 [TOOL_CALL]
 """
 
 
-from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url, encode_image, runToolMateCommand, getLlamacppServerClient
-from toolmate.utils.call_chatgpt import check_openai_errors
+from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, getMistralClient, is_valid_url, encode_image
 import os
-from openai import OpenAI
 
-@check_openai_errors
-def analyze_images_chatgpt(function_args):
+def analyze_images_pixtral(function_args):
     from toolmate import config
 
-    llmInterface = "chatgpt"
-
-    if llmInterface in ("chatgpt", "letmedoit") and not config.openaiApiKey:
-        return "OpenAI API key not found!"
 
     query = function_args.get("query") # required
     files = function_args.get("image_filepath") # required
@@ -56,7 +36,10 @@ def analyze_images_chatgpt(function_args):
     content = []
     # valid image paths
     for i in files:
-        if is_valid_url(i) and is_valid_image_url(i):
+        if getFileSizeInMB(i) > 10:
+            print1(f"File `{i}` exceeds 10MB!")
+            continue
+        elif is_valid_url(i) and is_valid_image_url(i):
             content.append({"type": "image_url", "image_url": {"url": i,},})
         elif os.path.isfile(i) and is_valid_image_file(i):
             content.append({"type": "image_url", "image_url": {"url": encode_image(i)},})
@@ -64,31 +47,19 @@ def analyze_images_chatgpt(function_args):
             files.remove(i)
 
     if content:
-        client = OpenAI()
-
         content.insert(0, {"type": "text", "text": query,})
 
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {
-                "role": "user",
-                "content": content,
-                }
-            ],
-            max_tokens=4096,
+        completion = client.chat.complete(
+            model="pixtral-12b-2409",
+            messages=messages
         )
-        answer = response.choices[0].message.content
+        answer = completion.choices[0].message.content
         config.toolTextOutput = answer
 
         # display answer
         print2("```assistant")
         print1(answer)
         print2("```")
-
-        # stop llama.cpp vision server
-        if llmInterface == "llamacpp":
-            stopLlamacppVisionServer()
 
         return ""
     return "[INVALID]"
@@ -99,8 +70,8 @@ functionSignature = {
         "compare images",
         "analyze image",
     ],
-    "name": "analyze_images_chatgpt",
-    "description": "Describe or compare images with ChatGPT",
+    "name": "analyze_images_pixtral",
+    "description": "Describe or compare images with Pixtral",
     "parameters": {
         "type": "object",
         "properties": {
@@ -117,4 +88,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=analyze_images_chatgpt)
+config.addFunctionCall(signature=functionSignature, method=analyze_images_pixtral)

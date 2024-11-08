@@ -12,13 +12,14 @@ You can manually edit config.py to customise these settings.
 [TOOL_CALL]
 """
 
-from toolmate import config, isServerAlive, print1, print2, plainTextToUrl, get_local_ip
+from toolmate import config, isServerAlive, print1, print2, plainTextToUrl, get_local_ip, getGroqApi_key
 import requests, json, re, copy
 
 persistentConfigs = (
     ("perplexica_server", "http://localhost"),
     ("perplexica_frontend_port", 3000),
     ("perplexica_backend_port", 3001),
+    ("perplexica_local_embedding_model", "xenova-bge-small-en-v1.5"), # local options "xenova-bge-small-en-v1.5", "xenova-gte-small", "xenova-bert-base-multilingual-uncased"
 )
 config.setConfig(persistentConfigs)
 if config.perplexica_server == "localhost":
@@ -45,21 +46,46 @@ if isServerAlive(re.sub("http://|https://", "", config.perplexica_server), confi
 
         api_url = f"{config.perplexica_server}:{config.perplexica_backend_port}/api/search" 
         headers = {"Content-Type": "application/json"}
+        # references:
+        # https://github.com/ItzCrazyKns/Perplexica/blob/master/docs/API/SEARCH.md
+        # https://github.com/ItzCrazyKns/Perplexica/tree/master/src/lib/providers
 
-        data = {
-            "chatModel": {
-                "provider": "openai",
-                "model": "gpt-4o-mini"
-            },
-            "embeddingModel": {
-                "provider": "openai",
-                "model": "text-embedding-3-large"
-            },
-            "optimizationMode": "speed",
-            "focusMode": "webSearch",
-            "query": query,
-            "history": history,
-        }
+        if config.llmInterface in ("chatgpt", "letmedoit"):
+
+            data = {
+                "chatModel": {
+                    "provider": "openai",
+                    "model": config.chatGPTApiModel,
+                },
+                "embeddingModel": {
+                    "provider": "openai",
+                    "model": "text-embedding-3-large",
+                },
+                "optimizationMode": "speed",
+                "focusMode": "webSearch",
+                "query": query,
+                "history": history,
+            }
+
+        else:
+
+            # groq
+            data = {
+                "chatModel": {
+                    "provider": "custom_openai",
+                    "model": config.groqApi_tool_model,
+                    "customOpenAIBaseURL": "https://api.groq.com/openai/v1",
+                    "customOpenAIKey": getGroqApi_key(),
+                },
+                "embeddingModel": {
+                    "provider": "local",
+                    "model": config.perplexica_local_embedding_model,
+                },
+                "optimizationMode": "speed",
+                "focusMode": "webSearch",
+                "query": query,
+                "history": history,
+            }
 
         try:
             response = requests.post(api_url, headers=headers, data=json.dumps(data))

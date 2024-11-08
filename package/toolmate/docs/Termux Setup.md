@@ -115,6 +115,8 @@ sed -i "s/-D__ARM_FEATURE_MATMUL_INT8//g" llama/llama.go
 go generate ./...
 go build .
 cp ollama /data/data/com.termux/files/usr/bin/
+echo 'export OLLAMA_HOST=0.0.0.0' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 Start Ollama server:
@@ -253,6 +255,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 export PATH=$HOME/.cargo/bin:$PATH
 # install ollama
 curl -fsSL https://ollama.com/install.sh | sh
+echo 'export OLLAMA_HOST=0.0.0.0' >> ~/.bashrc
 # install fabric
 mkdir -p .local/bin
 echo "export PATH=$HOME/.local/bin:$PATH" >> ~/.bashrc

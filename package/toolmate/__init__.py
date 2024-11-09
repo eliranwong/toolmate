@@ -72,7 +72,7 @@ config.thisPlatform = "macOS" if thisPlatform == "Darwin" else thisPlatform
 if config.terminalEnableTermuxAPI:
     checkPath()
     config.open = "termux-share"
-    config.thisDistro = ""
+    config.thisDistro = "Android Termux"
 elif thisPlatform == "Linux":
     checkPath()
     config.open = "xdg-open"

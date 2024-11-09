@@ -1,5 +1,5 @@
 from toolmate import config, showErrors, isValidPythodCode, executeToolFunction, toParameterSchema, getCpuThreads, useChatSystemMessage
-from toolmate import print1, print2, print3, getPythonFunctionResponse, extractPythonCode, encode_image
+from toolmate import print1, print2, print3, getPythonFunctionResponse, extractPythonCode, encode_image, validParameters
 from typing import Optional
 from llama_cpp import Llama
 from llama_cpp.llama_chat_format import Llava15ChatHandler
@@ -140,7 +140,7 @@ Remember, output the new copy of python code ONLY, without additional notes or e
             arguments = function_call_message["function_call"]["arguments"]
             if not arguments:
                 print2("Generating code ...")
-                response = CallLlamaCpp.getSingleChatResponse(userInput, prefill="```python\n", stop=["```"]).replace(r"\\n", "\n")
+                response = CallLlamaCpp.getSingleChatResponse(userInput, prefill="```python\n", stop=["```"], keepSystemMessage=True).replace(r"\\n", "\n")
                 python_code = extractPythonCode(response)
                 if isValidPythodCode(python_code):
                     arguments = {
@@ -267,7 +267,7 @@ Remember, output the new copy of python code ONLY, without additional notes or e
             return {}
 
     @staticmethod
-    def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[float]=None, max_tokens: Optional[int]=None, prefill: Optional[str]=None, stop: Optional[list]=None):
+    def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[float]=None, max_tokens: Optional[int]=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
         # non-streaming single call
         if userInput:
             item = {"role": "user", "content" : userInput}
@@ -275,7 +275,7 @@ Remember, output the new copy of python code ONLY, without additional notes or e
                 messages.insert(-1, item)
             else:
                 messages.append(item)
-        chatMessages = useChatSystemMessage(copy.deepcopy(messages))
+        chatMessages = copy.deepcopy(messages) if keepSystemMessage else useChatSystemMessage(copy.deepcopy(messages))
         if prefill is not None:
             chatMessages.append({'role': 'assistant', 'content': prefill})
         try:
@@ -346,9 +346,7 @@ Remember, output the new copy of python code ONLY, without additional notes or e
                     tool_response = executeToolFunction(func_arguments={}, function_name=tool_name)
                 else:
                     tool_parameters = CallLlamaCpp.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
-                    if not tool_parameters:
-                        if config.developer:
-                            print1("Failed to extract parameters!")
+                    if not validParameters(tool_parameters, tool_schema["required"]):
                         return CallLlamaCpp.regularCall(messages)
                     # 4. Function Execution
                     tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
@@ -413,7 +411,7 @@ Here is my request:
 
 Remember, response with the required python code ONLY, WITHOUT extra notes or explanations."""
 
-            code = CallLlamaCpp.getSingleChatResponse(code_instruction, ongoingMessages[:-1], temperature, max_tokens, prefill="```python\n", stop=["```"]).replace(r"\\n", "\n")
+            code = CallLlamaCpp.getSingleChatResponse(code_instruction, ongoingMessages[:-1], temperature, max_tokens, prefill="```python\n", stop=["```"], keepSystemMessage=True).replace(r"\\n", "\n")
             code = extractPythonCode(code, keepInvalid=True)
             if len(schema["properties"]) == 1:
                 return {"code": code}

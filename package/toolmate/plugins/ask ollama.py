@@ -12,8 +12,11 @@ from toolmate.utils.call_ollama import CallOllama
 
 def ask_ollama(function_args):
     config.stopSpinning()
-    query = function_args.get("query") # required
-    config.currentMessages[-1] = {"role": "user", "content": query}
+    if function_args:
+        query = function_args.get("query") # required
+        config.currentMessages[-1] = {"role": "user", "content": query}
+    else:
+        query = config.currentMessages[-1]["content"]
     completion = CallOllama.regularCall(config.currentMessages, chat_model=config.ollamaChatModel if config.useAdditionalChatModel else None)
     config.toolmate.streamCompletion(completion, openai=False)
     if config.useAdditionalChatModel and not config.ollamaChatModel == config.ollamaToolModel:
@@ -28,17 +31,13 @@ functionSignature = {
     "description": "Ask an Ollama model to chat or provide information",
     "parameters": {
         "type": "object",
-        "properties": {
-            #"model": {
-            #    "type": "string",
-            #    "description": "The LLM model name, e.g. 'llama3.1', 'llama3.1:8b', etc.",
-            #},
+        "properties": {} if not config.tool_selection_agent else {
             "query": {
                 "type": "string",
-                "description": "The request in detail, including any supplementary information",
+                "description": "The original request in detail, including any supplementary information",
             },
         },
-        "required": ["query"],
+        "required": [] if not config.tool_selection_agent else ["query"],
     },
 }
 

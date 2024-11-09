@@ -230,6 +230,14 @@ Launch a `NEW SESSION` in which you may run ToolMate AI.
 
 ![new_session](https://github.com/user-attachments/assets/3cc9f388-e878-45a6-9ba7-a846fa092c5d)
 
+# How to Update Perplexica?
+```
+cd ~/Perplexica
+git pull
+docker pull
+docker compose up -d
+```
+
 # References
 
 https://github.com/P1N2O/qemu-termux-alpine

@@ -6,15 +6,20 @@ search Tavily
 [TOOL_CALL]
 """
 
+from toolmate import config
+
 if not config.isTermux:
 
-    from toolmate import config, getTavilyClient
+    from toolmate import getTavilyClient
 
     def search_tavily(function_args):
-        query = function_args.get("query") # required
-        config.currentMessages[-1] = {"role": "user", "content": query}
-        context = getTavilyClient().get_search_context(query=query)
         config.stopSpinning()
+        if function_args:
+            query = function_args.get("query")
+            config.currentMessages[-1] = {"role": "user", "content": query}
+        else:
+            query = config.currentMessages[-1]["content"]
+        context = getTavilyClient().get_search_context(query=query)
         return context
 
     functionSignature = {
@@ -25,13 +30,13 @@ if not config.isTermux:
         "description": "Search for online information with Tavily",
         "parameters": {
             "type": "object",
-            "properties": {
+            "properties": {} if not config.tool_selection_agent else {
                 "query": {
                     "type": "string",
                     "description": "The original request in detail, including any supplementary information",
                 },
             },
-            "required": ["query"],
+            "required": [] if not config.tool_selection_agent else ["query"],
         },
     }
 

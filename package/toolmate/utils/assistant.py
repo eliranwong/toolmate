@@ -2645,7 +2645,7 @@ My writing:
 # My Request
 
 {request}"""
-        cli = CallLLM.getSingleChatResponse(instruction, prefill="```\n", stop=["```"])
+        cli = CallLLM.getSingleChatResponse(instruction, prefill="```\n", stop=["```"], keepSystemMessage=True)
         if cli := cli.strip():
             cli = cli[3:-3].strip() if cli.startswith("```") and cli.endswith("```") else re.sub("^.*?```(.*?)```.*?$", r"\1", cli).strip()
         if config.developer:
@@ -2655,16 +2655,17 @@ My writing:
         return cli
 
     def generateSystemCommand(self, request: str):
+        distro = f" '{config.thisDistro}'" if config.thisDistro else ""
         instruction = f"""# Instructions
 
-* Generate a system command line to resolve `My Request` given below.
+* Generate a system command line, that works on {config.thisPlatform}{distro}, to resolve `My Request` given below.
 * Remember, provide me with the generated system command line ONLY, without additional notes or explanations.
 * Enclose the system command line with triple backticks ``` at the beginning and at the end of the command line in your output.
 
 # My Request
 
 {request}"""
-        cli = CallLLM.getSingleChatResponse(instruction, prefill="```\n", stop=["```"])
+        cli = CallLLM.getSingleChatResponse(instruction, prefill="```\n", stop=["```"], keepSystemMessage=True)
         if cli := cli.strip():
             cli = cli[3:-3].strip() if cli.startswith("```") and cli.endswith("```") else re.sub("^.*?```(.*?)```.*?$", r"\1", cli).strip()
         if config.developer:
@@ -2686,7 +2687,7 @@ Acess the risk level of the following `{target.capitalize()}`:
 # {target.capitalize()}
 
 {content}"""
-        risk = CallLLM.getSingleChatResponse(instruction, temperature=0.0, prefill="```\n", stop=["```"])
+        risk = CallLLM.getSingleChatResponse(instruction, temperature=0.0, prefill="```\n", stop=["```"], keepSystemMessage=True)
         if risk := risk.strip():
             risk = risk[3:-3].strip() if risk.startswith("```") and risk.endswith("```") else re.sub("^.*?```(.*?)```.*?$", r"\1", risk).strip()
         if "high" in risk:

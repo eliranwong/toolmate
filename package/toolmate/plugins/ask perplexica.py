@@ -31,8 +31,12 @@ if not isServerAlive(re.sub("http://|https://", "", config.perplexica_server), c
 if isServerAlive(re.sub("http://|https://", "", config.perplexica_server), config.perplexica_backend_port):
 
     def ask_perplexica(function_args):
-
-        query = config.currentMessages[-1]["content"]
+        config.stopSpinning()
+        if function_args:
+            query = function_args.get("query")
+            config.currentMessages[-1] = {"role": "user", "content": query}
+        else:
+            query = config.currentMessages[-1]["content"]
 
         history = []
         for i in config.currentMessages[:-1]:
@@ -130,8 +134,13 @@ if isServerAlive(re.sub("http://|https://", "", config.perplexica_server), confi
         "description": "Request Perplexica to conduct research or provide information through internet searches.",
         "parameters": {
             "type": "object",
-            "properties": {},
-            "required": [],
+            "properties": {} if not config.tool_selection_agent else {
+                "query": {
+                    "type": "string",
+                    "description": "The original request in detail, including any supplementary information",
+                },
+            },
+            "required": [] if not config.tool_selection_agent else ["query"],
         },
     }
 

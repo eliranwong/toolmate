@@ -1,3 +1,17 @@
+# 0.4.94-0.4.98
+
+* improved use of backends Mistral AI and Gemini
+
+* improved use of system messages
+
+* improved a few plugins
+
+* validate extracted parameters for tool calling
+
+* fixed code generation with Mistral AI backend
+
+* added `@search_conversation` tool running on Android Termux
+
 # 0.4.89-0.4.93
 
 * added support of Mistral AI API Keys, read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Mistral%20API%20Setup.md

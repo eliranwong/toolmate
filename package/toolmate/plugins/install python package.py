@@ -11,9 +11,13 @@ from toolmate import installPipPackage
 
 # Function method
 def install_package(function_args):
-    package = function_args.get("package") # required
+    config.stopSpinning()
+    if function_args:
+        package = function_args.get("package") # required
+        #config.currentMessages[-1] = {"role": "user", "content": package}
+    else:
+        package = config.currentMessages[-1]["content"]
     if package:
-        config.stopSpinning()
         install = installPipPackage(f"--upgrade {package}")
         return "Installed!" if install else f"Failed to install '{package}'!"
     return ""
@@ -27,13 +31,13 @@ functionSignature = {
     "description": f'''Install a python package''',
     "parameters": {
         "type": "object",
-        "properties": {
+        "properties": {} if not config.tool_selection_agent else {
             "package": {
                 "type": "string",
                 "description": "Package name",
             },
         },
-        "required": ["package"],
+        "required": [] if not config.tool_selection_agent else ["package"],
     },
 }
 

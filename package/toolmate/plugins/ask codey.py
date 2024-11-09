@@ -19,8 +19,11 @@ if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enable
 
     def ask_codey(function_args):
         config.stopSpinning()
-        query = function_args.get("query") # required
-        config.currentMessages[-1] = {"role": "user", "content": query}
+        if function_args:
+            query = function_args.get("query") # required
+            config.currentMessages[-1] = {"role": "user", "content": query}
+        else:
+            query = config.currentMessages[-1]["content"]
 
         model = CodeChatModel.from_pretrained("codechat-bison-32k")
         # https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/text-chat
@@ -65,13 +68,13 @@ if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enable
         "description": "Ask Codey for information about coding",
         "parameters": {
             "type": "object",
-            "properties": {
+            "properties": {} if not config.tool_selection_agent else {
                 "query": {
                     "type": "string",
-                    "description": "The request in detail, including any supplementary information",
+                    "description": "The original request in detail, including any supplementary information",
                 },
             },
-            "required": ["query"],
+            "required": [] if not config.tool_selection_agent else ["query"],
         },
     }
 

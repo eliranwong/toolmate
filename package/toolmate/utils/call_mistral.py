@@ -1,6 +1,6 @@
 from toolmate import showErrors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution, useChatSystemMessage
 from toolmate import config
-from toolmate import print1, print2, print3, check_llm_errors, getMistralClient, toParameterSchema, extractPythonCode
+from toolmate import print1, print2, print3, check_llm_errors, getMistralClient, toParameterSchema, extractPythonCode, validParameters
 import re, traceback, pprint, copy, textwrap, json, pygments
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit import print_formatted_text, HTML
@@ -25,7 +25,7 @@ Acess the risk level of this Python code:
 {code}
 ```"""
         try:
-            answer = CallMistral.getSingleChatResponse(content, temperature=0.0)
+            answer = CallMistral.getSingleChatResponse(content, temperature=0.0, keepSystemMessage=True)
             if not answer:
                 answer = "high"
             answer = re.sub("[^A-Za-z]", "", answer).lower()
@@ -87,7 +87,7 @@ Acess the risk level of this Python code:
 
     @staticmethod
     @check_llm_errors
-    def getSingleChatResponse(userInput, messages=[], temperature: Optional[float]=None, max_tokens: Optional[int]=None, prefill: Optional[str]=None, stop: Optional[list]=None):
+    def getSingleChatResponse(userInput, messages=[], temperature: Optional[float]=None, max_tokens: Optional[int]=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
         """
         non-streaming single call
         """
@@ -97,13 +97,14 @@ Acess the risk level of this Python code:
                 messages.insert(-1, item)
             else:
                 messages.append(item)
-        chatMessages = useChatSystemMessage(copy.deepcopy(messages), mergeSystemIntoUserMessage=True)
+        chatMessages = useChatSystemMessage(copy.deepcopy(messages), mergeSystemIntoUserMessage=True, thisSystemMessage=config.systemMessage_tool_current if keepSystemMessage else "")
+        chatMessagesCopy = None
         if prefill is not None:
-            chatMessages.append({'role': 'assistant', 'content': prefill})
+            chatMessagesCopy = chatMessages + [{'role': 'assistant', 'content': prefill, "prefix": True}]
         try:
             completion = getMistralClient().chat.complete(
                 model=config.mistralApi_tool_model,
-                messages=chatMessages,
+                messages=chatMessagesCopy if chatMessagesCopy is not None else chatMessages,
                 n=1,
                 temperature=temperature if temperature is not None else config.llmTemperature,
                 max_tokens=max_tokens if max_tokens is not None else config.mistralApi_tool_model_max_tokens,
@@ -286,9 +287,7 @@ Acess the risk level of this Python code:
                     tool_response = executeToolFunction(func_arguments={}, function_name=tool_name)
                 else:
                     tool_parameters = CallMistral.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
-                    if not tool_parameters:
-                        if config.developer:
-                            print1("Failed to extract parameters!")
+                    if not validParameters(tool_parameters, tool_schema["parameters"]["required"]):
                         return CallMistral.regularCall(messages)
                     # 4. Function Execution
                     tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
@@ -355,7 +354,8 @@ Here is my request:
 
 Remember, response with the required python code ONLY, WITHOUT extra notes or explanations."""
 
-            code = CallMistral.getSingleChatResponse(code_instruction, ongoingMessages[:-1], temperature, max_tokens, prefill="```python\n", stop=["```"]).replace(r"\\n", "\n")
+            #code = CallMistral.getSingleChatResponse(code_instruction, ongoingMessages[:-1], temperature, max_tokens, prefill="```python\n", stop=["```"], keepSystemMessage=True).replace(r"\\n", "\n")
+            code = CallMistral.getSingleChatResponse(code_instruction, ongoingMessages[:-1], temperature, max_tokens, keepSystemMessage=True).replace(r"\\n", "\n")
             code = extractPythonCode(code, keepInvalid=True)
             if len(schema["properties"]) == 1:
                 return {"code": code}

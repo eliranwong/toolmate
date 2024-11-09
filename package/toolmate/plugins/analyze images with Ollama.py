@@ -60,7 +60,7 @@ def analyze_images_ollama(function_args):
 
     if content:
         config.currentMessages[-1] = {'role': 'user', 'content': query, 'images': files}
-        answer = CallOllama.getSingleChatResponse("", config.currentMessages, model=config.ollamaVisionModel)
+        answer = CallOllama.getSingleChatResponse("", config.currentMessages, model=config.ollamaVisionModel, keepSystemMessage=True)
         config.toolTextOutput = answer
         print2("```assistant")
         print1(answer)

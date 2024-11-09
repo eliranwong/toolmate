@@ -14,8 +14,11 @@ if not config.isTermux:
     def ask_llamacpp(function_args):
         chatModel = None
         config.stopSpinning()
-        query = function_args.get("query") # required
-        config.currentMessages[-1] = {"role": "user", "content": query}
+        if function_args:
+            query = function_args.get("query") # required
+            config.currentMessages[-1] = {"role": "user", "content": query}
+        else:
+            query = config.currentMessages[-1]["content"]
         if config.useAdditionalChatModel:
             chatModel = loadLlamacppChatModel()
             completion = CallLlamaCpp.regularCall(config.currentMessages, model=chatModel)
@@ -38,13 +41,13 @@ if not config.isTermux:
         "description": "Ask Llama.cpp to chat or provide information",
         "parameters": {
             "type": "object",
-            "properties": {
+            "properties": {} if not config.tool_selection_agent else {
                 "query": {
                     "type": "string",
                     "description": "The original request in detail, including any supplementary information",
                 },
             },
-            "required": ["query"],
+            "required": [] if not config.tool_selection_agent else ["query"],
         },
     }
 

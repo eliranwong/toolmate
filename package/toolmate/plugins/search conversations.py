@@ -145,3 +145,41 @@ if not config.isTermux:
     config.inputSuggestions += ["Search chat records: ", "Load chat records with this ID: ", "Load chat records in this file: "]
     config.addFunctionCall(signature=functionSignature1, method=search_conversations)
     config.addFunctionCall(signature=functionSignature2, method=load_conversations)
+
+else:
+
+    import os
+
+    def search_conversations(function_args):
+        config.stopSpinning()
+        if function_args:
+            query = function_args.get("query")
+            config.currentMessages[-1] = {"role": "user", "content": query}
+        else:
+            query = config.currentMessages[-1]["content"]
+        query = query.replace('"', '\\"')
+        chatFolder = os.path.join(config.localStorage, "chats")
+        # Linux/macOS: find chats/ -name "*.txt" -type f -exec grep -rin --color=auto "your_string" {} +
+        # Windows: findstr /s "your_string" *.txt /path/to/your/folder
+        cli = '''find {0} -name "*.txt" -type f -exec grep -Erin --color=auto "{1}" {2}{3} +'''.format(chatFolder, query, "{", "}")
+        os.system(cli)
+        return ""
+
+    functionSignature1 = {
+        "examples": [],
+        "name": "search_conversations",
+        "description": """Search chat records or conversations""",
+        "parameters": {
+            "type": "object",
+            "properties": {} if not config.tool_selection_agent else {
+                "query": {
+                    "type": "string",
+                    "description": "The search query in detail",
+                },
+            },
+            "required": [] if not config.tool_selection_agent else ["query"],
+        },
+    }
+
+    config.inputSuggestions += ["Search chat records: "]
+    config.addFunctionCall(signature=functionSignature1, method=search_conversations)

@@ -147,14 +147,14 @@ defaultSettings = (
     ('whispercpp_model', ''), # whisper.cpp model file path
     ('whispercpp_additional_options', ''), # whisper.cpp additional options. See https://github.com/ggerganov/whisper.cpp/tree/master/examples/main for all options.
     ('cpu_threads', 0),
-    # common configs as in LetMeDoIt AI
+    # common configs as in ToolMate AI
     ('translateToLanguage', 'English'),
     ('dynamicTokenCount', False),
     ('use_oai_assistant', False), # support OpenAI Assistants API in AutoGen Agent Builder
     ('max_agents', 5), # maximum number of agents build manager can create.
     ('max_group_chat_round', 12), # AutoGen group chat maximum round
     ('env_QT_QPA_PLATFORM_PLUGIN_PATH', ''), # e.g. # deal with error: qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "~/apps/letmedoit/lib/python3.10/site-packages/cv2/qt/plugins" even though it was found.
-    ('systemMessage_tool', ''), # letmedoit system message
+    ('systemMessage_tool', ''), # toolmate system message
     ('systemMessage_ollama', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone ollama chatbot
     ('systemMessage_groq', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone groq chatbot
     ('systemMessage_mistral', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone mistral chatbot
@@ -313,6 +313,7 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "systemMessage_tool_current",
     "completer_user",
     "completer_developer",
     "actionKeys",

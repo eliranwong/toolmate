@@ -1011,6 +1011,18 @@ def is_valid_image_file(file_path):
 
 # call llm
 
+def validParameters(tool_parameters, requirements):
+    if not isinstance(tool_parameters, dict) or not tool_parameters:
+        return False
+    isValid = True
+    for i in requirements:
+        if not i in tool_parameters:
+            isValid = False
+            break
+    if not isValid and config.developer:
+        print2("Invalid parameters not processed!")
+    return isValid
+
 def executeToolFunction(func_arguments: dict, function_name: str):
     def notifyDeveloper(func_name):
         if config.developer:
@@ -1050,12 +1062,14 @@ def toChatml(messages: dict=[], use_system_message=True) -> str:
             messages_str += roles[role].format(content=content)
     return messages_str.rstrip()
 
-def useChatSystemMessage(messages: dict, mergeSystemIntoUserMessage=False) -> dict:
+def useChatSystemMessage(messages: dict, mergeSystemIntoUserMessage=False, thisSystemMessage="") -> dict:
     #for i in messages:
     for index, i in enumerate(reversed(messages)):
         if i.get("role", "") == "system":
             originalIndex = len(messages) - index - 1
-            if config.tempChatSystemMessage:
+            if thisSystemMessage:
+                messages[originalIndex]["content"] = thisSystemMessage
+            elif config.tempChatSystemMessage:
                 messages[originalIndex]["content"] = config.tempChatSystemMessage
                 config.tempChatSystemMessage = ""
             elif config.llmInterface == "ollama":

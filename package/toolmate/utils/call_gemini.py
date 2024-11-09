@@ -1,5 +1,5 @@
 from toolmate import getDeviceInfo, showErrors, toGeminiMessages, executeToolFunction, extractPythonCode
-from toolmate import print1, print2, print3, getPythonFunctionResponse, isValidPythodCode
+from toolmate import print1, print2, print3, getPythonFunctionResponse, isValidPythodCode, validParameters, useChatSystemMessage
 from toolmate import config
 from prompt_toolkit import prompt
 import traceback, os, json, pprint, copy, datetime, codecs
@@ -117,12 +117,13 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     def regularCall(messages: dict, useSystemMessage: bool=True, **kwargs):
-        history, _, lastUserMessage = toGeminiMessages(messages=messages)
+        chatMessages = useChatSystemMessage(copy.deepcopy(messages), mergeSystemIntoUserMessage=True)
+        history, _, lastUserMessage = toGeminiMessages(messages=chatMessages)
         #userMessage = f"{systemMessage}\n\nHere is my request:\n{lastUserMessage}" if useSystemMessage and systemMessage else lastUserMessage
-        userMessage = f"{config.systemMessage_gemini}\n\nHere is my request:\n{lastUserMessage}" if useSystemMessage and config.systemMessage_gemini else lastUserMessage
+        #userMessage = f"{config.systemMessage_gemini}\n\nHere is my request:\n{lastUserMessage}" if useSystemMessage and config.systemMessage_gemini else lastUserMessage
         chat = CallGemini.getGeminiModel().start_chat(history=history)
         return chat.send_message(
-            userMessage,
+            lastUserMessage,
             generation_config=config.gemini_generation_config,
             safety_settings=config.gemini_safety_settings,
             stream=True,
@@ -232,9 +233,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                     tool_response = executeToolFunction(func_arguments={}, function_name=tool_name)
                 else:
                     tool_parameters = CallGemini.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
-                    if not tool_parameters:
-                        if config.developer:
-                            print1("Failed to extract parameters!")
+                    if not validParameters(tool_parameters, tool_schema["parameters"]["required"]):
                         return CallGemini.regularCall(messages)
                     # 4. Function Execution
                     tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)

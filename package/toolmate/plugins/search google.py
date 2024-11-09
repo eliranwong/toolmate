@@ -14,9 +14,12 @@ import json, googlesearch
 # Use google https://pypi.org/project/googlesearch-python/ to search internet for information, about which ChatGPT doesn't know.
 
 def search_google(function_args):
-    # retrieve argument values from a dictionary
-    #print(function_args)
-    keywords = function_args.get("keywords") # required
+    config.stopSpinning()
+    if function_args:
+        keywords = function_args.get("keywords")
+        #config.currentMessages[-1] = {"role": "user", "content": keywords}
+    else:
+        keywords = config.currentMessages[-1]["content"]
 
     print1("Loading internet searches ...")
 
@@ -33,22 +36,18 @@ def search_google(function_args):
     return json.dumps(info)
 
 functionSignature = {
-    "examples": [
-        "access real-time information",
-        "search online",
-        "Google search",
-    ],
+    "examples": [],
     "name": "search_google",
     "description": "Search Google for real-time information or latest updates when LLM lacks information",
     "parameters": {
         "type": "object",
-        "properties": {
+        "properties": {} if not config.tool_selection_agent else {
             "keywords": {
                 "type": "string",
-                "description": "keywords for searches, e.g. ChatGPT",
+                "description": "Keywords for online searches",
             },
         },
-        "required": ["keywords"],
+        "required": [] if not config.tool_selection_agent else ["keywords"],
     },
 }
 

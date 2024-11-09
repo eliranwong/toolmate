@@ -18,8 +18,11 @@ if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enable
 
     def ask_gemini(function_args):
         config.stopSpinning()
-        query = function_args.get("query") # required
-        config.currentMessages[-1] = {"role": "user", "content": query}
+        if function_args:
+            query = function_args.get("query") # required
+            config.currentMessages[-1] = {"role": "user", "content": query}
+        else:
+            query = config.currentMessages[-1]["content"]
         completion = CallGemini.regularCall(config.currentMessages)
         config.toolmate.streamCompletion(completion, openai=False)
         return ""
@@ -32,13 +35,13 @@ if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enable
         "description": "Ask Gemini to chat or provide information",
         "parameters": {
             "type": "object",
-            "properties": {
+            "properties": {} if not config.tool_selection_agent else {
                 "query": {
                     "type": "string",
                     "description": "The original request in detail, including any supplementary information",
                 },
             },
-            "required": ["query"],
+            "required": [] if not config.tool_selection_agent else ["query"],
         },
     }
 

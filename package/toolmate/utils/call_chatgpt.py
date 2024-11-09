@@ -1,6 +1,6 @@
 from toolmate import showErrors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution, useChatSystemMessage
 from toolmate import config
-from toolmate import print1, print2, print3, getDynamicTokens, selectTool, selectEnabledTool
+from toolmate import print1, print2, print3, getDynamicTokens, selectTool, selectEnabledTool, validParameters
 import re, traceback, openai, pprint, copy, textwrap, json, pygments
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit import print_formatted_text, HTML
@@ -98,7 +98,7 @@ Acess the risk level of this Python code:
 {code}
 ```"""
     try:
-        answer = getSingleChatResponse(content, temperature=0.0)
+        answer = getSingleChatResponse(content, temperature=0.0, keepSystemMessage=True)
         if not answer:
             answer = "high"
         answer = re.sub("[^A-Za-z]", "", answer).lower()
@@ -164,7 +164,7 @@ def getToolArgumentsFromStreams(completion):
     return toolArguments
 
 @check_openai_errors
-def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None):
+def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
     """
     non-streaming single call
     """
@@ -174,7 +174,7 @@ def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Opt
             messages.insert(-1, item)
         else:
             messages.append(item)
-    chatMessages = useChatSystemMessage(copy.deepcopy(messages))
+    chatMessages = copy.deepcopy(messages) if keepSystemMessage else useChatSystemMessage(copy.deepcopy(messages))
     if prefill is not None:
             chatMessages.append({'role': 'assistant', 'content': prefill})
     try:
@@ -320,8 +320,8 @@ class CallChatGPT:
 
     @staticmethod
     @check_openai_errors
-    def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None):
-        return getSingleChatResponse(userInput, messages, temperature, prefill, stop)
+    def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
+        return getSingleChatResponse(userInput, messages, temperature, prefill, stop, keepSystemMessage)
 
     @staticmethod
     def finetuneSingleFunctionCallResponse(func_arguments, function_name):
@@ -387,12 +387,11 @@ class CallChatGPT:
             try:
                 if not tool_schema["parameters"]["properties"]:
                     # Execute function directly
-                    tool_response = executeToolFunction(func_arguments={}, function_name=tool_name)
+                    tool_parameters = {}
+                    tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
                 else:
                     tool_parameters = CallChatGPT.getDictionaryOutput(messages=messages, schema=tool_schema)
-                    if not tool_parameters:
-                        if config.developer:
-                            print1("Failed to extract parameters!")
+                    if not validParameters(tool_parameters, tool_schema["parameters"]["required"]):
                         return CallChatGPT.regularCall(messages)
                     # 4. Function Execution
                     tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
@@ -467,8 +466,8 @@ class CallLetMeDoIt:
 
     @staticmethod
     @check_openai_errors
-    def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None):
-        return getSingleChatResponse(userInput, messages, temperature, prefill, stop)
+    def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
+        return getSingleChatResponse(userInput, messages, temperature, prefill, stop, keepSystemMessage)
 
     @staticmethod
     def finetuneSingleFunctionCallResponse(func_arguments, function_name):

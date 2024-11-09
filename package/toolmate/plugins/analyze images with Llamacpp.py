@@ -74,24 +74,8 @@ if not config.isTermux:
                 files.remove(i)
 
         if content:
-            if llmInterface in ("chatgpt", "letmedoit"):
-                client = OpenAI()
-            elif llmInterface == "llamacpp":
-                # start llama.cpp vision server
-                startLlamacppVisionServer()
-                client = OpenAI(base_url=f"http://localhost:{config.llamacppVisionModel_server_port}/v1", api_key="toolmate")
-            elif llmInterface == "llamacppserver":
-                # start llama.cpp vision server
-                runToolMateCommand("customvisionserver")
-                client = getLlamacppServerClient("vision")
-            elif llmInterface in ("ollama", "groq"):
-                config.currentMessages[-1] = {'role': 'user', 'content': query, 'images': files}
-                answer = CallOllama.getSingleChatResponse("", config.currentMessages, model=config.ollamaVisionModel)
-                config.toolTextOutput = answer
-                print2("```assistant")
-                print1(answer)
-                print2("```")
-                return ""
+            # start llama.cpp vision server
+            startLlamacppVisionServer()
 
             content.insert(0, {"type": "text", "text": query,})
 

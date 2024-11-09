@@ -20,11 +20,14 @@ class CallLLM:
             CallOllama.unloadModels()
         #elif config.llmInterface == "llamacpp":
         #    CallLlamaCpp.unloadModels()
-        distro = f" '{config.thisDistro}'" if config.thisDistro else ""
-        systemMessage1 = config.systemMessage_tool if config.systemMessage_tool else f'''You’re {config.toolMateAIName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my {config.thisPlatform} device. When you need to generate code, please make sure your code work on {config.thisPlatform}{distro}. Your functionality expands as I add more plugins to you.
-Always remember that you are much more than a text-based AI. You possess both vision and speech capabilities and have direct access to my device operating system, enabling you to execute tasks at my command. Please do not state otherwise.'''
 
-        systemMessage2 = config.systemMessage_tool if config.systemMessage_tool else f'''You’re {config.toolMateAIName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device.
+        if config.systemMessage_tool:
+
+            config.systemMessage_tool_current = config.systemMessage_tool
+        
+        elif config.llmInterface in ("chatgpt", "letmedoit"):
+
+            config.systemMessage_tool_current = f'''You’re {config.toolMateAIName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device.
 I am providing the basic information of my device below in case you need it:
 ```
 {getDeviceInfo()}
@@ -41,10 +44,15 @@ Remember, do not use function call if it is a translation task.
 Always remember that you are much more than a text-based AI. You possess both vision and speech capabilities and have direct access to my device's system, enabling you to execute tasks at my command. Please do not state otherwise.
 '''
 
-        systemMessage = systemMessage2 if config.llmInterface in ("chatgpt", "letmedoit") else systemMessage1
+        else:
+
+            # other backends
+            distro = f" '{config.thisDistro}'" if config.thisDistro else ""
+            config.systemMessage_tool_current = f'''You’re {config.toolMateAIName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my {config.thisPlatform} device. When you need to generate code, please make sure your code work on {config.thisPlatform}{distro}. Your functionality expands as I add more plugins to you.
+Always remember that you are much more than a text-based AI. You possess both vision and speech capabilities and have direct access to my device operating system, enabling you to execute tasks at my command. Please do not state otherwise.'''
 
         messages = [
-            {"role": "system", "content": systemMessage}
+            {"role": "system", "content": config.systemMessage_tool_current}
         ]
         if prompt:
             messages.append({"role": "user", "content": prompt})
@@ -128,28 +136,36 @@ Always remember that you are much more than a text-based AI. You possess both vi
         return CallChatGPT.regularCall(chatMessages)
 
     @staticmethod
-    def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=[]):
+    def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=[], keepSystemMessage: bool=False):
         """
         non-streaming single call
         """
-        chatMessages = useChatSystemMessage(copy.deepcopy(messages))
+        chatMessages = copy.deepcopy(messages) if keepSystemMessage else useChatSystemMessage(copy.deepcopy(messages))
         if config.llmInterface == "ollama":
-            return CallOllama.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop)
+            return CallOllama.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "groq":
-            return CallGroq.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop)
+            return CallGroq.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "mistral":
-            return CallMistral.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop)
+            return CallMistral.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "llamacppserver":
-            return CallLlamaCppServer.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature)
+            return CallLlamaCppServer.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "llamacpp":
-            return CallLlamaCpp.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature)
+            return CallLlamaCpp.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "gemini":
-            history, *_ = toGeminiMessages(messages=chatMessages)
+            history, systemMessage, lastUserMessage = toGeminiMessages(messages=chatMessages)
+            if userInput.strip() and systemMessage:
+                userInput = f"""# Your role\n\n{systemMessage}\n\n# My Inquiry\n\n{userMessage}"""
+            elif not userInput.strip() and lastUserMessage.strip() and systemMessage:
+                userInput = f"""# Your role\n\n{systemMessage}\n\n# My Inquiry\n\n{lastUserMessage}"""
+            elif not userInput.strip() and lastUserMessage.strip():
+                userInput = lastUserMessage
             return CallGemini.getSingleChatResponse(userInput, history=history)
+            #history, *_ = toGeminiMessages(messages=chatMessages)
+            #return CallGemini.getSingleChatResponse(userInput, history=history)
         elif config.llmInterface == "chatgpt":
-            return CallChatGPT.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature)
+            return CallChatGPT.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         # letmedoit
-        return CallLetMeDoIt.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature)
+        return CallLetMeDoIt.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
 
     @staticmethod
     def getSingleFunctionCallResponse(messages, function_name, temperature=None):

@@ -1,5 +1,5 @@
 from toolmate import showErrors, isValidPythodCode, executeToolFunction, toParameterSchema, useChatSystemMessage
-from toolmate import print1, print2, print3, getPythonFunctionResponse, extractPythonCode, isValidPythodCode
+from toolmate import print1, print2, print3, getPythonFunctionResponse, extractPythonCode, isValidPythodCode, validParameters
 from toolmate import config, getOllamaServerClient
 import shutil, re, traceback, json, ollama, pprint, copy, datetime
 from typing import Optional
@@ -66,7 +66,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             arguments = function_call_message["function_call"]["arguments"]
             if not arguments:
                 print2("Generating code ...")
-                response = CallOllama.getSingleChatResponse(userInput, prefill="```python\n", stop=["```"]).replace(r"\\n", "\n")
+                response = CallOllama.getSingleChatResponse(userInput, prefill="```python\n", stop=["```"], keepSystemMessage=True).replace(r"\\n", "\n")
                 python_code = extractPythonCode(response)
                 if isValidPythodCode(python_code):
                     arguments = {
@@ -166,7 +166,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     @check_ollama_errors
-    def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, model: Optional[str]=None, prefill: Optional[str]=None, stop: Optional[list]=None):
+    def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, model: Optional[str]=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
         # non-streaming single call
         if userInput:
             item = {"role": "user", "content" : userInput}
@@ -174,7 +174,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                 messages.insert(-1, item)
             else:
                 messages.append(item)
-        chatMessages = useChatSystemMessage(copy.deepcopy(messages))
+        chatMessages = copy.deepcopy(messages) if keepSystemMessage else useChatSystemMessage(copy.deepcopy(messages))
         if prefill is not None:
             chatMessages.append({'role': 'assistant', 'content': prefill})
         try:
@@ -252,9 +252,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                     tool_response = executeToolFunction(func_arguments={}, function_name=tool_name)
                 else:
                     tool_parameters = CallOllama.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
-                    if not tool_parameters:
-                        if config.developer:
-                            print1("Failed to extract parameters!")
+                    if not validParameters(tool_parameters, tool_schema["required"]):
                         return CallOllama.regularCall(messages)
                     # 4. Function Execution
                     tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
@@ -315,7 +313,7 @@ Here is my request:
 
 Remember, response with the required python code ONLY, WITHOUT extra notes or explanations."""
 
-            code = CallOllama.getSingleChatResponse(code_instruction, ongoingMessages[:-1], prefill="```python\n", stop=["```"]).replace(r"\\n", "\n")
+            code = CallOllama.getSingleChatResponse(code_instruction, ongoingMessages[:-1], prefill="```python\n", stop=["```"], keepSystemMessage=True).replace(r"\\n", "\n")
             code = extractPythonCode(code, keepInvalid=True)
             if len(schema["properties"]) == 1:
                 return {"code": code}

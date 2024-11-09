@@ -10,8 +10,12 @@ from toolmate import config, openURL
 import urllib.parse
 
 def send_tweet(function_args):
-    message = function_args.get("message") # required
     config.stopSpinning()
+    if function_args:
+        message = function_args.get("message") # required
+        #config.currentMessages[-1] = {"role": "user", "content": message}
+    else:
+        message = config.currentMessages[-1]["content"]
     if message:
         openURL(f"""https://twitter.com/intent/tweet?text={urllib.parse.quote(message)}""")
     return ""
@@ -25,13 +29,13 @@ functionSignature = {
     "description": f'''Send a tweet to twitter''',
     "parameters": {
         "type": "object",
-        "properties": {
+        "properties": {} if not config.tool_selection_agent else {
             "message": {
                 "type": "string",
                 "description": "The message that is to be sent to twitter",
             },
         },
-        "required": ["message"],
+        "required": [] if not config.tool_selection_agent else ["message"],
     },
 }
 

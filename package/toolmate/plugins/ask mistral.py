@@ -11,10 +11,13 @@ from toolmate import config
 from toolmate.utils.call_mistral import CallMistral
 
 def ask_mistral(function_args):
-    query = function_args.get("query") # required
-    config.currentMessages[-1] = {"role": "user", "content": query}
-    completion = CallMistral.regularCall(config.currentMessages, chat_model=config.mistralApi_chat_model if config.useAdditionalChatModel else None, max_tokens=config.mistralApi_chat_model_max_tokens if config.useAdditionalChatModel else None)
     config.stopSpinning()
+    if function_args:
+        query = function_args.get("query") # required
+        config.currentMessages[-1] = {"role": "user", "content": query}
+    else:
+        query = config.currentMessages[-1]["content"]
+    completion = CallMistral.regularCall(config.currentMessages, chat_model=config.mistralApi_chat_model if config.useAdditionalChatModel else None, max_tokens=config.mistralApi_chat_model_max_tokens if config.useAdditionalChatModel else None)
     config.toolmate.streamCompletion(completion, openai=True)
     return ""
 
@@ -26,13 +29,13 @@ functionSignature = {
     "description": "Ask Mistral to chat or provide information",
     "parameters": {
         "type": "object",
-        "properties": {
+        "properties": {} if not config.tool_selection_agent else {
             "query": {
                 "type": "string",
                 "description": "The original request in detail, including any supplementary information",
             },
         },
-        "required": ["query"],
+        "required": [] if not config.tool_selection_agent else ["query"],
     },
 }
 

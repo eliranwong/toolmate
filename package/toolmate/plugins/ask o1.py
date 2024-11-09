@@ -16,8 +16,11 @@ try:
 
     def ask_o1(function_args):
         config.stopSpinning()
-        query = function_args.get("query") # required
-        config.currentMessages[-1] = {"role": "user", "content": query}
+        if function_args:
+            query = function_args.get("query") # required
+            config.currentMessages[-1] = {"role": "user", "content": query}
+        else:
+            query = config.currentMessages[-1]["content"]
 
         # read beta limitations at https://platform.openai.com/docs/guides/reasoning/beta-limitations
         chatMessages = useChatSystemMessage(copy.deepcopy(config.currentMessages))
@@ -39,13 +42,13 @@ try:
         "description": "Ask reasoning model o1 to chat or provide information",
         "parameters": {
             "type": "object",
-            "properties": {
+            "properties": {} if not config.tool_selection_agent else {
                 "query": {
                     "type": "string",
                     "description": "The original request in detail, including any supplementary information",
                 },
             },
-            "required": ["query"],
+            "required": [] if not config.tool_selection_agent else ["query"],
         },
     }
 

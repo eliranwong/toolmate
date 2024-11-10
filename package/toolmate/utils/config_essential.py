@@ -289,7 +289,7 @@ defaultSettings = (
     ("hotkey_launch_pager_view", ["c-p"]),
     ("hotkey_toggle_developer_mode", ["escape", "d"]),
     ("hotkey_toggle_multiline_entry", ["escape", "l"]),
-    #("hotkey_list_directory_content", ["c-l"]),
+    ("hotkey_list_directory_content", ["c-l"]),
     ("hotkey_launch_system_prompt", ["escape", "t"]),
     ("hotkey_voice_generation_config", ["escape", "v"]),
     ("hotkey_voice_entry", ["c-s"]),

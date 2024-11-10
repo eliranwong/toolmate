@@ -1,4 +1,4 @@
-# 0.4.94-0.4.98
+# 0.4.94-0.5.01
 
 * improved use of backends Mistral AI and Gemini
 
@@ -9,6 +9,8 @@
 * validate extracted parameters for tool calling
 
 * fixed code generation with Mistral AI backend
+
+* a few fixes
 
 * added `@search_conversation` tool running on Android Termux
 

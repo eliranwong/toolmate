@@ -650,6 +650,9 @@ def displayLoadedMessages(messages):
             if role == 'assistant' and not index == len(messages) - 2:
                 print("")
     print("")
+    # allow save, saveas, export
+    if messages:
+        config.conversationStarted = True
 
 def refinePath(docs_path):
     docs_path = docs_path.strip()

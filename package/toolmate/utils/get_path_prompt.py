@@ -214,7 +214,8 @@ class GetPath:
                     # use read command for auto-suggestion of filepath
                     # –e: use the Bash built-in Readline library to read the input line
                     # –p: prompt: print the prompt text before requesting the input from the standard input stream without a <newline> character
-                    userInput = subprocess.check_output(f'read -e -p "{indicator}" var ; echo $var', shell=True).strip()
+                    cli = f'read -p "{indicator}" var ; echo $var' if config.isTermux else f'read -e -p "{indicator}" var ; echo $var'
+                    userInput = subprocess.check_output(cli, shell=True).strip()
                     userInput = userInput.decode("utf-8")
                 
             userInput = refinePath(userInput)

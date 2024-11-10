@@ -73,7 +73,7 @@ Though you may run fabric alone in terminal, like:
 ```
 fabric -p write_essay "What is machine learning?" | fabric -p extract_wisdom | fabric -p summarize
 ```
-Text output in intermediate steps are not visible. You can, however, visual all text-output by running fabric with ToolMate AI, e.g.:
+The text output in intermediate steps, with fabric alone, are not visible. You can, however, visualize all text-output by running fabric with ToolMate AI, e.g.:
 
 ```
 @fabric -m gemini-1.5-pro -p write_essay "What is machine learning?"

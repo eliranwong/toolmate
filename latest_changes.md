@@ -1,3 +1,13 @@
+# 0.5.02
+
+* added a combination for inserting the best-liked entry
+
+* a few changes on default key combination, enter `.keys` for more information
+
+* a few tweaks
+
+* reload plugins after changing the tool-selection agent setting
+
 # 0.4.94-0.5.01
 
 * improved use of backends Mistral AI and Gemini

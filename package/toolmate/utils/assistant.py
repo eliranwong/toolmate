@@ -147,7 +147,7 @@ class ToolMate:
             # session
             ".new": (f"start a new conversation {str(config.hotkey_new)}", None),
             ".open": (f"open a saved conversation {str(config.hotkey_open_chat_records)}", None),
-            ".last": (f"open previous conversation {str(config.hotkey_open_previous_conversation)}", None),
+            ".last": (f"open previous conversation {str(config.hotkey_open_last_conversation)}", None),
             ".read": (f"read current conversation {str(config.hotkey_read_conversation)}", self.readCurrentMessages),
             ".edit": (f"edit current conversation {str(config.hotkey_edit_last_response)}", self.editCurrentConversation),
             ".trim": (f"trim current conversation", self.trimCurrentConversation),
@@ -202,11 +202,12 @@ class ToolMate:
             ".toggledeveloper": (f"toggle developer mode {str(config.hotkey_toggle_developer_mode)}", self.toggleDeveloperMode),
             ".togglemultiline": (f"toggle multi-line input {str(config.hotkey_toggle_multiline_entry)}", self.toggleMultiline),
             ".togglemousesupport": (f"toogle mouse support {str(config.hotkey_toggle_mouse_support)}", self.toggleMouseSupport),
-            ".toggletextbrightness": (f"swap text brightness {str(config.hotkey_swap_text_brightness)}", swapTerminalColors),
             ".togglewordwrap": (f"toggle word wrap {str(config.hotkey_toggle_word_wrap)}", self.toggleWordWrap),
             ".toggleinputimprovement": (f"toggle input improvement {str(config.hotkey_toggle_input_improvement)}", self.toggleInputImprovement),
             ".toggleinputaudio": (f"toggle input audio {str(config.hotkey_toggle_input_audio)}", toggleinputaudio),
             ".toggleoutputaudio": (f"toggle output audio {str(config.hotkey_toggle_response_audio)}", toggleoutputaudio),
+            ".toggletextbrightness": (f"toggle text brightness", swapTerminalColors),
+            #".toggletextbrightness": (f"toggle text brightness {str(config.hotkey_swap_text_brightness)}", swapTerminalColors),
             # editor
             ".editor": ("change custom text editor", self.setCustomTextEditor),
             ".editconfigs": ("edit configuration settings", self.editConfigs),
@@ -1237,12 +1238,16 @@ class ToolMate:
         return False
 
     def setToolSelectionConfigs(self):
+        tool_selection_agent = config.tool_selection_agent
         self.configureToolSelectionAgent()
         if config.tool_selection_agent:
             self.configureToolSelectionRequirements()
             self.configureAutoToolSelection()
         else:
             self.setDefaultTool()
+        if not tool_selection_agent == config.tool_selection_agent:
+            # reload plugins as some plugins changes with config.tool_selection_agent value
+            Plugins.runPlugins()
 
     def selectLlmPlatform(self):
         instruction = "Select an AI platform:"
@@ -1760,14 +1765,23 @@ class ToolMate:
             AutoGenBuilder().promptConfig()
 
     def setFavorite_string(self):
-        print2("You can pre-define a favourite string that you use most.")
-        print1(f"It is inserted automatically when you pressing the key combo {str(config.hotkey_insert_favorite_string)}.")
-        print1("Set your favourite string below:")
+        hotkey_insert_bestliked_entry = str(config.hotkey_insert_bestliked_entry)[2:-2].replace("c-", "Ctrl+")
+        hotkey_insert_favorite_entry = str(config.hotkey_insert_favorite_entry)[2:-2].replace("c-", "Ctrl+")
+        print2(f"Two key combinations `{hotkey_insert_bestliked_entry}` and `{hotkey_insert_favorite_entry}` are used for inserting most frequently entries easily.")
+        # best-link entry
+        print1(f"Enter your best-liked entry that is inserted automatically with the key combo `{hotkey_insert_bestliked_entry}`:")
+        favorite_string_best = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.favorite_string_best)
+        if favorite_string_best and not favorite_string_best.strip().lower() == config.exit_entry:
+            config.favorite_string_best = favorite_string_best
+            config.saveConfig()
+            print3(f"Favourite entry changed: {config.favorite_string_best}")
+        # favourite entry
+        print1(f"Enter your favourite entry that is inserted automatically with the key combo `{hotkey_insert_favorite_entry}`:")
         favorite_string = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.favorite_string)
         if favorite_string and not favorite_string.strip().lower() == config.exit_entry:
             config.favorite_string = favorite_string
             config.saveConfig()
-            print3(f"Favourite string changed: {config.favorite_string}")
+            print3(f"Favourite entry changed: {config.favorite_string}")
 
     def setAssistantName(self):
         print1("You may modify my name below:")

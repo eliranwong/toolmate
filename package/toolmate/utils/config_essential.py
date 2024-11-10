@@ -29,6 +29,7 @@ defaultSettings = (
     ('last_conversation', ''),
     ('last_workflow', ''),
     ('defaultTool', 'chat'),
+    ('favorite_string_best', '@chat'),
     ('favorite_string', '@chat'),
     ('appName', ''),
     ('text2art_font1', 'cybermedum'),
@@ -279,11 +280,11 @@ defaultSettings = (
     ("hotkey_exit", ["c-q"]),
     ("hotkey_cancel", ["c-z"]),
     ("hotkey_new", ["c-n"]),
-    ("hotkey_insert_filepath", ["c-f"]),
+    ("hotkey_insert_file_path", ["escape", "o"]),
     ("hotkey_insert_newline", ["c-i"]),
     ("hotkey_open_chat_records", ["c-o"]),
     #("hotkey_open_plain_text_file", ["escape", "o"]),
-    ("hotkey_open_previous_conversation", ["escape", "o"]),
+    ("hotkey_open_last_conversation", ["c-l"]),
     ("hotkey_export", ["c-g"]),
     ("hotkey_count_tokens", ["escape", "c"]),
     ("hotkey_launch_pager_view", ["c-p"]),
@@ -305,11 +306,10 @@ defaultSettings = (
     ("hotkey_toggle_mouse_support", ["escape", "m"]),
     ("hotkey_edit_current_entry", ["c-e"]),
     ("hotkey_edit_last_response", ["escape", "e"]),
-    ("hotkey_swap_text_brightness", ["escape", "b"]),
+    #("hotkey_swap_text_brightness", ["escape", "b"]), # "escape", "b" conflict with key combo to jump to the beginning of a line
     ("hotkey_select_plugins", ["escape", "p"]),
-    ("hotkey_insert_favorite_string", ["c-b"]),
-    # available "c-l"
-    # available "escape", "o"
+    ("hotkey_insert_favorite_entry", ["c-f"]),
+    ("hotkey_insert_bestliked_entry", ["c-b"]),
 )
 
 temporaryConfigs = [

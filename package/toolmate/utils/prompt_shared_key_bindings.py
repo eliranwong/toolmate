@@ -120,9 +120,9 @@ def _(event):
     set_title(config.toolMateAIName)
 
 # swap color theme
-@prompt_shared_key_bindings.add(*config.hotkey_swap_text_brightness)
-def _(_):
-    swapTerminalColors()
+#@prompt_shared_key_bindings.add(*config.hotkey_swap_text_brightness)
+#def _(_):
+#    swapTerminalColors()
 
 @staticmethod
 def swapTerminalColors():

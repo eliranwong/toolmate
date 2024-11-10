@@ -12,6 +12,7 @@ class Plugins:
 
     @staticmethod
     def runPlugins():
+        print2("Loading plugins ...")
         # The following config values can be modified with plugins, to extend functionalities
         #config.pluginsWithFunctionCall = []
         config.aliases = {}

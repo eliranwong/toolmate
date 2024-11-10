@@ -91,7 +91,12 @@ class Prompts:
             config.defaultEntry = buffer.text
             buffer.text = ".plugins"
             buffer.validate_and_handle()
-        @this_key_bindings.add(*config.hotkey_insert_favorite_string)
+        @this_key_bindings.add(*config.hotkey_insert_bestliked_entry)
+        def _(event):
+            buffer = event.app.current_buffer
+            buffer.text += config.favorite_string_best
+            buffer.cursor_position = len(buffer.text)
+        @this_key_bindings.add(*config.hotkey_insert_favorite_entry)
         def _(event):
             buffer = event.app.current_buffer
             buffer.text += config.favorite_string
@@ -107,7 +112,7 @@ class Prompts:
             buffer = event.app.current_buffer
             buffer.text = config.exit_entry
             buffer.validate_and_handle()
-        @this_key_bindings.add(*config.hotkey_insert_filepath) # add path
+        @this_key_bindings.add(*config.hotkey_insert_file_path) # add path
         def _(event):
             buffer = event.app.current_buffer
             config.addPathAt = buffer.cursor_position
@@ -124,7 +129,7 @@ class Prompts:
             config.defaultEntry = buffer.text
             buffer.text = ".open"
             buffer.validate_and_handle()
-        @this_key_bindings.add(*config.hotkey_open_previous_conversation)
+        @this_key_bindings.add(*config.hotkey_open_last_conversation)
         def _(event):
             buffer = event.app.current_buffer
             config.defaultEntry = buffer.text
@@ -266,7 +271,7 @@ Current input: {currentInputTokens}
             "[c-r]": "reverse-i-search",
             str(config.hotkey_new): "new conversation",
             str(config.hotkey_open_chat_records): "open conversation",
-            str(config.hotkey_open_previous_conversation): "open previous conversation",
+            str(config.hotkey_open_last_conversation): "open previous conversation",
             str(config.hotkey_read_conversation): "read current conversation",
             str(config.hotkey_edit_last_response): "edit current conversation",
             str(config.hotkey_export): "export conversation",
@@ -280,14 +285,15 @@ Current input: {currentInputTokens}
             str(config.hotkey_toggle_response_audio): "toggle response audio",
             str(config.hotkey_toggle_multiline_entry): "toggle multi-line entry",
             str(config.hotkey_toggle_word_wrap): "toggle word wrap",
-            str(config.hotkey_insert_favorite_string): "insert my favourite string",
-            str(config.hotkey_insert_filepath): "insert a file or folder path",
+            str(config.hotkey_insert_bestliked_entry): "insert my best-like entry",
+            str(config.hotkey_insert_favorite_entry): "insert my favourite entry",
+            str(config.hotkey_insert_file_path): "insert a file or folder path",
             str(config.hotkey_display_device_info): "display device information",
             str(config.hotkey_count_tokens): "count current message tokens",
             str(config.hotkey_toggle_input_improvement): "toggle improved writing feature",
             str(config.hotkey_toggle_mouse_support): "toggle mouse support",
             str(config.hotkey_launch_system_prompt): "system command prompt",
-            str(config.hotkey_swap_text_brightness): "swap text brightness",
+            #str(config.hotkey_swap_text_brightness): "swap text brightness",
             str(config.hotkey_toggle_developer_mode): "swap developer mode",
             str(config.hotkey_restart_app): "restart toolmate",
         }

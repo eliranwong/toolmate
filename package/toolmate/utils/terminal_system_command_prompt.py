@@ -35,7 +35,7 @@ class SystemCommandPrompt:
         self.openCommand = config.open
 
     def getToolBar(self):
-        return f""" {str(config.hotkey_exit).replace("'", "")} exit {str(config.hotkey_list_directory_content).replace("'", "")} list content {str(config.hotkey_insert_filepath).replace("'", "")} insert path """
+        return f""" {str(config.hotkey_exit).replace("'", "")} exit {str(config.hotkey_list_directory_content).replace("'", "")} list content {str(config.hotkey_insert_file_path).replace("'", "")} insert path """
 
     def getSystemCommands(self):
         try:
@@ -70,7 +70,7 @@ class SystemCommandPrompt:
         def _(_):
             print1("")
             run_in_terminal(lambda: self.getPath.displayDirectoryContent())
-        @this_key_bindings.add(*config.hotkey_insert_filepath)
+        @this_key_bindings.add(*config.hotkey_insert_file_path)
         def _(event):
             self.addPath = True
             buffer = event.app.current_buffer

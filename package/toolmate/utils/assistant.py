@@ -572,9 +572,9 @@ class ToolMate:
             return False
 
     def changeAPIkeys(self):
-        self.changeChatGPTAPIkey()
         self.changeGroqApi()
         self.changeMistralApi()
+        self.changeChatGPTAPIkey()
         if not config.isTermux:
             self.setAutoGenBuilderConfig()
         self.changeOpenweathermapApi()

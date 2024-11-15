@@ -14,7 +14,7 @@ if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enable
         HarmBlockThreshold,
     )
     from toolmate import config
-    from toolmate.utils.call_gemini import CallGemini
+    from toolmate.utils.call_gemini import CallVertexAI
 
     def ask_gemini(function_args):
         config.stopSpinning()
@@ -23,7 +23,7 @@ if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enable
             config.currentMessages[-1] = {"role": "user", "content": query}
         else:
             query = config.currentMessages[-1]["content"]
-        completion = CallGemini.regularCall(config.currentMessages)
+        completion = CallVertexAI.regularCall(config.currentMessages)
         config.toolmate.streamCompletion(completion, openai=False)
         return ""
 

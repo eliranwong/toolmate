@@ -10,7 +10,7 @@ if not config.isTermux:
         from opencc import OpenCC
     except:
         from toolmate import installPipPackage
-        installPipPackage(f"--upgrade opencc")
+        installPipPackage(f"--upgrade opencc-python-reimplemented")
 
     from toolmate import config
     from opencc import OpenCC

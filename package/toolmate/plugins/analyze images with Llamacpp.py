@@ -36,7 +36,7 @@ if not config.isTermux:
 
         llmInterface = "llamacpp"
 
-        if llmInterface == "gemini":
+        if llmInterface == "vertexai":
             answer = GeminiProVision(temperature=config.llmTemperature).analyze_images_llamacpp(function_args)
             if answer:
                 config.toolTextOutput = answer

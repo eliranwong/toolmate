@@ -13,7 +13,7 @@ if not hasattr(config, "max_consecutive_auto_reply"):
 
 from toolmate import print2, print3, tokenLimits
 
-from toolmate import getEmbeddingFunction, startLlamacppServer, stopLlamacppServer, getGroqApi_key, refinePath
+from toolmate import getEmbeddingFunction, startLlamacppServer, stopLlamacppServer, getGroqApi_key, getGoogleGenAIClient, refinePath
 import autogen, os, json, traceback, chromadb, re, zipfile, datetime, traceback
 from chromadb.config import Settings
 from pathlib import Path
@@ -128,8 +128,18 @@ class AutoGenRetriever:
                     "api_key": getGroqApi_key(),
                 }
             ]
+        elif config.llmInterface == "googleai":
+            llm = config.googleaiApi_tool_model
+            config_list = [
+                {
+                    "model": llm,
+                    "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+                    "api_type": "open_ai",
+                    "api_key": getGoogleGenAIClient(),
+                }
+            ]
         else:
-        #if config.llmInterface in ("chatgpt", "letmedoit", "gemini"):
+        #if config.llmInterface in ("chatgpt", "letmedoit", "vertexai"):
             llm = config.chatGPTApiModel
             config_list = autogen.config_list_from_json(
                 env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added

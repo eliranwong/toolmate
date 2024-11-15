@@ -337,6 +337,12 @@ def getTavilyApi_key():
 def getTavilyClient():
     return TavilyClient(api_key=getTavilyApi_key())
 
+def getGoogleGenAIClient():
+    return OpenAI(
+        api_key=config.googleaiApi_key,
+        base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+    )
+
 def getGroqApi_key():
     '''
     support multiple grop api keys
@@ -1085,8 +1091,10 @@ def useChatSystemMessage(messages: dict, mergeSystemIntoUserMessage=False, thisS
                 messages[originalIndex]["content"] = config.systemMessage_llamacppserver
             elif config.llmInterface == "llamacpp":
                 messages[originalIndex]["content"] = config.systemMessage_llamacpp
-            elif config.llmInterface == "gemini":
-                messages[originalIndex]["content"] = config.systemMessage_gemini
+            elif config.llmInterface == "googleai":
+                messages[originalIndex]["content"] = config.systemMessage_googleai
+            elif config.llmInterface == "vertexai":
+                messages[originalIndex]["content"] = config.systemMessage_vertexai
             elif config.llmInterface in ("chatgpt", "letmedoit"):
                 messages[originalIndex]["content"] = config.systemMessage_chatgpt
             # merge system message

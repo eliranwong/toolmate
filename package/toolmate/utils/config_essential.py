@@ -34,7 +34,7 @@ defaultSettings = (
     ('appName', ''),
     ('text2art_font1', 'cybermedum'),
     ('text2art_font2', 'white_bubble'),
-    ('llmInterface', ""), # "llamacpp", "llamacppserver", "ollama", "gemini", "chatgpt", "letmedoit", "groq", "mistral"
+    ('llmInterface', ""), # "llamacpp", "llamacppserver", "ollama", "chatgpt", "letmedoit", "groq", "mistral", "googleai", "vertexai"
     ('tool_selection_agent', False), # automatically screens user request and recommend tools, can also be manually triggered by tool `@recommend_tool`
     ('tool_selection_requirements', False), # convey each tool's requirements to the tool selection agent for the tool selection process.
     ('auto_tool_selection', False), # apply only if tool_selection_agent is set to True
@@ -156,13 +156,14 @@ defaultSettings = (
     ('max_group_chat_round', 12), # AutoGen group chat maximum round
     ('env_QT_QPA_PLATFORM_PLUGIN_PATH', ''), # e.g. # deal with error: qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "~/apps/letmedoit/lib/python3.10/site-packages/cv2/qt/plugins" even though it was found.
     ('systemMessage_tool', ''), # toolmate system message
+    ('systemMessage_googleai', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone google generative ai chatbot
     ('systemMessage_ollama', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone ollama chatbot
     ('systemMessage_groq', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone groq chatbot
     ('systemMessage_mistral', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone mistral chatbot
     ('systemMessage_llamacpp', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone llamacpp chatbot
     ('systemMessage_llamacppserver', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone llamacppserver chatbot
     ('systemMessage_chatgpt', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone chatgpt chatbot
-    ('systemMessage_gemini', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone geminipro chatbot
+    ('systemMessage_vertexai', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone geminipro chatbot
     ('systemMessage_palm2', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone palm2 chatbot
     ('systemMessage_codey', 'You are an expert on coding.'), # system message for standalone codey chatbot
     ('embeddingModel', 'paraphrase-multilingual-mpnet-base-v2'), # reference: https://www.sbert.net/docs/pretrained_models.html
@@ -211,6 +212,13 @@ defaultSettings = (
     ('mistralApi_chat_model_additional_chat_options', {}),
     ('mistralApi_tool_model_max_tokens', 2048),
     ('mistralApi_chat_model_max_tokens', 2048),
+    ('googleaiApi_key', ''),
+    ('googleaiApi_tool_model', "gemini-1.5-flash"),
+    ('googleaiApi_tool_model_additional_chat_options', {}),
+    ('googleaiApi_chat_model', "gemini-1.5-pro"),
+    ('googleaiApi_chat_model_additional_chat_options', {}),
+    ('googleaiApi_tool_model_max_tokens', 2048),
+    ('googleaiApi_chat_model_max_tokens', 2048),
     ('openaiApiKey', ''),
     ('openaiApiOrganization', ''),
     ('loadingInternetSearches', "auto"),

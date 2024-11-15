@@ -87,7 +87,7 @@ if not config.isTermux:
                     showErrors()
                 return ""
 
-            elif config.llmInterface == "gemini":
+            elif config.llmInterface == "vertexai":
 
                 # create a speech recognition object
                 r = sr.Recognizer()
@@ -209,7 +209,7 @@ if not config.isTermux:
                 "language": {
                     "type": "string",
                     "description": "Audio language",
-                    "enum": list(googleSpeeckToTextLanguages.values()) if config.llmInterface == "gemini" else ["English", "non-English"],
+                    "enum": list(googleSpeeckToTextLanguages.values()) if config.llmInterface == "vertexai" else ["English", "non-English"],
                 },
             },
             "required": ["audio_filepath", "language"],

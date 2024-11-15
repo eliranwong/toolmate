@@ -81,9 +81,9 @@ class GeminiPro:
         system_message_session = PromptSession(history=FileHistory(system_message_history))
         # prompt
         print2("Change system message below:")
-        prompt = SinglePrompt.run(style=self.promptStyle, promptSession=system_message_session, default=config.systemMessage_gemini, completer=completer)
+        prompt = SinglePrompt.run(style=self.promptStyle, promptSession=system_message_session, default=config.systemMessage_vertexai, completer=completer)
         if prompt and not prompt == config.exit_entry:
-            config.systemMessage_gemini = prompt
+            config.systemMessage_vertexai = prompt
             config.saveConfig()
             print2("System message changed!")
 
@@ -122,7 +122,7 @@ class GeminiPro:
         #print2(f"\n{self.name} + Vision loaded!" if self.enableVision else f"\n{self.name} loaded!")
         print2(f"\n{self.name} loaded!")
         print2("```system message")
-        print1(config.systemMessage_gemini)
+        print1(config.systemMessage_vertexai)
         print2("```")
         if hasattr(config, "currentMessages"):
             bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
@@ -182,8 +182,8 @@ class GeminiPro:
 #                )
 
                 try:
-                    if not hasattr(config, "currentMessages") and config.systemMessage_gemini and justStarted:
-                        prompt = f"# Your role\n\n{config.systemMessage_gemini}\n\n# My Inquiry\n\n{prompt}"
+                    if not hasattr(config, "currentMessages") and config.systemMessage_vertexai and justStarted:
+                        prompt = f"# Your role\n\n{config.systemMessage_vertexai}\n\n# My Inquiry\n\n{prompt}"
                         justStarted = False
                     # https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini
                     # Note: At the time of writing, function call feature with Gemini Pro is very weak, compared with the function call feature offerred by ChatGPT:

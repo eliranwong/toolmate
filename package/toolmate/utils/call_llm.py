@@ -3,10 +3,11 @@ from toolmate import config, getDeviceInfo, toGeminiMessages, useChatSystemMessa
 from toolmate.utils.call_ollama import CallOllama
 from toolmate.utils.call_groq import CallGroq
 from toolmate.utils.call_mistral import CallMistral
+from toolmate.utils.call_googleai import CallGoogleAI
 from toolmate.utils.call_chatgpt import CallChatGPT, CallLetMeDoIt
 import copy
 if not config.isTermux:
-    from toolmate.utils.call_gemini import CallGemini
+    from toolmate.utils.call_gemini import CallVertexAI
     from toolmate.utils.call_llamacpp import CallLlamaCpp
     from toolmate.utils.call_llamacppserver import CallLlamaCppServer
 
@@ -22,7 +23,7 @@ class CallLLM:
         #    CallLlamaCpp.unloadModels()
 
         if config.systemMessage_tool:
-
+            # Custom Tool System Message
             config.systemMessage_tool_current = config.systemMessage_tool
         
         elif config.llmInterface in ("chatgpt", "letmedoit"):
@@ -73,8 +74,10 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallLlamaCppServer.checkCompletion()
         elif config.llmInterface == "llamacpp":
             return CallLlamaCpp.checkCompletion()
-        elif config.llmInterface == "gemini":
-            return CallGemini.checkCompletion()
+        elif config.llmInterface == "vertexai":
+            return CallVertexAI.checkCompletion()
+        elif config.llmInterface == "googleai":
+            return CallGoogleAI.checkCompletion()
         elif config.llmInterface == "chatgpt":
             return CallChatGPT.checkCompletion()
         # letmedoit
@@ -92,8 +95,10 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallLlamaCppServer.autoCorrectPythonCode(code, trace)
         elif config.llmInterface == "llamacpp":
             return CallLlamaCpp.autoCorrectPythonCode(code, trace)
-        elif config.llmInterface == "gemini":
-            return CallGemini.autoCorrectPythonCode(code, trace)
+        elif config.llmInterface == "vertexai":
+            return CallVertexAI.autoCorrectPythonCode(code, trace)
+        elif config.llmInterface == "googleai":
+            return CallGoogleAI.autoCorrectPythonCode(code, trace)
         elif config.llmInterface == "chatgpt":
             return CallChatGPT.autoCorrectPythonCode(code, trace)
         # letmedoit
@@ -111,8 +116,10 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallLlamaCppServer.runSingleFunctionCall(messages, function_name)
         elif config.llmInterface == "llamacpp":
             return CallLlamaCpp.runSingleFunctionCall(messages, function_name)
-        elif config.llmInterface == "gemini":
-            return CallGemini.runSingleFunctionCall(messages, function_name)
+        elif config.llmInterface == "vertexai":
+            return CallVertexAI.runSingleFunctionCall(messages, function_name)
+        elif config.llmInterface == "googleai":
+            return CallGoogleAI.runSingleFunctionCall(messages, function_name)
         elif config.llmInterface == "chatgpt":
             return CallChatGPT.runSingleFunctionCall(messages, function_name)
         # letmedoit
@@ -131,8 +138,10 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallLlamaCppServer.regularCall(chatMessages)
         elif config.llmInterface == "llamacpp":
             return CallLlamaCpp.regularCall(chatMessages)
-        elif config.llmInterface == "gemini":
-            return CallGemini.regularCall(chatMessages)
+        elif config.llmInterface == "vertexai":
+            return CallVertexAI.regularCall(chatMessages)
+        elif config.llmInterface == "googleai":
+            return CallGoogleAI.regularCall(chatMessages)
         return CallChatGPT.regularCall(chatMessages)
 
     @staticmethod
@@ -147,11 +156,13 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallGroq.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "mistral":
             return CallMistral.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop, keepSystemMessage=keepSystemMessage)
+        elif config.llmInterface == "googleai":
+            return CallGoogleAI.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "llamacppserver":
             return CallLlamaCppServer.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "llamacpp":
             return CallLlamaCpp.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
-        elif config.llmInterface == "gemini":
+        elif config.llmInterface == "vertexai":
             history, systemMessage, lastUserMessage = toGeminiMessages(messages=chatMessages)
             if userInput.strip() and systemMessage:
                 userInput = f"""# Your role\n\n{systemMessage}\n\n# My Inquiry\n\n{userMessage}"""
@@ -159,9 +170,9 @@ Always remember that you are much more than a text-based AI. You possess both vi
                 userInput = f"""# Your role\n\n{systemMessage}\n\n# My Inquiry\n\n{lastUserMessage}"""
             elif not userInput.strip() and lastUserMessage.strip():
                 userInput = lastUserMessage
-            return CallGemini.getSingleChatResponse(userInput, history=history)
+            return CallVertexAI.getSingleChatResponse(userInput, history=history)
             #history, *_ = toGeminiMessages(messages=chatMessages)
-            #return CallGemini.getSingleChatResponse(userInput, history=history)
+            #return CallVertexAI.getSingleChatResponse(userInput, history=history)
         elif config.llmInterface == "chatgpt":
             return CallChatGPT.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         # letmedoit
@@ -181,8 +192,10 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallLlamaCppServer.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmInterface == "llamacpp":
             return CallLlamaCpp.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
-        elif config.llmInterface == "gemini":
-            return CallGemini.getSingleFunctionCallResponse(messages, function_name)
+        elif config.llmInterface == "vertexai":
+            return CallVertexAI.getSingleFunctionCallResponse(messages, function_name)
+        elif config.llmInterface == "googleai":
+            return CallGoogleAI.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmInterface == "chatgpt":
             return CallChatGPT.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         # letmedoit
@@ -200,8 +213,10 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallLlamaCppServer.runToolCall(messages)
         elif config.llmInterface == "llamacpp":
             return CallLlamaCpp.runToolCall(messages)
-        elif config.llmInterface == "gemini":
-            return CallGemini.runToolCall(messages)
+        elif config.llmInterface == "vertexai":
+            return CallVertexAI.runToolCall(messages)
+        elif config.llmInterface == "googleai":
+            return CallGoogleAI.runToolCall(messages)
         elif config.llmInterface == "chatgpt":
             return CallChatGPT.runToolCall(messages)
         # letmedoit

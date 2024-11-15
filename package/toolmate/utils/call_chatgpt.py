@@ -1,6 +1,6 @@
 from toolmate import showErrors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution, useChatSystemMessage
 from toolmate import config
-from toolmate import print1, print2, print3, getDynamicTokens, selectTool, selectEnabledTool, validParameters
+from toolmate import print1, print2, print3, getDynamicTokens, validParameters
 import re, traceback, openai, pprint, copy, textwrap, json, pygments
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit import print_formatted_text, HTML

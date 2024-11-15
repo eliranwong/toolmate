@@ -53,7 +53,7 @@ def main(tempInterface=""):
 
     # update to the latest version
     config.tempInterface = tempInterface
-    backends = ("llamacpp", "llamacppserver", "ollama", "groq", "gemini", "chatgpt", "letmedoit")
+    backends = ("llamacpp", "llamacppserver", "ollama", "groq", "googleai", "vertexai", "chatgpt", "letmedoit")
     if args.backend:
         config.llmInterface = args.backend.lower()
     elif args.temp and args.temp.lower() in backends:

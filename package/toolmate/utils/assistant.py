@@ -1256,6 +1256,7 @@ class ToolMate:
             "ollama": "Ollama",
             "groq": "Groq Cloud API",
             "mistral": "Mistral AI API",
+            "googleai": "Google AI Studio API [Paid online service]",
             "chatgpt": "OpenAI ChatGPT [Paid online service]",
             "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",
         } if config.isTermux else {
@@ -1264,7 +1265,8 @@ class ToolMate:
             "ollama": "Ollama",
             "groq": "Groq Cloud API",
             "mistral": "Mistral AI API",
-            "gemini": "Google Gemini [Paid online service]",
+            "googleai": "Google AI Studio API [Paid online service]",
+            "vertexai": "Google Vertex AI [Paid online service]",
             "chatgpt": "OpenAI ChatGPT [Paid online service]",
             "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",
         }
@@ -1356,8 +1358,11 @@ class ToolMate:
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_mistral("chat")
                 self.setMaxTokens(feature="chat")
-        elif config.llmInterface == "gemini":
-            self.setLlmModel_gemini()
+        elif config.llmInterface == "vertexai":
+            self.setLlmModel_vertexai()
+            self.setMaxTokens(feature="default")
+        elif config.llmInterface == "googleai":
+            self.setLlmModel_googleai()
             self.setMaxTokens(feature="default")
         else:
             if not config.openaiApiKey or config.openaiApiKey == "toolmate":
@@ -1665,11 +1670,25 @@ class ToolMate:
                 config.mistralApi_chat_model = model
             print3(f"Mistral model: {model}")
 
-    def setLlmModel_gemini(self):
-        models = ["gemini-1.5-pro-001", "gemini-1.5-flash-001", "gemini-1.0-pro-002", "gemini-1.0-pro-001"]
+    def setLlmModel_googleai(self):
+        models = ["gemini-1.5-flash", "gemini-1.5-flash-8b", "gemini-1.5-pro"]
         model = self.dialogs.getValidOptions(
             options=models,
-            title="Gemini Models",
+            title="Google AI Studio Models",
+            default=config.googleaiApi_tool_model if config.googleaiApi_tool_model in models else models[0],
+            text="Select a tool call model:\n(for both chat and task execution)",
+        )
+        if model:
+            config.googleaiApi_tool_model = model
+            print3(f"Gemini model: {model}")
+            # set max tokens
+            print3(f"Maximum output tokens: {config.gemini_max_output_tokens}")
+
+    def setLlmModel_vertexai(self):
+        models = ["gemini-1.5-pro", "gemini-1.5-flash"]
+        model = self.dialogs.getValidOptions(
+            options=models,
+            title="Google Vertex AI Models",
             default=config.gemini_model if config.gemini_model in models else models[0],
             text="Select a tool call model:\n(for both chat and task execution)",
         )
@@ -1809,8 +1828,10 @@ class ToolMate:
             systemMessage_chat = config.systemMessage_llamacppserver
         elif config.llmInterface == "llamacpp":
             systemMessage_chat = config.systemMessage_llamacpp
-        elif config.llmInterface == "gemini":
-            systemMessage_chat = config.systemMessage_gemini
+        elif config.llmInterface == "vertexai":
+            systemMessage_chat = config.systemMessage_vertexai
+        elif config.llmInterface == "googleai":
+            systemMessage_chat = config.systemMessage_googleai
         elif config.llmInterface in ("chatgpt", "letmedoit"):
             systemMessage_chat = config.systemMessage_chatgpt
 
@@ -1831,8 +1852,10 @@ class ToolMate:
                 config.systemMessage_llamacppserver = message
             elif config.llmInterface == "llamacpp":
                 config.systemMessage_llamacpp = message
-            elif config.llmInterface == "gemini":
-                config.systemMessage_gemini = message
+            elif config.llmInterface == "vertexai":
+                config.systemMessage_vertexai = message
+            elif config.llmInterface == "googleai":
+                config.systemMessage_googleai = message
             elif config.llmInterface in ("chatgpt", "letmedoit"):
                 config.systemMessage_chatgpt = message
             config.saveConfig()
@@ -1982,9 +2005,12 @@ class ToolMate:
             print3(f"Context Window Size: {contextWindowSize}")
 
     def setMaxTokens_non_chatgpt(self, feature="default"):
-        if config.llmInterface == "gemini":
+        if config.llmInterface == "vertexai":
             print1("Visit https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models to read about tokens limits")
             default = config.gemini_max_output_tokens
+        elif config.llmInterface == "googleai":
+            print1("Visit https://ai.google.dev/gemini-api/docs/models/gemini to read about tokens limits")
+            default = config.googleaiApi_tool_model_max_tokens
         elif config.llmInterface in ("llamacpp", "llamacppserver"):
             default = config.llamacppChatModel_max_tokens if feature == "chat" else config.llamacppToolModel_max_tokens
         elif config.llmInterface == "ollama":
@@ -1999,8 +2025,10 @@ class ToolMate:
         maxtokens = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(default))
         if maxtokens and not maxtokens.strip().lower() == config.exit_entry and int(maxtokens) >= -1:
             maxtokens = int(maxtokens)
-            if config.llmInterface == "gemini":
+            if config.llmInterface == "vertexai":
                 config.gemini_max_output_tokens = maxtokens
+            elif config.llmInterface == "googleai":
+                config.googleaiApi_tool_model_max_tokens = maxtokens
             elif config.llmInterface in ("llamacpp", "llamacppserver"):
                 if feature == "chat":
                     config.llamacppChatModel_max_tokens = maxtokens
@@ -3059,7 +3087,7 @@ Acess the risk level of the following `{target.capitalize()}`:
         if gui is None:
             gui = True if hasattr(config, "desktopAssistant") else False
         if openai is None:
-            openai = True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "mistral", "llamacppserver") else False
+            openai = True if config.llmInterface in ("chatgpt", "letmedoit", "googleai", "groq", "mistral", "llamacppserver") else False
         try:
             if gui:
                 QtResponseStreamer(config.desktopAssistant).workOnCompletion(completion, openai)
@@ -3394,7 +3422,7 @@ Acess the risk level of the following `{target.capitalize()}`:
             "mistral": lambda: MistralChatbot().run(userInput),
             "chatgpt": lambda: ChatGPT().run(userInput),
             "letmedoit": lambda: ChatGPT().run(userInput),
-            "gemini": lambda: GeminiPro(temperature=config.llmTemperature).run(userInput),
+            "vertexai": lambda: GeminiPro(temperature=config.llmTemperature).run(userInput),
             "geminipro": lambda: GeminiPro(temperature=config.llmTemperature).run(userInput),
             "palm2": lambda: Palm2().run(userInput, temperature=config.llmTemperature),
             "codey": lambda: Codey().run(userInput, temperature=config.llmTemperature),

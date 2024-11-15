@@ -12,7 +12,7 @@ from vertexai.generative_models._generative_models import (
     HarmBlockThreshold,
 )
 
-class CallGemini:
+class CallVertexAI:
 
     @staticmethod
     def getGeminiModel(tool=None):
@@ -69,11 +69,11 @@ Please rewrite the code to make it work.
 Remember, give me the python code ONLY, without additional notes or explanation.""" # alternative: Please generate another copy of code that fix the errors.
             messages = [{"role": "user", "content" : userInput}]
             print3(f"Auto-correction attempt: {(i + 1)}")
-            function_call_message, function_call_response = CallGemini.getSingleFunctionCallResponse(messages, "correct_python_code")
+            function_call_message, function_call_response = CallVertexAI.getSingleFunctionCallResponse(messages, "correct_python_code")
             arguments = function_call_message["function_call"]["arguments"]
             if not arguments:
                 print2("Generating code ...")
-                response = CallGemini.getSingleChatResponse(userInput)
+                response = CallVertexAI.getSingleChatResponse(userInput)
                 python_code = extractPythonCode(response)
                 if isValidPythodCode(python_code):
                     arguments = {
@@ -120,8 +120,8 @@ Remember, give me the python code ONLY, without additional notes or explanation.
         chatMessages = useChatSystemMessage(copy.deepcopy(messages), mergeSystemIntoUserMessage=True)
         history, _, lastUserMessage = toGeminiMessages(messages=chatMessages)
         #userMessage = f"{systemMessage}\n\nHere is my request:\n{lastUserMessage}" if useSystemMessage and systemMessage else lastUserMessage
-        #userMessage = f"{config.systemMessage_gemini}\n\nHere is my request:\n{lastUserMessage}" if useSystemMessage and config.systemMessage_gemini else lastUserMessage
-        chat = CallGemini.getGeminiModel().start_chat(history=history)
+        #userMessage = f"{config.systemMessage_vertexai}\n\nHere is my request:\n{lastUserMessage}" if useSystemMessage and config.systemMessage_vertexai else lastUserMessage
+        chat = CallVertexAI.getGeminiModel().start_chat(history=history)
         return chat.send_message(
             lastUserMessage,
             generation_config=config.gemini_generation_config,
@@ -144,7 +144,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             function_declarations=[function_declaration],
         )
 
-        chat = CallGemini.getGeminiModel(tool).start_chat(history=history)
+        chat = CallVertexAI.getGeminiModel(tool).start_chat(history=history)
 
         try:
             completion = chat.send_message(
@@ -166,7 +166,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     def getSingleChatResponse(userInput: str, history: Optional[list]=None, prefill: Optional[str]=None, stop: Optional[list]=None, **kwargs) -> str:
         # non-streaming single call
         try:
-            chat = CallGemini.getGeminiModel().start_chat(history=history)
+            chat = CallVertexAI.getGeminiModel().start_chat(history=history)
             completion = chat.send_message(
                 userInput,
                 generation_config=config.gemini_generation_config,
@@ -184,7 +184,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     def runSingleFunctionCall(messages: list, function_name: str) -> list:
         messagesCopy = copy.deepcopy(messages)
         try:
-            _, function_call_response = CallGemini.getSingleFunctionCallResponse(messages, function_name)
+            _, function_call_response = CallVertexAI.getSingleFunctionCallResponse(messages, function_name)
             function_call_response = function_call_response if function_call_response else config.toolTextOutput
             messages[-1]["content"] += f"""\n\nAvailable information:\n{function_call_response}"""
             config.toolTextOutput = ""
@@ -197,7 +197,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     def getSingleFunctionCallResponse(messages: list, function_name: str, **kwargs) -> List[Union[Dict, str]]:
         tool_schema = config.toolFunctionSchemas[function_name]
         user_request = messages[-1]["content"]
-        func_arguments = CallGemini.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages, **kwargs)
+        func_arguments = CallVertexAI.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages, **kwargs)
         function_call_response = executeToolFunction(func_arguments=func_arguments, function_name=function_name)
         function_call_message_mini = {
             "role": "assistant",
@@ -215,7 +215,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     def runToolCall(messages: dict):
         user_request = messages[-1]["content"]
         if not config.selectedTool:
-            return CallGemini.regularCall(messages)
+            return CallVertexAI.regularCall(messages)
         else:
             # 2. Tool Selection
             if config.selectedTool and not config.selectedTool == "chat" and config.selectedTool in config.toolFunctionSchemas:
@@ -223,7 +223,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                 tool_schema = config.toolFunctionSchemas[tool_name]
                 config.selectedTool = ""
             else:
-                return CallGemini.regularCall(messages)
+                return CallVertexAI.regularCall(messages)
             # 3. Parameter Extraction
             if config.developer:
                 print1("extracting parameters ...")
@@ -232,9 +232,9 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                     # Execute function directly
                     tool_response = executeToolFunction(func_arguments={}, function_name=tool_name)
                 else:
-                    tool_parameters = CallGemini.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
+                    tool_parameters = CallVertexAI.extractToolParameters(schema=tool_schema, userInput=user_request, ongoingMessages=messages)
                     if not validParameters(tool_parameters, tool_schema["parameters"]["required"]):
-                        return CallGemini.regularCall(messages)
+                        return CallVertexAI.regularCall(messages)
                     # 4. Function Execution
                     tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
             except:
@@ -243,7 +243,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             # 5. Chat Extension
             if tool_response == "[INVALID]":
                 # invalid tool call; return a regular call instead
-                return CallGemini.regularCall(messages)
+                return CallVertexAI.regularCall(messages)
             else:
                 # record tool selection
                 #config.currentMessages[-1]["tool"] = tool_name
@@ -260,7 +260,7 @@ My query:
 
 Your response:
 {tool_response}"""
-                    return CallGemini.regularCall(messages)
+                    return CallVertexAI.regularCall(messages)
                 elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
                     # tool function executed without chat extension
                     config.currentMessages.append({"role": "assistant", "content": config.toolTextOutput if config.toolTextOutput else "Done!"})
@@ -298,7 +298,7 @@ Here is my request:
 </request>{deviceInfo}
 
 Remember, response with the required python code ONLY, WITHOUT extra notes or explanations."""
-            code = CallGemini.getSingleChatResponse(code_instruction, history=history)
+            code = CallVertexAI.getSingleChatResponse(code_instruction, history=history)
             if len(schema["parameters"]["properties"]) == 1:
                 if code := extractPythonCode(code):
                     return {"code": codecs.decode(code, "unicode_escape")}
@@ -316,7 +316,7 @@ Remember, response with the required python code ONLY, WITHOUT extra notes or ex
 
 When necessary, generate content based on your knowledge."""
 
-        parameters = CallGemini.getDictionaryOutput(history=history, schema=schema, userMessage=userMessage, **kwargs)
+        parameters = CallVertexAI.getDictionaryOutput(history=history, schema=schema, userMessage=userMessage, **kwargs)
         # fix linebreak
         if code and "code" in parameters:
             parameters["code"] = codecs.decode(parameters["code"], "unicode_escape")

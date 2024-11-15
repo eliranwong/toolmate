@@ -30,7 +30,7 @@ if not isServerAlive(re.sub("http://|https://", "", config.perplexica_server), c
 
 if isServerAlive(re.sub("http://|https://", "", config.perplexica_server), config.perplexica_backend_port):
 
-    def ask_perplexica(function_args):
+    def ask_perplexica_chatgpt(function_args):
         config.stopSpinning()
         if function_args:
             query = function_args.get("query")
@@ -54,42 +54,20 @@ if isServerAlive(re.sub("http://|https://", "", config.perplexica_server), confi
         # https://github.com/ItzCrazyKns/Perplexica/blob/master/docs/API/SEARCH.md
         # https://github.com/ItzCrazyKns/Perplexica/tree/master/src/lib/providers
 
-        if config.llmInterface in ("chatgpt", "letmedoit"):
-
-            data = {
-                "chatModel": {
-                    "provider": "openai",
-                    "model": config.chatGPTApiModel,
-                },
-                "embeddingModel": {
-                    "provider": "openai",
-                    "model": "text-embedding-3-large",
-                },
-                "optimizationMode": "speed",
-                "focusMode": "webSearch",
-                "query": query,
-                "history": history,
-            }
-
-        else:
-
-            # groq
-            data = {
-                "chatModel": {
-                    "provider": "custom_openai",
-                    "model": config.groqApi_tool_model,
-                    "customOpenAIBaseURL": "https://api.groq.com/openai/v1",
-                    "customOpenAIKey": getGroqApi_key(),
-                },
-                "embeddingModel": {
-                    "provider": "local",
-                    "model": config.perplexica_local_embedding_model,
-                },
-                "optimizationMode": "speed",
-                "focusMode": "webSearch",
-                "query": query,
-                "history": history,
-            }
+        data = {
+            "chatModel": {
+                "provider": "openai",
+                "model": config.chatGPTApiModel,
+            },
+            "embeddingModel": {
+                "provider": "openai",
+                "model": "text-embedding-3-large",
+            },
+            "optimizationMode": "speed",
+            "focusMode": "webSearch",
+            "query": query,
+            "history": history,
+        }
 
         try:
             response = requests.post(api_url, headers=headers, data=json.dumps(data))
@@ -130,7 +108,7 @@ if isServerAlive(re.sub("http://|https://", "", config.perplexica_server), confi
         "examples": [
             "Ask Perplexica",
         ],
-        "name": "ask_perplexica",
+        "name": "ask_perplexica_chatgpt",
         "description": "Request Perplexica to conduct research or provide information through internet searches.",
         "parameters": {
             "type": "object",
@@ -144,7 +122,7 @@ if isServerAlive(re.sub("http://|https://", "", config.perplexica_server), confi
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=ask_perplexica)
+    config.addFunctionCall(signature=functionSignature, method=ask_perplexica_chatgpt)
     config.inputSuggestions.append("Ask Perplexica: ")
 
 else:

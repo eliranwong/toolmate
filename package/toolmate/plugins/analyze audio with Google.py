@@ -29,10 +29,10 @@ if not config.isTermux:
         audio_file = function_args.get("audio_filepath") # required
         language = function_args.get("language") # required
 
-        llmInterface = "gemini"
+        llmInterface = "vertexai"
 
         if audio_file and os.path.isfile(audio_file):
-            if llmInterface == "gemini":
+            if llmInterface == "vertexai":
 
                 # create a speech recognition object
                 r = sr.Recognizer()

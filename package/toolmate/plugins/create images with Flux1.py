@@ -7,7 +7,7 @@ generate images with model "Flux.1"
 """
 
 
-if not config.isTermux:
+if not config.isLite:
 
     from toolmate import config, print2, print3, getCurrentDateTime, getCliOutput, getCpuThreads
     import os, shutil

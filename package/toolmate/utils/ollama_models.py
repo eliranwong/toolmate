@@ -1,4 +1,12 @@
 ollama_models = (
+    "athene-v2",
+    "athene-v2:72b",
+    "opencoder",
+    "opencoder:1.5b",
+    "opencoder:8b",
+    "llama3.2-vision",
+    "llama3.2-vision:11b",
+    "llama3.2-vision:90b",
     "smollm2",
     "smollm2:135m",
     "smollm2:360m",

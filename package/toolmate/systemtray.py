@@ -1,11 +1,12 @@
 import os, re
 thisFile = os.path.realpath(__file__)
 packageFolder = os.path.dirname(thisFile)
-#package = os.path.basename(packageFolder)
+package = os.path.basename(packageFolder)
 if os.getcwd() != packageFolder:
     os.chdir(packageFolder)
 
 from toolmate import config
+config.isLite = package.endswith("_lite")
 config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
 config.toolMateAIFolder = packageFolder
 if not hasattr(config, "toolMateAIName") or not config.toolMateAIName:

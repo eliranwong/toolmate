@@ -41,7 +41,7 @@ if os.path.isdir(storageDir):
         shutil.rmtree(shortcut_dir, ignore_errors=True)
 
         # check if config backup is available
-        backupFile = os.path.join(storageDir, "config_backup.py")
+        backupFile = os.path.join(storageDir, "config_lite_backup.py" if config.isLite else "config_backup.py")
         if os.path.isfile(backupFile):
             restore_backup = yes_no_dialog(
                 title="Configuration Backup Found",

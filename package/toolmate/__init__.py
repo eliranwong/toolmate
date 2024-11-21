@@ -26,6 +26,12 @@ if not os.path.isfile(configFile):
 
 # import config module
 from toolmate import config
+if not hasattr(config, "isLite"):
+    try:
+        from lightrag import LightRAG
+        config.isLite = False
+    except:
+        config.isLite = True
 config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") and not os.getcwd().startswith("/root") else False
 if config.isTermux and shutil.which("termux-share"):
     config.terminalEnableTermuxAPI = True

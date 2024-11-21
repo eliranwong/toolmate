@@ -6,7 +6,7 @@ analyze web content with "AutoGen Retriever"
 [TOOL_CALL]
 """
 
-if not config.isTermux:
+if not config.isLite:
 
     from toolmate import config
     from toolmate import print1, print2, print3, is_valid_url, downloadWebContent, ragRefineDocsPath, ragGetSplits, ragSearchContext, getRagPrompt

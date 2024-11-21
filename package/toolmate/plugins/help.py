@@ -7,7 +7,7 @@ Retrieve information from the documentation regarding how to use ToolMate AI
 """
 
 
-if not config.isTermux:
+if not config.isLite:
 
     from toolmate import config, getHelpCollection, query_vectors, getRagPrompt, print2
     from toolmate.utils.call_llm import CallLLM

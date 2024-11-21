@@ -247,7 +247,7 @@ selected_text=$(echo "$(xsel -o)" | sed 's/"/\"/g')
         with open(work_with_translation_script_path, "w", encoding="utf-8") as fileObj:
             fileObj.write(work_with_text_script)
         # work with files or folders selection via NAUTILUS; right-click > scripts > LetMeDoIt
-        if not config.isTermux:
+        if not config.isLite:
             work_with_files_script = f'''#!/usr/bin/env bash
 mkdir -p {storage}
 # Get the selected file or folder path
@@ -273,13 +273,13 @@ echo "$path" > {storage}/selected_files.txt
             # added a command shortcut
             try:
                 termux_shortcut_script = f'''#!/usr/bin/env bash\n{sys.executable} {config.toolMateAIFile}'''
-                termux_shortcut_path = "/data/data/com.termux/files/usr/bin/letmedoit"
+                termux_shortcut_path = "/data/data/com.termux/files/usr/bin/toolmate"
                 with open(termux_shortcut_path, "w", encoding="utf-8") as fileObj:
                     fileObj.write(termux_shortcut_script)
                 scriptFiles.append(termux_shortcut_path)
             except:
                 pass
-        else:
+        elif not config.isLite:
             scriptFiles.append(work_with_files_script_path)
         for i in scriptFiles:
             os.chmod(i, 0o755)

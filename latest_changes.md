@@ -1,3 +1,9 @@
+# 0.5.03-0.5.09
+
+* supports Google AI Studio API key
+
+* renamed package `toolmate_android` to `toolmate_lite`
+
 # 0.5.02
 
 * added a combination for inserting the best-liked entry
@@ -228,7 +234,7 @@
 
 # 0.3.81
 
-* added tool `@termux` in `toolmate_android` version
+* added tool `@termux` in `toolmate_lite` version
 
 * support install full version `toolmate` on Android
 
@@ -238,7 +244,7 @@
 
 # Version 0.3.76-0.3.78
 
-* created Android package `toolmate_android`
+* created Android package `toolmate_lite`
 
 * updated documentations
 

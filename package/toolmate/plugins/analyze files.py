@@ -6,7 +6,7 @@ analyze files with integrated "AutoGen Retriever"
 [TOOL_CALL]
 """
 
-if not config.isTermux:
+if not config.isLite:
 
     from toolmate import config, is_valid_image_file, ragRefineDocsPath, ragGetSplits, ragSearchContext, getRagPrompt
     from toolmate import print2, print3

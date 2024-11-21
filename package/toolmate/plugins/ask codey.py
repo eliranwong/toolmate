@@ -6,7 +6,7 @@ Ask Google Codey for information about coding
 [TOOL_CALL]
 """
 
-if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enabledGoogleAPIs and not config.isTermux:
+if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enabledGoogleAPIs and not config.isLite:
 
     import vertexai
     from vertexai.generative_models._generative_models import (

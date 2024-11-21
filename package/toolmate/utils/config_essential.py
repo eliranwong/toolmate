@@ -7,7 +7,7 @@ pluginExcludeList = [
     "edit text",
     "simplified Chinese to traditional Chinese",
 ]
-if config.isTermux:
+if config.isLite:
     pluginExcludeList += [
         "analyze files",
         "analyze web content",
@@ -128,8 +128,8 @@ defaultSettings = (
     ('llamacppChatModel_additional_chat_options', {}),
     ('llamacppToolModel_ollama_tag', ''), # selected ollama hosted model to run with llamacpp
     ('llamacppToolModel_model_path', ''), # specify file path of llama.cpp model for general purpose
-    ('llamacppToolModel_repo_id', 'bartowski/Llama-3.2-3B-Instruct-GGUF' if config.isTermux else 'MaziyarPanahi/WizardLM-2-7B-GGUF'), # llama.cpp model used for both task execution and conversation, e.g. 'TheBloke/phi-2-GGUF', 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
-    ('llamacppToolModel_filename', 'Llama-3.2-3B-Instruct-Q4_K_M.gguf' if config.isTermux else 'WizardLM-2-7B.Q4_K_M.gguf'), # llama.cpp model used for both task execution and conversation, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
+    ('llamacppToolModel_repo_id', 'bartowski/Llama-3.2-3B-Instruct-GGUF' if config.isLite else 'MaziyarPanahi/WizardLM-2-7B-GGUF'), # llama.cpp model used for both task execution and conversation, e.g. 'TheBloke/phi-2-GGUF', 'NousResearch/Hermes-2-Pro-Mistral-7B-GGUF', 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF'
+    ('llamacppToolModel_filename', 'Llama-3.2-3B-Instruct-Q4_K_M.gguf' if config.isLite else 'WizardLM-2-7B.Q4_K_M.gguf'), # llama.cpp model used for both task execution and conversation, e.g. 'Hermes-2-Pro-Mistral-7B.Q4_K_M.gguf', 'Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf'
     ('llamacppToolModel_n_ctx', 0), # llama.cpp tool model context window
     ('llamacppToolModel_max_tokens', 2048), # llama.cpp tool model maximum tokens
     ('llamacppToolModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration

@@ -695,7 +695,7 @@
     </node>
     <node id="&quot;TOOLMATE_ANDROID&quot;">
       <data key="d0">"TECHNOLOGY"</data>
-      <data key="d1">"toolmate_android is a module designed specifically for Android users, allowing them to install the ToolMate AI application on their devices."</data>
+      <data key="d1">"toolmate_lite is a module designed specifically for Android users, allowing them to install the ToolMate AI application on their devices."</data>
       <data key="d2">chunk-d8ead668718b74679a8edf65563b0c9a</data>
     </node>
     <node id="&quot;TOOLMATE AI GUI&quot;">

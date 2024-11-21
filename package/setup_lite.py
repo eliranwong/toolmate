@@ -31,7 +31,7 @@ with open(package_readme, "r", encoding="utf-8") as fileObj:
 
 # get required packages
 install_requires = []
-with open(os.path.join(package, "requirements_android.txt"), "r") as fileObj:
+with open(os.path.join(package, "requirements_lite.txt"), "r") as fileObj:
     for line in fileObj.readlines():
         mod = line.strip()
         if mod:
@@ -42,11 +42,17 @@ open(os.path.join(package, "config.py"), "w").close()
 
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
-    name="toolmate_android",
-    version="0.5.06",
+    name="toolmate_lite",
+    version="0.5.12",
     python_requires=">=3.8, <3.13",
     description=f"ToolMate AI, developed by Eliran Wong, is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. Supports custom workflow and plugins to automate multi-step actions.",
-    long_description=long_description,
+    long_description='''# ToolMate AI Lite
+
+This is the lite version of ToolMate AI https://pypi.org/project/toolmate/
+
+This `Lite` version supports running on Android Termux as well as on Windows / macOS / Linux / ChromeOS
+
+'''+long_description,
     author="Eliran Wong",
     author_email="support@letmedoit.ai",
     packages=[
@@ -78,7 +84,7 @@ setup(
     license="GNU General Public License (GPL)",
     install_requires=install_requires,
     extras_require={
-        'bible': ["uniquebible>=0.1.84"],  # Dependencies for the bible module
+        'bible': ["uniquebible>=0.2.0"],  # Dependencies for the bible module
     },
     entry_points={
         "console_scripts": [

@@ -139,7 +139,7 @@ def main(tempInterface=""):
     # backup configurations
     config.saveConfig()
     if os.path.isdir(config.localStorage):
-        shutil.copy(configFile, os.path.join(config.localStorage, "config_backup.py"))
+        shutil.copy(configFile, os.path.join(config.localStorage, "config_lite_backup.py" if config.isLite else "config_backup.py"))
     # unload llama.cpp model to free VRAM
     try:
         config.llamacppToolModel.close()

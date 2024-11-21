@@ -8,7 +8,7 @@ search Tavily
 
 from toolmate import config
 
-if not config.isTermux:
+if not config.isLite:
 
     from toolmate import getTavilyClient
 

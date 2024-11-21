@@ -8,7 +8,7 @@ from toolmate import config
 import sys, os
 
 # add python python to work with virtual environment
-if not config.isTermux:
+if not config.isLite:
     # integrated AutoGen agents
     config.aliases["!autoassist"] = f"!{sys.executable} {os.path.join(config.toolMateAIFolder, 'autoassist.py')}"
     config.aliases["!automath"] = f"!{sys.executable} {os.path.join(config.toolMateAIFolder, 'automath.py')}"
@@ -35,7 +35,7 @@ if not config.isTermux:
 config.aliases["!etextedit"] = f"!{sys.executable} {os.path.join(config.toolMateAIFolder, 'eTextEdit.py')}"
 config.aliases["!chatgpt"] = f"!{sys.executable} {os.path.join(config.toolMateAIFolder, 'chatgpt.py')}"
 
-if not config.isTermux:
+if not config.isLite:
     config.inputSuggestions += [
         "!autoassist",
         "!autobuilder",

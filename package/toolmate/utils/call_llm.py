@@ -6,7 +6,7 @@ from toolmate.utils.call_mistral import CallMistral
 from toolmate.utils.call_googleai import CallGoogleAI
 from toolmate.utils.call_chatgpt import CallChatGPT, CallLetMeDoIt
 import copy
-if not config.isTermux:
+if not config.isLite:
     from toolmate.utils.call_gemini import CallVertexAI
     from toolmate.utils.call_llamacpp import CallLlamaCpp
     from toolmate.utils.call_llamacppserver import CallLlamaCppServer
@@ -60,25 +60,27 @@ Always remember that you are much more than a text-based AI. You possess both vi
         return messages
 
     @staticmethod
-    def checkCompletion():
+    def checkCompletion(llmInterface=""):
         if not config.llmInterface:
             config.llmInterface = "llamacpp"
             config.saveConfig()
-        if config.llmInterface == "ollama":
+        if not llmInterface:
+            llmInterface = config.llmInterface
+        if llmInterface == "ollama":
             return CallOllama.checkCompletion()
-        elif config.llmInterface == "groq":
+        elif llmInterface == "groq":
             return CallGroq.checkCompletion()
-        elif config.llmInterface == "mistral":
+        elif llmInterface == "mistral":
             return CallMistral.checkCompletion()
-        elif config.llmInterface == "llamacppserver":
+        elif llmInterface == "llamacppserver":
             return CallLlamaCppServer.checkCompletion()
-        elif config.llmInterface == "llamacpp":
+        elif llmInterface == "llamacpp":
             return CallLlamaCpp.checkCompletion()
-        elif config.llmInterface == "vertexai":
+        elif llmInterface == "vertexai":
             return CallVertexAI.checkCompletion()
-        elif config.llmInterface == "googleai":
+        elif llmInterface == "googleai":
             return CallGoogleAI.checkCompletion()
-        elif config.llmInterface == "chatgpt":
+        elif llmInterface == "chatgpt":
             return CallChatGPT.checkCompletion()
         # letmedoit
         return CallLetMeDoIt.checkCompletion()

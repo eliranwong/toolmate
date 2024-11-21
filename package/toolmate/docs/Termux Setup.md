@@ -162,7 +162,7 @@ alias mp4='cd /data/data/com.termux/files/home/storage/movies && yt-dlp -f bestv
 
 # Install ToolMate_Android
 
-`toolmate_android` is a light version of `toolmate`, created to work with Termux:API.
+`toolmate_lite` is a light version of `toolmate`, created to work with Termux:API.
 
 Set up a shared folder where you can access content by ToolMate AI, from Termux and Android file manager
 
@@ -188,11 +188,11 @@ Remarks: In the first run, `Toolmate AI` automatically creates a directory `~/to
 
 To install:
 
-> pip install --upgrade toolmate_android
+> pip install --upgrade toolmate_lite
 
 If you want optional integration with [UniqueBible App](https://github.com/eliranwong/UniqueBible):
 
-> pip install --upgrade toolmate_android[bible]
+> pip install --upgrade toolmate_lite[bible]
 
 To run:
 

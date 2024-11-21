@@ -37,7 +37,7 @@ from toolmate.groqchat import GroqChatbot
 from toolmate.mistralchat import MistralChatbot
 from toolmate.ollamachat import OllamaChat
 from elevenlabs.client import ElevenLabs
-if not config.isTermux:
+if not config.isLite:
     from toolmate.chatgpt import ChatGPT
     from toolmate.llamacpp import LlamacppChat
     from toolmate.llamacppserver import LlamacppServerChat
@@ -120,6 +120,8 @@ class ToolMate:
         # check availability of api keys
         if not config.openaiApiKey:
             self.changeChatGPTAPIkey()
+        if not config.googleaiApi_key:
+            self.changeGoogleaiApikey()
         if not config.groqApi_key:
             self.changeGroqApi()
         if not config.mistralApi_key:
@@ -128,7 +130,7 @@ class ToolMate:
             self.changeOpenweathermapApi()
         if not config.elevenlabsApi:
             self.changeElevenlabsApi()
-        if not config.tavilyApi_key and not config.isTermux:
+        if not config.tavilyApi_key and not config.isLite:
             self.changeTavilyApi()
 
         # initial completion check at startup
@@ -213,9 +215,9 @@ class ToolMate:
             ".editconfigs": ("edit configuration settings", self.editConfigs),
             # app settings
             ".autoupgrade": ("change automatic upgrade", self.setAutoUpgrade),
-            ".favourite": ("change my favourite string", self.setFavorite_string),
+            ".favourite": ("change my favourites", self.changeMyFavouries),
             ".assistantname": ("change assistant name", self.setAssistantName),
-            ".storagedirectory": ("change storage directory", self.setStorageDirectory),
+            #".storagedirectory": ("change storage directory", self.setStorageDirectory),
             ".systemmessage": ("change system messages", self.setCustomSystemMessage),
             # miscellaneous
             ".system": (f"open system command prompt {str(config.hotkey_launch_system_prompt)}", lambda: SystemCommandPrompt().run(allowPathChanges=True)),
@@ -574,16 +576,30 @@ class ToolMate:
     def changeAPIkeys(self):
         self.changeGroqApi()
         self.changeMistralApi()
+        self.changeGoogleaiApikey()
         self.changeChatGPTAPIkey()
-        if not config.isTermux:
+        if not config.isLite:
             self.setAutoGenBuilderConfig()
         self.changeOpenweathermapApi()
         self.changeElevenlabsApi()
-        if not config.isTermux:
+        if not config.isLite:
             self.changeTavilyApi()
             self.selectGoogleAPIs()
         else:
             self.setTermuxApi()
+
+    def changeGoogleaiApikey(self):
+        print3("# Google AI API Key: allows access to Google AI Studio models")
+        print1("To set up Google AI API Key, read:\nhttps://aistudio.google.com/apikey\n")
+        print1("Enter your Google AI API Key [optional]:")
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.googleaiApi_key, is_password=True)
+        if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+            config.googleaiApi_key = apikey
+            CallLLM.checkCompletion("googleai")
+        else:
+            config.googleaiApi_key = "toolmate"
+        config.saveConfig()
+        print2("Configurations updated!")
 
     def changeChatGPTAPIkey(self):
         print3("# ChatGPT API Key: allows access to ChatGPT models")
@@ -592,13 +608,9 @@ class ToolMate:
         apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.openaiApiKey, is_password=True)
         if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
             config.openaiApiKey = apikey
-            CallLLM.checkCompletion()
+            CallLLM.checkCompletion("chatgpt")
         else:
             config.openaiApiKey = "toolmate"
-        #print1("Enter your Organization ID [optional]:")
-        #oid = self.prompts.simplePrompt(default=config.openaiApiOrganization, is_password=True)
-        #if oid and not oid.strip().lower() in (config.cancel_entry, config.exit_entry):
-        #    config.openaiApiOrganization = oid
         config.saveConfig()
         print2("Configurations updated!")
         setChatGPTAPIkey()
@@ -616,7 +628,6 @@ class ToolMate:
                     config.tavilyApi_key = eval(apikey)
             except:
                 config.tavilyApi_key = apikey
-            CallLLM.checkCompletion()
         else:
             config.tavilyApi_key = "toolmate"
         config.saveConfig()
@@ -635,7 +646,7 @@ class ToolMate:
                     config.groqApi_key = eval(apikey)
             except:
                 config.groqApi_key = apikey
-            CallLLM.checkCompletion()
+            CallLLM.checkCompletion("groq")
         else:
             config.groqApi_key = "toolmate"
         config.saveConfig()
@@ -654,7 +665,7 @@ class ToolMate:
                     config.mistralApi_key = eval(apikey)
             except:
                 config.mistralApi_key = apikey
-            CallLLM.checkCompletion()
+            CallLLM.checkCompletion("mistral")
         else:
             config.mistralApi_key = "toolmate"
         config.saveConfig()
@@ -810,6 +821,9 @@ class ToolMate:
         return userInput
 
     def setAutoUpgrade(self):
+        if config.thisPlatform == "Windows":
+            print2("Auto upgrading is not supported on Windows!")
+            return None
         options = ("enable", "disable")
         option = self.dialogs.getValidOptions(
             options=options,
@@ -1139,7 +1153,7 @@ class ToolMate:
     def editConfigs(self):
         # file paths
         configFile = os.path.join(config.toolMateAIFolder, "config.py")
-        backupFile = os.path.join(config.localStorage, "config_backup.py")
+        backupFile = os.path.join(config.localStorage, "config_lite_backup.py" if config.isLite else "config_backup.py")
         # backup configs
         config.saveConfig()
         shutil.copy(configFile, backupFile)
@@ -1259,7 +1273,7 @@ class ToolMate:
             "googleai": "Google AI Studio API [Paid online service]",
             "chatgpt": "OpenAI ChatGPT [Paid online service]",
             "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",
-        } if config.isTermux else {
+        } if config.isLite else {
             "llamacpp": "Llama.cpp",
             "llamacppserver": "Llama.cpp server [advanced]",
             "ollama": "Ollama",
@@ -1362,6 +1376,8 @@ class ToolMate:
             self.setLlmModel_vertexai()
             self.setMaxTokens(feature="default")
         elif config.llmInterface == "googleai":
+            if not config.googleaiApi_key or config.googleaiApi_key == "toolmate":
+                self.changeGoogleaiApikey()
             self.setLlmModel_googleai()
             self.setMaxTokens(feature="default")
         else:
@@ -1780,8 +1796,12 @@ class ToolMate:
             config.saveConfig()
 
     def setAutoGenBuilderConfig(self):
-        if not config.isTermux:
+        if not config.isLite:
             AutoGenBuilder().promptConfig()
+
+    def changeMyFavouries(self):
+        self.setDefaultTool()
+        self.setFavorite_string()
 
     def setFavorite_string(self):
         hotkey_insert_bestliked_entry = str(config.hotkey_insert_bestliked_entry)[2:-2].replace("c-", "Ctrl+")
@@ -2176,7 +2196,7 @@ class ToolMate:
                 config.usePygame = True
 
     def setTextToSpeechConfig(self):
-        options = ["edge", "elevenlabs", "custom"] if config.isTermux else ["edge", "google", "googlecloud", "elevenlabs", "custom"]
+        options = ["edge", "elevenlabs", "custom"] if config.isLite else ["edge", "google", "googlecloud", "elevenlabs", "custom"]
         descriptions = ["Microsoft Server Text-to-Speech", "ElevenLabs (credentials required)", "Custom Text-to-Speech Command [advanced]"] if config.isTermux else ["Microsoft Server Text-to-Speech", "Google Text-to-Speech (generic)", "Google Text-to-Speech (credentials required)", "ElevenLabs (credentials required)", "Custom Text-to-Speech Command [advanced]"]
         if config.isTermux and shutil.which("termux-tts-speak"):
             options.insert(0, "android")
@@ -2340,6 +2360,8 @@ class ToolMate:
                 print2("Given path invalid!")
 
     def setSpeechToTextConfig(self):
+        if config.isLite:
+            print1("This feature is not supported in Lite version.")
         if config.isTermux:
             print1("You may simply use the Android built-in voice typing feature.")
             return None
@@ -2752,7 +2774,7 @@ Acess the risk level of the following `{target.capitalize()}`:
         # Feature: improve writing:
         if writing:
             writing = re.sub(r"\n\[Current time: [^\n]*?$", "", writing)
-            if config.isTermux:
+            if config.isLite:
                 day_of_week = ""
             else:
                 day_of_week = f" ({getDayOfWeek()})"
@@ -3411,9 +3433,6 @@ Acess the risk level of the following `{target.capitalize()}`:
     def launchChatbot(self, chatbot, userInput):
         if not chatbot:
             chatbot = config.llmInterface
-        if config.isTermux:
-            #chatbot = "chatgpt"
-            ...
         chatbots = {
             "llamacpp": lambda: LlamacppChat(model=None if config.useAdditionalChatModel else config.llamacppToolModel).run(userInput),
             "llamacppserver": lambda: LlamacppServerChat().run(userInput),

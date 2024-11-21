@@ -6,7 +6,7 @@ generate images with model "Google Imagen 3"
 [TOOL_CALL]
 """
 
-if not config.isTermux:
+if not config.isLite:
 
   from toolmate import config, print3, getCurrentDateTime
   import os, subprocess, shutil

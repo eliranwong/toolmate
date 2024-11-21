@@ -6,7 +6,7 @@ Ask ChatGPT for conversation only; no function calling
 [TOOL_CALL]
 """
 
-if not config.isTermux:
+if not config.isLite:
 
     from toolmate import config, print1, loadLlamacppChatModel
     from toolmate.utils.call_llamacpp import CallLlamaCpp

@@ -4,7 +4,7 @@ from pathlib import Path
 from prompt_toolkit.completion import FuzzyCompleter, NestedCompleter, ThreadedCompleter
 import os, shutil, json, copy
 from typing import Callable
-if not config.isTermux:
+if not config.isLite:
     import chromadb
     from chromadb.config import Settings
 

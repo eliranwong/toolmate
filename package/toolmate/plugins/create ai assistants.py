@@ -7,7 +7,7 @@ build a group of agents to execute a task with integrated "AutoGen Agent Builder
 """
 
 
-if not config.isTermux:
+if not config.isLite:
     try:
         from toolmate.autobuilder import AutoGenBuilder
         from toolmate import config

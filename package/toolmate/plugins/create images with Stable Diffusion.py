@@ -6,7 +6,7 @@ generate images with model "dall-e-3"
 [TOOL_CALL]
 """
 
-if not config.isTermux:
+if not config.isLite:
 
     from toolmate import config, print2, print3, getCurrentDateTime, getCliOutput, getCpuThreads, downloadStableDiffusionFiles
     import os, shutil

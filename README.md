@@ -138,9 +138,15 @@ For Windows / macOS / LinuX / ChromeOS users:
 
 > pip install --upgrade toolmate
 
+or 
+
+> pip install --upgrade toolmate_lite
+
+The lite version `toolmate_lite` runs faster and supports Android Termux.  It lacks some of the features that are equipped with the full version `toolmate`.
+
 For Android users:
 
-> pip install --upgrade toolmate_android
+> pip install --upgrade toolmate_lite
 
 ## Optional Modules
 

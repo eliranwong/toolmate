@@ -25,7 +25,7 @@ chroma_client = chromadb.PersistentClient(memory_store, Settings(anonymized_tele
 #    return cosine
 
 
-if not config.isTermux:
+if not config.isLite:
 
     def save_memory(function_args):
         memory = function_args.get("memory") # required

@@ -24,7 +24,7 @@ import speech_recognition as sr
 import zipfile
 from openai import OpenAI
 import tiktoken
-if not config.isTermux:
+if not config.isLite:
     from llama_cpp import Llama
     from vertexai.generative_models import Content, Part
     from tavily import TavilyClient
@@ -117,7 +117,7 @@ def voiceTyping():
         process = subprocess.Popen(cli.rstrip(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
         return "[Error]" if stderr and not stdout else stdout.decode("utf-8").strip()
-    elif config.voiceTypingPlatform == "vosk" and not config.isTermux:
+    elif config.voiceTypingPlatform == "vosk" and not config.isLite:
         # disable log
         vosk.SetLogLevel(-1)
         # Load the Vosk model
@@ -1457,7 +1457,7 @@ def addTimeStamp(content):
     return f"{content}\n[Current time: {time}]"
 
 def getDayOfWeek():
-    if config.isTermux:
+    if config.isLite:
         return ""
     else:
         now = pendulum.now() 
@@ -1481,7 +1481,7 @@ Local ip: {local_ip}
 '''
     else:
         ipInfo = ""
-    if config.isTermux:
+    if config.isLite:
         dayOfWeek = ""
     else:
         dayOfWeek = getDayOfWeek()
@@ -1721,7 +1721,7 @@ def updateApp():
         except:
             bible = False
         package = os.path.basename(config.toolMateAIFolder)
-        thisPackage = f"{package}_android" if config.isTermux else package
+        thisPackage = f"{package}_lite" if config.isLite else package
         print(f"Checking '{thisPackage}' version ...")
         installed_version = getPackageInstalledVersion(thisPackage)
         if installed_version is None:

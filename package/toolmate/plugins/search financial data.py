@@ -6,7 +6,7 @@ search financial data with yfinance
 [TOOL_CALL]
 """
 
-if not config.isTermux:
+if not config.isLite:
 
     from toolmate import config
     from toolmate.utils.python_utils import PythonUtil

@@ -4,9 +4,15 @@ For Windows / macOS / LinuX / ChromeOS users:
 
 > pip install --upgrade toolmate
 
+or 
+
+> pip install --upgrade toolmate_lite
+
+The lite version `toolmate_lite` runs faster and supports Android Termux.  It lacks some of the features that are equipped with the full version `toolmate`.
+
 For Android users ([read more](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Termux%20Setup.md)):
 
-> pip install --upgrade toolmate_android
+> pip install --upgrade toolmate_lite
 
 Remarks: In the first run, `Toolmate AI` automatically creates a directory `~/toolmate`, where user content is stored.  Therefore, it is not recommended to install `Toolmate AI` in `~/toolmate`.
 

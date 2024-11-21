@@ -7,7 +7,7 @@ Ask llama.cpp server Model for conversation only; no function calling
 """
 
 
-if not config.isTermux:
+if not config.isLite:
 
     from toolmate import config
     from toolmate.utils.call_llamacppserver import CallLlamaCppServer

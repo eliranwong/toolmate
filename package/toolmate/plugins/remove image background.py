@@ -7,7 +7,7 @@ Remove image background
 """
 
 
-if not config.isTermux:
+if not config.isLite:
 
     from toolmate import config, is_valid_image_file
     from toolmate import print2, print3

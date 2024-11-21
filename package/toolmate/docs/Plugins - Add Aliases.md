@@ -13,7 +13,7 @@ from letmedoit import config
 import sys, os
 
 # add python python to work with virtual environment
-if not config.isTermux:
+if not config.isLite:
     # integrated AutoGen agents
     config.aliases["!autoassist"] = f"!{sys.executable} {os.path.join(config.letMeDoItAIFolder, 'autoassist.py')}"
     config.aliases["!automath"] = f"!{sys.executable} {os.path.join(config.letMeDoItAIFolder, 'automath.py')}"

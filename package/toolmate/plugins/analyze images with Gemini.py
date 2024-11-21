@@ -21,7 +21,7 @@ Reference: https://platform.openai.com/docs/guides/vision
 [TOOL_CALL]
 """
 
-if not config.isTermux:
+if not config.isLite:
 
     from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url, runToolMateCommand, getLlamacppServerClient
     from toolmate.utils.call_chatgpt import check_openai_errors

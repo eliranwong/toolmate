@@ -1,3 +1,11 @@
+# 0.5.10-0.5.14
+
+* support custom config file when launched, via -c argument
+
+* `.favourite` action renamed to `.like`
+
+* added command `toolmatelite` to full version
+
 # 0.5.03-0.5.09
 
 * supports Google AI Studio API key

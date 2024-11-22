@@ -321,6 +321,7 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "custom_config",
     "systemMessage_tool_current",
     "completer_user",
     "completer_developer",

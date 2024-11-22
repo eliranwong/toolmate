@@ -28,6 +28,10 @@ def set_log_file_max_lines(log_file, max_lines):
 def letmedoit():
     main("letmedoit")
 
+def lite():
+    config.isLite = True
+    main()
+
 def main(tempInterface=""):
     print(f"launching {config.toolMateAIName} ...")
 
@@ -36,7 +40,7 @@ def main(tempInterface=""):
     # Add arguments
     parser.add_argument("default", nargs="?", default=None, help="default entry; accepts a string; ignored when -l/rp/p/rf/f/r flag is used")
     parser.add_argument('-b', '--backend', action='store', dest='backend', help="set llm interface with -b flag; options: llamacpp/llamacppserver/ollama/groq/gemini/chatgpt/letmedoit")
-    #parser.add_argument('-c', '--context', action='store', dest='context', help="specify pre-defined context with -r flag; accepts a string")
+    parser.add_argument('-c', '--config', action='store', dest='config', help="specify custom config file with -c flag; accepts a file path")
     parser.add_argument('-f', '--file', action='store', dest='file', help="read file text as default entry with -f flag; accepts a file path; ignored when -l/rf flag is used")
     parser.add_argument('-i', '--ip', action='store', dest='ip', help="set 'true' to include or 'false' to exclude ip information in system message with -i flag")
     parser.add_argument('-l', '--load', action='store', dest='load', help="load file that contains saved chat records with -l flag; accepts either a chat ID or a file path; required plugin 'search chat records'")
@@ -60,6 +64,11 @@ def main(tempInterface=""):
         config.tempInterface = args.temp.lower()
     if config.tempInterface:
         config.llmInterface = config.tempInterface
+
+    if args.config:
+        config.custom_config = args.config
+    else:
+        config.custom_config = ""
 
     # update to the latest version
     if args.update:

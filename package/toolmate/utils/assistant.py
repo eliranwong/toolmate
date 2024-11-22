@@ -1800,23 +1800,25 @@ class ToolMate:
             AutoGenBuilder().promptConfig()
 
     def changeMyFavouries(self):
-        self.setDefaultTool()
+        if not config.tool_selection_agent:
+            self.setDefaultTool()
         self.setFavorite_string()
 
     def setFavorite_string(self):
+        completer = FuzzyCompleter(WordCompleter([f"@{i}" for i in config.allEnabledTools], ignore_case=True))
         hotkey_insert_bestliked_entry = str(config.hotkey_insert_bestliked_entry)[2:-2].replace("c-", "Ctrl+")
         hotkey_insert_favorite_entry = str(config.hotkey_insert_favorite_entry)[2:-2].replace("c-", "Ctrl+")
         print2(f"Two key combinations `{hotkey_insert_bestliked_entry}` and `{hotkey_insert_favorite_entry}` are used for inserting most frequently entries easily.")
         # best-link entry
         print1(f"Enter your best-liked entry that is inserted automatically with the key combo `{hotkey_insert_bestliked_entry}`:")
-        favorite_string_best = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.favorite_string_best)
+        favorite_string_best = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.favorite_string_best, completer=completer)
         if favorite_string_best and not favorite_string_best.strip().lower() == config.exit_entry:
             config.favorite_string_best = favorite_string_best
             config.saveConfig()
             print3(f"Favourite entry changed: {config.favorite_string_best}")
         # favourite entry
         print1(f"Enter your favourite entry that is inserted automatically with the key combo `{hotkey_insert_favorite_entry}`:")
-        favorite_string = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.favorite_string)
+        favorite_string = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.favorite_string, completer=completer)
         if favorite_string and not favorite_string.strip().lower() == config.exit_entry:
             config.favorite_string = favorite_string
             config.saveConfig()

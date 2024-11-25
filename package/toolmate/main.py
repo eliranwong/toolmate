@@ -66,7 +66,8 @@ def main(tempInterface=""):
         config.llmInterface = config.tempInterface
 
     if args.config:
-        config.custom_config = args.config
+        custom_config = os.path.expanduser(args.config)
+        config.custom_config = custom_config if os.path.isfile(custom_config) else ""
     else:
         config.custom_config = ""
 

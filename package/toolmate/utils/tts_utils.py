@@ -93,7 +93,7 @@ class TTSUtil:
                     piper_additional_options = f" {config.piper_additional_options.strip()}" if config.piper_additional_options.strip() else ""
                     if os.path.isfile(model_path):
                         if shutil.which("cvlc"):
-                            cmd = f'''"{shutil.which("piper")}" --model "{model_path}" --config "{model_config_path}" --output-raw | cvlc --play-and-exit --rate {config.vlcSpeed} --demux=rawaud --rawaud-channels=1 --rawaud-samplerate=22050{piper_additional_options} -{getHideOutputSuffix()}'''
+                            cmd = f'''"{shutil.which("piper")}" --model "{model_path}" --config "{model_config_path}" --output-raw | cvlc --no-loop --play-and-exit --rate {config.vlcSpeed} --demux=rawaud --rawaud-channels=1 --rawaud-samplerate=22050{piper_additional_options} -{getHideOutputSuffix()}'''
                         elif shutil.which("aplay"):
                             cmd = f'''"{shutil.which("piper")}" --model "{model_path}" --config "{model_config_path}" --output-raw | aplay -r 22050 -f S16_LE -t raw{piper_additional_options} -{getHideOutputSuffix()}'''
                         else:
@@ -101,7 +101,7 @@ class TTSUtil:
                     else:
                         print("[Downloading voice ...] ")
                         if shutil.which("cvlc"):
-                            cmd = f'''"{shutil.which("piper")}" --model {config.piper_voice} --download-dir "{model_dir}" --data-dir "{model_dir}" --output-raw | cvlc --play-and-exit --rate {config.vlcSpeed} --demux=rawaud --rawaud-channels=1 --rawaud-samplerate=22050{piper_additional_options} -{getHideOutputSuffix()}'''
+                            cmd = f'''"{shutil.which("piper")}" --model {config.piper_voice} --download-dir "{model_dir}" --data-dir "{model_dir}" --output-raw | cvlc --no-loop --play-and-exit --rate {config.vlcSpeed} --demux=rawaud --rawaud-channels=1 --rawaud-samplerate=22050{piper_additional_options} -{getHideOutputSuffix()}'''
                         elif shutil.which("aplay"):
                             cmd = f'''"{shutil.which("piper")}" --model {config.piper_voice} --download-dir "{model_dir}" --data-dir "{model_dir}" --output-raw | aplay -r 22050 -f S16_LE -t raw{piper_additional_options} -{getHideOutputSuffix()}'''
                         else:
@@ -118,7 +118,7 @@ class TTSUtil:
                         await communicate.save(audioFile)
                     asyncio.run(saveEdgeAudio())
                     if shutil.which("mpv"):
-                        os.system(f'''mpv --really-quiet "{audioFile}"''')
+                        os.system(f'''mpv --no-loop-file --really-quiet "{audioFile}"''')
                     else:
                         TTSUtil.playAudioFile(audioFile, vlcSpeed=0.0)
                 else:
@@ -154,7 +154,7 @@ class TTSUtil:
             elif config.isTermux and config.terminalEnableTermuxAPI:
                 os.system(f'''termux-media-player play "{audioFile}"''')
             elif shutil.which("mpv"):
-                os.system(f'''mpv --really-quiet "{audioFile}"''')
+                os.system(f'''mpv --no-loop-file --really-quiet "{audioFile}"''')
             else:
                 sounddevice.play(*soundfile.read(audioFile)) 
                 sounddevice.wait()

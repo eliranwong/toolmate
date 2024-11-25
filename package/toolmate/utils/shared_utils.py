@@ -866,6 +866,14 @@ def selectEnabledTool() -> Optional[str]:
 
 # connectivity
 
+def hostnameToIp(hostname):
+    try:
+        ip_address = socket.gethostbyname(hostname)
+        return ip_address
+    except socket.gaierror as e:
+        print(f"DNS lookup failed: {e}")
+        return None
+
 def isServerAlive(ip, port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(2)  # Timeout in case of server not responding
@@ -1262,7 +1270,7 @@ def transformText(text):
             text = transformer(text)
     return text
 
-def print1(content):
+def print1(content): # wrap words around terminal width
     content = transformText(content)
     if config.wrapWords:
         # wrap words to fit terminal width
@@ -1274,13 +1282,13 @@ def print1(content):
     else:
         print(content)
 
-def print2(content):
+def print2(content): # print in colour
     try:
         print_formatted_text(HTML(f"<{config.terminalPromptIndicatorColor2}>{content}</{config.terminalPromptIndicatorColor2}>"))
     except:
         print(content)
 
-def print3(content):
+def print3(content): # print in colour up to the `:`
     try:
         splittedContent = content.split(": ", 1)
         if len(splittedContent) == 2:

@@ -137,6 +137,7 @@ Start Docker:
 
 ```
 service docker start
+echo "service docker start" >> /etc/profile
 ```
 
 Test Docker:
@@ -211,16 +212,6 @@ Run in Termux:
 ```
 qemu-system-x86_64 -m 512 -netdev user,id=n1,hostfwd=tcp::2222-:22,hostfwd=tcp::4000-:4000,hostfwd=tcp::3000-:3000,hostfwd=tcp::3001-:3001 -device virtio-net,netdev=n1 -nographic alpine.qcow2
 ```
-
-# How to start docker or perplexica after the virtual machine is launched?
-
-Run in virtual machine:
-
-```
-service docker start
-```
-
-You just need to set up Perplexica once.  When you run `service docker start`, it runs the Perplexica and SearXNG service too.
 
 # How to run ToolMate AI while the virtual machine is running?
 

@@ -15,9 +15,9 @@ thisFile = os.path.realpath(__file__)
 packageFolder = os.path.dirname(thisFile)
 package = os.path.basename(packageFolder)
 
-# set current directory
-if os.getcwd() != packageFolder:
-    os.chdir(packageFolder)
+# set current directory; unnecessary; conflict with API client
+#if os.getcwd() != packageFolder:
+#    os.chdir(packageFolder)
 
 # create conifg.py in case it is deleted due to errors
 configFile = os.path.join(packageFolder, "config.py")

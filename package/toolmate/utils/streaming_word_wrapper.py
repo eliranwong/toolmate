@@ -75,7 +75,10 @@ class StreamingWordWrapper:
                             break
                         await asyncio.sleep(0.1)
 
-        asyncio.run(readKeys())
+        try:
+            asyncio.run(readKeys())
+        except:
+            pass
 
     def streamOutputs(self, streaming_event, completion, openai=False):
         terminal_width = shutil.get_terminal_size().columns

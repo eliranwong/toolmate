@@ -26,7 +26,15 @@ storageDir = config.localStorage
 # restore configs from backup
 if os.path.isdir(storageDir):
     configFile = os.path.join(config.toolMateAIFolder, "config.py")
-    if os.path.getsize(configFile) == 0:
+
+    if hasattr(config, "custom_config") and config.custom_config and os.path.isfile(config.custom_config):
+        try:
+            loadConfig(config.custom_config)
+            shutil.copy(config.custom_config, configFile)
+            print("Custom configuration applied!")
+        except:
+            print("Failed to apply custom backup!")
+    elif os.path.getsize(configFile) == 0:
         # It means that it is either a newly installed copy or an upgraded copy
         
         # delete old shortcut files so that newer versions of shortcuts can be created
@@ -41,28 +49,20 @@ if os.path.isdir(storageDir):
         shutil.rmtree(shortcut_dir, ignore_errors=True)
 
         # check if config backup is available
-        if hasattr(config, "custom_config") and config.custom_config and os.path.isfile(config.custom_config):
-            try:
-                loadConfig(config.custom_config)
-                shutil.copy(config.custom_config, configFile)
-                print("Configuration backup restored!")
-            except:
-                print("Failed to apply custom backup!")
-        else:
-            backupFile = os.path.join(storageDir, "config_lite_backup.py" if config.isLite else "config_backup.py")
-            if os.path.isfile(backupFile):
-                restore_backup = yes_no_dialog(
-                    title="Configuration Backup Found",
-                    text=f"Do you want to use the following backup?\n{backupFile}"
-                ).run()
-                if restore_backup:
-                    try:
-                        loadConfig(backupFile)
-                        shutil.copy(backupFile, configFile)
-                        print("Configuration backup restored!")
-                        #config.restartApp()
-                    except:
-                        print("Failed to restore backup!")
+        backupFile = os.path.join(storageDir, "config_lite_backup.py" if config.isLite else "config_backup.py")
+        if os.path.isfile(backupFile):
+            restore_backup = yes_no_dialog(
+                title="Configuration Backup Found",
+                text=f"Do you want to use the following backup?\n{backupFile}"
+            ).run()
+            if restore_backup:
+                try:
+                    loadConfig(backupFile)
+                    shutil.copy(backupFile, configFile)
+                    print("Configuration backup restored!")
+                    #config.restartApp()
+                except:
+                    print("Failed to restore backup!")
 
 # load new / unsaved configs
 setConfig(defaultSettings)

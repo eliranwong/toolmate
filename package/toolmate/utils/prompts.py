@@ -117,6 +117,11 @@ class Prompts:
             buffer = event.app.current_buffer
             config.addPathAt = buffer.cursor_position
             buffer.validate_and_handle()
+        @this_key_bindings.add(*config.hotkey_insert_tool) # add tool
+        def _(event):
+            buffer = event.app.current_buffer
+            config.addToolAt = buffer.cursor_position
+            buffer.validate_and_handle()
         @this_key_bindings.add(*config.hotkey_new)
         def _(event):
             buffer = event.app.current_buffer

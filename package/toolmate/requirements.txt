@@ -18,7 +18,7 @@ jsonpath-python==1.0.6
 zope.interface==7.0.3
 annotated-types==0.7.0
 exceptiongroup==1.2.2
-blinker==1.8.2
+blinker==1.9.0
 anthropic==0.34.2
 h11==0.14.0
 cachetools==5.5.0
@@ -132,3 +132,5 @@ vosk
 edge-tts
 ftfy
 lightrag-hku
+fastapi
+uvicorn

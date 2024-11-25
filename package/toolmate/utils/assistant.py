@@ -59,8 +59,34 @@ class ToolMate:
         self.setup()
         Plugins.runPlugins()
 
+    def resetMessages(self):
+        self.workflow = []
+        config.conversationStarted = False
+        return CallLLM.resetMessages()
+
+    def loadMessages(self, chatfile: str):
+        if chatfile and os.path.isfile(chatfile):
+            try:
+                config.conversationStarted = True
+                messages = eval(readTextFile(chatfile))
+                currentMessages = []
+                if isinstance(messages, list):
+                    for i in messages:
+                        try:
+                            role = i.get("role")
+                            content = i.get("content")
+                            if role in ("user", "assistant"):
+                                currentMessages.append(i)
+                        except:
+                            pass
+            except:
+                currentMessages = []
+        else:
+            currentMessages = []
+        return self.resetMessages() + currentMessages
+
     def setup(self):
-        config.currentMessages = []
+        config.currentMessages = self.resetMessages()
         # set up tool store client
 
         self.models = list(tokenLimits.keys())
@@ -86,6 +112,7 @@ class ToolMate:
         config.launchPager = self.launchPager
         config.changeOpenweathermapApi = self.changeOpenweathermapApi
         config.selectedTool = ""
+        config.addToolAt = None
         # env variables
         os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = config.env_QT_QPA_PLATFORM_PLUGIN_PATH
 
@@ -2481,7 +2508,7 @@ class ToolMate:
                         if not overwrite == "yes":
                             return None
                     with open(filePath, "w", encoding="utf-8") as fileObj:
-                        fileObj.write(pprint.pformat(messages))
+                        fileObj.write(pprint.pformat([i for i in messages if i.get("role", "") in ("user", "assistant")]))
                         print3(f"Conversation saved: {filePath}")
                         config.last_conversation = filePath
                     with open(workflowPath, "w", encoding="utf-8") as fileObj:
@@ -2518,7 +2545,7 @@ class ToolMate:
                 if os.path.isdir(folderPath):
                     chatFile = os.path.join(folderPath, f"{timestamp}.txt")
                     with open(chatFile, "w", encoding="utf-8") as fileObj:
-                        fileObj.write(pprint.pformat(messagesCopy))
+                        fileObj.write(pprint.pformat([i for i in messagesCopy if i.get("role", "") in ("user", "assistant")]))
                         print3(f"Conversation saved: {chatFile}")
                         config.last_conversation = chatFile
                     workflowFile = os.path.join(folderPath, f"{timestamp}_workflow.txt")
@@ -2534,26 +2561,11 @@ class ToolMate:
     def exportChat(self, messages, filePath=""):
         if config.conversationStarted:
             plainText = ""
-            timestamp = getCurrentDateTime()
-
             for i in messages:
-                if i["role"] == "user":
-                    content = i["content"]
-                    plainText += f">>> {content}"
-                if i["role"] == "function":
-                    if plainText:
-                        plainText += "\n\n"
-                    name = i["name"]
-                    plainText += f"```\n{name}\n```"
-                    content = i["content"]
-                    plainText += f"\n\n{content}\n\n"
-                elif i["role"] == "assistant":
-                    content = i["content"]
-                    if content is not None:
-                        if plainText:
-                            plainText += "\n\n"
-                        plainText += f"{content}\n\n"
-            plainText = plainText.strip()
+                role = i.get("role", "")
+                content = i.get("content", "")
+                if role in ("user", "assistant"):
+                    plainText += f"```{role}\n{content.rstrip()}\n```\n"
             if not filePath:
                 filePath = self.getPath.getFilePath(
                     empty_to_cancel=True,
@@ -3275,7 +3287,16 @@ Acess the risk level of the following `{target.capitalize()}`:
             
             # display options when empty string is entered
             userInputLower = userInput.lower()
-            if config.addPathAt is not None:
+            if config.addToolAt is not None:
+                prefix = userInput[:config.addToolAt]
+                suffix = userInput[config.addToolAt:]
+                completer = FuzzyCompleter(WordCompleter([f"@{i}" for i in config.allEnabledTools], ignore_case=True))
+                print2("Search for a tool below:")
+                insrtedTool = self.prompts.simplePrompt(style=self.prompts.promptStyle2, completer=completer)
+                config.defaultEntry = f"{prefix} {insrtedTool} {suffix}" if insrtedTool and not insrtedTool.strip().lower() == config.exit_entry else f"{prefix}{suffix}"
+                config.addToolAt = None
+                userInput = ""
+            elif config.addPathAt is not None:
                 prefix = userInput[:config.addPathAt]
                 prefixSplit = prefix.rsplit(" ", 1)
                 if len(prefixSplit) > 1:
@@ -3371,14 +3392,10 @@ Acess the risk level of the following `{target.capitalize()}`:
                     if config.conversationStarted:
                         print2("We are saving the current conversation first ...")
                         self.saveChat(config.currentMessages)
-                    try:
-                        currentMessages = eval(readTextFile(last_conversation))
-                        storagedirectory, config.currentMessages = startChat()
-                        storagedirectory = checkDirectory(storagedirectory)
-                        displayLoadedMessages(currentMessages)
-                        config.currentMessages = currentMessages
-                    except:
-                        print3(f"Unable to open: {last_conversation}")
+                    config.currentMessages = self.loadMessages(last_conversation)
+                    storagedirectory, _ = startChat()
+                    checkDirectory(storagedirectory)
+                    displayLoadedMessages(config.currentMessages)
                 else:
                     print2("Previously saved conversation not found!")
             elif userInputLower == ".open":
@@ -3400,11 +3417,10 @@ Acess the risk level of the following `{target.capitalize()}`:
                             print2("We are saving the current conversation first ...")
                             self.saveChat(config.currentMessages)
                         print3(f"Loading: {filePath}")
-                        currentMessages = eval(readTextFile(filePath))
-                        storagedirectory, config.currentMessages = startChat()
-                        storagedirectory = checkDirectory(storagedirectory)
-                        displayLoadedMessages(currentMessages)
-                        config.currentMessages = currentMessages
+                        config.currentMessages = self.loadMessages(filePath)
+                        storagedirectory, _ = startChat()
+                        checkDirectory(storagedirectory)
+                        displayLoadedMessages(config.currentMessages)
                     if changeDir:
                         os.chdir(cwd)
                 except:

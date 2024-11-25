@@ -84,7 +84,7 @@ class VlcUtil:
             command = f'''"{VlcUtil.windowsVlc}" --intf dummy --play-and-exit --rate {vlcSpeed} "{filePath}"'''
         # vlc on other platforms
         elif shutil.which("cvlc"):
-            command = f'''cvlc --play-and-exit --rate {vlcSpeed} "{filePath}"{getHideOutputSuffix()}'''
+            command = f'''cvlc --no-loop --play-and-exit --rate {vlcSpeed} "{filePath}"{getHideOutputSuffix()}'''
         # use .communicate() to wait for the playback to be completed as .wait() or checking pid existence does not work
         subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 
@@ -100,7 +100,7 @@ class VlcUtil:
             command = f'''"{VlcUtil.windowsVlc}" --play-and-exit --rate {vlcSpeed} "{filePath}"'''
         # vlc on other platforms
         elif shutil.which("vlc"):
-            command = f'''vlc --play-and-exit --rate {vlcSpeed} "{filePath}"{getHideOutputSuffix()}'''
+            command = f'''vlc --no-loop --play-and-exit --rate {vlcSpeed} "{filePath}"{getHideOutputSuffix()}'''
         # use .communicate() to wait for the playback to be completed as .wait() or checking pid existence does not work
         subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 

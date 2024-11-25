@@ -26,6 +26,12 @@ if config.isLite:
 
 defaultSettings = (
     # unique configs in ToolMate AI
+    ('toolmate_api_server_key', 'toolmateai'),
+    ('toolmate_api_server_port', 5555),
+    ('toolmate_api_server_host', "0.0.0.0"), # use ip address for this value
+    ('toolmate_api_client_key', 'toolmateai'),
+    ('toolmate_api_client_port', 5555),
+    ('toolmate_api_client_host', 'http://localhost'),
     ('last_conversation', ''),
     ('last_workflow', ''),
     ('defaultTool', 'chat'),
@@ -290,6 +296,7 @@ defaultSettings = (
     ("hotkey_new", ["c-n"]),
     ("hotkey_insert_file_path", ["escape", "o"]),
     ("hotkey_insert_newline", ["c-i"]),
+    ("hotkey_insert_tool", ["escape", "i"]),
     ("hotkey_open_chat_records", ["c-o"]),
     #("hotkey_open_plain_text_file", ["escape", "o"]),
     ("hotkey_open_last_conversation", ["c-l"]),
@@ -365,6 +372,7 @@ temporaryConfigs = [
     "saveConfig",
     "aliases",
     "addPathAt",
+    "addToolAt",
     "multilineInput",
     "conversationStarted",
     "dynamicToolBarText",

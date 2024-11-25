@@ -1,3 +1,9 @@
+# 0.5.15-0.5.22
+
+* added an API server, `toolmateserver`
+
+* added an API client, `toolmateclient`; `tm` and `tmc` are aliases to `toolmateclient`; `tmc` enables chat feature by default.
+
 # 0.5.10-0.5.14
 
 * support custom config file when launched, via -c argument

@@ -43,7 +43,7 @@ open(os.path.join(package, "config.py"), "w").close()
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name=package,
-    version="0.5.14",
+    version="0.5.22",
     python_requires=">=3.8, <3.13",
     description=f"ToolMate AI, developed by Eliran Wong, is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. Supports custom workflow and plugins to automate multi-step actions.",
     long_description=long_description,
@@ -137,6 +137,10 @@ setup(
             f"{package}={package}.main:main",
             f"{package}lite={package}.main:lite",
             f"letmedoit={package}.main:letmedoit",
+            f"{package}server={package}.api_server:main",
+            f"{package}client={package}.api_client:main",
+            f"tm={package}.api_client:main", # an alias to toolmate client
+            f"tmc={package}.api_client:chat", # an alias to toolmate client; with chat feature enabled
             f"{package}ai={package}.systemtray:main",
             f"toolserver={package}.servers:main",
             f"chatserver={package}.servers:chat",

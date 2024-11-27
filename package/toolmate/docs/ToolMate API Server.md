@@ -37,6 +37,18 @@ options:
 
 To change other server settings, use the action menu in interactive mode or manually edit `config.py`.
 
+The following configurations are created for running the API server / client:
+
+```
+toolmate_api_server_key='toolmateai'
+toolmate_api_server_port=5555
+toolmate_api_server_host='0.0.0.0'
+toolmate_api_client_key='toolmateai'
+toolmate_api_client_port=5555
+toolmate_api_client_host='http://localhost'
+toolmate_api_client_markdown=True
+```
+
 ## Examples
 
 * Use backend `googleai` for the server:
@@ -253,4 +265,4 @@ https://github.com/eliranwong/toolmate/blob/main/xonsh/.xonshrc
 
 3. Launch `xonsh`
 
-4. Enter '@' to get tool suggestions or '`' to get predefined system message / context suggestions after commands 'toolmateclient', 'tm' or 'tmc'
+4. Enter '@' and press 'TAB' to get tool suggestions or '`' and press 'TAB' to get predefined system message / context suggestions after commands 'toolmateclient', 'tm' or 'tmc'

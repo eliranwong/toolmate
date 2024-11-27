@@ -165,6 +165,14 @@ options:
 
 > tm -cs "Code Expert" "Compare rust to python."
 
+* Use a predefined context for conversation:
+
+> tm "@chat `Reflection` What is the best of python?"
+
+* Use both predefined chat system message and predefined context for conversation:
+
+> tm "@chat `Code Expert` `Reflection` What is the best of python?"
+
 * Specify output tokens and temperature for a single request:
 
 > tm -mo 500 -t 1.2 "tell me a joke"
@@ -242,3 +250,7 @@ We worked out a completer function to work with auto-completion and suggestions 
 https://github.com/eliranwong/toolmate/blob/main/xonsh/.xonshrc
 
 2. Edit the list items in the file in `~/.xonshrc` to suit your needs.
+
+3. Launch `xonsh`
+
+4. Enter '@' to get tool suggestions or '`' to get predefined system message / context suggestions after commands 'toolmateclient', 'tm' or 'tmc'

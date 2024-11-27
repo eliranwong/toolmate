@@ -54,6 +54,10 @@ def configs():
     print3(f"Reading: {configFile}")
     content = readTextFile(configFile)
     highlightPythonSyntax(content, pformat=False)
+    print("")
+    print2("```path")
+    print(configFile)
+    print2("```")
 
 def chat():
     main(True if not (args.chat is not None and args.chat.lower() == "false") else False)
@@ -61,17 +65,18 @@ def chat():
 def main(chat: bool = False):
     host = args.server if args.server else config.toolmate_api_client_host
     port = args.port if args.port else config.toolmate_api_client_port
-    if not isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port) and shutil.which("nohup") and shutil.which("toolmateserver"):
-        startSpinning()
-        print2("Loading ToolMate AI ...")
-        cli = f'''{shutil.which("nohup")} "{shutil.which("toolmateserver")}" &'''
-        os.system(cli)
-        # wait until the server is up
-        while not isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
-            pass
-        stopSpinning()
-    else:
-        print2("Failed to connect! Run `toolmateserver` first!")
+    if not isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
+        if shutil.which("nohup") and shutil.which("toolmateserver"):
+            startSpinning()
+            print2("Loading ToolMate AI ...")
+            cli = f'''{shutil.which("nohup")} "{shutil.which("toolmateserver")}" &'''
+            os.system(cli)
+            # wait until the server is up
+            while not isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
+                pass
+            stopSpinning()
+        else:
+            print2("Failed to connect ToolMate AI! Run `toolmateserver` first!")
 
     cliDefault = args.default.strip() if args.default is not None and args.default.strip() else ""
     stdin_text = sys.stdin.read() if not sys.stdin.isatty() else ""

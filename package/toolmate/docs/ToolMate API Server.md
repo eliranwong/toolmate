@@ -6,6 +6,12 @@ In case `nohup` is installed and in the $PATH of your device.  Running `tm` or `
 
 # API Server
 
+To start ToolMate AI server:
+
+> toolmateserver
+
+To check CLI options:
+
 > toolmateserver -h
 
 ```
@@ -27,6 +33,10 @@ options:
                         override default inference temperature; accepted range: 0.0-2.0
 ```
 
+## Change Server Settings
+
+To change other server settings, use the action menu in interactive mode or manually edit `config.py`.
+
 ## Examples
 
 * Use backend `googleai` for the server:
@@ -43,7 +53,21 @@ options:
 
 > toolmateserver -mo 2048 -t 0.5
 
+> toolmateserver -b chatgpt -p 5001 -mo 4096 -t 0.7
+
+> toolmateserver -b googleai -p 5002 -mo 8000 -t 0.3
+
 # API Client
+
+To start ToolMate AI server, use either `toolmateclient` or `tm` or `tmc`:
+
+> toolmateclient
+
+> tm
+
+> tmc
+
+To check CLI options:
 
 > toolmateclient -h
 
@@ -129,9 +153,17 @@ options:
 
 > tmc "Why?"
 
-* Assign a role to the assitant for chat:
+* Enable word wrap for output:
+
+> tm -ww true "How are you?"
+
+* Customise the assitant's system message for conversation:
 
 > tm -cs "Talk like a professor in economics" "What is your view on global finance?"
+
+* Use a predefined system message for conversation:
+
+> tm -cs "Code Expert" "Compare rust to python."
 
 * Specify output tokens and temperature for a single request:
 
@@ -141,7 +173,27 @@ options:
 
 > tm -st image
 
-* Specify the default tool for a non-workflow request:
+* Show all available tools:
+
+> tm -st @
+
+* Search for predefined chat system messages:
+
+> tm -ss code
+
+* Show all predefined chat system messages:
+
+> tm -ss @
+
+* Search for predefined contexts:
+
+> tm -sc character
+
+* Show all predefined contexts:
+
+> tm -sc @
+
+* Specify the default tool for a request that does not specify a tool:
 
 > tm -dt execute_computing_task "Create a text file 'hello.txt' and write 'Hello World!' in it."
 
@@ -178,3 +230,15 @@ options:
 * Power down the API server:
 
 > tm -pd true
+
+# Auto-completion and Suggestions on Xonsh
+
+![xonsh_input_suggestions](https://github.com/user-attachments/assets/34b88eb1-c013-4e5b-8f28-989fbf17173d)
+
+We worked out a completer function to work with auto-completion and suggestions on [xonsh](https://xon.sh/).
+
+1. Copy the following file to your home directory `~` as `~/.xonshrc`:
+
+https://github.com/eliranwong/toolmate/blob/main/xonsh/.xonshrc
+
+2. Edit the list items in the file in `~/.xonshrc` to suit your needs.

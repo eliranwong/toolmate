@@ -54,9 +54,15 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
     chat = request.chat
     chatfile = request.chatfile
     chatsystem = request.chatsystem
+    if chatsystem is not None:
+        check = re.sub("^`([^`]+?)`$", r"\1", chatsystem)
+        if check in config.predefinedChatSystemMessages:
+            chatsystem = config.predefinedChatSystemMessages.get(check)
     maximumoutput = request.maximumoutput
     temperature = request.temperature
     defaulttool = request.defaulttool
+    if defaulttool is not None:
+        defaulttool = re.sub("^@", "", defaulttool)
     toolagent = request.toolagent
     backupchat = request.backupchat
     backupsettings = request.backupsettings

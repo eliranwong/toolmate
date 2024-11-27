@@ -1,0 +1,47 @@
+FROM ubuntu:latest
+
+# To build:
+# > docker build -t ubuntu-shell --build-arg UID=$(id -u) --build-arg USER=$(whoami) .
+# or
+# > docker build -t ubuntu-shell -f Dockerfile --no-cache --progress plain --build-arg UID=$UID --build-arg USER=$USER .
+
+# To run:
+# > docker run --hostname toolmate -it ubuntu-shell
+
+# get UID/GID of host user for remapping to access bindmounts on host
+ARG USER
+ARG UID
+
+# Set the TERM environment variable
+ENV TERM=xterm-256color
+
+# Update package lists
+RUN apt update
+
+# Install necessary packages
+RUN apt install -y \
+    bash \
+    curl \
+    vim \
+    net-tools \
+    sudo
+
+# Set hostname
+RUN echo "toolmate" > /etc/hostname
+
+# Create the user and group, if current username is not `ubuntu`
+RUN if [ ${USER} != "ubuntu" ]; then \
+        useradd -m -d /home/${USER} -s /bin/bash ${USER}; \
+    fi
+
+# Add user to sudo group
+RUN usermod -aG sudo ${USER}
+
+RUN echo ${USER}" ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+USER ${USER}
+
+WORKDIR /home/${USER}
+
+# Set the default command
+CMD ["/bin/bash"]

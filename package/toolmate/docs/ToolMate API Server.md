@@ -1,14 +1,10 @@
-# CLI Options
-
-Interactive mode:
-
-> toolmate -h
-
 # API Server & Client
 
 Toolmate AI supports running as a API server, for quick access and full integration with all other cli tools.  Run `toolmateserver` once to start the API server.  Use commands `tm` or `tmc` for access.
 
-## API Server
+In case `nohup` is installed and in the $PATH of your device.  Running `tm` or `tmc` starts the server automatically if the server is not running.
+
+# API Server
 
 > toolmateserver -h
 
@@ -31,7 +27,23 @@ options:
                         override default inference temperature; accepted range: 0.0-2.0
 ```
 
-## API Client
+## Examples
+
+* Use backend `googleai` for the server:
+
+> toolmateserver -b googleai
+
+* Specify ports for running different backends:
+
+> toolmateserver -b chatgpt -p 5001
+
+> toolmateserver -b googleai -p 5002
+
+* Specify maximum output tokens and temperature
+
+> toolmateserver -mo 2048 -t 0.5
+
+# API Client
 
 > toolmateclient -h
 
@@ -98,3 +110,71 @@ options:
   -ww WORDWRAP, --wordwrap WORDWRAP
                         word wrap; true / false; determined by 'config.wrapWords' if not given
 ```
+
+## Examples
+
+* Start a conversation:
+
+> tm hi
+
+* Start a workflow:
+
+> tm "@chat tell me a joke @chat tell me another one"
+
+> tm "@chat Give me a random Youtube link @download_youtube_audio"
+
+* Continue the previous conversation
+
+> tmc "Tell me more"
+
+> tmc "Why?"
+
+* Assign a role to the assitant for chat:
+
+> tm -cs "Talk like a professor in economics" "What is your view on global finance?"
+
+* Specify output tokens and temperature for a single request:
+
+> tm -mo 500 -t 1.2 "tell me a joke"
+
+* Search for available tools:
+
+> tm -st image
+
+* Specify the default tool for a non-workflow request:
+
+> tm -dt execute_computing_task "Create a text file 'hello.txt' and write 'Hello World!' in it."
+
+> tm -dt deep_reflection "What countries are the best for young people?"
+
+* Automate tool selection for a request:
+
+> tm -ta true "Send email to me@myemail.com to say thank you to John"
+
+* Integrate with other CLI tools, e.g. fabric:
+
+> tm -dt deep_reflection "What countries are the best for young people?" | fabric -p extract_wisdom
+
+* Display the current conversation in a choosen format
+
+> tm -f plain
+
+> tm -f list
+
+* Export the current conversation in a choosen format
+
+> tm -f plain > chat_in_plain_format.txt
+
+> tm -f list > chat_in_list_format.txt
+
+* Back up the current conversation in ToolMate user directory, `~/toolmate` by default:
+
+> tm -bc true
+
+* Make a change in temperature persistent:
+
+> tm -t 0.8 -bs true
+
+* Power down the API server:
+
+> tm -pd true

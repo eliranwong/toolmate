@@ -52,7 +52,7 @@ from letmedoit import config
 from letmedoit.utils.install import installmodule
 
 # Function method
-def install_package(function_args):
+def install_python_package(function_args):
     package = function_args.get("package") # required
     if package:
         install = installmodule(f"--upgrade {package}")
@@ -61,7 +61,7 @@ def install_package(function_args):
 
 # Function Signature
 functionSignature = {
-    "name": "install_package",
+    "name": "install_python_package",
     "description": f'''Install python package''',
     "parameters": {
         "type": "object",
@@ -76,7 +76,7 @@ functionSignature = {
 }
 
 # Integrate the signature and method into LetMeDoIt AI
-config.addFunctionCall(name="install_package", signature=functionSignature, method=install_package)
+config.addFunctionCall(name="install_python_package", signature=functionSignature, method=install_python_package)
 ```
 
 # Example 2 - edit text

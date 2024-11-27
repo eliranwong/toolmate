@@ -10,7 +10,7 @@ from toolmate import config
 from toolmate import installPipPackage
 
 # Function method
-def install_package(function_args):
+def install_python_package(function_args):
     config.stopSpinning()
     if function_args:
         package = function_args.get("package") # required
@@ -27,7 +27,7 @@ functionSignature = {
     "examples": [
         "install python package",
     ],
-    "name": "install_package",
+    "name": "install_python_package",
     "description": f'''Install a python package''',
     "parameters": {
         "type": "object",
@@ -42,4 +42,4 @@ functionSignature = {
 }
 
 # Integrate the signature and method into LetMeDoIt AI
-config.addFunctionCall(signature=functionSignature, method=install_package)
+config.addFunctionCall(signature=functionSignature, method=install_python_package)

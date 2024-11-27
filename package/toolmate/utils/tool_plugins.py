@@ -31,7 +31,7 @@ class Plugins:
             "@convert_relative_datetime ",
             "@list_current_directory_contents ",
             "@extract_python_code ",
-            "@run_python_code ",
+            "@execute_python_code ",
         ]
         if config.isTermux:
             config.inputSuggestions.append("@termux ")
@@ -48,7 +48,7 @@ class Plugins:
             #"copy_to_clipboard": "Copy a given content to the system clipboard",
             #"paste_from_clipboard": "Retrieve the text content from the system clipboard and paste",
             "extract_python_code": "Extract the python code in a given content",
-            "run_python_code": "Extract and run the python code in a given content",
+            "execute_python_code": "Extract and run the python code in a given content",
             "list_current_directory_contents": "List the contents in the current directory",
             "command": "Execute a system command",
             "append_command": "Execute a system command with the previous text output appended to it",
@@ -165,3 +165,4 @@ class Plugins:
                 print3(tool)
         if display:
             print("")
+        return tools

@@ -134,3 +134,4 @@ ftfy
 #lightrag-hku
 fastapi
 uvicorn
+xonsh[full]

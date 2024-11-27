@@ -30,9 +30,9 @@ There are 3 different ways to run python code with ToolMate AI (The first two me
 
 The second method supports auto-correction feature whereas the first method does not.
 
-3. Use tool `@extract_python_code` or `@run_python_code`. For example, to extract and run the python code in assistant previous response, simply run:
+3. Use tool `@extract_python_code` or `@execute_python_code`. For example, to extract and run the python code in assistant previous response, simply run:
 
-> @run_python_code
+> @execute_python_code
 
 Read more about tools at: https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md
 

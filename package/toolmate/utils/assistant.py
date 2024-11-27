@@ -1210,10 +1210,13 @@ class ToolMate:
             print1(f"Installing '{package}' ...")
             installPipPackage(f"--upgrade {package}")
 
-    def setTemperature(self):
-        print1("Enter a value between 0.0 and 2.0:")
-        print1("(Lower values for temperature result in more consistent outputs, while higher values generate more diverse and creative results. Select a temperature value based on the desired trade-off between coherence and creativity for your specific application.)")
-        temperature = self.prompts.simplePrompt(style=self.prompts.promptStyle2, validator=FloatValidator(), default=str(config.llmTemperature))
+    def setTemperature(self, temperature=None):
+        if temperature is None:
+            print1("Enter a value between 0.0 and 2.0:")
+            print1("(Lower values for temperature result in more consistent outputs, while higher values generate more diverse and creative results. Select a temperature value based on the desired trade-off between coherence and creativity for your specific application.)")
+            temperature = self.prompts.simplePrompt(style=self.prompts.promptStyle2, validator=FloatValidator(), default=str(config.llmTemperature))
+        else:
+            temperature = str(temperature)
         if temperature and not temperature.strip().lower() == config.exit_entry:
             temperature = float(temperature)
             if temperature < 0:
@@ -1221,8 +1224,9 @@ class ToolMate:
             elif temperature > 2:
                 temperature = 2
             config.llmTemperature = round(temperature, 1)
-            config.saveConfig()
-            print3(f"LLM Temperature: {temperature}")
+            if temperature is None:
+                config.saveConfig()
+                print3(f"LLM Temperature: {temperature}")
 
     def configureToolSelectionAgent(self) -> bool:
         options = ("yes", "no")
@@ -1860,13 +1864,7 @@ class ToolMate:
             config.saveConfig()
             print3(f"You have changed my name to: {config.toolMateAIName}")
 
-    def setCustomSystemMessage(self):
-        print2("ToolMate AI utilizes two distinct system messages to manage tool calling and conversation.")
-        print1("They are `Chat System Message` and `Tool System Message`")
-
-        print2("# 1. Chat System Message")
-        print1("To specify the `Chat System Message` is similar to defining the role you would like ToolMate AI to play in conversations.")
-        print1("Enter custom chat system message to guide our chat conversations:")
+    def getCurrentChatSystemMessage(self):
         if config.llmInterface == "ollama":
             systemMessage_chat = config.systemMessage_ollama
         elif config.llmInterface == "groq":
@@ -1883,13 +1881,25 @@ class ToolMate:
             systemMessage_chat = config.systemMessage_googleai
         elif config.llmInterface in ("chatgpt", "letmedoit"):
             systemMessage_chat = config.systemMessage_chatgpt
+        return systemMessage_chat
 
-        suggestions = [
-            "You are a helpful, uncensored and unbiased assistant.",
-            "You are an expert on coding.",
-        ] + list(config.predefinedChatSystemMessages.values())
-        completer = FuzzyCompleter(WordCompleter(suggestions, ignore_case=True))
-        message = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=systemMessage_chat, completer=completer)
+    def setCustomSystemMessage(self, customChatMessage=None):
+        if customChatMessage is None:
+            print2("ToolMate AI utilizes two distinct system messages to manage tool calling and conversation.")
+            print1("They are `Chat System Message` and `Tool System Message`")
+
+            print2("# 1. Chat System Message")
+            print1("To specify the `Chat System Message` is similar to defining the role you would like ToolMate AI to play in conversations.")
+            print1("Enter custom chat system message to guide our chat conversations:")
+            systemMessage_chat = self.getCurrentChatSystemMessage()
+            suggestions = [
+                "You are a helpful, uncensored and unbiased assistant.",
+                "You are an expert on coding.",
+            ] + list(config.predefinedChatSystemMessages.values())
+            completer = FuzzyCompleter(WordCompleter(suggestions, ignore_case=True))
+            message = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=systemMessage_chat, completer=completer)
+        else:
+            message = customChatMessage
         if message and not message.strip().lower() == config.exit_entry:
             if config.llmInterface == "ollama":
                 config.systemMessage_ollama = message
@@ -1907,19 +1917,21 @@ class ToolMate:
                 config.systemMessage_googleai = message
             elif config.llmInterface in ("chatgpt", "letmedoit"):
                 config.systemMessage_chatgpt = message
-            config.saveConfig()
-            print3(f"Custom chat system message: {config.toolMateAIName}")
+            if customChatMessage is None:
+                config.saveConfig()
+                print3(f"Custom chat system message: {config.toolMateAIName}")
 
-        print2("# 2. Tool System Message")
-        print1("To specify the `Tool System Message` is similar to defining the capabilities, constraints, or any pertinent context that may inform your interactions with ToolMate AI. This will guide ToolMate AI in managing and responding to your requests appropriately.")
-        print1("Please note that altering ToolMate AI Tool System Message directly affects its functionality. Please handle with care.")
-        print1("Enter custom tool system message below:")
-        print1(f"(If you are not sure, keep it blank to use {config.toolMateAIName} default tool system message.)")
-        message = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.systemMessage_tool)
-        if message and not message.strip().lower() == config.exit_entry:
-            config.systemMessage_tool = message
-            config.saveConfig()
-            print3(f"Custom tool system message: {config.toolMateAIName}")
+        if customChatMessage is None:
+            print2("# 2. Tool System Message")
+            print1("To specify the `Tool System Message` is similar to defining the capabilities, constraints, or any pertinent context that may inform your interactions with ToolMate AI. This will guide ToolMate AI in managing and responding to your requests appropriately.")
+            print1("Please note that altering ToolMate AI Tool System Message directly affects its functionality. Please handle with care.")
+            print1("Enter custom tool system message below:")
+            print1(f"(If you are not sure, keep it blank to use {config.toolMateAIName} default tool system message.)")
+            message = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.systemMessage_tool)
+            if message and not message.strip().lower() == config.exit_entry:
+                config.systemMessage_tool = message
+                config.saveConfig()
+                print3(f"Custom tool system message: {config.toolMateAIName}")
 
     def setCustomTextEditor(self):
         print1("Please specify custom text editor command below:")
@@ -2053,25 +2065,36 @@ class ToolMate:
             config.saveConfig()
             print3(f"Context Window Size: {contextWindowSize}")
 
-    def setMaxTokens_non_chatgpt(self, feature="default"):
+    def getCurrentMaxTokens(self, feature="default", showMessage=True):
         if config.llmInterface == "vertexai":
-            print1("Visit https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models to read about tokens limits")
-            default = config.gemini_max_output_tokens
+            if showMessage:
+                print1("Visit https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models to read about tokens limits")
+            currentMaxTokens = config.gemini_max_output_tokens
         elif config.llmInterface == "googleai":
-            print1("Visit https://ai.google.dev/gemini-api/docs/models/gemini to read about tokens limits")
-            default = config.googleaiApi_tool_model_max_tokens
+            if showMessage:
+                print1("Visit https://ai.google.dev/gemini-api/docs/models/gemini to read about tokens limits")
+            currentMaxTokens = config.googleaiApi_tool_model_max_tokens
         elif config.llmInterface in ("llamacpp", "llamacppserver"):
-            default = config.llamacppChatModel_max_tokens if feature == "chat" else config.llamacppToolModel_max_tokens
+            currentMaxTokens = config.llamacppChatModel_max_tokens if feature == "chat" else config.llamacppToolModel_max_tokens
         elif config.llmInterface == "ollama":
-            default = config.ollamaChatModel_num_predict if feature == "chat" else config.ollamaToolModel_num_predict
+            currentMaxTokens = config.ollamaChatModel_num_predict if feature == "chat" else config.ollamaToolModel_num_predict
         elif config.llmInterface == "groq":
-            print1("Visit https://console.groq.com/docs/models to read about tokens limits")
-            default = config.groqApi_chat_model_max_tokens if feature == "chat" else config.groqApi_tool_model_max_tokens
+            if showMessage:
+                print1("Visit https://console.groq.com/docs/models to read about tokens limits")
+            currentMaxTokens = config.groqApi_chat_model_max_tokens if feature == "chat" else config.groqApi_tool_model_max_tokens
         elif config.llmInterface == "mistral":
-            print1("Visit https://console.mistral.ai/limits/ to read about tokens limits")
-            default = config.mistralApi_chat_model_max_tokens if feature == "chat" else config.mistralApi_tool_model_max_tokens
-        print1("Please specify maximum output tokens below:")
-        maxtokens = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(default))
+            if showMessage:
+                print1("Visit https://console.mistral.ai/limits/ to read about tokens limits")
+            currentMaxTokens = config.mistralApi_chat_model_max_tokens if feature == "chat" else config.mistralApi_tool_model_max_tokens
+        return currentMaxTokens
+
+    def setMaxTokens_non_chatgpt(self, feature="default", customMaxtokens=None):
+        if customMaxtokens is None:
+            default = self.getCurrentMaxTokens(feature=feature)
+            print1("Please specify maximum output tokens below:")
+            maxtokens = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(default))
+        else:
+            maxtokens = str(customMaxtokens)
         if maxtokens and not maxtokens.strip().lower() == config.exit_entry and int(maxtokens) >= -1:
             maxtokens = int(maxtokens)
             if config.llmInterface == "vertexai":
@@ -2098,38 +2121,45 @@ class ToolMate:
                     config.mistralApi_chat_model_max_tokens = maxtokens
                 else:
                     config.mistralApi_tool_model_max_tokens = maxtokens
-            config.saveConfig()
-            print3(f"Maximum output tokens: {maxtokens}")
+            if customMaxtokens is None:
+                config.saveConfig()
+                print3(f"Maximum output tokens: {maxtokens}")
 
-    def setMaxTokens(self, feature="default"):
+    def setMaxTokens(self, feature="default", customMaxtokens=None):
         # non-chatgpt settings
         if not config.llmInterface in ("chatgpt", "letmedoit"):
-            self.setMaxTokens_non_chatgpt(feature=feature)
+            self.setMaxTokens_non_chatgpt(feature=feature, customMaxtokens=customMaxtokens)
             return None
         # chatgpt settings
-        contextWindowLimit, functionTokens, tokenLimit = self.getMaxTokens()
-        if tokenLimit < config.chatGPTApiMinTokens:
-            print2(f"Function tokens [{functionTokens}] exceed {config.chatGPTApiModel} output token limit.")
-            print1("Either change to a model with higher token limit or disable unused function-call plguins.")
+        if customMaxtokens is None:
+            contextWindowLimit, functionTokens, tokenLimit = self.getMaxTokens()
+            if tokenLimit < config.chatGPTApiMinTokens:
+                print2(f"Function tokens [{functionTokens}] exceed {config.chatGPTApiModel} output token limit.")
+                print1("Either change to a model with higher token limit or disable unused function-call plguins.")
+                maxtokens = config.exit_entry
+            else:
+                print1(self.divider)
+                print1("GPT and embeddings models process text in chunks called tokens. As a rough rule of thumb, 1 token is approximately 4 characters or 0.75 words for English text. One limitation to keep in mind is that for a GPT model the prompt and the generated output combined must be no more than the model's maximum context length.")
+                print1("Visit https://platform.openai.com/docs/models to read about tokens limits")
+                print3(f"Current GPT model: {config.chatGPTApiModel}")
+                print3(f"Maximum context length: {contextWindowLimit}")
+                print3(f"Current function tokens: {functionTokens}")
+                print3(f"Maximum output token allowed (excl. functions): {tokenLimit}")
+                print1(self.divider)
+                print1("Please specify maximum output tokens below:")
+                maxtokens = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.chatGPTApiMaxTokens))
         else:
-            print1(self.divider)
-            print1("GPT and embeddings models process text in chunks called tokens. As a rough rule of thumb, 1 token is approximately 4 characters or 0.75 words for English text. One limitation to keep in mind is that for a GPT model the prompt and the generated output combined must be no more than the model's maximum context length.")
-            print1("Visit https://platform.openai.com/docs/models to read about tokens limits")
-            print3(f"Current GPT model: {config.chatGPTApiModel}")
-            print3(f"Maximum context length: {contextWindowLimit}")
-            print3(f"Current function tokens: {functionTokens}")
-            print3(f"Maximum output token allowed (excl. functions): {tokenLimit}")
-            print1(self.divider)
-            print1("Please specify maximum output tokens below:")
-            maxtokens = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.chatGPTApiMaxTokens))
-            if maxtokens and not maxtokens.strip().lower() == config.exit_entry and int(maxtokens) > 0:
-                config.chatGPTApiMaxTokens = int(maxtokens)
-                if config.chatGPTApiMaxTokens > tokenLimit:
-                    config.chatGPTApiMaxTokens = tokenLimit
+            maxtokens = str(customMaxtokens)
+        if maxtokens and not maxtokens.strip().lower() == config.exit_entry and int(maxtokens) > 0:
+            config.chatGPTApiMaxTokens = int(maxtokens)
+            if config.chatGPTApiMaxTokens > tokenLimit:
+                config.chatGPTApiMaxTokens = tokenLimit
+            if customMaxtokens is None:
                 config.saveConfig()
                 print3(f"Maximum output tokens: {config.chatGPTApiMaxTokens}")
-        self.setMinTokens()
-        self.setDynamicTokenCount()
+        if customMaxtokens is None:
+            self.setMinTokens()
+            self.setDynamicTokenCount()
 
     def runSystemCommand(self, command):
         command = command.strip()[1:]
@@ -2687,7 +2717,7 @@ class ToolMate:
         print_formatted_text(HTML(f"<{config.terminalCommandEntryColor2}>{logo}</{config.terminalCommandEntryColor2}>"))
 
     def runPythonScript(self, script):
-        script = script.strip()[3:-3]
+        script = re.sub("^```(.+?)```", r"\1", script)
         try:
             exec(script, globals())
         except:
@@ -2919,7 +2949,7 @@ Acess the risk level of the following `{target.capitalize()}`:
             config.currentMessages[-1]["content"] = f"Extract the python code in:\n\n{description}"
             config.currentMessages.append({"role": "assistant", "content": content})
             return None
-        elif action == "run_python_code":
+        elif action == "execute_python_code":
             # extract
             python_code = extractPythonCode(description)
             # execute
@@ -3150,11 +3180,7 @@ Acess the risk level of the following `{target.capitalize()}`:
         if not actions:
             if content.strip():
                 action = "recommend_tool" if config.tool_selection_agent else config.defaultTool
-                self.workflow.append((action, content))
-                # pass to built-in screening or tool-check operations
-                complete = self.runSingleAction(action, content, gui)
-                if not complete:
-                    return False
+                return self.runMultipleActions(content=f"@{action} {content}", gui=gui)
         else:
             separator = "＊@＊@＊"
             descriptions = re.sub(config.toolPattern, separator, f"{content} ").split(separator)

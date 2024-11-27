@@ -32,6 +32,7 @@ defaultSettings = (
     ('toolmate_api_client_key', 'toolmateai'),
     ('toolmate_api_client_port', 5555),
     ('toolmate_api_client_host', 'http://localhost'),
+    ('toolmate_api_client_markdown', True),
     ('last_conversation', ''),
     ('last_workflow', ''),
     ('defaultTool', 'chat'),

@@ -1,3 +1,11 @@
+# 0.5.23-0.5.27
+
+* enhanced API server and client features, check `toolmate -h`, `tm -h`, `tmc -h` for options
+
+* fixed use of default tool
+
+* fixed running python code
+
 # 0.5.15-0.5.22
 
 * added an API server, `toolmateserver`
@@ -562,7 +570,7 @@ For set up of Vertex AI Credentials, read https://github.com/eliranwong/toolmate
 
 * added option to manage code execution risk, read https://github.com/eliranwong/freegenius/blob/main/package/freegenius/docs/Risk%20Management%20Agent.md
 
-* tool `run_python_code` now works with `config.toolTextOutput` for retrieval of text output.
+* tool `execute_python_code` now works with `config.toolTextOutput` for retrieval of text output.
 
 * tweaked tool `improve_writing`
 
@@ -637,7 +645,7 @@ Added two tools:
 
 `extract_python_code` extract python code, enclosed by ```
 
-`run_python_code` extract and run python code, enclosed by ```
+`execute_python_code` extract and run python code, enclosed by ```
 
 # Version: 0.2.97
 
@@ -838,7 +846,7 @@ Currently supported tools:
 @download_web_content
 @edit_text
 @execute_computing_task
-@install_package
+@install_python_package
 @save_memory
 @search_memory
 @modify_images

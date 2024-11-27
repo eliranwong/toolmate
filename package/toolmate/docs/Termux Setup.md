@@ -71,7 +71,7 @@ Read more at https://wiki.termux.com/wiki/Sharing_Data
 # Install Basic Packages
 
 ```
-pkg install which python golang git binutils libjpeg-turbo libpng build-essential clang make cmake pkg-config curl wget lynx w3m elinks vlc xclip xsel vim libxml2 libxslt python-apsw libzmq libsodium libgmp libmpc libmpfr python-lxml micro nano rust proot python-torch python-torchaudio python-torchvision
+pkg install bash-completion which python golang git binutils libjpeg-turbo libpng build-essential clang make cmake pkg-config curl wget lynx w3m elinks vlc xclip xsel vim libxml2 libxslt python-apsw libzmq libsodium libgmp libmpc libmpfr python-lxml micro nano rust proot python-torch python-torchaudio python-torchvision
 echo 'alias micro="micro -softwrap true -wordwrap true"' >> ~/.bashrc
 source ~/.bashrc
 ```
@@ -236,9 +236,11 @@ Basic:
 ```
 cd
 apt update && apt full-upgrade
+apt install -y bash-completion
 apt install -y python3
 apt install -y python3-setuptools python3-pip python3-dev python3-venv portaudio19-dev ffmpeg wget curl git wget nano micro sqlite3 libsqlite3-dev net-tools
 apt install libxcb-cursor0 pulseaudio-utils alsa-base alsa-utils mpg123 espeak
+pip install xonsh[full]
 # add missing group names
 groupadd -g 3003 groupname3003
 groupadd -g 9997 groupname9997
@@ -246,6 +248,12 @@ groupadd -g 20298 groupname20298
 groupadd -g 50298 groupname50298
 # support container sound output
 echo 'export PULSE_SERVER=127.0.0.1' >> ~/.bashrc
+# configure xonsh
+echo "# XONSH WEBCONFIG START
+$XONSH_COLOR_STYLE = 'material' 
+xontrib load coreutils 
+# XONSH WEBCONFIG END
+aliases['micro']='micro -softwrap true -wordwrap true'" > .xonshrc
 # install golang
 add-apt-repository ppa:longsleep/golang-backports
 apt update

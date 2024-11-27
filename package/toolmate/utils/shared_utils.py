@@ -1317,12 +1317,25 @@ def getStringWidth(text):
     return width
 
 def getPygmentsStyle():
-    theme = config.pygments_style if config.pygments_style else "stata-dark" if not config.terminalResourceLinkColor.startswith("ansibright") else "stata-light"
+    theme = config.pygments_style if config.pygments_style else "github-dark" if not config.terminalResourceLinkColor.startswith("ansibright") else "stata-light"
+    """
+    from pygments.styles import get_all_styles
+    styles = list(get_all_styles())
+    print(styles)
+    ['abap', 'algol', 'algol_nu', 'arduino', 'autumn', 'bw', 'borland', 'coffee', 'colorful', 'default', 'dracula', 'emacs', 'friendly_grayscale', 'friendly', 'fruity', 'github-dark', 'gruvbox-dark', 'gruvbox-light', 'igor', 'inkpot', 'lightbulb', 'lilypond', 'lovelace', 'manni', 'material', 'monokai', 'murphy', 'native', 'nord-darker', 'nord', 'one-dark', 'paraiso-dark', 'paraiso-light', 'pastie', 'perldoc', 'rainbow_dash', 'rrt', 'sas', 'solarized-dark', 'solarized-light', 'staroffice', 'stata-dark', 'stata-light', 'tango', 'trac', 'vim', 'vs', 'xcode', 'zenburn']
+    """
     return style_from_pygments_cls(get_style_by_name(theme))
 
-def showErrors():
+def showErrors(e=None, message=""):
     trace = traceback.format_exc()
-    print(trace if config.developer else "Error encountered!")
+    if config.developer:
+        print2("```error")
+        print(trace)
+        print2("```")
+    if e is not None:
+        print3(f"An error occurred: {e}")
+    else:
+        print2(message if message else "An error occurred!")
     return trace
 
 def check_llm_errors(func):

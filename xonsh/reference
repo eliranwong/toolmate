@@ -1,0 +1,32 @@
+"""
+old_args=('test', 'tm -dt test', 6, 10) / 
+
+completion_context=
+
+CompletionContext(
+
+# context.command
+command= 
+CommandContext(
+
+# context.command.args
+args=
+(
+CommandArg(value='tm', opening_quote='', closing_quote='', is_io_redir=False), 
+CommandArg(value='-dt', opening_quote='', closing_quote='', is_io_redir=False)
+), 
+arg_index=2, 
+prefix='test',
+suffix='',
+opening_quote='',
+closing_quote='',
+is_after_closing_quote=False,
+subcmd_opening=''
+
+), 
+
+# context.python
+python=PythonContext('tm it sddf', 10, is_sub_expression=False)
+
+):
+"""

@@ -64,15 +64,17 @@ config.addFunctionCall = Plugins.addFunctionCall
 from toolmate.utils.vlc_utils import VlcUtil
 config.isVlcPlayerInstalled = VlcUtil.isVlcPlayerInstalled()
 
-try:
-    # hide pygame welcome message
-    os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
-    import pygame
-    pygame.mixer.init()
-    config.isPygameInstalled = True
-except:
-    config.isPygameInstalled = False
-
+if not hasattr(config, "isPygameInstalled"):
+    try:
+        # hide pygame welcome message
+        os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+        import pygame
+        pygame.mixer.init()
+        config.isPygameInstalled = True
+    except:
+        config.isPygameInstalled = False
+elif not config.isPygameInstalled:
+    config.usePygame = False
 thisPlatform = platform.system()
 config.thisPlatform = "macOS" if thisPlatform == "Darwin" else thisPlatform
 if config.terminalEnableTermuxAPI:

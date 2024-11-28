@@ -229,6 +229,6 @@ def toolmate_completer(context):
     if context.command and context.command.args and context.command.args[0].value in ('toolmateclient', 'tm', 'tmc') and context.command.prefix:
         if context.command.prefix == "@":
             return set([f"@{i}" for i in toolmate_tools])
-        elif context.command.prefix == "`":
-            return set([f"`{i}`" for i in toolmate_system_messages+toolmate_contexts])
+        elif context.command.prefix.endswith("`"):
+            return set([f"{context.command.prefix}{i}`" for i in toolmate_system_messages+toolmate_contexts])
 completer add "toolmate_completer" toolmate_completer "start"

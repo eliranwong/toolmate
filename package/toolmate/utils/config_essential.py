@@ -329,6 +329,7 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "api_server_id",
     "custom_config",
     "systemMessage_tool_current",
     "completer_user",

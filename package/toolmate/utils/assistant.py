@@ -3455,14 +3455,18 @@ Acess the risk level of the following `{target.capitalize()}`:
 
                 # tweak for `Let me Translate`
                 if config.predefinedContext == "Let me Translate" and userInput.startswith("@chat Assist me by acting as a translator.\nPlease translate"):
-                    print1("Please specify the language you would like the content to be translated into:")
-                    language = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.translateToLanguage)
-                    if language and not language.strip().lower() in (config.cancel_entry, config.exit_entry):
-                        config.translateToLanguage = language
-                    else:
+                    if hasattr(config, "api_server_id"):
                         if not config.translateToLanguage:
                             config.translateToLanguage = "English"
-                        print3(f"Language not specified! The content will be translated into: {config.translateToLanguage}")
+                    else:
+                        print1("Please specify the language you would like the content to be translated into:")
+                        language = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.translateToLanguage)
+                        if language and not language.strip().lower() in (config.cancel_entry, config.exit_entry):
+                            config.translateToLanguage = language
+                        else:
+                            if not config.translateToLanguage:
+                                config.translateToLanguage = "English"
+                            print3(f"Language not specified! The content will be translated into: {config.translateToLanguage}")
                     userInput = f"{userInput}\n\nPlease translate the content into <language>{config.translateToLanguage}</language>."
 
                 # reset `config.predefinedContext` and clear `config.predefinedContextTemp` if `config.predefinedContextTemp`` is not empty

@@ -9,16 +9,19 @@ try:
     from google.cloud import texttospeech
 except:
     pass
-try:
-    # hide pygame welcome message
-    os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
-    import pygame
-    if pygame.mixer.get_init() is None:
-        pygame.mixer.init()
-    config.isPygameInstalled = True
-except:
+if not hasattr(config, "isPygameInstalled"):
+    try:
+        # hide pygame welcome message
+        os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+        import pygame
+        if pygame.mixer.get_init() is None:
+            pygame.mixer.init()
+        config.isPygameInstalled = True
+    except:
+        config.usePygame = False
+        config.isPygameInstalled = False
+elif not config.isPygameInstalled:
     config.usePygame = False
-    config.isPygameInstalled = True
 if not config.isTermux:
     import sounddevice, soundfile
 

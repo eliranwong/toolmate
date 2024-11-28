@@ -196,7 +196,7 @@ def main():
         config.ttsInput = False
         config.ttsOutput = False
         # backend
-        backends = ("llamacpp", "llamacppserver", "ollama", "groq", "googleai", "vertexai", "chatgpt", "letmedoit")
+        backends = ("llamacpp", "llamacppserver", "ollama", "groq", "xai", "googleai", "vertexai", "chatgpt", "letmedoit")
         if args.backend and args.backend.lower() in backends:
             config.llmInterface = args.backend.lower()
         # initiate assistant

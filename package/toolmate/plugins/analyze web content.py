@@ -32,7 +32,7 @@ if not config.isLite:
             print3("Running tool: 'analyze_images'")
             return config.toolFunctionMethods["analyze_images"](function_args)
 
-        if config.rag_useAutoRetriever and not config.llmInterface in ("vertexai", "googleai"):
+        if config.rag_useAutoRetriever and not config.llmInterface in ("vertexai",):
             # process with AutoGen Retriever
             print2("AutoGen Retriever launched!")
             last_message = AutoGenRetriever().getResponse(filename, query, True)

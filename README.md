@@ -31,6 +31,8 @@ Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/d
 
 # New Additions
 
+[NEW! Support X AI / Grok API Keys](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/xAI.md)
+
 [NEW! ToolMate API Server & Client](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/ToolMate%20API%20Server.md)
 
 [NEW! Support Mistral API Keys](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Mistral%20API%20Setup.md)

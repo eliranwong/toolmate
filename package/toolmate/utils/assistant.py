@@ -149,6 +149,8 @@ class ToolMate:
             self.changeChatGPTAPIkey()
         if not config.googleaiApi_key:
             self.changeGoogleaiApikey()
+        if not config.xaiApi_key:
+            self.changeXaiApikey()
         if not config.groqApi_key:
             self.changeGroqApi()
         if not config.mistralApi_key:
@@ -604,6 +606,7 @@ class ToolMate:
         self.changeGroqApi()
         self.changeMistralApi()
         self.changeGoogleaiApikey()
+        self.changeXaiApikey()
         self.changeChatGPTAPIkey()
         if not config.isLite:
             self.setAutoGenBuilderConfig()
@@ -625,6 +628,19 @@ class ToolMate:
             CallLLM.checkCompletion("googleai")
         else:
             config.googleaiApi_key = "toolmate"
+        config.saveConfig()
+        print2("Configurations updated!")
+
+    def changeXaiApikey(self):
+        print3("# X AI API Key: allows access to X AI Studio models")
+        print1("To set up X AI API Key, read:\nhttps://x.ai/api\n")
+        print1("Enter your X AI API Key [optional]:")
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.xaiApi_key, is_password=True)
+        if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+            config.xaiApi_key = apikey
+            CallLLM.checkCompletion("xai")
+        else:
+            config.xaiApi_key = "toolmate"
         config.saveConfig()
         print2("Configurations updated!")
 
@@ -1301,6 +1317,7 @@ class ToolMate:
             "ollama": "Ollama",
             "groq": "Groq Cloud API",
             "mistral": "Mistral AI API",
+            "xai": "X AI API [Paid online service]",
             "googleai": "Google AI Studio API [Paid online service]",
             "chatgpt": "OpenAI ChatGPT [Paid online service]",
             "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",
@@ -1310,6 +1327,7 @@ class ToolMate:
             "ollama": "Ollama",
             "groq": "Groq Cloud API",
             "mistral": "Mistral AI API",
+            "xai": "X AI API [Paid online service]",
             "googleai": "Google AI Studio API [Paid online service]",
             "vertexai": "Google Vertex AI [Paid online service]",
             "chatgpt": "OpenAI ChatGPT [Paid online service]",
@@ -1410,6 +1428,11 @@ class ToolMate:
             if not config.googleaiApi_key or config.googleaiApi_key == "toolmate":
                 self.changeGoogleaiApikey()
             self.setLlmModel_googleai()
+            self.setMaxTokens(feature="default")
+        elif config.llmInterface == "xai":
+            if not config.xaiApi_key or config.xaiApi_key == "toolmate":
+                self.changeXaiApikey()
+            self.setLlmModel_xai()
             self.setMaxTokens(feature="default")
         else:
             if not config.openaiApiKey or config.openaiApiKey == "toolmate":
@@ -1729,7 +1752,21 @@ class ToolMate:
             config.googleaiApi_tool_model = model
             print3(f"Gemini model: {model}")
             # set max tokens
-            print3(f"Maximum output tokens: {config.gemini_max_output_tokens}")
+            print3(f"Maximum output tokens: {config.googleaiApi_tool_model_max_tokens}")
+
+    def setLlmModel_xai(self):
+        models = ["grok-beta"]
+        model = self.dialogs.getValidOptions(
+            options=models,
+            title="X AI Models",
+            default=config.xaiApi_tool_model if config.xaiApi_tool_model in models else models[0],
+            text="Select a tool call model:\n(for both chat and task execution)",
+        )
+        if model:
+            config.xaiApi_tool_model = model
+            print3(f"X AI model: {model}")
+            # set max tokens
+            print3(f"Maximum output tokens: {config.xaiApi_tool_model_max_tokens}")
 
     def setLlmModel_vertexai(self):
         models = ["gemini-1.5-pro", "gemini-1.5-flash"]
@@ -1879,6 +1916,8 @@ class ToolMate:
             systemMessage_chat = config.systemMessage_vertexai
         elif config.llmInterface == "googleai":
             systemMessage_chat = config.systemMessage_googleai
+        elif config.llmInterface == "xai":
+            systemMessage_chat = config.systemMessage_xai
         elif config.llmInterface in ("chatgpt", "letmedoit"):
             systemMessage_chat = config.systemMessage_chatgpt
         return systemMessage_chat
@@ -1915,6 +1954,8 @@ class ToolMate:
                 config.systemMessage_vertexai = message
             elif config.llmInterface == "googleai":
                 config.systemMessage_googleai = message
+            elif config.llmInterface == "xai":
+                config.systemMessage_xai = message
             elif config.llmInterface in ("chatgpt", "letmedoit"):
                 config.systemMessage_chatgpt = message
             if customChatMessage is None:
@@ -2074,6 +2115,10 @@ class ToolMate:
             if showMessage:
                 print1("Visit https://ai.google.dev/gemini-api/docs/models/gemini to read about tokens limits")
             currentMaxTokens = config.googleaiApi_tool_model_max_tokens
+        elif config.llmInterface == "xai":
+            if showMessage:
+                print1("Visit https://docs.x.ai/docs#models to read about tokens limits. In our latest test, the maximum value accepts 127999.")
+            currentMaxTokens = config.xaiApi_tool_model_max_tokens
         elif config.llmInterface in ("llamacpp", "llamacppserver"):
             currentMaxTokens = config.llamacppChatModel_max_tokens if feature == "chat" else config.llamacppToolModel_max_tokens
         elif config.llmInterface == "ollama":
@@ -2101,6 +2146,8 @@ class ToolMate:
                 config.gemini_max_output_tokens = maxtokens
             elif config.llmInterface == "googleai":
                 config.googleaiApi_tool_model_max_tokens = maxtokens
+            elif config.llmInterface == "xai":
+                config.xaiApi_tool_model_max_tokens = maxtokens
             elif config.llmInterface in ("llamacpp", "llamacppserver"):
                 if feature == "chat":
                     config.llamacppChatModel_max_tokens = maxtokens
@@ -3153,7 +3200,7 @@ Acess the risk level of the following `{target.capitalize()}`:
         if gui is None:
             gui = True if hasattr(config, "desktopAssistant") else False
         if openai is None:
-            openai = True if config.llmInterface in ("chatgpt", "letmedoit", "googleai", "groq", "mistral", "llamacppserver") else False
+            openai = True if config.llmInterface in ("chatgpt", "letmedoit", "googleai", "xai", "groq", "mistral", "llamacppserver") else False
         try:
             if gui:
                 QtResponseStreamer(config.desktopAssistant).workOnCompletion(completion, openai)

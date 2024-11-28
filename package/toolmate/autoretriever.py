@@ -13,7 +13,7 @@ if not hasattr(config, "max_consecutive_auto_reply"):
 
 from toolmate import print2, print3, tokenLimits
 
-from toolmate import getEmbeddingFunction, startLlamacppServer, stopLlamacppServer, getGroqApi_key, getGoogleGenAIClient, refinePath
+from toolmate import getEmbeddingFunction, startLlamacppServer, stopLlamacppServer, getGroqApi_key, getGoogleGenAIClient, getXAIClient, refinePath
 import autogen, os, json, traceback, chromadb, re, zipfile, datetime, traceback
 from chromadb.config import Settings
 from pathlib import Path
@@ -136,6 +136,16 @@ class AutoGenRetriever:
                     "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
                     "api_type": "open_ai",
                     "api_key": getGoogleGenAIClient(),
+                }
+            ]
+        elif config.llmInterface == "xai":
+            llm = config.xaiApi_tool_model
+            config_list = [
+                {
+                    "model": llm,
+                    "base_url": "https://api.x.ai/v1",
+                    "api_type": "open_ai",
+                    "api_key": getXAIClient(),
                 }
             ]
         else:

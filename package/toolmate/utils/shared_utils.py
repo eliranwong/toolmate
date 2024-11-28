@@ -343,6 +343,12 @@ def getGoogleGenAIClient():
         base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
     )
 
+def getXAIClient():
+    return OpenAI(
+        api_key=config.xaiApi_key,
+        base_url="https://api.x.ai/v1",
+    )
+
 def getGroqApi_key():
     '''
     support multiple grop api keys
@@ -1101,6 +1107,8 @@ def useChatSystemMessage(messages: dict, mergeSystemIntoUserMessage=False, thisS
                 messages[originalIndex]["content"] = config.systemMessage_llamacpp
             elif config.llmInterface == "googleai":
                 messages[originalIndex]["content"] = config.systemMessage_googleai
+            elif config.llmInterface == "xai":
+                messages[originalIndex]["content"] = config.systemMessage_xai
             elif config.llmInterface == "vertexai":
                 messages[originalIndex]["content"] = config.systemMessage_vertexai
             elif config.llmInterface in ("chatgpt", "letmedoit"):

@@ -1,5 +1,5 @@
 from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, refinePath, displayLoadedMessages, removeDuplicatedListItems, getElevenlabsApi_key
-from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, tokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getUserPreviousRequest, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText
+from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, tokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getUserPreviousRequest, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText, isRemoteOllamaHost
 from toolmate import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runToolMateCommand, displayPythonCode, selectTool, showRisk, confirmExecution
 from toolmate.utils.call_llm import CallLLM
 import threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy
@@ -68,7 +68,12 @@ class ToolMate:
         if chatfile and os.path.isfile(chatfile):
             try:
                 config.conversationStarted = True
-                messages = eval(readTextFile(chatfile))
+                unwanted = r"""\|
+/
+-
+\\
+"""
+                messages = eval(re.sub(f"^{unwanted}", "", readTextFile(chatfile)))
                 currentMessages = []
                 if isinstance(messages, list):
                     for i in messages:
@@ -518,7 +523,7 @@ class ToolMate:
             config.gcttsSpeed = round(gcttsSpeed, 1)
             print3(f"Google Cloud Text-to-Speech playback speed: {gcttsSpeed}")
 
-    def setGoogleCredentialsPath(self):
+    def setGoogleCredentialsPath(self) -> bool:
         filePath = self.getPath.getFilePath(
             empty_to_cancel=True,
             list_content_on_directory_change=True,
@@ -526,17 +531,20 @@ class ToolMate:
             message=f"{self.divider}\nEnter the file path of your Google Cloud Credentials:\n(Default: {config.google_cloud_credentials_file})",
             default=config.google_cloud_credentials,
         )
-        if filePath:
-            if os.path.isfile(filePath):
-                config.google_cloud_credentials = filePath
-            else:
-                print2("Invalid file path given!")
+        if filePath and os.path.isfile(filePath):
+            config.google_cloud_credentials = filePath
+            isCredentialGiven= True
+        else:
+            print2("Invalid file path given!")
+            isCredentialGiven = False
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = config.google_cloud_credentials if config.google_cloud_credentials and os.path.isfile(config.google_cloud_credentials) else ""
+        return isCredentialGiven
 
 
     def selectGoogleAPIs(self):
-        if not os.environ["GOOGLE_APPLICATION_CREDENTIALS"]:
-            self.setGoogleCredentialsPath()
+        #if not os.environ["GOOGLE_APPLICATION_CREDENTIALS"]:
+        if not self.setGoogleCredentialsPath():
+            return None
 
         if os.environ["GOOGLE_APPLICATION_CREDENTIALS"]:
             enabledGoogleAPIs = self.dialogs.getMultipleSelection(
@@ -1402,8 +1410,8 @@ class ToolMate:
             print2("# Vision Server - for vision only")
             self.setLlmModel_llamacppserver("vision")
         elif config.llmInterface == "groq":
-            if not config.groqApi_key or config.groqApi_key == "toolmate":
-                self.changeGroqApi()
+            #if not config.groqApi_key or config.groqApi_key == "toolmate":
+            self.changeGroqApi()
             print2("# Tool Model - for both task execution and conversation")
             self.setLlmModel_groq()
             self.setMaxTokens(feature="default")
@@ -1412,8 +1420,8 @@ class ToolMate:
                 self.setLlmModel_groq("chat")
                 self.setMaxTokens(feature="chat")
         elif config.llmInterface == "mistral":
-            if not config.mistralApi_key or config.mistralApi_key == "toolmate":
-                self.changeMistralApi()
+            #if not config.mistralApi_key or config.mistralApi_key == "toolmate":
+            self.changeMistralApi()
             print2("# Tool Model - for both task execution and conversation")
             self.setLlmModel_mistral()
             self.setMaxTokens(feature="default")
@@ -1421,22 +1429,27 @@ class ToolMate:
                 print2("# Chat Model - for conversation only")
                 self.setLlmModel_mistral("chat")
                 self.setMaxTokens(feature="chat")
+        elif config.llmInterface == "xai":
+            #if not config.xaiApi_key or config.xaiApi_key == "toolmate":
+            self.changeXaiApikey()
+            self.setLlmModel_xai()
+            self.setMaxTokens(feature="default")
         elif config.llmInterface == "vertexai":
+            if not "Vertex AI" in config.enabledGoogleAPIs:
+                config.enabledGoogleAPIs.append("Vertex AI")
+            if not self.setGoogleCredentialsPath():
+                return None
             self.setLlmModel_vertexai()
             self.setMaxTokens(feature="default")
         elif config.llmInterface == "googleai":
-            if not config.googleaiApi_key or config.googleaiApi_key == "toolmate":
-                self.changeGoogleaiApikey()
+            #if not config.googleaiApi_key or config.googleaiApi_key == "toolmate":
+            self.changeGoogleaiApikey()
             self.setLlmModel_googleai()
             self.setMaxTokens(feature="default")
-        elif config.llmInterface == "xai":
-            if not config.xaiApi_key or config.xaiApi_key == "toolmate":
-                self.changeXaiApikey()
-            self.setLlmModel_xai()
-            self.setMaxTokens(feature="default")
         else:
-            if not config.openaiApiKey or config.openaiApiKey == "toolmate":
-                self.changeChatGPTAPIkey()
+            # chatgpt / letmedoit
+            #if not config.openaiApiKey or config.openaiApiKey == "toolmate":
+            self.changeChatGPTAPIkey()
             self.setLlmModel_chatgpt()
             self.setMaxTokens(feature="default")
         config.saveConfig()
@@ -1477,10 +1490,14 @@ class ToolMate:
         return ""
 
     def setLlmModel_ollama(self, feature="default"):
+        isRemote = (isRemoteOllamaHost(config.ollamaToolServer_url) or isRemoteOllamaHost(config.ollamaChatServer_url))
         model = self.selectOllamaModel(feature=feature)
         if model:
-            downloadedOllamaModels = getDownloadedOllamaModels()
-            if model in downloadedOllamaModels:
+            if shutil.which("ollama"):
+                downloadedOllamaModels = getDownloadedOllamaModels()
+            else:
+                downloadedOllamaModels = {}
+            if isRemote or model in downloadedOllamaModels:
                 if feature == "default":
                     config.ollamaToolModel = model
                 elif feature == "chat":
@@ -1488,9 +1505,10 @@ class ToolMate:
                 elif feature == "embedding":
                     config.embeddingModel = f"_ollama_{model}"
             else:
-                if shutil.which("ollama"):
+                if shutil.which("ollama") or isRemote:
                     try:
-                        Downloader.downloadOllamaModel(model, True)
+                        if shutil.which("ollama"):
+                            Downloader.downloadOllamaModel(model, True)
                         if feature == "default":
                             config.ollamaToolModel = model
                         elif feature == "chat":
@@ -1567,20 +1585,20 @@ class ToolMate:
                     config.customToolServer_command = command
                 return command
             return None
-        print2(f"Enter full custom {server} server command line below:")
-        print1("(or leave it blank to use built-in or remote llama.cpp server)")
-        command = setCommand()
+        #print2(f"Enter full custom {server} server command line below:")
+        #print1("(or leave it blank to use built-in or remote llama.cpp server)")
+        #command = setCommand()
         print2(f"Enter custom {server} server IP address below:")
         setIp()
         print2(f"Enter custom {server} server port below:")
         setPort()
-        if command:
-            # timeout option does not apply to built-in server
-            print2(f"Enter custom {server} server read/write timeout in seconds below:")
-            setTimeout()
+        #if command:
+        #    # timeout option does not apply to built-in server
+        #    print2(f"Enter custom {server} server read/write timeout in seconds below:")
+        #    setTimeout()
         # try to start server
-        if server in ("tool", "chat"):
-            runToolMateCommand(f"custom{server}server")
+        #if server in ("tool", "chat"):
+        #    runToolMateCommand(f"custom{server}server")
 
     def setLlmModel_llamacpp(self, feature="default"):
         library = self.dialogs.getValidOptions(
@@ -2081,16 +2099,23 @@ class ToolMate:
             config.saveConfig()
             print3(f"GPU Layers: {gpuLayers}")
 
-    def setContextWindowSize(self, feature="default"):
-        if not config.llmInterface in ("llamacpp", "ollama"):
-            print1("Option `Context window size` applies to backends `llamacpp` and `ollama` only.")
-            return None
-        print1("Please specify context window size below:")
+    def getCurrentContextWindowSize(self, feature="default"):
         if config.llmInterface == "llamacpp":
             default = config.llamacppChatModel_n_ctx if feature == "chat" else config.llamacppToolModel_n_ctx
         elif config.llmInterface == "ollama":
             default = config.ollamaChatModel_num_ctx if feature == "chat" else config.ollamaToolModel_num_ctx
-        contextWindowSize = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(default))
+        return default
+
+    def setContextWindowSize(self, feature="default", customContextWindowSize=None):
+        if not config.llmInterface in ("llamacpp", "ollama"):
+            print1("Option `Context window size` applies to backends `llamacpp` and `ollama` only.")
+            return None
+        if customContextWindowSize is None:
+            default = self.getCurrentContextWindowSize(feature=feature)
+            print1("Please specify context window size below:")
+            contextWindowSize = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(default))
+        else:
+            contextWindowSize = str(customContextWindowSize)
         if contextWindowSize and not contextWindowSize.strip().lower() == config.exit_entry and int(contextWindowSize) >= 0:
             contextWindowSize = int(contextWindowSize)
             if config.llmInterface == "llamacpp":
@@ -2103,8 +2128,9 @@ class ToolMate:
                     config.ollamaChatModel_num_ctx = contextWindowSize
                 else:
                     config.ollamaToolModel_num_ctx = contextWindowSize
-            config.saveConfig()
-            print3(f"Context Window Size: {contextWindowSize}")
+            if customContextWindowSize is None:
+                config.saveConfig()
+                print3(f"Context Window Size: {contextWindowSize}")
 
     def getCurrentMaxTokens(self, feature="default", showMessage=True):
         if config.llmInterface == "vertexai":

@@ -6,7 +6,13 @@ generate images with model "dall-e-3"
 [TOOL_CALL]
 """
 
-if not config.isLite:
+try:
+    from stable_diffusion_cpp import StableDiffusion
+    isSDcppInstalled = True
+except:
+    isSDcppInstalled = False
+
+if not config.isLite and isSDcppInstalled:
 
     from toolmate import config, print2, print3, getCurrentDateTime, getCliOutput, getCpuThreads, downloadStableDiffusionFiles
     import os, shutil
@@ -15,7 +21,6 @@ if not config.isLite:
     from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
     from openai import OpenAI
     from pathlib import Path
-    from stable_diffusion_cpp import StableDiffusion
     from toolmate.utils.single_prompt import SinglePrompt
     from prompt_toolkit.styles import Style
     from toolmate.utils.prompt_validator import NumberValidator

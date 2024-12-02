@@ -1,4 +1,4 @@
-from toolmate import showErrors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution, useChatSystemMessage
+from toolmate import showErrors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution, useChatSystemMessage, getRagPrompt
 from toolmate import config
 from toolmate import print1, print2, print3, validParameters, getGoogleGenAIClient
 import re, traceback, openai, pprint, copy, textwrap, json, pygments, codecs
@@ -362,17 +362,7 @@ class CallGoogleAI:
                         print2(config.divider)
                     # update message chain
                     user_request = messages[-1]["content"]
-                    messages[-1]["content"] = f"""# Provided Context
-
-{tool_response}
-
-# My question:
-
-{user_request}
-
-# Instruction
-
-Select all the relevant information from the provided context to answer my question."""
+                    messages[-1]["content"] = getRagPrompt(user_request, tool_response)
                     return CallGoogleAI.regularCall(messages)
                 elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
                     # tool function executed without chat extension

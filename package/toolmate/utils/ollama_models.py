@@ -1,4 +1,11 @@
 ollama_models = (
+    "qwq",
+    "qwq:32b",
+    "marco-o1",
+    "marco-o1:7b",
+    "tulu3",
+    "tulu3:8b",
+    "tulu3:70b",
     "athene-v2",
     "athene-v2:72b",
     "opencoder",

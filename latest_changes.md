@@ -1,3 +1,7 @@
+# 0.5.28-0.5.42
+
+* Improved api server and client
+
 # 0.5.23-0.5.27
 
 * enhanced API server and client features, check `toolmate -h`, `tm -h`, `tmc -h` for options

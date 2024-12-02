@@ -4,9 +4,15 @@
 
 Run '.model' in ToolMate AI prompt and select 'llamacppserver' as LLM interface.  This option is designed for advanced users who want more control over the LLM backend, particularly useful for customisation like GPU acceleration.
 
-Basically, [compile your customised copy of llama.cpp](https://github.com/ggerganov/llama.cpp?tab=readme-ov-file#build) on your device and enter the server command in ToolMate AI configurations. It auto-starts the llama.cpp server when ToolMate AI starts.
+# Requirements:
 
-# Example - macOS
+1. You need an access to a server that have llama.cpp running on it. If you don't, you may want to [build and run a llama.cpp server](https://github.com/ggerganov/llama.cpp?tab=readme-ov-file#build) on your device, to customise everything to suit your own needs.
+
+2. Specify the llama.cpp server ip address and port in ToolMate AI settings.
+
+# Examples to build a Llama.cpp server
+
+## Example - macOS
 
 On MacOS, Metal is enabled by default. Using Metal makes the computation run on the GPU.  Therefore, compiling source is a simple one:
 
@@ -30,9 +36,13 @@ To configure ToolMate AI:
 
 <img width="729" alt="Screenshot 2024-06-06 at 11 32 54" src="https://github.com/eliranwong/toolmate/assets/25262722/5004662d-03db-4f5b-a770-d0f16996a03c">
 
-To briefly explain the server command line above:
+To start up the server, e.g.
 
 > ~/llama.cpp/llama-server --host 127.0.0.1 --port 8080 --threads $(sysctl -n hw.physicalcpu) --ctx-size 0 --chat-template chatml --parallel 2 --model ~/models/wizardlm2.gguf
+
+Make sure you have your LLM file in *.gguf format downloaded before starting up the server.
+
+Brief description about the options:
 
 ```
 --threads $(sysctl -n hw.physicalcpu): set the threads to the number of physical CPU cores
@@ -46,7 +56,7 @@ For more options:
 
 > ./server -h
 
-# Example - Acceleration with AMD Integrated GPU
+## Example - Acceleration with AMD Integrated GPU
 
 Inference result is roughly 1.5x faster.  Read https://github.com/eliranwong/MultiAMDGPU_AIDev_Ubuntu/blob/main/igpu_only/igpu_only.md
 
@@ -71,7 +81,7 @@ Compile Llama.cpp from source:
 
 > make GGML_HIPBLAS=1 GGML_HIP_UMA=1 AMDGPU_TARGETS=gfx1030 -j$(lscpu | grep '^Core(s)' | awk '{print $NF}')
 
-Enter full command line in ToolMate AI configurations as described in previous example:
+To start up the server, e.g.
 
 > ~/llama.cpp/llama-server --host 127.0.0.1 --port 8080 --threads $(lscpu | grep '^Core(s)' | awk '{print $NF}') --ctx-size 0 --chat-template chatml --parallel 2 --gpu-layers 999 --model ~/models/wizardlm2.gguf
 
@@ -81,7 +91,9 @@ Please note we used `--gpu-layers` in the command above. You may want to change 
 --gpu-layers: number of layers to store in VRAM
 ```
 
-# Example - Acceleration with Multiple Discrete AMD GPUs
+Make sure you have your LLM file in *.gguf format downloaded before starting up the server.
+
+## Example - Acceleration with Multiple Discrete AMD GPUs
 
 Tested on Ubuntu with Dual AMD RX 7900 XTX. Full setup notes are documented at https://github.com/eliranwong/MultiAMDGPU_AIDev_Ubuntu/blob/main/README.md
 
@@ -93,11 +105,13 @@ Compile Llama.cpp from source:
 
 > make GGML_HIPBLAS=1 AMDGPU_TARGETS=gfx1100 -j$(lscpu | grep '^Core(s)' | awk '{print $NF}')
 
-Enter full command line in ToolMate AI configurations as described in previous examples:
+To start up the server, e.g.
 
 > ~/llama.cpp/llama-server --host 127.0.0.1 --port 8080 --threads $(lscpu | grep '^Core(s)' | awk '{print $NF}') --ctx-size 0 --chat-template chatml --parallel 2 --gpu-layers 999 --model ~/models/wizardlm2.gguf
 
-# Example - Acceleration with Nvidia GPUs
+Make sure you have your LLM file in *.gguf format downloaded before starting up the server.
+
+## Example - Acceleration with Nvidia GPUs
 
 Compile Llama.cpp from source:
 
@@ -107,9 +121,21 @@ Compile Llama.cpp from source:
 
 > make GGML_CUDA=1 -j$(lscpu | grep '^Core(s)' | awk '{print $NF}')
 
-Enter full command line in ToolMate AI configurations as described in previous examples:
+To start up the server, e.g.
 
 > ~/llama.cpp/llama-server --host 127.0.0.1 --port 8080 --threads $(lscpu | grep '^Core(s)' | awk '{print $NF}') --ctx-size 0 --chat-template chatml --parallel 2 --gpu-layers 999 --model ~/models/wizardlm2.gguf
+
+Make sure you have your LLM file in *.gguf format downloaded before starting up the server.
+
+# Enter IP Addresses and Port Numbers in ToolMate AI
+
+![select_backend](https://github.com/user-attachments/assets/a2ae3751-8e39-4c03-991b-d7522176a00f)
+
+1. Enter `.model` in ToolMate AI prompt.
+
+2. Select `Llama.cpp Server [advanced]`.
+
+3. Follow the dialogs to enter your Llama.cpp IP addresses and ports.
 
 # Read more
 

@@ -129,6 +129,8 @@ class QtResponseStreamer:
                     # openai
                     # when open api key is invalid for some reasons, event response in string
                     answer = event if isinstance(event, str) else event.choices[0].delta.content
+                elif hasattr(event, "message"): # newer ollama python package
+                    answer = event.message.content
                 elif isinstance(event, dict):
                     if "message" in event:
                         # ollama chat
@@ -140,9 +142,9 @@ class QtResponseStreamer:
                     # vertex ai
                     answer = event.text
                 # transform
-                if hasattr(config, "outputTransformers"):
-                    for transformer in config.outputTransformers:
-                        answer = transformer(answer)
+                if hasattr(config, "outputTextConverters"):
+                    for converter in config.outputTextConverters:
+                        answer = converter(answer)
                 # STREAM THE ANSWER
                 if answer is not None:
                     if firstEvent:

@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import APIKeyHeader
-from toolmate import config, configFile, isServerAlive, print2, print3
+from toolmate import config, configFile, isServerAlive, print2, print3, getOllamaServerClient
 from toolmate.utils.assistant import ToolMate
 from toolmate.utils.tool_plugins import Plugins
 from pydantic import BaseModel
@@ -16,6 +16,7 @@ parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutpu
 parser.add_argument('-p', '--port', action='store', dest='port', help="server port")
 parser.add_argument('-s', '--server', action='store', dest='server', help="server address; '0.0.0.0' by default")
 parser.add_argument('-t', '--temperature', action='store', dest='temperature', help="override default inference temperature; accepted range: 0.0-2.0")
+parser.add_argument('-ws', '--windowsize', action='store', dest='windowsize', help="override default context window size; applicable to backends `llama.cpp` amd `ollama` only; accepts non-negative integers")
 # Parse arguments
 args = parser.parse_args()
 
@@ -39,6 +40,7 @@ class Request(BaseModel):
     chat: bool | None = False
     chatfile: str | None = None
     chatsystem: str | None = None
+    windowsize: str | None = None
     maximumoutput: str | None = None
     temperature: str | None = None
     defaulttool: str | None = None
@@ -58,6 +60,7 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
         check = re.sub("^`([^`]+?)`$", r"\1", chatsystem)
         if check in config.predefinedChatSystemMessages:
             chatsystem = config.predefinedChatSystemMessages.get(check)
+    windowsize = request.windowsize
     maximumoutput = request.maximumoutput
     temperature = request.temperature
     defaulttool = request.defaulttool
@@ -85,6 +88,21 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
         current_defaulttool = config.defaultTool
         config.defaultTool = defaulttool
         print3(f"Default tool changed for this request: {defaulttool}")
+
+    # override context window size; applicable to backends `ollama` and `llama.cpp` only
+    if windowsize and config.llmInterface in ("llamacpp", "ollama"):
+        current_windowsize = config.toolmate.getCurrentContextWindowSize()
+        try:
+            windowsize = int(windowsize)
+            if windowsize < 0:
+                print2("No change in context window size! Negative values not accepted!")
+            else:
+                config.toolmate.setContextWindowSize(customContextWindowSize=windowsize)
+                print3(f"Context window size changed for this request: {windowsize}")
+        except:
+            print2("No change in context window size! Non-integer values not accepted!")
+    elif windowsize:
+        print2("No change in context window size! This option applicable to backends `llama.cpp` and `ollama` only!")
 
     # override maximum output tokens once
     if maximumoutput:
@@ -142,6 +160,9 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
         if defaulttool and defaulttool in config.allEnabledTools:
             config.defaultTool = current_defaulttool
             print3(f"Default tool restored: {current_defaulttool}")
+        if windowsize and config.llmInterface in ("llamacpp", "ollama"):
+            config.toolmate.setContextWindowSize(customContextWindowSize=current_windowsize)
+            print3(f"Context window size restored: {current_windowsize}")
         if maximumoutput:
             config.toolmate.setMaxTokens(customMaxtokens=current_maximumoutput)
             print3(f"Maximum output tokens restored: {current_maximumoutput}")
@@ -150,6 +171,18 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
             print3(f"Temperature changed restored: {current_temperature}")
 
     if powerdown:
+        # unload local models to free VRAM
+        try:
+            config.llamacppToolModel.close()
+            print("Llama.cpp model unloaded!")
+        except:
+            pass
+        if hasattr(config, "llamacppToolModel"):
+            del config.llamacppToolModel
+        if config.llmInterface == "ollama":
+            getOllamaServerClient().generate(model=config.ollamaToolModel, keep_alive=0, stream=False,)
+            print(f"Ollama model '{config.ollamaToolModel}' unloaded!")
+        # kill server process
         os.kill(config.api_server_id, signal.SIGINT)
 
     return json.dumps(response)
@@ -202,6 +235,18 @@ def main():
         # initiate assistant
         config.toolmate = ToolMate()
         # backend-dependent configurations
+        if args.windowsize and args.windowsize.strip() and config.llmInterface in ("llamacpp", "ollama"):
+            try:
+                windowsize = int(args.windowsize)
+                if windowsize < 0:
+                    print2("No change in context window size! Negative values not accepted!")
+                else:
+                    config.toolmate.setContextWindowSize(customContextWindowSize=windowsize)
+                    print3(f"Context window size configured: {windowsize}")
+            except:
+                print2("No change in context window size! Non-integer values not accepted!")
+        elif args.windowsize:
+            print2("No change in context window size! This option applicable to backends `llama.cpp` and `ollama` only!")
         if args.maximumoutput and args.maximumoutput.strip():
             try:
                 maximumoutput = int(args.maximumoutput)

@@ -1,6 +1,6 @@
-from toolmate import showErrors, isValidPythodCode, executeToolFunction, toParameterSchema, useChatSystemMessage
+from toolmate import showErrors, isValidPythodCode, executeToolFunction, toParameterSchema, useChatSystemMessage, isRemoteOllamaHost
 from toolmate import print1, print2, print3, getPythonFunctionResponse, extractPythonCode, isValidPythodCode, validParameters
-from toolmate import config, getOllamaServerClient
+from toolmate import config, getOllamaServerClient, getRagPrompt
 import shutil, re, traceback, json, ollama, pprint, copy, datetime
 from typing import Optional
 from toolmate.utils.download import Downloader
@@ -29,11 +29,11 @@ class CallOllama:
     @staticmethod
     @check_ollama_errors
     def checkCompletion():
-        if shutil.which("ollama"):
+        if shutil.which("ollama") and not isRemoteOllamaHost(config.ollamaToolServer_url):
             Downloader.downloadOllamaModel(config.ollamaToolModel)
-            if config.useAdditionalChatModel:
-                Downloader.downloadOllamaModel(config.ollamaChatModel)
-        else:
+        if config.useAdditionalChatModel and not isRemoteOllamaHost(config.ollamaChatServer_url):
+            Downloader.downloadOllamaModel(config.ollamaChatModel)
+        if not shutil.which("ollama") and not (isRemoteOllamaHost(config.ollamaToolServer_url) or isRemoteOllamaHost(config.ollamaChatServer_url)):
             print("Ollama not found! Install it first!")
             print("Check https://ollama.com")
             config.llmInterface = "llamacpp"
@@ -154,7 +154,8 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                     **config.ollamaToolModel_additional_options,
                 ),
             )
-            jsonOutput = completion["message"]["content"]
+            #jsonOutput = completion["message"]["content"]
+            jsonOutput = completion.message.content if hasattr(completion, "message") else completion["message"]["content"]
             jsonOutput = re.sub("^[^{]*?({.*?})[^}]*?$", r"\1", jsonOutput)
             responseDict = json.loads(jsonOutput)
             #if config.developer:
@@ -192,7 +193,8 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                     **config.ollamaToolModel_additional_options,
                 ),
             )
-            return completion["message"]["content"]
+            #return completion["message"]["content"]
+            return completion.message.content if hasattr(completion, "message") else completion["message"]["content"]
         except:
             return ""
 
@@ -272,13 +274,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                         print2("Tool output:")
                         print(tool_response)
                         print2(config.divider)
-                    messages[-1]["content"] = f"""Describe the query and response below in your own words in detail, without comment about your ability.
-
-My query:
-{user_request}
-
-Your response:
-{tool_response}"""
+                    messages[-1]["content"] = getRagPrompt(user_request, tool_response)
                     return CallOllama.regularCall(messages)
                 elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
                     # tool function executed without chat extension

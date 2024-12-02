@@ -32,7 +32,12 @@ def lite():
     config.isLite = True
     main()
 
-def main(tempInterface=""):
+def setup():
+    print("Setting up ToolMate AI ...")
+    main(setupOnly=True)
+    print("Setup done!")
+
+def main(tempInterface="", setupOnly=False):
     print(f"launching {config.toolMateAIName} ...")
 
     # Create the parser
@@ -41,6 +46,8 @@ def main(tempInterface=""):
     parser.add_argument("default", nargs="?", default=None, help="default entry; accepts a string; ignored when -l/rp/p/rf/f/r flag is used")
     parser.add_argument('-b', '--backend', action='store', dest='backend', help="set llm interface with -b flag; options: llamacpp/llamacppserver/ollama/groq/gemini/chatgpt/letmedoit")
     parser.add_argument('-c', '--config', action='store', dest='config', help="specify custom config file with -c flag; accepts a file path")
+    parser.add_argument('-ca', '--configureapi', action='store', dest='configureapi', help="configure API keys; true / false")
+    parser.add_argument('-cb', '--configurebackend', action='store', dest='configurebackend', help="configure backends; true / false")
     parser.add_argument('-f', '--file', action='store', dest='file', help="read file text as default entry with -f flag; accepts a file path; ignored when -l/rf flag is used")
     parser.add_argument('-i', '--ip', action='store', dest='ip', help="set 'true' to include or 'false' to exclude ip information in system message with -i flag")
     parser.add_argument('-l', '--load', action='store', dest='load', help="load file that contains saved chat records with -l flag; accepts either a chat ID or a file path; required plugin 'search chat records'")
@@ -144,7 +151,13 @@ def main(tempInterface=""):
         filepath = os.path.join(config.localStorage, "history", i)
         set_log_file_max_lines(filepath, 3000)
     config.toolmate = ToolMate()
-    config.toolmate.startChats()
+    if setupOnly:
+        if args.configureapi and args.configureapi.lower() == "true":
+            config.toolmate.changeAPIkeys()
+        if args.configurebackend and args.configurebackend.lower() == "true":
+            config.toolmate.setLlmModel()
+    else:
+        config.toolmate.startChats()
     # Do the following tasks before exit
     # backup configurations
     config.saveConfig()

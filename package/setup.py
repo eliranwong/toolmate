@@ -135,12 +135,14 @@ setup(
     entry_points={
         "console_scripts": [
             f"{package}={package}.main:main",
+            f"tmsetup={package}.main:setup", # setup only
             f"{package}lite={package}.main:lite",
             f"letmedoit={package}.main:letmedoit",
             f"{package}server={package}.api_server:main",
+            f"tmserver={package}.api_server:main", # a shortcut of toolmateserver
             f"{package}client={package}.api_client:main",
-            f"tm={package}.api_client:main", # an alias to toolmate client
-            f"tmc={package}.api_client:chat", # an alias to toolmate client; with chat feature enabled
+            f"tm={package}.api_client:main", # a shortcut of toolmateclient
+            f"tmc={package}.api_client:chat", # a shortcut of toolmateclient; with chat feature enabled
             f"tmconfigs={package}.api_client:configs",
             f"{package}ai={package}.systemtray:main",
             f"toolserver={package}.servers:main",
@@ -167,14 +169,14 @@ setup(
             f"llamacpp={package}.llamacpp:main",
             f"llamacppserver={package}.llamacppserver:main",
             f"ollamachat={package}.ollamachat:main",
-            f"gemma2b={package}.ollamachat:gemma2b",
-            f"gemma7b={package}.ollamachat:gemma7b",
-            f"llava={package}.ollamachat:llava",
-            f"phi3={package}.ollamachat:phi3",
-            f"vicuna={package}.ollamachat:vicuna",
-            f"starlinglm={package}.ollamachat:starlinglm",
-            f"orca2={package}.ollamachat:orca2",
-            f"wizardlm2={package}.ollamachat:wizardlm2",
+            #f"gemma2b={package}.ollamachat:gemma2b",
+            #f"gemma7b={package}.ollamachat:gemma7b",
+            #f"llava={package}.ollamachat:llava",
+            #f"phi3={package}.ollamachat:phi3",
+            #f"vicuna={package}.ollamachat:vicuna",
+            #f"starlinglm={package}.ollamachat:starlinglm",
+            #f"orca2={package}.ollamachat:orca2",
+            #f"wizardlm2={package}.ollamachat:wizardlm2",
         ],
     },
     keywords="ai assistant ollama llama llamacpp groq openai chatgpt gemini autogen rag agent stable-diffusion fabric dalle imagen",

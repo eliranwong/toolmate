@@ -77,7 +77,7 @@ def runPlugins():
     }
     config.predefinedInstructions = {}
     config.inputSuggestions = []
-    config.outputTransformers = []
+    config.outputTextConverters = []
     config.toolFunctionSchemas = {}
     config.toolFunctionMethods = {}
 

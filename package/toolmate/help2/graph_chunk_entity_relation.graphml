@@ -1228,9 +1228,9 @@
       <data key="d1">"config.inputSuggestions is a variable used in LetMeDoIt AI's plugins for generating input suggestions."</data>
       <data key="d2">chunk-93ddd8ad41905bb4e11714d30ecf4b1e</data>
     </node>
-    <node id="&quot;CONFIG.OUTPUTTRANSFORMERS&quot;">
+    <node id="&quot;CONFIG.outputTextConverters&quot;">
       <data key="d0">"CONCEPT"</data>
-      <data key="d1">"config.outputTransformers is a variable used in LetMeDoIt AI's plugins to transform text output."</data>
+      <data key="d1">"config.outputTextConverters is a variable used in LetMeDoIt AI's plugins to transform text output."</data>
       <data key="d2">chunk-93ddd8ad41905bb4e11714d30ecf4b1e</data>
     </node>
     <node id="&quot;CONFIG.ADDFUNCTIONCALL&quot;">

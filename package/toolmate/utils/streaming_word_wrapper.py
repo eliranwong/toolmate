@@ -76,7 +76,8 @@ class StreamingWordWrapper:
                         await asyncio.sleep(0.1)
 
         try:
-            asyncio.run(readKeys())
+            if not hasattr(config, "api_server_id"):
+                asyncio.run(readKeys())
         except:
             pass
 
@@ -121,6 +122,8 @@ class StreamingWordWrapper:
                         answer = event.data.choices[0].delta.content
                     else: # openai, groq
                         answer = event.choices[0].delta.content
+                elif hasattr(event, "message"): # newer ollama python package
+                    answer = event.message.content
                 elif isinstance(event, dict):
                     if "message" in event:
                         # ollama chat
@@ -132,9 +135,9 @@ class StreamingWordWrapper:
                     # vertex ai
                     answer = event.text
                 # transform
-                if hasattr(config, "outputTransformers"):
-                    for transformer in config.outputTransformers:
-                        answer = transformer(answer)
+                if hasattr(config, "outputTextConverters"):
+                    for converter in config.outputTextConverters:
+                        answer = converter(answer)
                 # STREAM THE ANSWER
                 if answer is not None:
                     if firstEvent:

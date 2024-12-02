@@ -50,7 +50,7 @@ LetMeDoIt AI utilizes 'config' modules to interact with plugins. Developers can 
 
 * config.inputSuggestions [read more](https://github.com/eliranwong/letmedoit/wiki/Plugins-%E2%80%90-Input-Suggestions)
 
-* config.outputTransformers [read more](https://github.com/eliranwong/letmedoit/wiki/Plugins-%E2%80%90-Transform-Text-Output)
+* config.outputTextConverters [read more](https://github.com/eliranwong/letmedoit/wiki/Plugins-%E2%80%90-Transform-Text-Output)
 
 * config.predefinedContexts [read more](https://github.com/eliranwong/letmedoit/wiki/Plugins-%E2%80%90-Predefined-Contexts)
 

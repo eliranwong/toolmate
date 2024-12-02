@@ -35,7 +35,7 @@ class Plugins:
         ]
         if config.isTermux:
             config.inputSuggestions.append("@termux ")
-        config.outputTransformers = []
+        config.outputTextConverters = []
         config.deviceInfoPlugins = []
         config.datetimeSensitivePlugins = []
         config.toolFunctionSchemas = {}

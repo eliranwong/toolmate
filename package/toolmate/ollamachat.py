@@ -1,7 +1,7 @@
 import ollama, os, argparse, threading, shutil, json
 from ollama import Options, pull
 from toolmate.utils.download import Downloader
-from toolmate import config, is_valid_image_file, getOllamaServerClient
+from toolmate import config, is_valid_image_file, getOllamaServerClient, isRemoteOllamaHost
 from toolmate import print1, print2, print3, toggleinputaudio, toggleoutputaudio
 from toolmate.utils.ollama_models import ollama_models
 from toolmate.utils.streaming_word_wrapper import StreamingWordWrapper
@@ -28,7 +28,7 @@ class OllamaChat:
 
     def __init__(self):
         # authentication
-        if shutil.which("ollama"):
+        if shutil.which("ollama") or (isRemoteOllamaHost(config.ollamaToolServer_url) or isRemoteOllamaHost(config.ollamaChatServer_url)):
             self.runnable = True
         else:
             print("Local LLM Server 'Ollama' not found! Install Ollama first!")
@@ -96,7 +96,7 @@ To generate a JSON that contains two keys, "image_filepath_list" and "query", ba
 
 Here is my request:
 """
-            completion = getOllamaServerClient().chat(
+            completion = getOllamaServerClient("chat" if config.useAdditionalChatModel else "tool").chat(
                 model="gemma:2b",
                 messages=[
                     {
@@ -113,7 +113,8 @@ Here is my request:
                     num_predict=config.ollamaToolModel_num_predict,
                 ),
             )
-            output = json.loads(completion["message"]["content"])
+            #output = json.loads(completion["message"]["content"])
+            output = json.loads(completion.message.content if hasattr(completion, "message") else completion["message"]["content"])
             if config.developer:
                 print2("Input:")
                 print(output)
@@ -197,7 +198,7 @@ Here is my request:
                 else:
                     messages.append({'role': 'user', 'content': prompt})
                 try:
-                    completion = getOllamaServerClient().chat(
+                    completion = getOllamaServerClient("chat" if config.useAdditionalChatModel else "tool").chat(
                         model=model,
                         messages=messages,
                         stream=True,
@@ -316,6 +317,9 @@ def main(thisModel=""):
         prompt=prompt,
         model=model,
     )
+    if config.useAdditionalChatModel and not model == config.ollamaToolModel:
+        getOllamaServerClient("chat").generate(model=model, keep_alive=0, stream=False,)
+        print(f"Ollama model '{model}' unloaded!")
         
 
 if __name__ == '__main__':

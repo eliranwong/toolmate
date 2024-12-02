@@ -2,12 +2,15 @@ from toolmate import config, isCommandInstalled, print2
 import os, shutil, subprocess
 
 # add config item `fabricPath`.  Users can customise fabric path by editing its value in `config.py`.
-#whichFabric = shutil.which("fabric")
+whichFabric = shutil.which("fabric")
 persistentConfigs = (
     #("fabricPath", whichFabric if whichFabric else "fabric"),
     ("fabricPath", "fabric"), # more flexible when two packages shared the same user directory
 )
 config.setConfig(persistentConfigs)
+
+if not isCommandInstalled(config.fabricPath) and whichFabric:
+    config.fabricPath = whichFabric
 
 if isCommandInstalled(config.fabricPath) or os.path.isfile(config.fabricPath):
     # add aliases

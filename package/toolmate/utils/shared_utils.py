@@ -448,8 +448,20 @@ def stopAutogenstudioServer():
             os.killpg(os.getpgid(config.autogenstudioServer.pid), signal.SIGTERM)
         config.autogenstudioServer = None
 
-def getOllamaServerClient(server="main"):
-    return Client(host=f"http://{config.ollamaChatServer_ip if server=='chat' else config.ollamaToolServer_ip}:{config.ollamaChatServer_port if server=='chat' else config.ollamaToolServer_port}")
+def isRemoteOllamaHost(url):
+    if config.ollamaToolHost_localIp or config.ollamaChatHost_localIp:
+        return True
+    #host = "http://localhost:11434"
+    #host = re.sub("^.*?://", "", host.strip())
+    #host = re.sub(":[0-9]+?$", "", host)
+    return False if url.lower() in ("127.0.0.1", "localhost") else True
+
+def getOllamaServerClient(server="tool"):
+    if server=="chat" and config.ollamaChatHost_localIp:
+        return Client(host=f"{config.ollamaToolServer_protocol}{get_local_ip()}:{config.ollamaChatServer_port}")
+    elif server=="tool" and config.ollamaToolHost_localIp:
+        return Client(host=f"{config.ollamaChatServer_protocol}{get_local_ip()}:{config.ollamaToolServer_port}")
+    return Client(host=f"{config.ollamaToolServer_protocol if server=='chat' else config.ollamaChatServer_protocol}{config.ollamaChatServer_url if server=='chat' else config.ollamaToolServer_url}:{config.ollamaChatServer_port if server=='chat' else config.ollamaToolServer_port}")
 
 def loadLlamacppChatModel():
     cpuThreads = getCpuThreads()
@@ -467,6 +479,11 @@ def loadLlamacppChatModel():
 
 def getLlamacppServerClient(server="tool"):
     def getNewClient():
+        protocols = {
+            "tool": config.customToolServer_protocol,
+            "chat": config.customChatServer_protocol,
+            "vision": config.customVisionServer_protocol,
+        }
         ips = {
             "tool": config.customToolServer_ip,
             "chat": config.customChatServer_ip,
@@ -478,7 +495,7 @@ def getLlamacppServerClient(server="tool"):
             "vision": config.customVisionServer_port,
         }
         return OpenAI(
-            base_url=f"http://{ips[server]}:{ports[server]}/v1",
+            base_url=f"{protocols[server]}{ips[server]}:{ports[server]}/v1",
             api_key = "toolmate",
         )
     if server == "tool":
@@ -1273,13 +1290,13 @@ def wrapText(content, terminal_width=None):
         terminal_width = shutil.get_terminal_size().columns
     return "\n".join([textwrap.fill(line, width=terminal_width) for line in content.split("\n")])
 
-def transformText(text):
-    for transformer in config.outputTransformers:
-            text = transformer(text)
+def convertOutputText(text):
+    for converter in config.outputTextConverters:
+            text = converter(text)
     return text
 
 def print1(content): # wrap words around terminal width
-    content = transformText(content)
+    content = convertOutputText(content)
     if config.wrapWords:
         # wrap words to fit terminal width
         terminal_width = shutil.get_terminal_size().columns
@@ -1987,7 +2004,20 @@ Chromadb
 https://cookbook.chromadb.dev/embeddings/gpu-support/
 """
 
-def getRagPrompt(query, retrievedContext):
+def getRagPrompt(query, context):
+    f"""# Provided Context
+
+{context}
+
+# My question:
+
+{query}
+
+# Instruction
+
+Select all the relevant information from the provided context to answer my question."""
+
+def getRagPrompt_old(query, retrievedContext):
     return f"""Question:
 <question>
 {query}

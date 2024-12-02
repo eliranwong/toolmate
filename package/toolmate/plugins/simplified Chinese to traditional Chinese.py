@@ -19,4 +19,4 @@ def convertToTraditionalChinese(text):
     else:
         return text
 
-config.outputTransformers.append(convertToTraditionalChinese)
+config.outputTextConverters.append(convertToTraditionalChinese)

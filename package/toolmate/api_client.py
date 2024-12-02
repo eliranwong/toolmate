@@ -1,5 +1,5 @@
 import requests, argparse, json, sys, os, pprint, re, shutil
-from toolmate import config, transformText, wrapText, startSpinning, stopSpinning, readTextFile, print2, print3, getPygmentsStyle, showErrors, isServerAlive
+from toolmate import config, convertOutputText, wrapText, startSpinning, stopSpinning, readTextFile, writeTextFile, print2, print3, getPygmentsStyle, showErrors, isServerAlive
 from toolmate.utils.tts_utils import TTSUtil
 
 import pygments
@@ -18,7 +18,8 @@ parser.add_argument('-c', '--chat', action='store', dest='chat', help="enable or
 parser.add_argument('-cf', '--chatfile', action='store', dest='chatfile', help="a chat file containing a saved conversation")
 parser.add_argument('-cs', '--chatsystem', action='store', dest='chatsystem', help="override chat system message for a single request; optionally use it together with '-bc' to make a change persistant")
 parser.add_argument('-dt', '--defaulttool', action='store', dest='defaulttool', help="override default tool for a single request; optionally use it together with '-bc' to make a change persistant; applied when 'Tool Selection Agent' is disabled and no tool is specified in the request")
-parser.add_argument('-f', '--format', action='store', dest='format', help="conversation output format; plain or list; useful for sharing or backup; display assistant response only if not given")
+parser.add_argument('-e', '--export', action='store', dest='export', help="export conversation; optionally used with -f option to specify a format for the export")
+parser.add_argument('-f', '--format', action='store', dest='format', help="conversation output format; plain or list; useful for sharing or backup; only output the last assistant response if this option is not used")
 parser.add_argument('-k', '--key', action='store', dest='key', help="specify the API key for authenticating access to the ToolMate AI server")
 parser.add_argument('-md', '--markdown', action='store', dest='markdown', help="highlight assistant response in markdown format; true / false")
 parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', help="override maximum output tokens for a single request; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
@@ -33,6 +34,7 @@ parser.add_argument('-st', '--searchtools', action='store', dest='searchtools', 
 parser.add_argument('-t', '--temperature', action='store', dest='temperature', help="override inference temperature for a single request; optionally use it together with '-bc' to make a change persistant; accepted range: 0.0-2.0; unaccepted values will be ignored without notification")
 parser.add_argument('-ta', '--toolagent', action='store', dest='toolagent', help="override tool selection agent for a single request; optionally use it together with '-bc' to make a change persistant; true / false; unaccepted values will be ignored without notification")
 parser.add_argument('-wd', '--workingdirectory', action='store', dest='workingdirectory', help="working directory; current location by default")
+parser.add_argument('-ws', '--windowsize', action='store', dest='windowsize', help="override context window size for a single request; applicable to backends `llama.cpp` amd `ollama` only; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
 parser.add_argument('-ww', '--wordwrap', action='store', dest='wordwrap', help="word wrap; true / false; determined by 'config.wrapWords' if not given")
 # Parse arguments
 args = parser.parse_args()
@@ -66,10 +68,13 @@ def main(chat: bool = False):
     host = args.server if args.server else config.toolmate_api_client_host
     port = args.port if args.port else config.toolmate_api_client_port
     if not isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
+        configFile = os.path.join(config.toolMateAIFolder, "config.py")
+        if os.path.getsize(configFile) == 0 and shutil.which("tmsetup"):
+            os.system("tmsetup")
         if shutil.which("nohup") and shutil.which("toolmateserver"):
             startSpinning()
             print2("Loading ToolMate AI ...")
-            cli = f'''{shutil.which("nohup")} "{shutil.which("toolmateserver")}" &'''
+            cli = f'''{shutil.which("nohup")} "{shutil.which("toolmateserver")}" > ~/toolmate/nohup-api-server.out 2>&1 &'''
             os.system(cli)
             # wait until the server is up
             while not isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
@@ -196,6 +201,7 @@ def main(chat: bool = False):
             "chat": chat,
             "chatfile": chatfile,
             "chatsystem": args.chatsystem,
+            "windowsize": args.windowsize,
             "maximumoutput": args.maximumoutput,
             "temperature": args.temperature,
             "defaulttool": args.defaulttool,
@@ -215,11 +221,23 @@ def main(chat: bool = False):
 
         if args.format and args.format.lower() in ("plain", "list"):
             if args.format.lower() == "plain":
+                outputText = ""
                 for i in json.loads(response.json()):
                     role = i.get("role", "")
                     content = i.get("content", "")
                     if role in ("user", "assistant"):
-                        print(f"```{role}\n{content.rstrip()}\n```")
+                        if role == "assistant":
+                            content = convertOutputText(content.rstrip())
+                        content = f"```{role}\n{content}\n```"
+                        if args.export:
+                            outputText.append(content)
+                        else:
+                            print(content)
+                if args.export:
+                    try:
+                        writeTextFile(args.export, outputText)
+                    except Exception as e:
+                        showErrors(e=e)
             elif args.format.lower() == "list":
                 try:
                     output = json.loads(response.json())
@@ -229,7 +247,7 @@ def main(chat: bool = False):
         else:
             try:
                 output = json.loads(response.json())[-1]["content"]
-                output = transformText(output)
+                output = convertOutputText(output)
                 wordwrap = True if (args.wordwrap is not None and args.wordwrap.lower() == "true") or config.wrapWords else False
                 outputContent = wrapText(output) if wordwrap else output
                 if (args.markdown and args.markdown.lower() == "true") or (config.toolmate_api_client_markdown and not (args.markdown and args.markdown.lower() == "false")):

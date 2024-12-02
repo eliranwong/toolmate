@@ -75,12 +75,18 @@ defaultSettings = (
     ('perplexica_directory', ""),
     ('perplexica_ip', "127.0.0.1"),
     ('perplexica_port', 3000),
-    ('ollamaToolServer_ip', "127.0.0.1"),
-    ('ollamaChatServer_ip', "127.0.0.1"),
-    ('ollamaVisionServer_ip', "127.0.0.1"),
+    ('ollamaToolHost_localIp', False),
+    ('ollamaChatHost_localIp', False),
+    #('ollamaToolServer', "http://127.0.0.1"),
+    #('ollamaChatServer', "http://127.0.0.1"),
+    ('ollamaToolServer_protocol', "http://"),
+    ('ollamaChatServer_protocol', "http://"),
+    ('ollamaToolServer_url', "127.0.0.1"),
+    ('ollamaChatServer_url', "127.0.0.1"),
     ('ollamaToolServer_port', 11434),
     ('ollamaChatServer_port', 11434),
-    ('ollamaVisionServer_port', 11434),
+    #('ollamaVisionServer_ip', "127.0.0.1"),
+    #('ollamaVisionServer_port', 11434),
     ('ollamaVisionModel', 'llava'), # ollama model used for vision
     ('ollamaToolModel', 'granite3-dense:2b' if config.isTermux else 'wizardlm2'), # ollama model used for both task execution and conversation
     ('ollamaToolModel_additional_options', {}),
@@ -97,6 +103,9 @@ defaultSettings = (
     ('llamacppToolModel_verbose', False),
     ('llamacppChatModel_verbose', False),
     ('llamacppVisionModel_verbose', False),
+    ('customToolServer_protocol', "http://"),
+    ('customChatServer_protocol', "http://"),
+    ('customVisionServer_protocol', "http://"),
     ('customToolServer_command', ""),
     ('customChatServer_command', ""),
     ('customVisionServer_command', ""),
@@ -414,7 +423,7 @@ temporaryConfigs = [
     "toolMateAIFolder",
     "open",
     "inputSuggestions", # used with plugins; user input suggestions
-    "outputTransformers", # used with plugins; transform output message
+    "outputTextConverters", # used with plugins; transform output message
     "predefinedInstructions", # used with plugins; pre-defined instructions
     "predefinedContexts", # used with plugins; pre-defined contexts
     "predefinedChatSystemMessages", # used with plugins; pre-defined chat system messages

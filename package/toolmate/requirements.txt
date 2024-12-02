@@ -1,8 +1,9 @@
 wheel
 setuptools
 pipdeptree
-chromadb>=0.5.3
-mistralai>=1.2.0
+chromadb==0.5.3
+chroma-hnswlib==0.7.3
+mistralai==1.2.3
 scikit-image==0.24.0
 scikit-learn==1.5.2
 sqlmodel==0.0.22
@@ -119,7 +120,7 @@ setuptools-rust
 SpeechRecognition
 openai-whisper
 pydub
-stable-diffusion-cpp-python
+#stable-diffusion-cpp-python
 pytz
 geopy
 psutil

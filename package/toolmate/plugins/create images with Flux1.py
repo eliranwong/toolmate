@@ -6,13 +6,17 @@ generate images with model "Flux.1"
 [TOOL_CALL]
 """
 
+try:
+    from stable_diffusion_cpp import StableDiffusion
+    isSDcppInstalled = True
+except:
+    isSDcppInstalled = False
 
-if not config.isLite:
+if not config.isLite and isSDcppInstalled:
 
     from toolmate import config, print2, print3, getCurrentDateTime, getCliOutput, getCpuThreads
     import os, shutil
     from pathlib import Path
-    from stable_diffusion_cpp import StableDiffusion
     from toolmate.utils.single_prompt import SinglePrompt
     from prompt_toolkit.styles import Style
     from toolmate.utils.prompt_validator import NumberValidator

@@ -51,18 +51,23 @@ if os.path.isdir(storageDir):
         # check if config backup is available
         backupFile = os.path.join(storageDir, "config_lite_backup.py" if config.isLite else "config_backup.py")
         if os.path.isfile(backupFile):
-            restore_backup = yes_no_dialog(
-                title="Configuration Backup Found",
-                text=f"Do you want to use the following backup?\n{backupFile}"
-            ).run()
-            if restore_backup:
-                try:
-                    loadConfig(backupFile)
-                    shutil.copy(backupFile, configFile)
-                    print("Configuration backup restored!")
-                    #config.restartApp()
-                except:
-                    print("Failed to restore backup!")
+            if hasattr(config, "api_server_id"):
+                loadConfig(backupFile)
+                shutil.copy(backupFile, configFile)
+                print("Configuration backup restored!")
+            else:
+                restore_backup = yes_no_dialog(
+                    title="Configuration Backup Found",
+                    text=f"Do you want to use the following backup?\n{backupFile}"
+                ).run()
+                if restore_backup:
+                    try:
+                        loadConfig(backupFile)
+                        shutil.copy(backupFile, configFile)
+                        print("Configuration backup restored!")
+                        #config.restartApp()
+                    except:
+                        print("Failed to restore backup!")
 
 # load new / unsaved configs
 setConfig(defaultSettings)

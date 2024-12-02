@@ -6,7 +6,7 @@ You can use plugins to process responses before they are displayed.
 
 2. Write your own text transformer method
 
-3. Append the method for text transformation to config.outputTransformers
+3. Append the method for text transformation to config.outputTextConverters
 
 For example, change all characters to upper cases:
 
@@ -16,7 +16,7 @@ from letmedoit import config
 def convertToUpperCases(text):
     return text.upper()
 
-config.outputTransformers.append(convertToUpperCases)
+config.outputTextConverters.append(convertToUpperCases)
 ```
 
 Another example, ChatGPT modals is currently weak to produce responses in traditional Chinese characters. When ChatGPT is asked to answer in traditional Chinese, the output is usually mixed with some simplified Chinese characters.  The following plugin ensure that all simplified Chinese characters are converted into traditional Chinese characters before they are displayed:
@@ -33,7 +33,7 @@ def convertToTraditionalChinese(text):
     else:
         return text
 
-config.outputTransformers.append(convertToTraditionalChinese)
+config.outputTextConverters.append(convertToTraditionalChinese)
 ```
 
 # More about LetMeDoIt AI Plugins

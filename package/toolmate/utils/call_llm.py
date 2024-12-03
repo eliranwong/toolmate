@@ -8,8 +8,11 @@ from toolmate.utils.call_xai import CallXAI
 from toolmate.utils.call_chatgpt import CallChatGPT, CallLetMeDoIt
 import copy
 if not config.isLite:
+    try:
+        from toolmate.utils.call_llamacpp import CallLlamaCpp
+    except:
+        pass
     from toolmate.utils.call_gemini import CallVertexAI
-    from toolmate.utils.call_llamacpp import CallLlamaCpp
     from toolmate.utils.call_llamacppserver import CallLlamaCppServer
 
 class CallLLM:

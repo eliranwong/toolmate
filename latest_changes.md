@@ -2,6 +2,10 @@
 
 * Improved api server and client
 
+* Added cli `tmsetup` for setup, check `tmsetup -h` for options
+
+* backend `llama.cpp` changed to be extra module for installation
+
 # 0.5.23-0.5.27
 
 * enhanced API server and client features, check `toolmate -h`, `tm -h`, `tmc -h` for options

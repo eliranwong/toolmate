@@ -1,5 +1,5 @@
 from toolmate import config, showErrors, isValidPythodCode, executeToolFunction, toParameterSchema, getCpuThreads, useChatSystemMessage
-from toolmate import print1, print2, print3, getPythonFunctionResponse, extractPythonCode, encode_image, validParameters
+from toolmate import print1, print2, print3, getPythonFunctionResponse, extractPythonCode, encode_image, validParameters, getRagPrompt
 from typing import Optional
 from llama_cpp import Llama
 from llama_cpp.llama_chat_format import Llava15ChatHandler
@@ -366,17 +366,7 @@ Remember, output the new copy of python code ONLY, without additional notes or e
                         print2("Tool output:")
                         print(tool_response)
                         print2(config.divider)
-                    messages[-1]["content"] = f"""Response to the following query according to given supplementary information.
-
-Query:
-<query>
-{user_request}
-</query>
-
-Supplementary information:
-<supplementary_information>
-{tool_response}
-</supplementary_information>"""
+                    messages[-1]["content"] = getRagPrompt(user_request, tool_response)
                     return CallLlamaCpp.regularCall(messages)
                 elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
                     # tool function executed without chat extension

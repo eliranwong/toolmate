@@ -162,7 +162,7 @@ Name={config.toolMateAIName} AI
                 pass
 
     # create utilities
-    createUtilities()
+    #createUtilities() # TODO
     #createAppAlias()
 
 def createUtilities():

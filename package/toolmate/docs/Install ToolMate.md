@@ -8,7 +8,7 @@ or
 
 > pip install --upgrade toolmate_lite
 
-The lite version `toolmate_lite` runs faster and supports Android Termux.  It lacks some of the features that are equipped with the full version `toolmate`.
+The lite version `toolmate_lite` runs faster and supports Android Termux.  It does not support backends `Vertex AI` and `Llama.cpp` as the full version does.  It also lacks some of the features that are equipped with the full version `toolmate`.
 
 For Android users ([read more](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Termux%20Setup.md)):
 

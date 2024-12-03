@@ -120,7 +120,7 @@ class Plugins:
     # input suggestions
     @staticmethod
     def buildInputSuggestions():
-        nestedSuggestions = {i: None for i in config.actionKeys}
+        nestedSuggestions = {i: None for i in [".backend"]+config.actionKeys}
         nestedSuggestions["@chat"] = {f"`{i}` ":None for i in config.predefinedChatSystemMessages}
         for i in config.predefinedContexts:
             if not i.startswith("["):

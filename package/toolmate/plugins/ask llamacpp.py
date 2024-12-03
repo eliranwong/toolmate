@@ -6,10 +6,15 @@ Ask ChatGPT for conversation only; no function calling
 [TOOL_CALL]
 """
 
-if not config.isLite:
+try:
+    from toolmate.utils.call_llamacpp import CallLlamaCpp
+    runnable = True
+except:
+    runnable = False
+
+if not config.isLite and runnable:
 
     from toolmate import config, print1, loadLlamacppChatModel
-    from toolmate.utils.call_llamacpp import CallLlamaCpp
 
     def ask_llamacpp(function_args):
         chatModel = None

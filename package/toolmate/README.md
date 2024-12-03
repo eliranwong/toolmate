@@ -152,7 +152,11 @@ For Android users:
 
 > pip install --upgrade toolmate_lite
 
-## Optional Modules
+## Extra Modules
+
+`cpp` install additional cpp libraries, i.e. `llama-cpp-python[server]` and `stable-diffusion-cpp-python`
+
+> pip install --upgrade toolmate[cpp]
 
 `gui` install additional GUI library for running gui system tray and experimental desktop assistant
 

@@ -52,12 +52,13 @@ if not config.isLite:
 
 class ToolMate:
 
-    def __init__(self):
+    def __init__(self, plugins=True):
         #config.letMeDoItAI = self
         self.prompts = Prompts()
         self.dialogs = TerminalModeDialogs(self)
         self.setup()
-        Plugins.runPlugins()
+        if plugins:
+            Plugins.runPlugins()
 
     def resetMessages(self):
         self.workflow = []
@@ -1323,6 +1324,7 @@ class ToolMate:
         print1(instruction)
         options = {
             "ollama": "Ollama",
+            "llamacppserver": "Llama.cpp server",
             "groq": "Groq Cloud API",
             "mistral": "Mistral AI API",
             "xai": "X AI API [Paid online service]",
@@ -1330,9 +1332,9 @@ class ToolMate:
             "chatgpt": "OpenAI ChatGPT [Paid online service]",
             "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",
         } if config.isLite else {
-            "llamacpp": "Llama.cpp",
-            "llamacppserver": "Llama.cpp server [advanced]",
             "ollama": "Ollama",
+            "llamacpp": "Llama.cpp",
+            "llamacppserver": "Llama.cpp server",
             "groq": "Groq Cloud API",
             "mistral": "Mistral AI API",
             "xai": "X AI API [Paid online service]",
@@ -1341,6 +1343,11 @@ class ToolMate:
             "chatgpt": "OpenAI ChatGPT [Paid online service]",
             "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",
         }
+        if not config.isLite:
+            try:
+                from llama_cpp import Llama
+            except:
+                del options["llamacpp"]
         llmInterface = self.dialogs.getValidOptions(
             options=options.keys(),
             descriptions=list(options.values()),
@@ -2108,7 +2115,7 @@ class ToolMate:
 
     def setContextWindowSize(self, feature="default", customContextWindowSize=None):
         if not config.llmInterface in ("llamacpp", "ollama"):
-            print1("Option `Context window size` applies to backends `llamacpp` and `ollama` only.")
+            print2("Option `Context window size` applies to backends `llamacpp` and `ollama` only!")
             return None
         if customContextWindowSize is None:
             default = self.getCurrentContextWindowSize(feature=feature)
@@ -3386,6 +3393,8 @@ Acess the risk level of the following `{target.capitalize()}`:
             
             # display options when empty string is entered
             userInputLower = userInput.lower()
+            if userInputLower == ".backend":
+                userInput = userInputLower = ".model"
             if config.addToolAt is not None:
                 prefix = userInput[:config.addToolAt]
                 suffix = userInput[config.addToolAt:]

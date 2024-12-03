@@ -1,4 +1,4 @@
-from toolmate import getDeviceInfo, showErrors, toGeminiMessages, executeToolFunction, extractPythonCode
+from toolmate import getDeviceInfo, showErrors, toGeminiMessages, executeToolFunction, extractPythonCode, getRagPrompt
 from toolmate import print1, print2, print3, getPythonFunctionResponse, isValidPythodCode, validParameters, useChatSystemMessage
 from toolmate import config
 from prompt_toolkit import prompt
@@ -253,13 +253,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                         print2("Tool output:")
                         print(tool_response)
                         print2(config.divider)
-                    messages[-1]["content"] = f"""Describe the query and response below in your own words in detail, without comment about your ability.
-
-My query:
-{user_request}
-
-Your response:
-{tool_response}"""
+                    messages[-1]["content"] = getRagPrompt(user_request, tool_response)
                     return CallVertexAI.regularCall(messages)
                 elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
                     # tool function executed without chat extension

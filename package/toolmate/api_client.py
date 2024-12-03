@@ -220,8 +220,8 @@ def main(chat: bool = False):
         stopSpinning()
 
         if args.format and args.format.lower() in ("plain", "list"):
+            outputText = []
             if args.format.lower() == "plain":
-                outputText = ""
                 for i in json.loads(response.json()):
                     role = i.get("role", "")
                     content = i.get("content", "")
@@ -233,21 +233,33 @@ def main(chat: bool = False):
                             outputText.append(content)
                         else:
                             print(content)
-                if args.export:
-                    try:
-                        writeTextFile(args.export, outputText)
-                    except Exception as e:
-                        showErrors(e=e)
             elif args.format.lower() == "list":
                 try:
                     output = json.loads(response.json())
-                    pprint.pprint(output)
+                    if args.export:
+                        outputText.append(pprint.pformat(output))
+                    else:
+                        pprint.pprint(output)
                 except:
-                    print(response.json())
+                    if args.export:
+                        outputText.append(response.text)
+                    else:
+                        print(response.json())
+            if args.export:
+                try:
+                    writeTextFile(args.export, "\n".join(outputText))
+                except Exception as e:
+                    showErrors(e=e)
         else:
             try:
                 output = json.loads(response.json())[-1]["content"]
                 output = convertOutputText(output)
+                if args.export:
+                    try:
+                        writeTextFile(args.export, output)
+                    except Exception as e:
+                        showErrors(e=e)
+                    return None
                 wordwrap = True if (args.wordwrap is not None and args.wordwrap.lower() == "true") or config.wrapWords else False
                 outputContent = wrapText(output) if wordwrap else output
                 if (args.markdown and args.markdown.lower() == "true") or (config.toolmate_api_client_markdown and not (args.markdown and args.markdown.lower() == "false")):

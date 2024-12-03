@@ -1,6 +1,6 @@
 from toolmate import showErrors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution, useChatSystemMessage
 from toolmate import config
-from toolmate import print1, print2, print3, check_llm_errors, toParameterSchema, extractPythonCode, getLlamacppServerClient, validParameters
+from toolmate import print1, print2, print3, check_llm_errors, toParameterSchema, extractPythonCode, getLlamacppServerClient, validParameters, getRagPrompt
 import re, traceback, pprint, copy, textwrap, json, pygments
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit import print_formatted_text, HTML
@@ -312,17 +312,7 @@ Acess the risk level of this Python code:
                         print2("Tool output:")
                         print(tool_response)
                         print2(config.divider)
-                    messages[-1]["content"] = f"""Response to the following query according to given supplementary information.
-
-Query:
-<query>
-{user_request}
-</query>
-
-Supplementary information:
-<supplementary_information>
-{tool_response}
-</supplementary_information>"""
+                    messages[-1]["content"] = getRagPrompt(user_request, tool_response)
                     return CallLlamaCppServer.regularCall(messages)
                 elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
                     # tool function executed without chat extension

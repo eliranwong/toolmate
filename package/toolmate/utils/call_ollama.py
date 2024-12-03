@@ -1,5 +1,5 @@
 from toolmate import showErrors, isValidPythodCode, executeToolFunction, toParameterSchema, useChatSystemMessage, isRemoteOllamaHost
-from toolmate import print1, print2, print3, getPythonFunctionResponse, extractPythonCode, isValidPythodCode, validParameters
+from toolmate import print1, print2, print3, getPythonFunctionResponse, extractPythonCode, isValidPythodCode, validParameters, getRagPrompt
 from toolmate import config, getOllamaServerClient, getRagPrompt
 import shutil, re, traceback, json, ollama, pprint, copy, datetime
 from typing import Optional

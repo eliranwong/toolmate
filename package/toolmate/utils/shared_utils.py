@@ -25,7 +25,10 @@ import zipfile
 from openai import OpenAI
 import tiktoken
 if not config.isLite:
-    from llama_cpp import Llama
+    try:
+        from llama_cpp import Llama
+    except:
+        pass
     from vertexai.generative_models import Content, Part
     from tavily import TavilyClient
     import chromadb, pendulum
@@ -2005,7 +2008,7 @@ https://cookbook.chromadb.dev/embeddings/gpu-support/
 """
 
 def getRagPrompt(query, context):
-    f"""# Provided Context
+    return f"""# Provided Context
 
 {context}
 
@@ -2015,7 +2018,7 @@ def getRagPrompt(query, context):
 
 # Instruction
 
-Select all the relevant information from the provided context to answer my question."""
+Select all the relevant information from the provided context to answer my question in as much detail as possible."""
 
 def getRagPrompt_old(query, retrievedContext):
     return f"""Question:

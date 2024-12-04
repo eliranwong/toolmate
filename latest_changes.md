@@ -1,4 +1,4 @@
-# 0.5.28-0.5.42
+# 0.5.28-0.5.55
 
 * Improved api server and client
 
@@ -458,7 +458,7 @@ Added plugins:
 
 * implemented the new tool selection agent to all other backends
 
-* TODO: check backward compatibility of letmedoit mode
+* check backward compatibility of letmedoit mode
 
 # Version 0.3.40
 

@@ -29,7 +29,8 @@ import os
 def analyze_images_ollama(function_args):
     from toolmate import config
 
-    Downloader.downloadOllamaModel(config.ollamaVisionModel)
+    if shutil.which("ollama") and not (isRemoteOllamaHost(config.ollamaToolServer_host) or isRemoteOllamaHost(config.ollamaChatServer_host)):
+        Downloader.downloadOllamaModel(config.ollamaVisionModel)
 
     query = function_args.get("query") # required
     files = function_args.get("image_filepath") # required

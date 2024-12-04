@@ -29,11 +29,11 @@ class CallOllama:
     @staticmethod
     @check_ollama_errors
     def checkCompletion():
-        if shutil.which("ollama") and not isRemoteOllamaHost(config.ollamaToolServer_url):
+        if shutil.which("ollama") and not isRemoteOllamaHost(config.ollamaToolServer_host):
             Downloader.downloadOllamaModel(config.ollamaToolModel)
-        if config.useAdditionalChatModel and not isRemoteOllamaHost(config.ollamaChatServer_url):
+        if config.useAdditionalChatModel and not isRemoteOllamaHost(config.ollamaChatServer_host):
             Downloader.downloadOllamaModel(config.ollamaChatModel)
-        if not shutil.which("ollama") and not (isRemoteOllamaHost(config.ollamaToolServer_url) or isRemoteOllamaHost(config.ollamaChatServer_url)):
+        if not shutil.which("ollama") and not (isRemoteOllamaHost(config.ollamaToolServer_host) or isRemoteOllamaHost(config.ollamaChatServer_host)):
             print("Ollama not found! Install it first!")
             print("Check https://ollama.com")
             config.llmInterface = "llamacpp"

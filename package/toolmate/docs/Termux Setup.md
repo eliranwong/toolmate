@@ -103,6 +103,16 @@ pkg install python-numpy
 pkg install matplotlib
 ```
 
+# Build Llama.cpp
+
+```
+cd ~
+git clone https://github.com/ggerganov/llama.cpp.git
+cd llama.cpp
+cmake -B build
+cmake --build build --config Release
+```
+
 # Instal Ollama on Termux
 
 Install Ollama:
@@ -303,3 +313,49 @@ To exit, enter `.exit` or press `ctrl+q`.
 ```
 exit
 ```
+
+# Configure ToolMate AI to Use Llama.cpp
+
+First, download gguf model from hugging face or related repositories.
+
+To start a llama.cpp server, run in a termux session, assuming `llama3.2_3b.gguf` is downloaded in folder `~/downloads`, e.g.:
+
+```
+~/llama.cpp/build/bin/llama-server --host 127.0.0.1 --port 8080 --threads $(lscpu | grep -m 1 '^Core(s)' | awk '{print $NF} ') --ctx-size 2048 --chat-template chatml --parallel 2 --model ~/downloads/llama3.2_3b.gguf
+```
+
+To stop later, press, ctrl+C
+
+Run ToolMate AI in a sperate termux session:
+
+```
+toolmate -r .model
+```
+
+Select Llama.cpp server, enter server address and server port
+
+# Configure ToolMate AI to Use Ollama
+
+To start an Ollama server, run in a termux session:
+
+```
+ollama serve
+```
+
+To stop later, press, ctrl+C
+
+Download a LLM in a termux session, e.g. `llama3.2:3b`:
+
+```
+ollama pull llama3.2:3b
+```
+
+Run ToolMate AI:
+
+```
+toolmate -r .model
+```
+
+Select Ollama and model
+
+Remarks: It appears that Llama.cpp servers run faster inference with the same model on Android, compared to ollama.

@@ -1,3 +1,7 @@
+# 0.5.56
+
+* Support Llama.cpp server on Lite version and running on Android
+
 # 0.5.28-0.5.55
 
 * Improved api server and client

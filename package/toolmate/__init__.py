@@ -119,7 +119,10 @@ if not config.isTermux:
     setGoogleCredentials()
 
 # context
-g = geocoder.ip('me')
-config.country = g.country
-config.state = g.state
-config.dayOfWeek = getDayOfWeek()
+if isServerAlive("8.8.8.8", 53):
+    g = geocoder.ip('me')
+    config.country = g.country
+    config.state = g.state
+    config.dayOfWeek = getDayOfWeek()
+else:
+    config.country = config.state = config.dayOfWeek = "n/a"

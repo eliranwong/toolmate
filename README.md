@@ -22,14 +22,18 @@ Windows, macOS, Linux, ChromeOS, Android
 
 # AI Backends and Models
 
-ToolMate AI supports a wide range of AI backends and models, including [Ollama, Llama.cpp, Llama-cpp-python (default), Groq Cloud API, OpenAI API, and Google Gemini via Vertex AI](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Supported%20Backends%20and%20Models.md). Llama-cpp-python is selected as the default backend because it is completely free and requires no additional setup. However, users can switch backends at any time.
+ToolMate AI supports a wide range of AI backends and models, including [Ollama, Llama.cpp, Llama-cpp-python, Groq Cloud API, Mistral AI API, X AI API, OpenAI API, Google AI Studio API and Google Vertex AI](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Supported%20Backends%20and%20Models.md). Llama-cpp-python is selected as the default backend because it is completely free and requires no additional setup. However, users can switch backends at any time.
 
 Our recommendations:
 * For backend selection, we consider [Ollama](https://ollama.com/) as the best friendly free `offline` option and [Groq Cloud API](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Groq%20API%20Setup.md) as the best freiendly and free `online` option.
 
+* Remarks: Though Llama.cpp requires extra setup, it runs faster inference with the same model, compared to Ollama, when they are running on Android Termux.
+
 Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Supported%20Backends%20and%20Models.md
 
 # New Additions
+
+[NEW! Support Llama.cpp server running on Android](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Android%20Versions.md)
 
 [NEW! Support X AI / Grok API Keys](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/xAI.md)
 

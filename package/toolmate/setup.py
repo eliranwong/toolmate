@@ -14,18 +14,19 @@ def main():
     # Create the parser
     parser = argparse.ArgumentParser(description="ToolMate AI cli options")
     # Add arguments
-    parser.add_argument('-b', '--backend', action='store', dest='backend', help="configure AI backend and models; true / false")
-    parser.add_argument('-cs', '--chatsystem', action='store', dest='chatsystem', help="configure chat system message; true / false")
+    #parser.add_argument('-ac', '--actionmenu', action='store_true', dest='actionmenu', help="launch action menu; true / false")
+    parser.add_argument('-b', '--backend', action='store_true', dest='backend', help="configure AI backend and models")
+    parser.add_argument('-cs', '--chatsystem', action='store_true', dest='chatsystem', help="configure chat system message")
     parser.add_argument('-d', '--developer', action='store', dest='developer', help="configure developer mode; true / false")
-    parser.add_argument('-ec', '--editconfigs', action='store', dest='editconfigs', help="configure config.py; true / false")
-    parser.add_argument('-k', '--apikeys', action='store', dest='apikeys', help="configure API keys; true / false")
-    parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', help="configure maximum output tokens; true / false")
-    parser.add_argument('-p', '--plugins', action='store', dest='plugins', help="configure plugins; true / false")
-    parser.add_argument('-sg', '--speechgeneration', action='store', dest='speechgeneration', help="configure speech generation; true / false")
-    parser.add_argument('-sr', '--speechrecognition', action='store', dest='speechrecognition', help="configure speech recognition; true / false")
-    parser.add_argument('-t', '--temperature', action='store', dest='temperature', help="configure inference temperature; true / false")
-    parser.add_argument('-ta', '--toolagent', action='store', dest='toolagent', help="configure tool selection agent; true / false")
-    parser.add_argument('-ws', '--windowsize', action='store', dest='windowsize', help="configure context window size; true / false")
+    parser.add_argument('-ec', '--editconfigs', action='store_true', dest='editconfigs', help="configure config.py")
+    parser.add_argument('-k', '--apikeys', action='store_true', dest='apikeys', help="configure API keys")
+    parser.add_argument('-mo', '--maximumoutput', action='store_true', dest='maximumoutput', help="configure maximum output tokens")
+    parser.add_argument('-p', '--plugins', action='store_true', dest='plugins', help="configure plugins")
+    parser.add_argument('-sg', '--speechgeneration', action='store_true', dest='speechgeneration', help="configure speech generation")
+    parser.add_argument('-sr', '--speechrecognition', action='store_true', dest='speechrecognition', help="configure speech recognition")
+    parser.add_argument('-t', '--temperature', action='store_true', dest='temperature', help="configure inference temperature")
+    parser.add_argument('-ta', '--toolagent', action='store_true', dest='toolagent', help="configure tool selection agent")
+    parser.add_argument('-ws', '--windowsize', action='store_true', dest='windowsize', help="configure context window size")
     parser.add_argument('-ww', '--wordwrap', action='store', dest='wordwrap', help="configure word wrap; true / false")
     # Parse arguments
     args = parser.parse_args()
@@ -44,9 +45,11 @@ def main():
 
     config.toolmate = ToolMate(plugins=False)
 
-    if args.backend and args.backend.lower() == "true":
+    #if args.actionmenu:
+    #    config.toolmate.runActions("...")
+    if args.backend:
         config.toolmate.setLlmModel()
-    if args.chatsystem and args.chatsystem.lower() == "true":
+    if args.chatsystem:
         config.toolmate.setCustomSystemMessage()
     if args.developer:
         if args.developer.lower() == "true":
@@ -57,23 +60,23 @@ def main():
             print2("Developer mode disabled!")
         else:
             print2("Developer mode unchanged! Accept 'True' or 'False' only!")
-    if args.editconfigs and args.editconfigs.lower() == "true":
+    if args.editconfigs:
         config.toolmate.editConfigs()
-    if args.apikeys and args.apikeys.lower() == "true":
+    if args.apikeys:
         config.toolmate.changeAPIkeys()
-    if args.maximumoutput and args.maximumoutput.lower() == "true":
+    if args.maximumoutput:
         config.toolmate.setMaxTokens()
-    if args.plugins and args.plugins.lower() == "true":
+    if args.plugins:
         config.toolmate.selectPlugins()
-    if args.speechgeneration and args.speechgeneration.lower() == "true":
+    if args.speechgeneration:
         config.toolmate.setTextToSpeechConfig()
-    if args.speechrecognition and args.speechrecognition.lower() == "true":
+    if args.speechrecognition:
         config.toolmate.setSpeechToTextConfig()
-    if args.temperature and args.temperature.lower() == "true":
+    if args.temperature:
         config.toolmate.setTemperature()
-    if args.toolagent and args.toolagent.lower() == "true":
+    if args.toolagent:
         config.toolmate.setToolSelectionConfigs()
-    if args.windowsize and args.windowsize.lower() == "true":
+    if args.windowsize:
         config.toolmate.setContextWindowSize()
     if args.wordwrap:
         if args.wordwrap.lower() == "true":

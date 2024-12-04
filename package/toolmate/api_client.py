@@ -12,8 +12,8 @@ from prompt_toolkit import print_formatted_text
 parser = argparse.ArgumentParser(description="ToolMate AI API client cli options")
 # Add arguments
 parser.add_argument("default", nargs="?", default=None, help="instruction sent to ToolMate API server; work on previous conversation if not given.")
-parser.add_argument('-bc', '--backupchat', action='store', dest='backupchat', help="back up the current conversation in ToolMate AI user directory; true / false; default: false")
-parser.add_argument('-bs', '--backupsettings', action='store', dest='backupsettings', help="back up the current settings in ToolMate AI user directory; true / false; default: false")
+parser.add_argument('-bc', '--backupchat', action='store_true', dest='backupchat', help="back up the current conversation in ToolMate AI user directory")
+parser.add_argument('-bs', '--backupsettings', action='store_true', dest='backupsettings', help="back up the current settings in ToolMate AI user directory")
 parser.add_argument('-c', '--chat', action='store', dest='chat', help="enable or disable to chat as an on-going conversation; true / false")
 parser.add_argument('-cf', '--chatfile', action='store', dest='chatfile', help="a chat file containing a saved conversation")
 parser.add_argument('-cs', '--chatsystem', action='store', dest='chatsystem', help="override chat system message for a single request; optionally use it together with '-bc' to make a change persistant")
@@ -24,10 +24,10 @@ parser.add_argument('-k', '--key', action='store', dest='key', help="specify the
 parser.add_argument('-md', '--markdown', action='store', dest='markdown', help="highlight assistant response in markdown format; true / false")
 parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', help="override maximum output tokens for a single request; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
 parser.add_argument('-p', '--port', action='store', dest='port', help="server port")
-parser.add_argument('-pd', '--powerdown', action='store', dest='powerdown', help="power down server; true / false; default: false")
-parser.add_argument('-r', '--read', action='store', dest='read', help="read text output; true / false")
+parser.add_argument('-pd', '--powerdown', action='store_true', dest='powerdown', help="power down server")
+parser.add_argument('-r', '--read', action='store_true', dest='read', help="read text output")
 parser.add_argument('-s', '--server', action='store', dest='server', help="server address; 'http://localhost' by default")
-parser.add_argument('-sd', '--showdescription', action='store', dest='showdescription', help="show description of the found items in search results; true / false; used together with 'sc', 'ss' and 'st'")
+parser.add_argument('-sd', '--showdescription', action='store_true', dest='showdescription', help="show description of the found items in search results; used together with 'sc', 'ss' and 'st'")
 parser.add_argument('-sc', '--searchcontexts', action='store', dest='searchcontexts', help="search predefined contexts; use '@' to display all; use regex pattern to filter")
 parser.add_argument('-ss', '--searchsystems', action='store', dest='searchsystems', help="search predefined system messages; use '@' to display all; use regex pattern to filter")
 parser.add_argument('-st', '--searchtools', action='store', dest='searchtools', help="search enabled tools; use '@' to display all; use regex pattern to filter")
@@ -108,7 +108,7 @@ def main(chat: bool = False):
         
         try:
             results = json.loads(response.json())["results"]
-            if args.showdescription and args.showdescription.lower() == "true":
+            if args.showdescription:
                 for key, value in results.items():
                     print3(f"@{key}: {value}")
             else:
@@ -206,9 +206,9 @@ def main(chat: bool = False):
             "temperature": args.temperature,
             "defaulttool": args.defaulttool,
             "toolagent": toolagent,
-            "backupchat": True if args.backupchat and args.backupchat.strip().lower() == "true" else False,
-            "backupsettings": True if args.backupsettings and args.backupsettings.strip().lower() == "true" else False,
-            "powerdown": True if args.powerdown and args.powerdown.strip().lower() == "true" else False,
+            "backupchat": True if args.backupchat else False,
+            "backupsettings": True if args.backupsettings else False,
+            "powerdown": True if args.powerdown else False,
         }
         try:
             response = requests.post(endpoint, headers=headers, json=data)
@@ -270,7 +270,7 @@ def main(chat: bool = False):
                         print(outputContent)
                 else:
                     print(outputContent)
-                if args.read is not None and args.read.lower() == "true":
+                if args.read:
                     TTSUtil.play(output)
             except:
                 print(response.text)

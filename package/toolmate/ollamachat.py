@@ -27,8 +27,9 @@ promptStyle = Style.from_dict({
 class OllamaChat:
 
     def __init__(self):
+        self.remote = (isRemoteOllamaHost(config.ollamaToolServer_host) or isRemoteOllamaHost(config.ollamaChatServer_host))
         # authentication
-        if shutil.which("ollama") or (isRemoteOllamaHost(config.ollamaToolServer_url) or isRemoteOllamaHost(config.ollamaChatServer_url)):
+        if shutil.which("ollama") or self.remote:
             self.runnable = True
         else:
             print("Local LLM Server 'Ollama' not found! Install Ollama first!")
@@ -127,9 +128,9 @@ Here is my request:
             return None
 
         # check model
-        if not Downloader.downloadOllamaModel(model):
+        if not self.remote and not Downloader.downloadOllamaModel(model):
             return None
-        if model.startswith("llava"):
+        if not self.remote and model.startswith("llava"):
             Downloader.downloadOllamaModel("gemma:2b")
         
         previoiusModel = config.ollamaToolModel

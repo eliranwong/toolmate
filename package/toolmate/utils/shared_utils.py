@@ -1,6 +1,6 @@
 from toolmate import config
 from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
-import sys, os, html, geocoder, platform, socket, geocoder, datetime, requests, getpass, pkg_resources, webbrowser, unicodedata
+import sys, os, html, geocoder, platform, socket, datetime, requests, getpass, pkg_resources, webbrowser, unicodedata
 import traceback, uuid, re, textwrap, signal, wcwidth, shutil, threading, time, subprocess, json, base64, html2text, pydoc, codecs, psutil
 from packaging import version
 import importlib.resources
@@ -452,7 +452,7 @@ def stopAutogenstudioServer():
         config.autogenstudioServer = None
 
 def isRemoteOllamaHost(url):
-    if config.ollamaToolHost_localIp or config.ollamaChatHost_localIp:
+    if not url:
         return True
     #host = "http://localhost:11434"
     #host = re.sub("^.*?://", "", host.strip())
@@ -460,11 +460,21 @@ def isRemoteOllamaHost(url):
     return False if url.lower() in ("127.0.0.1", "localhost") else True
 
 def getOllamaServerClient(server="tool"):
-    if server=="chat" and config.ollamaChatHost_localIp:
+    if server=="chat":
+        if not config.ollamaChatServer_host or (config.ollamaChatServer_host == "127.0.0.1" and not isServerAlive(config.ollamaChatServer_host, config.ollamaChatServer_port)):
+            ollamaChatHost_localIp = True
+        else:
+            ollamaChatHost_localIp = False
+    elif server=="tool":
+        if not config.ollamaToolServer_host or (config.ollamaToolServer_host == "127.0.0.1" and not isServerAlive(config.ollamaToolServer_host, config.ollamaToolServer_port)):
+            ollamaToolHost_localIp = True
+        else:
+            ollamaToolHost_localIp = False
+    if server=="chat" and ollamaChatHost_localIp:
         return Client(host=f"{config.ollamaToolServer_protocol}{get_local_ip()}:{config.ollamaChatServer_port}")
-    elif server=="tool" and config.ollamaToolHost_localIp:
+    elif server=="tool" and ollamaToolHost_localIp:
         return Client(host=f"{config.ollamaChatServer_protocol}{get_local_ip()}:{config.ollamaToolServer_port}")
-    return Client(host=f"{config.ollamaToolServer_protocol if server=='chat' else config.ollamaChatServer_protocol}{config.ollamaChatServer_url if server=='chat' else config.ollamaToolServer_url}:{config.ollamaChatServer_port if server=='chat' else config.ollamaToolServer_port}")
+    return Client(host=f"{config.ollamaToolServer_protocol if server=='chat' else config.ollamaChatServer_protocol}{config.ollamaChatServer_host if server=='chat' else config.ollamaToolServer_host}:{config.ollamaChatServer_port if server=='chat' else config.ollamaToolServer_port}")
 
 def loadLlamacppChatModel():
     cpuThreads = getCpuThreads()
@@ -1406,24 +1416,23 @@ def get_local_ip_old(): # It does not work in some cases
                     return ip"""
 
 def get_local_ip():
-  """
-  Gets the local IP address of the machine.
-
-  Returns:
-    str: The local IP address.
-  """
-  try:
-    # Create a socket object
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    # Connect to a known external server (e.g., Google's DNS server)
-    s.connect(("8.8.8.8", 80))
-    # Get the local IP address assigned to the socket
-    ip_address = s.getsockname()[0]
-    s.close()
-    return ip_address
-  except Exception as e:
-    print(f"Error getting local IP address: {e}")
-    return None
+    """
+    Gets the local IP address of the machine.
+    Returns:
+        str: The local IP address.
+    """
+    try:
+        # Create a socket object
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # Connect to a known external server (e.g., Google's DNS server)
+        s.connect(("8.8.8.8", 80))
+        # Get the local IP address assigned to the socket
+        ip_address = s.getsockname()[0]
+        s.close()
+        return ip_address
+    except Exception as e:
+        print(f"Error getting local IP address: {e}")
+        return None
 
 def runSystemCommand(command):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
@@ -1515,14 +1524,21 @@ def getDayOfWeek():
 # device information
 
 def getDeviceInfo(includeIp=False):
-    g = geocoder.ip('me')
+    if isServerAlive("8.8.8.8", 53):
+        g = geocoder.ip('me')
+        location = f"""Latitude & longitude: {g.latlng}
+Country: {g.country}
+State: {g.state}
+City: {g.city}"""
+    else:
+        location = ""
     if hasattr(config, "thisPlatform"):
         thisPlatform = config.thisPlatform
     else:
         thisPlatform = platform.system()
         if thisPlatform == "Darwin":
             thisPlatform = "macOS"
-    if config.includeIpInDeviceInfoTemp or includeIp or (config.includeIpInDeviceInfo and config.includeIpInDeviceInfoTemp):
+    if isServerAlive("8.8.8.8", 53) and (config.includeIpInDeviceInfoTemp or includeIp or (config.includeIpInDeviceInfo and config.includeIpInDeviceInfoTemp)):
         wan_ip = get_wan_ip()
         local_ip = get_local_ip()
         ipInfo = f'''Wan ip: {wan_ip}
@@ -1547,10 +1563,7 @@ Python implementation: {platform.python_implementation()}
 Current directory: {os.getcwd()}
 Current time: {str(datetime.datetime.now())}
 {dayOfWeek}
-{ipInfo}Latitude & longitude: {g.latlng}
-Country: {g.country}
-State: {g.state}
-City: {g.city}"""
+{ipInfo}{location}"""
 
 # token management
 
@@ -1795,6 +1808,12 @@ def updateApp():
                         if config.developer:
                             print(traceback.format_exc())
                         print(f"Failed to upgrade '{thisPackage}'!")
+
+def list_installed_packages():
+    import importlib.metadata
+    packages = importlib.metadata.distributions()
+    for package in packages:
+        print(f"{package.metadata['Name']} {package.version}")
 
 def installPipPackage(module, update=True):
     #executablePath = os.path.dirname(sys.executable)

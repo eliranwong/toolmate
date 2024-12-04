@@ -194,11 +194,11 @@ Current input: {currentInputTokens}
             buffer.validate_and_handle()
         '''
         @this_key_bindings.add("escape", "!")
-        @this_key_bindings.add(*config.hotkey_launch_system_prompt)
+        @this_key_bindings.add(*config.hotkey_launch_xonsh)
         def _(event):
             buffer = event.app.current_buffer
             config.defaultEntry = buffer.text
-            buffer.text = ".system"
+            buffer.text = ".xonsh"
             buffer.validate_and_handle()
         @this_key_bindings.add(*config.hotkey_display_key_combo)
         def _(_):
@@ -297,9 +297,10 @@ Current input: {currentInputTokens}
             str(config.hotkey_count_tokens): "count current message tokens",
             str(config.hotkey_toggle_input_improvement): "toggle improved writing feature",
             str(config.hotkey_toggle_mouse_support): "toggle mouse support",
-            str(config.hotkey_launch_system_prompt): "system command prompt",
+            str(config.hotkey_toggle_developer_mode): "toggle developer mode",
+            str(config.hotkey_launch_xonsh): "run xonsh",
+            #str(config.hotkey_launch_system_prompt): "system command prompt",
             #str(config.hotkey_swap_text_brightness): "swap text brightness",
-            str(config.hotkey_toggle_developer_mode): "swap developer mode",
             str(config.hotkey_restart_app): "restart toolmate",
         }
         textEditor = config.customTextEditor.split(" ", 1)[0]

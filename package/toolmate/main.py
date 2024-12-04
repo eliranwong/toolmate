@@ -32,12 +32,7 @@ def lite():
     config.isLite = True
     main()
 
-def setup():
-    print("Setting up ToolMate AI ...")
-    main(setupOnly=True)
-    print("Setup done!")
-
-def main(tempInterface="", setupOnly=False):
+def main(tempInterface=""):
     print(f"launching {config.toolMateAIName} ...")
 
     # Create the parser
@@ -46,17 +41,15 @@ def main(tempInterface="", setupOnly=False):
     parser.add_argument("default", nargs="?", default=None, help="default entry; accepts a string; ignored when -l/rp/p/rf/f/r flag is used")
     parser.add_argument('-b', '--backend', action='store', dest='backend', help="set llm interface with -b flag; options: llamacpp/llamacppserver/ollama/groq/gemini/chatgpt/letmedoit")
     parser.add_argument('-c', '--config', action='store', dest='config', help="specify custom config file with -c flag; accepts a file path")
-    parser.add_argument('-ca', '--configureapi', action='store', dest='configureapi', help="configure API keys; true / false")
-    parser.add_argument('-cb', '--configurebackend', action='store', dest='configurebackend', help="configure backends; true / false")
     parser.add_argument('-f', '--file', action='store', dest='file', help="read file text as default entry with -f flag; accepts a file path; ignored when -l/rf flag is used")
     parser.add_argument('-i', '--ip', action='store', dest='ip', help="set 'true' to include or 'false' to exclude ip information in system message with -i flag")
     parser.add_argument('-l', '--load', action='store', dest='load', help="load file that contains saved chat records with -l flag; accepts either a chat ID or a file path; required plugin 'search chat records'")
     parser.add_argument('-n', '--nocheck', action='store', dest='nocheck', help="set 'true' to bypass completion check at startup with -n flag")
-    parser.add_argument('-p', '--paste', action='store', dest='paste', help="set 'true' to paste clipboard text as default entry with -p flag")
+    parser.add_argument('-p', '--paste', action='store_true', dest='paste', help="paste clipboard text as default entry with -p flag")
     parser.add_argument('-r', '--run', action='store', dest='run', help="run default entry with -r flag; accepts a string; ignored when -l/rf/f flag is used")
-    parser.add_argument('-rp', '--runpaste', action='store', dest='runpaste', help="set 'true' to paste and run clipboard text as default entry with -rp flag")
+    parser.add_argument('-rp', '--runpaste', action='store_true', dest='runpaste', help="paste and run clipboard text as default entry with -rp flag")
     parser.add_argument('-rf', '--runfile', action='store', dest='runfile', help="read file text as default entry and run with -rf flag; accepts a file path; ignored when -l flag is used")
-    parser.add_argument('-u', '--update', action='store', dest='update', help="set 'true' to force or 'false' to not automatic update with -u flag")
+    parser.add_argument('-u', '--update', action='store_true', dest='update', help="set 'true' to force or 'false' to not automatic update with -u flag")
     parser.add_argument('-t', '--temp', action='store', dest='temp', help="set temporary llm interface with -t flag; options: llamacpp/llamacppserver/ollama/groq/gemini/chatgpt/letmedoit; all changes in configs are temporary")
     # Parse arguments
     args = parser.parse_args()
@@ -80,8 +73,7 @@ def main(tempInterface="", setupOnly=False):
 
     # update to the latest version
     if args.update:
-        if args.update.lower() == "true":
-            updateApp()
+        updateApp()
     # determined by config.autoUpgrade if -u flag is not used
     elif config.autoUpgrade:
         updateApp()
@@ -97,10 +89,10 @@ def main(tempInterface="", setupOnly=False):
         load = args.load.strip()
         config.defaultEntry = f"Load chat records with this ID: {load}"
         config.accept_default = True
-    elif args.runpaste and args.runpaste.lower() == "true":
+    elif args.runpaste:
         config.defaultEntry = subprocess.run("termux-clipboard-get", shell=True, capture_output=True, text=True).stdout if shutil.which("termux-clipboard-get") else pyperclip.paste()
         config.accept_default = True
-    elif args.paste and args.paste.lower() == "true":
+    elif args.paste:
         config.defaultEntry = subprocess.run("termux-clipboard-get", shell=True, capture_output=True, text=True).stdout if shutil.which("termux-clipboard-get") else pyperclip.paste()
     elif args.runfile or args.file:
         try:
@@ -151,13 +143,7 @@ def main(tempInterface="", setupOnly=False):
         filepath = os.path.join(config.localStorage, "history", i)
         set_log_file_max_lines(filepath, 3000)
     config.toolmate = ToolMate()
-    if setupOnly:
-        if args.configureapi and args.configureapi.lower() == "true":
-            config.toolmate.changeAPIkeys()
-        if args.configurebackend and args.configurebackend.lower() == "true":
-            config.toolmate.setLlmModel()
-    else:
-        config.toolmate.startChats()
+    config.toolmate.startChats()
     # Do the following tasks before exit
     # backup configurations
     config.saveConfig()

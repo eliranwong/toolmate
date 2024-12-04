@@ -4,7 +4,7 @@ ToolMate AI is designed to support a wide range of backends and models.  Both fr
 
 # Supported Backends and Models
 
-ToolMate AI supports four interfaces: llamcpp, ollama, gemini, and chatgpt. It also maintains backward compatibility with LetMeDoIt AI in LetMeDoIt Mode. The configuration of the LLM Interface is determined by the value of config.llmInterface, which defaults to 'llamacpp'.
+ToolMate AI supports nine interfaces: llamcpp, llama-cpp-python, ollama, googleai, vertexai, mistral, grok, xai, and chatgpt. It also maintains backward compatibility with LetMeDoIt AI in LetMeDoIt Mode.
 
 * llamacpp - [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library)
 
@@ -14,7 +14,13 @@ ToolMate AI supports four interfaces: llamcpp, ollama, gemini, and chatgpt. It a
 
 * groq - [Groq cloud api and model](https://console.groq.com/keys) / [Groq Hosted models](https://console.groq.com/docs/models)
 
-* gemini - [Google Vertex AI](https://cloud.google.com/vertex-ai) / [Gemini Pro & Gemini Pro Vision](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
+* mistral - Mistral AI (recent addition)
+
+* xai - Grok model via X AI (recent addition)
+
+* googleai - Gemini via Google AI Studio API (recent addition)
+
+* vertexai - [Gemini via Google Vertex AI](https://cloud.google.com/vertex-ai) / [Gemini Pro & Gemini Pro Vision](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
 
 * chatgpt - [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
 

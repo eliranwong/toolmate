@@ -255,7 +255,8 @@ class ToolMate:
             #".storagedirectory": ("change storage directory", self.setStorageDirectory),
             ".systemmessage": ("change system messages", self.setCustomSystemMessage),
             # miscellaneous
-            ".system": (f"open system command prompt {str(config.hotkey_launch_system_prompt)}", lambda: SystemCommandPrompt().run(allowPathChanges=True)),
+            ".xonsh": (f"run xonsh {str(config.hotkey_launch_xonsh)}", lambda: os.system("xonsh")),
+            #".system": (f"open system command prompt {str(config.hotkey_launch_system_prompt)}", lambda: SystemCommandPrompt().run(allowPathChanges=True)),
             #".install": ("install python package", self.installPythonPackage), # changed to a tool
             ".keys": (f"learn about key entries and bindings {str(config.hotkey_display_key_combo)}", config.showKeyBindings),
             ".help": ("open documentations", lambda: openURL('https://github.com/eliranwong/toolmate/wiki')),
@@ -1323,8 +1324,8 @@ class ToolMate:
         instruction = "Select an AI platform:"
         print1(instruction)
         options = {
+            "llamacppserver": "Llama.cpp",
             "ollama": "Ollama",
-            "llamacppserver": "Llama.cpp server",
             "groq": "Groq Cloud API",
             "mistral": "Mistral AI API",
             "xai": "X AI API [Paid online service]",
@@ -1332,9 +1333,9 @@ class ToolMate:
             "chatgpt": "OpenAI ChatGPT [Paid online service]",
             "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",
         } if config.isLite else {
+            "llamacppserver": "Llama.cpp",
+            "llamacpp": "Llama-cpp-python",
             "ollama": "Ollama",
-            "llamacpp": "Llama.cpp",
-            "llamacppserver": "Llama.cpp server",
             "groq": "Groq Cloud API",
             "mistral": "Mistral AI API",
             "xai": "X AI API [Paid online service]",
@@ -1414,8 +1415,8 @@ class ToolMate:
                 print2("# Chat Server - for conversation only")
                 self.setLlmModel_llamacppserver("chat")
                 self.setMaxTokens(feature="chat")
-            print2("# Vision Server - for vision only")
-            self.setLlmModel_llamacppserver("vision")
+            #print2("# Vision Server - for vision only")
+            #self.setLlmModel_llamacppserver("vision")
         elif config.llmInterface == "groq":
             #if not config.groqApi_key or config.groqApi_key == "toolmate":
             self.changeGroqApi()
@@ -1497,10 +1498,43 @@ class ToolMate:
         return ""
 
     def setLlmModel_ollama(self, feature="default"):
-        isRemote = (isRemoteOllamaHost(config.ollamaToolServer_url) or isRemoteOllamaHost(config.ollamaChatServer_url))
+        def setIp(feature=feature):
+            ips = {
+                "default": config.ollamaToolServer_host,
+                "chat": config.ollamaChatServer_host,
+            }
+            ip = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=ips[feature])
+            ip = re.sub("^(http://|https://)", "", ip, re.IGNORECASE)
+            if ip is not None and not ip.strip().lower() == config.exit_entry: # accept blank entry
+                if feature=="chat":
+                    config.ollamaChatServer_host = ip
+                else:
+                    config.ollamaToolServer_host = ip
+        def setPort(feature=feature):
+            ports = {
+                "default": config.ollamaToolServer_port,
+                "chat": config.ollamaChatServer_port,
+            }
+            port = self.prompts.simplePrompt(numberOnly=True, style=self.prompts.promptStyle2, default=str(ports[feature]))
+            if port and not port.strip().lower() == config.exit_entry:
+                port = int(port)
+                if feature=="chat":
+                    config.ollamaChatServer_port = port
+                else:
+                    config.ollamaToolServer_port = port
+        # specify host ip and port
+        print3(f"# Ollama server for running: {'chatbot' if feature=='chat' else 'tool'}")
+        print2("Enter server address below:")
+        print1("(Enter a blank entry '' if you want to use device local ip address instead of '127.0.0.1')")
+        setIp(feature=feature)
+        print2("Enter server port below:")
+        setPort(feature=feature)
+
+        # select model
+        isRemote = (isRemoteOllamaHost(config.ollamaToolServer_host) or isRemoteOllamaHost(config.ollamaChatServer_host))
         model = self.selectOllamaModel(feature=feature)
         if model:
-            if shutil.which("ollama"):
+            if not isRemote and shutil.which("ollama"):
                 downloadedOllamaModels = getDownloadedOllamaModels()
             else:
                 downloadedOllamaModels = {}
@@ -1511,22 +1545,21 @@ class ToolMate:
                     config.ollamaChatModel = model
                 elif feature == "embedding":
                     config.embeddingModel = f"_ollama_{model}"
+            elif shutil.which("ollama"):
+                try:
+                    if shutil.which("ollama"):
+                        Downloader.downloadOllamaModel(model, True)
+                    if feature == "default":
+                        config.ollamaToolModel = model
+                    elif feature == "chat":
+                        config.ollamaChatModel = model
+                    elif feature == "embedding":
+                        config.embeddingModel = f"_ollama_{model}"
+                except:
+                    print2(f"Failed to download '{model}'! Please make sure you enter a valid model name or tag.")
             else:
-                if shutil.which("ollama") or isRemote:
-                    try:
-                        if shutil.which("ollama"):
-                            Downloader.downloadOllamaModel(model, True)
-                        if feature == "default":
-                            config.ollamaToolModel = model
-                        elif feature == "chat":
-                            config.ollamaChatModel = model
-                        elif feature == "embedding":
-                            config.embeddingModel = f"_ollama_{model}"
-                    except:
-                        print2(f"Failed to download '{model}'! Please make sure you enter a valid model name or tag.")
-                else:
-                    print("Ollama not found! Install Ollama first to use Ollama model library!")
-                    print("To install Ollama, visit https://ollama.com")
+                print("Ollama not found! Install Ollama first to use Ollama model library!")
+                print("To install Ollama, visit https://ollama.com")
 
     def setLlmModel_llamacppserver(self, server="tool"):
         def setTimeout(server=server):
@@ -1596,9 +1629,9 @@ class ToolMate:
         #print1("(or leave it blank to use built-in or remote llama.cpp server)")
         #command = setCommand()
         print2(f"Enter custom {server} server IP address below:")
-        setIp()
+        setIp(server=server)
         print2(f"Enter custom {server} server port below:")
-        setPort()
+        setPort(server=server)
         #if command:
         #    # timeout option does not apply to built-in server
         #    print2(f"Enter custom {server} server read/write timeout in seconds below:")
@@ -1625,7 +1658,7 @@ class ToolMate:
                         elif feature == "chat":
                             config.llamacppChatModel_model_path = downloadedOllamaModels[model]
                     else:
-                        if shutil.which("ollama"):
+                        if shutil.which("ollama") and not (isRemoteOllamaHost(config.ollamaToolServer_host) or isRemoteOllamaHost(config.ollamaChatServer_host)):
                             try:
                                 Downloader.downloadOllamaModel(model, True)
                                 model_name = model.replace(":latest", "")

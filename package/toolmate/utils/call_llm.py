@@ -6,6 +6,7 @@ from toolmate.utils.call_mistral import CallMistral
 from toolmate.utils.call_googleai import CallGoogleAI
 from toolmate.utils.call_xai import CallXAI
 from toolmate.utils.call_chatgpt import CallChatGPT, CallLetMeDoIt
+from toolmate.utils.call_llamacppserver import CallLlamaCppServer
 import copy
 if not config.isLite:
     try:
@@ -13,7 +14,6 @@ if not config.isLite:
     except:
         pass
     from toolmate.utils.call_gemini import CallVertexAI
-    from toolmate.utils.call_llamacppserver import CallLlamaCppServer
 
 class CallLLM:
 

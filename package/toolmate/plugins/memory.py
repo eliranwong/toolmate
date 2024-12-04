@@ -35,14 +35,18 @@ if not config.isLite:
         if not isinstance(memory_tags, str):
             memory_tags = str(memory_tags)
         collection = get_or_create_collection(chroma_client, "memories")
-        g = geocoder.ip('me')
+        if isServerAlive("8.8.8.8", 53):
+            g = geocoder.ip('me')
+            location = f"{g.city}, {g.state}, {g.country}"
+        else:
+            location = "n/a"
         metadata = {
             "timestamp": str(datetime.datetime.now()),
             "tags": memory_tags,
             "title": memory_title,
             "type": memory_type,
             "user": getpass.getuser(),
-            "location": f"{g.city}, {g.state}, {g.country}",
+            "location": location,
         }
         if config.developer:
             print1(config.divider)

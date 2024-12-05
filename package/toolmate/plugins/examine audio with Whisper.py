@@ -16,7 +16,7 @@ if not config.isLite:
     from pydub import AudioSegment
 
     # Function method
-    def analyze_audio_whisper(function_args):
+    def examine_audio_whisper(function_args):
         from toolmate import config
         def check_file_format(file_path):
             # List of allowed file extensions
@@ -69,7 +69,7 @@ if not config.isLite:
         "examples": [
             "analyze speech",
         ],
-        "name": "analyze_audio_whisper",
+        "name": "examine_audio_whisper",
         "description": f'''Retrieve information from an audio with Whisper''',
         "parameters": {
             "type": "object",
@@ -89,4 +89,4 @@ if not config.isLite:
     }
 
     # Integrate the signature and method into LetMeDoIt AI
-    config.addFunctionCall(signature=functionSignature, method=analyze_audio_whisper)
+    config.addFunctionCall(signature=functionSignature, method=examine_audio_whisper)

@@ -160,7 +160,7 @@ class GeminiPro:
 
                 # declare a function
 #                get_vision_func = generative_models.FunctionDeclaration(
-#                    name="analyze_images",
+#                    name="examine_images",
 #                    description="Describe or analyze images. Remember, do not use this function for non-image related tasks. Even it is an image-related task, use this function ONLY if I provide at least one image file path or image url.",
 #                    parameters={
 #                        "type": "object",

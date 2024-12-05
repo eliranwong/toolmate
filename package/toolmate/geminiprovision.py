@@ -74,14 +74,14 @@ class GeminiProVision:
                         "query": query,
                         "image_filepath": files,
                     }
-                    self.analyze_images(function_args)
+                    self.examine_images(function_args)
                 except:
                     showErrors()
         else:
             print2("Entered path does not exist!")
         print2("\nGemini Pro Vision closed!")
 
-    def analyze_images(self, function_args):
+    def examine_images(self, function_args):
         def load_image_from_url(image_url: str) -> Image:
             with urllib.request.urlopen(image_url) as response:
                 response = typing.cast(http.client.HTTPResponse, response)

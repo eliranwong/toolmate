@@ -1,20 +1,40 @@
 """
-ToolMate AI Plugin - analyze images with Groq
+ToolMate AI Plugin - analyze images
 
-analyze images with Groq
+analyze images
 
-Reference: https://console.groq.com/docs/vision
+Platform: llamacpp, ollama
+Model: llava <- customizable
+To customise:
+Change in config.py:
+llamacppVisionModel_model_path
+llamacppVisionModel_clip_model_path
+ollamaVisionModel
+
+Platform: gemini
+Model: Gemini Pro Vision
+
+Platform: chaptgpt, letmedoit
+Model "gpt-4o"
+Reference: https://platform.openai.com/docs/guides/vision
 
 [TOOL_CALL]
 """
 
 
-from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, getGroqClient, is_valid_url, encode_image
+from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url, encode_image, runToolMateCommand, getLlamacppServerClient
+from toolmate.utils.call_chatgpt import check_openai_errors
 import os
+from openai import OpenAI
 
-def analyze_images_groq(function_args):
+@check_openai_errors
+def examine_images_chatgpt(function_args):
     from toolmate import config
 
+    llmInterface = "chatgpt"
+
+    if llmInterface in ("chatgpt", "letmedoit") and not config.openaiApiKey:
+        return "OpenAI API key not found!"
 
     query = function_args.get("query") # required
     files = function_args.get("image_filepath") # required
@@ -36,10 +56,7 @@ def analyze_images_groq(function_args):
     content = []
     # valid image paths
     for i in files:
-        if getFileSizeInMB(i) > 20:
-            print1(f"File `{i}` exceeds 20MB!")
-            continue
-        elif is_valid_url(i) and is_valid_image_url(i):
+        if is_valid_url(i) and is_valid_image_url(i):
             content.append({"type": "image_url", "image_url": {"url": i,},})
         elif os.path.isfile(i) and is_valid_image_file(i):
             content.append({"type": "image_url", "image_url": {"url": encode_image(i)},})
@@ -47,25 +64,31 @@ def analyze_images_groq(function_args):
             files.remove(i)
 
     if content:
+        client = OpenAI()
+
         content.insert(0, {"type": "text", "text": query,})
 
-        completion = getGroqClient().chat.completions.create(
-            model="llama-3.2-90b-vision-preview",
+        response = client.chat.completions.create(
+            model="gpt-4o",
             messages=[
                 {
                 "role": "user",
                 "content": content,
                 }
             ],
-            max_tokens=8000,
+            max_tokens=4096,
         )
-        answer = completion.choices[0].message.content
+        answer = response.choices[0].message.content
         config.toolTextOutput = answer
 
         # display answer
         print2("```assistant")
         print1(answer)
         print2("```")
+
+        # stop llama.cpp vision server
+        if llmInterface == "llamacpp":
+            stopLlamacppVisionServer()
 
         return ""
     return "[INVALID]"
@@ -76,8 +99,8 @@ functionSignature = {
         "compare images",
         "analyze image",
     ],
-    "name": "analyze_images_groq",
-    "description": "Describe or compare images with Llama 3.2 Vision",
+    "name": "examine_images_chatgpt",
+    "description": "Describe or compare images with ChatGPT",
     "parameters": {
         "type": "object",
         "properties": {
@@ -94,6 +117,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=analyze_images_groq)
-config.inputSuggestions.append("Describe this image in detail: ")
-config.inputSuggestions.append("Extract text from this image: ")
+config.addFunctionCall(signature=functionSignature, method=examine_images_chatgpt)

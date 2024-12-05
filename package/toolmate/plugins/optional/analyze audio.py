@@ -16,7 +16,7 @@ if not config.isTermux:
     from pydub import AudioSegment
 
     # Function method
-    def analyze_audio(function_args):
+    def examine_audio(function_args):
         from toolmate import config
         def check_file_format(file_path):
             # List of allowed file extensions
@@ -197,7 +197,7 @@ if not config.isTermux:
             "audio transcript",
             "transcibe audio",
         ],
-        "name": "analyze_audio",
+        "name": "examine_audio",
         "description": f'''Transcribe audio into text or retrieve information from an audio''',
         "parameters": {
             "type": "object",
@@ -217,4 +217,4 @@ if not config.isTermux:
     }
 
     # Integrate the signature and method into LetMeDoIt AI
-    config.addFunctionCall(signature=functionSignature, method=analyze_audio)
+    config.addFunctionCall(signature=functionSignature, method=examine_audio)

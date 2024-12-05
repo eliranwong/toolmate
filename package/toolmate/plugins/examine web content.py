@@ -13,7 +13,7 @@ if not config.isLite:
     from toolmate.utils.call_llm import CallLLM
     from toolmate.autoretriever import AutoGenRetriever
 
-    def analyze_web_content(function_args):
+    def examine_web_content(function_args):
         query = function_args.get("query") # required
         url = function_args.get("url") # required
         if not url or not is_valid_url(url):
@@ -29,8 +29,8 @@ if not config.isLite:
                 "query": query,
                 "files": [filename],
             }
-            print3("Running tool: 'analyze_images'")
-            return config.toolFunctionMethods["analyze_images"](function_args)
+            print3("Running tool: 'examine_images'")
+            return config.toolFunctionMethods["examine_images"](function_args)
 
         if config.rag_useAutoRetriever and not config.llmInterface in ("vertexai",):
             # process with AutoGen Retriever
@@ -61,7 +61,7 @@ if not config.isLite:
             "retrieve website information",
             "summarize this webpage",
         ],
-        "name": "analyze_web_content",
+        "name": "examine_web_content",
         "description": "retrieve information from a webpage if an url is provided",
         "parameters": {
             "type": "object",
@@ -79,4 +79,4 @@ if not config.isLite:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=analyze_web_content)
+    config.addFunctionCall(signature=functionSignature, method=examine_web_content)

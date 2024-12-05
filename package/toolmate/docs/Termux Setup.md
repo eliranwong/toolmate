@@ -314,26 +314,6 @@ To exit, enter `.exit` or press `ctrl+q`.
 exit
 ```
 
-# Configure ToolMate AI to Use Llama.cpp
-
-First, download gguf model from hugging face or related repositories.
-
-To start a llama.cpp server, run in a termux session, assuming `llama3.2_3b.gguf` is downloaded in folder `~/downloads`, e.g.:
-
-```
-~/llama.cpp/build/bin/llama-server --host 127.0.0.1 --port 8080 --threads $(lscpu | grep -m 1 '^Core(s)' | awk '{print $NF} ') --ctx-size 2048 --chat-template chatml --parallel 2 --model ~/downloads/llama3.2_3b.gguf
-```
-
-To stop later, press, ctrl+C
-
-Run ToolMate AI in a sperate termux session:
-
-```
-toolmate -r .model
-```
-
-Select Llama.cpp server, enter server address and server port
-
 # Configure ToolMate AI to Use Ollama
 
 To start an Ollama server, run in a termux session:
@@ -357,5 +337,55 @@ toolmate -r .model
 ```
 
 Select Ollama and model
+
+# Configure ToolMate AI to Use Llama.cpp
+
+First, download models in gguf format from [hugging face](https://huggingface.co/).
+
+If you want to use the models, downloaded with ollama, use `tmsetup -em` to export the downloaded models.
+
+For an example, assuming you have previously downloaded `llama3.2:1b` and `llama3.2:3b` by running:
+
+```
+ollama pull llama3.2:1b
+ollama pull llama3.2:3b
+```
+
+To export these two models, run:
+
+```
+tmsetup -em "['llama3.2:1b', 'llama3.2:3b']"
+```
+
+To export all downloaded models, pass an empty list instead:
+
+```
+tmsetup -em "[]"
+```
+
+To start a llama.cpp server, run in a termux session, assuming `llama3.2_3b.gguf` is downloaded in folder `~/downloads`, e.g.:
+
+```
+~/llama.cpp/build/bin/llama-server --host 127.0.0.1 --port 8080 --threads $(lscpu | grep -m 1 '^Core(s)' | awk '{print $NF} ') --ctx-size 2048 --chat-template chatml --parallel 2 --model ~/downloads/llama3.2_3b.gguf
+```
+
+To stop later, press, ctrl+C
+
+Run ToolMate AI in a sperate termux session:
+
+```
+toolmate -r .model
+```
+
+Select Llama.cpp server, enter server address and server port
+
+## Set aliases to run llama.cpp server
+
+For an example, assuming llm files `llama3.2_1b.gguf` and `llama3.2_3b.gguf` are downloaded in folder `~/toolmate/LLMs/`:
+
+```
+alias llama1b="~/llama.cpp/build/bin/llama-server --host 127.0.0.1 --port 8080 --threads $(lscpu | grep -m 1 '^Core(s)' | awk '{print $NF} ') --ctx-size 2048 --chat-template chatml --parallel 2 --model ~/toolmate/LLMs/gguf/llama3.2_1b.gguf"
+alias llama3b="~/llama.cpp/build/bin/llama-server --host 127.0.0.1 --port 8080 --threads $(lscpu | grep -m 1 '^Core(s)' | awk '{print $NF} ') --ctx-size 2048 --chat-template chatml --parallel 2 --model ~/toolmate/LLMs/gguf/llama3.2_3b.gguf"
+```
 
 Remarks: It appears that Llama.cpp servers run faster inference with the same model on Android, compared to ollama.

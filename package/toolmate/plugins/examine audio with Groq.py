@@ -11,7 +11,7 @@ from toolmate import print3
 import os, shutil, subprocess
 
 # Function method
-def analyze_audio_groq(function_args):
+def examine_audio_groq(function_args):
     from toolmate import config
     def check_file_format(file_path):
         # List of allowed file extensions
@@ -62,7 +62,7 @@ functionSignature = {
     "examples": [
         "analyze speech",
     ],
-    "name": "analyze_audio_groq",
+    "name": "examine_audio_groq",
     "description": f'''Retrieve information from an audio with Groq''',
     "parameters": {
         "type": "object",
@@ -77,4 +77,4 @@ functionSignature = {
 }
 
 # Integrate the signature and method into LetMeDoIt AI
-config.addFunctionCall(signature=functionSignature, method=analyze_audio_groq)
+config.addFunctionCall(signature=functionSignature, method=examine_audio_groq)

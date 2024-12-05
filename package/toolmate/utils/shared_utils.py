@@ -608,6 +608,9 @@ def getOllamaModelDir():
         modelDir = os.path.expanduser("~/.ollama/models")
     elif config.thisPlatform == "Linux":
         modelDir = "/usr/share/ollama/.ollama/models"
+        modelDir2 = os.path.expanduser("~/.ollama/models")
+        if not os.path.isdir(modelDir) and os.path.isdir(modelDir2):
+            modelDir = modelDir2
     
     if os.path.isdir(modelDir):
         return modelDir
@@ -642,6 +645,7 @@ def getDownloadedOllamaModels() -> dict:
     return models
 
 def exportOllamaModels(selection: list=[]) -> None:
+    print2("# Exporting Ollama models ...")
     llm_directory = os.path.join(config.localStorage, "LLMs", "gguf")
     Path(llm_directory).mkdir(parents=True, exist_ok=True)
     models = getDownloadedOllamaModels()

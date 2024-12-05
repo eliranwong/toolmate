@@ -31,13 +31,13 @@ if not config.isLite:
     from toolmate.utils.call_ollama import CallOllama
 
     @check_openai_errors
-    def analyze_images_llamacpp(function_args):
+    def examine_images_llamacpp(function_args):
         from toolmate import config
 
         llmInterface = "llamacpp"
 
         if llmInterface == "vertexai":
-            answer = GeminiProVision(temperature=config.llmTemperature).analyze_images_llamacpp(function_args)
+            answer = GeminiProVision(temperature=config.llmTemperature).examine_images_llamacpp(function_args)
             if answer:
                 config.toolTextOutput = answer
                 return ""
@@ -110,7 +110,7 @@ if not config.isLite:
             "compare images",
             "analyze image",
         ],
-        "name": "analyze_images_llamacpp",
+        "name": "examine_images_llamacpp",
         "description": "Describe or compare images with Llama.cpp",
         "parameters": {
             "type": "object",
@@ -128,4 +128,4 @@ if not config.isLite:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=analyze_images_llamacpp)
+    config.addFunctionCall(signature=functionSignature, method=examine_images_llamacpp)

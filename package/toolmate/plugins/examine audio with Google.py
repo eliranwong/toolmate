@@ -16,7 +16,7 @@ if not config.isLite:
     from pydub import AudioSegment
 
     # Function method
-    def analyze_audio_google(function_args):
+    def examine_audio_google(function_args):
         from toolmate import config
         def check_file_format(file_path):
             # List of allowed file extensions
@@ -107,7 +107,7 @@ if not config.isLite:
         "examples": [
             "analyze speech",
         ],
-        "name": "analyze_audio_google",
+        "name": "examine_audio_google",
         "description": f'''Retrieve information from an audio with Google''',
         "parameters": {
             "type": "object",
@@ -127,4 +127,4 @@ if not config.isLite:
     }
 
     # Integrate the signature and method into LetMeDoIt AI
-    config.addFunctionCall(signature=functionSignature, method=analyze_audio_google)
+    config.addFunctionCall(signature=functionSignature, method=examine_audio_google)

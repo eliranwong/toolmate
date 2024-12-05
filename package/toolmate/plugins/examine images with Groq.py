@@ -1,36 +1,20 @@
 """
-ToolMate AI Plugin - analyze images
+ToolMate AI Plugin - analyze images with Groq
 
-analyze images
+analyze images with Groq
 
-Platform: llamacpp, ollama
-Model: llava <- customizable
-To customise:
-Change in config.py:
-llamacppVisionModel_model_path
-llamacppVisionModel_clip_model_path
-ollamaVisionModel
-
-Platform: gemini
-Model: Gemini Pro Vision
-
-Platform: chaptgpt, letmedoit
-Model "gpt-4o"
-Reference: https://platform.openai.com/docs/guides/vision
+Reference: https://console.groq.com/docs/vision
 
 [TOOL_CALL]
 """
 
-from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, is_valid_url, encode_image
-from toolmate.utils.call_ollama import CallOllama
-from toolmate.utils.download import Downloader
+
+from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, getGroqClient, is_valid_url, encode_image
 import os
 
-def analyze_images_ollama(function_args):
+def examine_images_groq(function_args):
     from toolmate import config
 
-    if shutil.which("ollama") and not (isRemoteOllamaHost(config.ollamaToolServer_host) or isRemoteOllamaHost(config.ollamaChatServer_host)):
-        Downloader.downloadOllamaModel(config.ollamaVisionModel)
 
     query = function_args.get("query") # required
     files = function_args.get("image_filepath") # required
@@ -52,7 +36,10 @@ def analyze_images_ollama(function_args):
     content = []
     # valid image paths
     for i in files:
-        if is_valid_url(i) and is_valid_image_url(i):
+        if getFileSizeInMB(i) > 20:
+            print1(f"File `{i}` exceeds 20MB!")
+            continue
+        elif is_valid_url(i) and is_valid_image_url(i):
             content.append({"type": "image_url", "image_url": {"url": i,},})
         elif os.path.isfile(i) and is_valid_image_file(i):
             content.append({"type": "image_url", "image_url": {"url": encode_image(i)},})
@@ -60,27 +47,19 @@ def analyze_images_ollama(function_args):
             files.remove(i)
 
     if content:
-        config.currentMessages[-1] = {'role': 'user', 'content': query, 'images': files}
-        answer = CallOllama.getSingleChatResponse("", config.currentMessages, model=config.ollamaVisionModel, keepSystemMessage=True)
-        config.toolTextOutput = answer
-        print2("```assistant")
-        print1(answer)
-        print2("```")
-        return ""
-
         content.insert(0, {"type": "text", "text": query,})
 
-        response = client.chat.completions.create(
-            model="gpt-4o",
+        completion = getGroqClient().chat.completions.create(
+            model="llama-3.2-90b-vision-preview",
             messages=[
                 {
                 "role": "user",
                 "content": content,
                 }
             ],
-            max_tokens=4096,
+            max_tokens=8000,
         )
-        answer = response.choices[0].message.content
+        answer = completion.choices[0].message.content
         config.toolTextOutput = answer
 
         # display answer
@@ -97,8 +76,8 @@ functionSignature = {
         "compare images",
         "analyze image",
     ],
-    "name": "analyze_images_ollama",
-    "description": "Describe or compare images with Ollama",
+    "name": "examine_images_groq",
+    "description": "Describe or compare images with Llama 3.2 Vision",
     "parameters": {
         "type": "object",
         "properties": {
@@ -115,4 +94,6 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=analyze_images_ollama)
+config.addFunctionCall(signature=functionSignature, method=examine_images_groq)
+config.inputSuggestions.append("Describe this image in detail: ")
+config.inputSuggestions.append("Extract text from this image: ")

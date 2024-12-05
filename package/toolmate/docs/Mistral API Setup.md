@@ -62,7 +62,7 @@ To use multiple Mistral AI API keys, following the following format in your entr
 
 # Remarks:
 
-Tools `@ask_mistral` and `@analyze_images_pixtral` work only if you enter valid Mistral AI API key(s)
+Tools `@ask_mistral` and `@examine_images_pixtral` work only if you enter valid Mistral AI API key(s)
 
 # Related Wiki Page
 

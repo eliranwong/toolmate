@@ -831,7 +831,7 @@ class ToolMate:
         context = self.getDefaultContext()
         # tweaks for `Let me Summarize` and `Let me Translate`
         if is_valid_url(userInput) and config.predefinedContext in ("Let me Summarize", "Let me Explain"):
-            context = context.replace("@chat Provide me with a summary of the following content:", "@analyze_web_content Provide me with a summary of the content in the this web url:\n")
+            context = context.replace("@chat Provide me with a summary of the following content:", "@examine_web_content Provide me with a summary of the content in the this web url:\n")
         elif is_valid_url(userInput) and config.predefinedContext == "Let me Translate":
             userInput = getWebText(userInput)
         # apply context

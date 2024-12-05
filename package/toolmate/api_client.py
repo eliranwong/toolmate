@@ -1,12 +1,18 @@
 import requests, argparse, json, sys, os, pprint, re, shutil
 from toolmate import config, convertOutputText, wrapText, startSpinning, stopSpinning, readTextFile, writeTextFile, print2, print3, getPygmentsStyle, showErrors, isServerAlive
 from toolmate.utils.tts_utils import TTSUtil
+from toolmate.utils.single_prompt import SinglePrompt
 
 import pygments
 from pygments.lexers.markup import MarkdownLexer
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit import print_formatted_text
+from prompt_toolkit.styles import Style
+from prompt_toolkit import PromptSession
+from prompt_toolkit.history import FileHistory
+from prompt_toolkit.completion import WordCompleter, FuzzyCompleter
+from pathlib import Path
 
 # Create the parser
 parser = argparse.ArgumentParser(description="ToolMate AI API client cli options")
@@ -20,6 +26,7 @@ parser.add_argument('-cs', '--chatsystem', action='store', dest='chatsystem', he
 parser.add_argument('-dt', '--defaulttool', action='store', dest='defaulttool', help="override default tool for a single request; optionally use it together with '-bc' to make a change persistant; applied when 'Tool Selection Agent' is disabled and no tool is specified in the request")
 parser.add_argument('-e', '--export', action='store', dest='export', help="export conversation; optionally used with -f option to specify a format for the export")
 parser.add_argument('-f', '--format', action='store', dest='format', help="conversation output format; plain or list; useful for sharing or backup; only output the last assistant response if this option is not used")
+parser.add_argument('-i', '--interactive', action='store_true', dest='interactive', help="interactive prompt, with auto-suggestions enabled, for writing instruction; do not use this option together with standard input or output")
 parser.add_argument('-k', '--key', action='store', dest='key', help="specify the API key for authenticating access to the ToolMate AI server")
 parser.add_argument('-md', '--markdown', action='store', dest='markdown', help="highlight assistant response in markdown format; true / false")
 parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', help="override maximum output tokens for a single request; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
@@ -60,6 +67,39 @@ def configs():
     print2("```path")
     print(configFile)
     print2("```")
+
+def getPrefix(host, port):
+    stopSpinning()
+
+    endpoint = f"{host}:{port}/api/tools"
+    url = f"""{endpoint}?query=@"""
+    headers = {
+        "Content-Type": "application/json",
+        "X-API-Key": args.key if args.key else config.toolmate_api_client_key,
+    }
+    try:
+        response = requests.post(url, headers=headers)
+        availableTools = json.loads(response.json())["results"].keys()
+    except Exception as e:
+        showErrors(e=e)
+        return ""
+
+    promptStyle = Style.from_dict({
+        # User input (default text).
+        "": config.terminalCommandEntryColor2,
+        # Prompt.
+        "indicator": config.terminalPromptIndicatorColor2,
+    })
+    historyFolder = os.path.join(config.localStorage, "history")
+    Path(historyFolder).mkdir(parents=True, exist_ok=True)
+    instruction_history = os.path.join(historyFolder, "api_client")
+    instruction_session = PromptSession(history=FileHistory(instruction_history))
+    completer = FuzzyCompleter(WordCompleter(sorted([f"@{i}" for i in availableTools]), ignore_case=True))
+    bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
+    instruction = SinglePrompt.run(style=promptStyle, promptSession=instruction_session, bottom_toolbar=bottom_toolbar, completer=completer)
+    if instruction and not instruction.lower() == config.exit_entry:
+        return instruction
+    return ""
 
 def chat():
     main(True if not (args.chat is not None and args.chat.lower() == "false") else False)
@@ -180,7 +220,8 @@ def main(chat: bool = False):
         startSpinning()
 
         endpoint = f"{host}:{port}/api/toolmate"
-        instruction = cliDefault + stdin_text
+        prefix = getPrefix(host, port) if args.interactive else ""
+        instruction = prefix + cliDefault + stdin_text
         if not instruction:
             instruction = "."
         chatfile = args.chatfile if args.chatfile is not None and os.path.isfile(args.chatfile) else ""

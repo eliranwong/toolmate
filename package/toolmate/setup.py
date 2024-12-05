@@ -3,7 +3,7 @@ from toolmate import config, print2
 import os, shutil, argparse, pyperclip, subprocess
 from pathlib import Path
 
-from toolmate import updateApp, configFile, getOllamaServerClient
+from toolmate import updateApp, configFile, getOllamaServerClient, exportOllamaModels
 from toolmate.utils.assistant import ToolMate
 from prompt_toolkit.shortcuts import set_title, clear_title
 
@@ -12,13 +12,13 @@ def main():
     print(f"Setting up {config.toolMateAIName} ...")
 
     # Create the parser
-    parser = argparse.ArgumentParser(description="ToolMate AI cli options")
+    parser = argparse.ArgumentParser(description="ToolMate AI setup options")
     # Add arguments
-    #parser.add_argument('-ac', '--actionmenu', action='store_true', dest='actionmenu', help="launch action menu; true / false")
     parser.add_argument('-b', '--backend', action='store_true', dest='backend', help="configure AI backend and models")
     parser.add_argument('-cs', '--chatsystem', action='store_true', dest='chatsystem', help="configure chat system message")
     parser.add_argument('-d', '--developer', action='store', dest='developer', help="configure developer mode; true / false")
     parser.add_argument('-ec', '--editconfigs', action='store_true', dest='editconfigs', help="configure config.py")
+    parser.add_argument('-em', '--exportmodels', action='store', dest='exportmodels', help="""export models, downloaded with ollama, to ~/toolmate/LLMs/gguf/; specify a model, e.g. 'llama3.2:1b' or pass a list of models for the export, e.g. "['llama3.2:1b','llama3.2:3b']"; pass an empty list "[]" to export all downloaded models""")
     parser.add_argument('-k', '--apikeys', action='store_true', dest='apikeys', help="configure API keys")
     parser.add_argument('-mo', '--maximumoutput', action='store_true', dest='maximumoutput', help="configure maximum output tokens")
     parser.add_argument('-p', '--plugins', action='store_true', dest='plugins', help="configure plugins")
@@ -45,8 +45,19 @@ def main():
 
     config.toolmate = ToolMate(plugins=False)
 
-    #if args.actionmenu:
-    #    config.toolmate.runActions("...")
+    if args.exportmodels:
+        exportmodels = eval(args.exportmodels)
+        if isinstance(exportmodels, list):
+            exportOllamaModels(exportmodels)
+        elif isinstance(exportmodels, str):
+            exportOllamaModels(exportmodels.split())
+        else:
+            print2("""To export models, downloaded with ollama, either:
+* specify a single model, e.g. "llama3.2:1b"
+* specify multiple models, separated by spaces, e.g. "llama3.2:1b llama3.2:3b"
+* pass a list of models for the export, e.g. "['llama3.2:1b','llama3.2:3b']"
+* pass an empty list "[]" to export all downloaded models""")
+
     if args.backend:
         config.toolmate.setLlmModel()
     if args.chatsystem:

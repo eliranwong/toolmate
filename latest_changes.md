@@ -843,10 +843,10 @@ Currently supported tools:
 
 @search_google
 @add_calendar_event
-@analyze_audio
-@analyze_files
-@analyze_images
-@analyze_web_content
+@examine_audio
+@examine_files
+@examine_images
+@examine_web_content
 @correct_python_code
 @chat
 @build_agents

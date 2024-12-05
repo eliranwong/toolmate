@@ -16,7 +16,7 @@ if not config.isLite:
     #from PIL import Image
 
 
-    def analyze_files(function_args):
+    def examine_files(function_args):
         query = function_args.get("query") # required
         files = function_args.get("filepath") # required
         if os.path.exists(files):
@@ -26,8 +26,8 @@ if not config.isLite:
                     "query": query,
                     "files": [files],
                 }
-                print3("Running tool: 'analyze_images'")
-                return config.toolFunctionMethods["analyze_images"](function_args)
+                print3("Running tool: 'examine_images'")
+                return config.toolFunctionMethods["examine_images"](function_args)
             config.stopSpinning()
             if config.rag_useAutoRetriever and not config.llmInterface in ("vertexai",):
                 print2("AutoGen Retriever launched!")
@@ -58,7 +58,7 @@ if not config.isLite:
             "analyze files",
             "retrieve file information",
         ],
-        "name": "analyze_files",
+        "name": "examine_files",
         "description": "Retrieve information from files",
         "parameters": {
             "type": "object",
@@ -76,4 +76,4 @@ if not config.isLite:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=analyze_files)
+    config.addFunctionCall(signature=functionSignature, method=examine_files)

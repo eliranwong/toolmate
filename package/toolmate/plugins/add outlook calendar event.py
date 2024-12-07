@@ -1,7 +1,3 @@
-from toolmate import config, openURL
-import datetime, re
-import urllib.parse
-
 """
 ToolMate AI Plugin - add calender event
 
@@ -64,101 +60,109 @@ https://outlook.office.com/owa/?path=/calendar/action/compose&rru=addevent
 When you click on this URL, it will open a new window in Outlook web app and fill in the event details for you. You can then save or edit the event as you wish.
 """
 
-def add_outlook_calendar_event(function_args):
-    calendar = "outlook" # required
-    title = function_args.get("title") # required
-    description = function_args.get("description") # required
-    url = function_args.get("url", "") # optional
-    start_time = function_args.get("start_time", "") # required
-    start_time = f"{re.sub('Z$', '', start_time.replace('-', ''))}000000"[:15]
-    end_time = function_args.get("end_time", "") # optional
-    end_time = f"{re.sub('Z$', '', end_time.replace('-', ''))}000000"[:15]
-    location = function_args.get("location", "") # optional
+from toolmate import config
 
-    title = urllib.parse.quote(title)
-    description = urllib.parse.quote(description)
-    location = urllib.parse.quote(location)
+if config.online:
 
-    def getGoogleLink():
-        link = "https://calendar.google.com/calendar/render?action=TEMPLATE"
-        if title:
-            link += f"&text={title}"
-        if start_time:
-            link += f"&dates={start_time}"
-        if end_time:
-            link += f"/{end_time}"
-        if description:
-            link += f"&details={description}"
-        if url:
-            link += f"%20with%20URL:%20{url}"
-        if location:
-            link += f"&location={location}"
-        return link
+    from toolmate import openURL
+    import datetime, re
+    import urllib.parse
 
-    def getOutlookLink():
+    def add_outlook_calendar_event(function_args):
+        calendar = "outlook" # required
+        title = function_args.get("title") # required
+        description = function_args.get("description") # required
+        url = function_args.get("url", "") # optional
+        start_time = function_args.get("start_time", "") # required
+        start_time = f"{re.sub('Z$', '', start_time.replace('-', ''))}000000"[:15]
+        end_time = function_args.get("end_time", "") # optional
+        end_time = f"{re.sub('Z$', '', end_time.replace('-', ''))}000000"[:15]
+        location = function_args.get("location", "") # optional
 
-        def datetime_to_ISO8601(datetime_str):
-            # Parse the input string using the specified format
-            datetime_obj = datetime.datetime.strptime(datetime_str, '%Y%m%dT%H%M%S')
-            # ISO8601
-            formatted_str = datetime_obj.strftime('%Y-%m-%dT%H%%3A%M%%3A%S')
-            return formatted_str
+        title = urllib.parse.quote(title)
+        description = urllib.parse.quote(description)
+        location = urllib.parse.quote(location)
 
-        link = "https://outlook.office.com/owa/?path=/calendar/action/compose&rru=addevent"
-        if title:
-            link += f"&subject={title}"
-        if start_time:
-            link += f"&startdt={datetime_to_ISO8601(start_time)}%2B00%3A00"
-        if end_time:
-            link += f"&enddt={datetime_to_ISO8601(end_time)}%2B00%3A00"
-        if description:
-            link += f"&body={description}"
-        if url:
-            link += f"%20with%20URL:%20{url}"
-        if location:
-            link += f"&location={location}"
-        return link
+        def getGoogleLink():
+            link = "https://calendar.google.com/calendar/render?action=TEMPLATE"
+            if title:
+                link += f"&text={title}"
+            if start_time:
+                link += f"&dates={start_time}"
+            if end_time:
+                link += f"/{end_time}"
+            if description:
+                link += f"&details={description}"
+            if url:
+                link += f"%20with%20URL:%20{url}"
+            if location:
+                link += f"&location={location}"
+            return link
 
-    openURL(getOutlookLink() if calendar == "outlook" else getGoogleLink())
+        def getOutlookLink():
 
-    return ""
+            def datetime_to_ISO8601(datetime_str):
+                # Parse the input string using the specified format
+                datetime_obj = datetime.datetime.strptime(datetime_str, '%Y%m%dT%H%M%S')
+                # ISO8601
+                formatted_str = datetime_obj.strftime('%Y-%m-%dT%H%%3A%M%%3A%S')
+                return formatted_str
 
-functionSignature = {
-    "examples": [
-        "add an outlook calendar event",
-    ],
-    "name": "add_outlook_calendar_event",
-    "description": "Add an Outlook calendar event",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "title": {
-                "type": "string",
-                "description": "The title of the event.",
+            link = "https://outlook.office.com/owa/?path=/calendar/action/compose&rru=addevent"
+            if title:
+                link += f"&subject={title}"
+            if start_time:
+                link += f"&startdt={datetime_to_ISO8601(start_time)}%2B00%3A00"
+            if end_time:
+                link += f"&enddt={datetime_to_ISO8601(end_time)}%2B00%3A00"
+            if description:
+                link += f"&body={description}"
+            if url:
+                link += f"%20with%20URL:%20{url}"
+            if location:
+                link += f"&location={location}"
+            return link
+
+        openURL(getOutlookLink() if calendar == "outlook" else getGoogleLink())
+
+        return ""
+
+    functionSignature = {
+        "examples": [
+            "add an outlook calendar event",
+        ],
+        "name": "add_outlook_calendar_event",
+        "description": "Add an Outlook calendar event",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "The title of the event.",
+                },
+                "description": {
+                    "type": "string",
+                    "description": "The detailed description of the event, including the people involved and their roles, if any.",
+                },
+                "url": {
+                    "type": "string",
+                    "description": "Event url",
+                },
+                "start_time": {
+                    "type": "string",
+                    "description": "The start date and time of the event in the format `YYYYMMDDTHHmmss`. For example, `20220101T100000` represents January 1, 2022, at 10:00 AM.",
+                },
+                "end_time": {
+                    "type": "string",
+                    "description": "The end date and time of the event in the format `YYYYMMDDTHHmmss`. For example, `20220101T100000` represents January 1, 2022, at 10:00 AM. If not given, return 1 hour later than the start_time",
+                },
+                "location": {
+                    "type": "string",
+                    "description": "The location or venue of the event.",
+                },
             },
-            "description": {
-                "type": "string",
-                "description": "The detailed description of the event, including the people involved and their roles, if any.",
-            },
-            "url": {
-                "type": "string",
-                "description": "Event url",
-            },
-            "start_time": {
-                "type": "string",
-                "description": "The start date and time of the event in the format `YYYYMMDDTHHmmss`. For example, `20220101T100000` represents January 1, 2022, at 10:00 AM.",
-            },
-            "end_time": {
-                "type": "string",
-                "description": "The end date and time of the event in the format `YYYYMMDDTHHmmss`. For example, `20220101T100000` represents January 1, 2022, at 10:00 AM. If not given, return 1 hour later than the start_time",
-            },
-            "location": {
-                "type": "string",
-                "description": "The location or venue of the event.",
-            },
+            "required": ["title", "description"],
         },
-        "required": ["title", "description"],
-    },
-}
+    }
 
-config.addFunctionCall(signature=functionSignature, method=add_outlook_calendar_event, deviceInfo=True, datetimeSensitive=True)
+    config.addFunctionCall(signature=functionSignature, method=add_outlook_calendar_event, deviceInfo=True, datetimeSensitive=True)

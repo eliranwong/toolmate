@@ -6,12 +6,12 @@ Retrieve information from the documentation regarding how to use ToolMate AI
 [TOOL_CALL]
 """
 
+from toolmate import config
 
 if not config.isLite:
 
-    from toolmate import config, getHelpCollection, query_vectors, getRagPrompt, print2
+    from toolmate import getHelpCollection, query_vectors, getRagPrompt, print2
     from toolmate.utils.call_llm import CallLLM
-    import os
 
 
     def help(function_args):

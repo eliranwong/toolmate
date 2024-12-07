@@ -6,9 +6,10 @@ share file on Android
 [TOOL_CALL]
 """
 
+from toolmate import config
+
 if config.isTermux:
 
-    from toolmate import config
     import subprocess
 
     def share_file(function_args):

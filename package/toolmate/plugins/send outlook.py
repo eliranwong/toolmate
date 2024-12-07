@@ -55,9 +55,11 @@ https://outlook.office.com/owa/?path=/mail/action/compose&to=john.doe%40example.
 When you click on this URL, it will open a new window in Outlook web app and fill in the email details for you. You can then send or edit the email as you wish.
 """
 
-if not config.isTermux:
+from toolmate import config
 
-    from toolmate import config, openURL
+if not config.isTermux and config.online:
+
+    from toolmate import openURL
     import urllib.parse
 
     def send_outlook(function_args):

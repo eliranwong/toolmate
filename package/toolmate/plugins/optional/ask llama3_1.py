@@ -7,8 +7,6 @@ Ask Llama2 for information
 """
 
 from toolmate import config
-from toolmate import print2
-from toolmate.ollamachat import OllamaChat
 #from toolmate.utils.ollama_models import ollama_models
 
 from toolmate.utils.call_ollama import CallOllama

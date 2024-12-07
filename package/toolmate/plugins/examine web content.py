@@ -6,9 +6,10 @@ analyze web content with "AutoGen Retriever"
 [TOOL_CALL]
 """
 
-if not config.isLite:
+from toolmate import config
 
-    from toolmate import config
+if not config.isLite and config.online:
+
     from toolmate import print1, print2, print3, is_valid_url, downloadWebContent, ragRefineDocsPath, ragGetSplits, ragSearchContext, getRagPrompt
     from toolmate.utils.call_llm import CallLLM
     from toolmate.autoretriever import AutoGenRetriever

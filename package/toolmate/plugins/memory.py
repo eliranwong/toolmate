@@ -8,16 +8,7 @@ modified from source: https://medium.com/@simon_attard/building-a-memory-layer-f
 [TOOL_CALL]
 """
 
-from toolmate import config, get_or_create_collection, add_vector, query_vectors
-from toolmate import print1
-from pathlib import Path
-from chromadb.config import Settings
-import os, chromadb, getpass, geocoder, datetime, json
-
-memory_store = os.path.join(config.localStorage, "memory")
-Path(memory_store).mkdir(parents=True, exist_ok=True)
-chroma_client = chromadb.PersistentClient(memory_store, Settings(anonymized_telemetry=False))
-
+from toolmate import config
 #import numpy as np
 #from numpy.linalg import norm
 #def cosine_similarity(A, B):
@@ -26,6 +17,16 @@ chroma_client = chromadb.PersistentClient(memory_store, Settings(anonymized_tele
 
 
 if not config.isLite:
+
+    from toolmate import get_or_create_collection, add_vector, query_vectors
+    from toolmate import print1
+    from pathlib import Path
+    from chromadb.config import Settings
+    import os, chromadb, getpass, geocoder, datetime, json
+
+    memory_store = os.path.join(config.localStorage, "memory")
+    Path(memory_store).mkdir(parents=True, exist_ok=True)
+    chroma_client = chromadb.PersistentClient(memory_store, Settings(anonymized_telemetry=False))
 
     def save_memory(function_args):
         memory = function_args.get("memory") # required

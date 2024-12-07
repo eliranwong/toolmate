@@ -6,12 +6,13 @@ analyze audio file
 [TOOL_CALL]
 """
 
-if not config.isLite:
+from toolmate import config
 
-    from toolmate import config, showErrors, getGroqClient
-    from toolmate import print1, print2, print3
+if not config.isLite and config.online:
+
+    from toolmate import print1, print2
     from toolmate.utils.sttLanguages import googleSpeeckToTextLanguages
-    import os, whisper, io, shutil, subprocess
+    import os, io
     import speech_recognition as sr
     from pydub import AudioSegment
 

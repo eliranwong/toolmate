@@ -6,10 +6,11 @@ Remove image background
 [TOOL_CALL]
 """
 
+from toolmate import config
 
 if not config.isLite:
 
-    from toolmate import config, is_valid_image_file
+    from toolmate import is_valid_image_file
     from toolmate import print2, print3
     from toolmate.utils.python_utils import PythonUtil
     import os, json, rembg, shutil

@@ -6,9 +6,11 @@ add a calendar event on Android
 [TOOL_CALL]
 """
 
-if config.isTermux:
+from toolmate import config
 
-    from toolmate import config, stopSpinning
+if config.isTermux and config.online:
+
+    from toolmate import stopSpinning
 
     def add_calendar_event(function_args):
         title = function_args.get("title") # required

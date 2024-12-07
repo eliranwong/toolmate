@@ -8,9 +8,10 @@ Ask ChatGPT for conversation only; no function calling
 
 
 from toolmate import config
-from toolmate.utils.call_xai import CallXAI
 
-if config.xaiApi_key:
+if config.xaiApi_key and config.online:
+
+    from toolmate.utils.call_xai import CallXAI
 
     try:
         CallXAI.checkCompletion()

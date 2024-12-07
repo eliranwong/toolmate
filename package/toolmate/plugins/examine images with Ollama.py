@@ -21,10 +21,11 @@ Reference: https://platform.openai.com/docs/guides/vision
 [TOOL_CALL]
 """
 
-from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, is_valid_url, encode_image
+from toolmate import config
+from toolmate import print1, print2, is_valid_image_file, is_valid_image_url, is_valid_url, encode_image, isRemoteOllamaHost
 from toolmate.utils.call_ollama import CallOllama
 from toolmate.utils.download import Downloader
-import os
+import os, shutil
 
 def examine_images_ollama(function_args):
     from toolmate import config
@@ -68,27 +69,6 @@ def examine_images_ollama(function_args):
         print2("```")
         return ""
 
-        content.insert(0, {"type": "text", "text": query,})
-
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {
-                "role": "user",
-                "content": content,
-                }
-            ],
-            max_tokens=4096,
-        )
-        answer = response.choices[0].message.content
-        config.toolTextOutput = answer
-
-        # display answer
-        print2("```assistant")
-        print1(answer)
-        print2("```")
-
-        return ""
     return "[INVALID]"
 
 functionSignature = {

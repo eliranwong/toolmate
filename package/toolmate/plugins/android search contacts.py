@@ -6,9 +6,11 @@ search contacts on Android
 [TOOL_CALL]
 """
 
+from toolmate import config
+
 if config.isTermux:
 
-    from toolmate import config, print3
+    from toolmate import print3
     import subprocess, json
 
     def search_contacts(function_args):

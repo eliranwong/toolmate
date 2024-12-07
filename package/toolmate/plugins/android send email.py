@@ -6,9 +6,11 @@ send email on Android
 [TOOL_CALL]
 """
 
-if config.isTermux:
+from toolmate import config
 
-    from toolmate import config, stopSpinning
+if config.isTermux and config.online:
+
+    from toolmate import stopSpinning
     import urllib.parse
     import subprocess
 

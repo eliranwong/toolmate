@@ -6,9 +6,11 @@ generate images with model "Google Imagen 3"
 [TOOL_CALL]
 """
 
-if not config.isLite:
+from toolmate import config
 
-  from toolmate import config, print3, getCurrentDateTime
+if not config.isLite and config.online:
+
+  from toolmate import print3, getCurrentDateTime
   import os, subprocess, shutil
   from pathlib import Path
 

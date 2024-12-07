@@ -6,9 +6,10 @@ search financial data with yfinance
 [TOOL_CALL]
 """
 
-if not config.isLite:
+from toolmate import config
 
-    from toolmate import config
+if not config.isLite and config.online:
+
     from toolmate.utils.python_utils import PythonUtil
     import json
 

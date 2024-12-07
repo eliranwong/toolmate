@@ -6,9 +6,10 @@ play media on Android
 [TOOL_CALL]
 """
 
+from toolmate import config
+
 if config.isTermux:
 
-    from toolmate import config
     import subprocess
 
     def play_media(function_args):

@@ -8,7 +8,7 @@ Ask Tavily
 
 from toolmate import config
 
-if not config.isLite:
+if not config.isLite and config.online:
 
     from toolmate import getTavilyClient, print1
 

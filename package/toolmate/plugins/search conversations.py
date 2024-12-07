@@ -6,9 +6,11 @@ search and open old chat records
 [TOOL_CALL]
 """
 
+from toolmate import config
+
 if not config.isLite:
 
-    from toolmate import config, get_or_create_collection, add_vector, query_vectors, showErrors, displayLoadedMessages
+    get_or_create_collection, add_vector, query_vectors, showErrors, displayLoadedMessages
     from toolmate import print1, print2, print3
     from pathlib import Path
     from chromadb.config import Settings

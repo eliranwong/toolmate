@@ -1,17 +1,15 @@
-from toolmate import config, get_or_create_collection, add_vector, getFilenamesWithoutExtension, execPythonFile
+from toolmate import config, getFilenamesWithoutExtension, execPythonFile, isServerAlive
 from toolmate import print2, print3
 from pathlib import Path
 from prompt_toolkit.completion import FuzzyCompleter, NestedCompleter, ThreadedCompleter
-import os, shutil, json, copy
+import os, copy
 from typing import Callable
-if not config.isLite:
-    import chromadb
-    from chromadb.config import Settings
 
 class Plugins:
 
     @staticmethod
     def runPlugins():
+        config.online = True if isServerAlive("8.8.8.8", 53) else False
         print2("Loading plugins ...")
         # The following config values can be modified with plugins, to extend functionalities
         #config.pluginsWithFunctionCall = []

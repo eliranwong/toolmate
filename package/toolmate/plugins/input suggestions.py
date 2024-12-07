@@ -5,7 +5,7 @@ add input suggestions
 """
 
 from toolmate import config
-import sys, os
+import sys
 
 config.inputSuggestions += [
         #"[CHAT_chatgpt] ",

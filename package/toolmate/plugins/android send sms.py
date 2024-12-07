@@ -6,9 +6,10 @@ send sms on Android
 [TOOL_CALL]
 """
 
+from toolmate import config
+
 if config.isTermux:
 
-    from toolmate import config
     import subprocess
 
     def send_sms(function_args):

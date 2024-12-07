@@ -22,99 +22,103 @@ Reference: https://platform.openai.com/docs/guides/vision
 """
 
 
-from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url, encode_image, runToolMateCommand, getLlamacppServerClient
-from toolmate.utils.call_chatgpt import check_openai_errors
-import os
-from openai import OpenAI
+from toolmate import config
 
-@check_openai_errors
-def examine_images_chatgpt(function_args):
-    from toolmate import config
+if config.online:
 
-    llmInterface = "chatgpt"
+    from toolmate import print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url, encode_image, runToolMateCommand, getLlamacppServerClient
+    from toolmate.utils.call_chatgpt import check_openai_errors
+    import os
+    from openai import OpenAI
 
-    if llmInterface in ("chatgpt", "letmedoit") and not config.openaiApiKey:
-        return "OpenAI API key not found!"
+    @check_openai_errors
+    def examine_images_chatgpt(function_args):
+        from toolmate import config
 
-    query = function_args.get("query") # required
-    files = function_args.get("image_filepath") # required
-    #print(files)
-    if isinstance(files, str):
-        if not files.startswith("["):
-            files = f'["{files}"]'
-        files = eval(files)
+        llmInterface = "chatgpt"
 
-    filesCopy = files[:]
-    for item in filesCopy:
-        if os.path.isdir(item):
-            for root, _, allfiles in os.walk(item):
-                for file in allfiles:
-                    file_path = os.path.join(root, file)
-                    files.append(file_path)
-            files.remove(item)
+        if llmInterface in ("chatgpt", "letmedoit") and not config.openaiApiKey:
+            return "OpenAI API key not found!"
 
-    content = []
-    # valid image paths
-    for i in files:
-        if is_valid_url(i) and is_valid_image_url(i):
-            content.append({"type": "image_url", "image_url": {"url": i,},})
-        elif os.path.isfile(i) and is_valid_image_file(i):
-            content.append({"type": "image_url", "image_url": {"url": encode_image(i)},})
-        else:
-            files.remove(i)
+        query = function_args.get("query") # required
+        files = function_args.get("image_filepath") # required
+        #print(files)
+        if isinstance(files, str):
+            if not files.startswith("["):
+                files = f'["{files}"]'
+            files = eval(files)
 
-    if content:
-        client = OpenAI()
+        filesCopy = files[:]
+        for item in filesCopy:
+            if os.path.isdir(item):
+                for root, _, allfiles in os.walk(item):
+                    for file in allfiles:
+                        file_path = os.path.join(root, file)
+                        files.append(file_path)
+                files.remove(item)
 
-        content.insert(0, {"type": "text", "text": query,})
+        content = []
+        # valid image paths
+        for i in files:
+            if is_valid_url(i) and is_valid_image_url(i):
+                content.append({"type": "image_url", "image_url": {"url": i,},})
+            elif os.path.isfile(i) and is_valid_image_file(i):
+                content.append({"type": "image_url", "image_url": {"url": encode_image(i)},})
+            else:
+                files.remove(i)
 
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {
-                "role": "user",
-                "content": content,
-                }
-            ],
-            max_tokens=4096,
-        )
-        answer = response.choices[0].message.content
-        config.toolTextOutput = answer
+        if content:
+            client = OpenAI()
 
-        # display answer
-        print2("```assistant")
-        print1(answer)
-        print2("```")
+            content.insert(0, {"type": "text", "text": query,})
 
-        # stop llama.cpp vision server
-        if llmInterface == "llamacpp":
-            stopLlamacppVisionServer()
+            response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {
+                    "role": "user",
+                    "content": content,
+                    }
+                ],
+                max_tokens=4096,
+            )
+            answer = response.choices[0].message.content
+            config.toolTextOutput = answer
 
-        return ""
-    return "[INVALID]"
+            # display answer
+            print2("```assistant")
+            print1(answer)
+            print2("```")
 
-functionSignature = {
-    "examples": [
-        "describe image",
-        "compare images",
-        "analyze image",
-    ],
-    "name": "examine_images_chatgpt",
-    "description": "Describe or compare images with ChatGPT",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "query": {
-                "type": "string",
-                "description": "Questions or requests that users ask about the given images",
+            # stop llama.cpp vision server
+            if llmInterface == "llamacpp":
+                stopLlamacppVisionServer()
+
+            return ""
+        return "[INVALID]"
+
+    functionSignature = {
+        "examples": [
+            "describe image",
+            "compare images",
+            "analyze image",
+        ],
+        "name": "examine_images_chatgpt",
+        "description": "Describe or compare images with ChatGPT",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "Questions or requests that users ask about the given images",
+                },
+                "image_filepath": {
+                    "type": "string",
+                    "description": """Return a list of image paths or urls, e.g. '["image1.png", "/tmp/image2.png", "https://letmedoit.ai/image.png"]'. Return '[]' if image path is not provided.""",
+                },
             },
-            "image_filepath": {
-                "type": "string",
-                "description": """Return a list of image paths or urls, e.g. '["image1.png", "/tmp/image2.png", "https://letmedoit.ai/image.png"]'. Return '[]' if image path is not provided.""",
-            },
+            "required": ["query", "image_filepath"],
         },
-        "required": ["query", "image_filepath"],
-    },
-}
+    }
 
-config.addFunctionCall(signature=functionSignature, method=examine_images_chatgpt)
+    config.addFunctionCall(signature=functionSignature, method=examine_images_chatgpt)

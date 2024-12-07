@@ -6,7 +6,11 @@ Ask Google PaLM 2 for information
 [TOOL_CALL]
 """
 
-if not config.isLite:
+from toolmate import config
+
+if not config.isLite and config.online:
+    import os
+    
     if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enabledGoogleAPIs and not config.isLite:
 
         import vertexai

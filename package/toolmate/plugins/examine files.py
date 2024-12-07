@@ -6,9 +6,11 @@ analyze files with integrated "AutoGen Retriever"
 [TOOL_CALL]
 """
 
+from toolmate import config
+
 if not config.isLite:
 
-    from toolmate import config, is_valid_image_file, ragRefineDocsPath, ragGetSplits, ragSearchContext, getRagPrompt
+    from toolmate import is_valid_image_file, ragRefineDocsPath, ragGetSplits, ragSearchContext, getRagPrompt
     from toolmate import print2, print3
     from toolmate.utils.call_llm import CallLLM
     from toolmate.autoretriever import AutoGenRetriever

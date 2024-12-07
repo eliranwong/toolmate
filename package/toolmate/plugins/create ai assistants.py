@@ -6,12 +6,12 @@ build a group of agents to execute a task with integrated "AutoGen Agent Builder
 [TOOL_CALL]
 """
 
+from toolmate import config
 
-if not config.isLite:
+if not config.isLite and config.online:
     try:
         from toolmate.autobuilder import AutoGenBuilder
-        from toolmate import config
-        from toolmate import print1, print2, print3
+        from toolmate import print2, print3
 
         def build_agents(function_args):
             if not config.openaiApiKey or config.openaiApiKey == "toolmate":

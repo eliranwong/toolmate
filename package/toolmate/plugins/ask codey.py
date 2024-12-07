@@ -6,7 +6,10 @@ Ask Google Codey for information about coding
 [TOOL_CALL]
 """
 
-if not config.isLite:
+from toolmate import config
+
+if not config.isLite and config.online:
+    import os
     if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enabledGoogleAPIs:
 
         import vertexai
@@ -14,7 +17,6 @@ if not config.isLite:
             HarmCategory,
             HarmBlockThreshold,
         )
-        from toolmate import config
         import vertexai
         from vertexai.language_models import CodeChatModel, ChatMessage
 

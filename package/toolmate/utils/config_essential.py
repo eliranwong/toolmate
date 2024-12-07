@@ -345,6 +345,7 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "online",
     "api_server_id",
     "custom_config",
     "systemMessage_tool_current",

@@ -6,9 +6,10 @@ send whatsapp messages on Android
 [TOOL_CALL]
 """
 
-if config.isTermux:
+from toolmate import config
 
-    from toolmate import config, stopSpinning
+if config.isTermux and config.online:
+
     import subprocess
 
     def send_whatsapp(function_args):

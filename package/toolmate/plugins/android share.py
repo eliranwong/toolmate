@@ -6,9 +6,10 @@ share text or previous generated result on Android
 [TOOL_CALL]
 """
 
+from toolmate import config
+
 if config.isTermux:
 
-    from toolmate import config, stopSpinning
     import pydoc
 
     def share(function_args):

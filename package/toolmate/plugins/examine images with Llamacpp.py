@@ -21,14 +21,14 @@ Reference: https://platform.openai.com/docs/guides/vision
 [TOOL_CALL]
 """
 
+from toolmate import config
+
 if not config.isLite:
 
-    from toolmate import config, print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url, encode_image, runToolMateCommand, getLlamacppServerClient
+    from toolmate import print1, print2, is_valid_image_file, is_valid_image_url, startLlamacppVisionServer, stopLlamacppVisionServer, is_valid_url, encode_image
     from toolmate.utils.call_chatgpt import check_openai_errors
     import os
-    from openai import OpenAI
     from toolmate.geminiprovision import GeminiProVision
-    from toolmate.utils.call_ollama import CallOllama
 
     @check_openai_errors
     def examine_images_llamacpp(function_args):

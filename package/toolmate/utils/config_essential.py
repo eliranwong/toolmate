@@ -345,6 +345,8 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "this_api_server_host",
+    "this_api_server_port",
     "online",
     "api_server_id",
     "custom_config",
@@ -395,7 +397,6 @@ temporaryConfigs = [
     "multilineInput",
     "conversationStarted",
     "dynamicToolBarText",
-    "tokenLimits",
     "currentMessages",
     "pagerContent",
     "selectAll",

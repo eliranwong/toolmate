@@ -1,6 +1,6 @@
-from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, refinePath, displayLoadedMessages, removeDuplicatedListItems, getElevenlabsApi_key
-from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, tokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getUserPreviousRequest, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText, isRemoteOllamaHost
-from toolmate import installPipPackage, getDownloadedOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runToolMateCommand, displayPythonCode, selectTool, showRisk, confirmExecution
+from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, refinePath, displayLoadedMessages, removeDuplicatedListItems, getElevenlabsApi_key, getLlms
+from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, chatgptTokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getUserPreviousRequest, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText
+from toolmate import installPipPackage, exportOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runToolMateCommand, displayPythonCode, selectTool, showRisk, confirmExecution
 from toolmate.utils.call_llm import CallLLM
 import threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy
 import edge_tts, asyncio, requests
@@ -94,8 +94,6 @@ class ToolMate:
     def setup(self):
         config.currentMessages = self.resetMessages()
         # set up tool store client
-
-        self.models = list(tokenLimits.keys())
         config.divider = self.divider = "--------------------"
         config.runPython = True
         if not hasattr(config, "accept_default"):
@@ -1325,15 +1323,6 @@ class ToolMate:
         print1(instruction)
         options = {
             "llamacppserver": "Llama.cpp",
-            "ollama": "Ollama",
-            "groq": "Groq Cloud API",
-            "mistral": "Mistral AI API",
-            "xai": "X AI API [Paid online service]",
-            "googleai": "Google AI Studio API [Paid online service]",
-            "chatgpt": "OpenAI ChatGPT [Paid online service]",
-            "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",
-        } if config.isLite else {
-            "llamacppserver": "Llama.cpp",
             "llamacpp": "Llama-cpp-python",
             "ollama": "Ollama",
             "groq": "Groq Cloud API",
@@ -1344,11 +1333,14 @@ class ToolMate:
             "chatgpt": "OpenAI ChatGPT [Paid online service]",
             "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",
         }
-        if not config.isLite:
-            try:
-                from llama_cpp import Llama
-            except:
-                del options["llamacpp"]
+        try:
+            from llama_cpp import Llama
+        except:
+            del options["llamacpp"]
+        try:
+            from vertexai.generative_models import GenerativeModel
+        except:
+            del options["vertexai"]
         llmInterface = self.dialogs.getValidOptions(
             options=options.keys(),
             descriptions=list(options.values()),
@@ -1467,10 +1459,14 @@ class ToolMate:
             print2("LLM Interface changed! Starting a new chat session ...")
             config.defaultEntry = ".new"
             config.accept_default = True
-        CallLLM.checkCompletion()
-
-        # change embedding models
-        self.setEmbeddingModel()
+        try:
+            CallLLM.checkCompletion()
+            self.setEmbeddingModel()
+        except:
+            config.llmInterface = ""
+            self.setLlmModel()
+        if not config.llmInterface:
+            self.setLlmModel()
 
     def selectOllamaModel(self, message="Select a model from Ollama Library:", feature="default") -> str:
         # history session
@@ -1531,35 +1527,19 @@ class ToolMate:
         setPort(feature=feature)
 
         # select model
-        isRemote = (isRemoteOllamaHost(config.ollamaToolServer_host) or isRemoteOllamaHost(config.ollamaChatServer_host))
         model = self.selectOllamaModel(feature=feature)
         if model:
-            if not isRemote and shutil.which("ollama"):
-                downloadedOllamaModels = getDownloadedOllamaModels()
-            else:
-                downloadedOllamaModels = {}
-            if isRemote or model in downloadedOllamaModels:
+            try:
+                if not model in getLlms()["ollama"]:
+                    Downloader.downloadOllamaModel(model, True)
                 if feature == "default":
                     config.ollamaToolModel = model
                 elif feature == "chat":
                     config.ollamaChatModel = model
                 elif feature == "embedding":
                     config.embeddingModel = f"_ollama_{model}"
-            elif shutil.which("ollama"):
-                try:
-                    if shutil.which("ollama"):
-                        Downloader.downloadOllamaModel(model, True)
-                    if feature == "default":
-                        config.ollamaToolModel = model
-                    elif feature == "chat":
-                        config.ollamaChatModel = model
-                    elif feature == "embedding":
-                        config.embeddingModel = f"_ollama_{model}"
-                except:
-                    print2(f"Failed to download '{model}'! Please make sure you enter a valid model name or tag.")
-            else:
-                print("Ollama not found! Install Ollama first to use Ollama model library!")
-                print("To install Ollama, visit https://ollama.com")
+            except:
+                print2(f"Failed to download '{model}'! Please make sure Ollama server is running and specify a valid model name.")
 
     def setLlmModel_llamacppserver(self, server="tool"):
         def setTimeout(server=server):
@@ -1649,37 +1629,34 @@ class ToolMate:
         )
         if library:
             if library == "Ollama Library":
-                model = self.selectOllamaModel(feature=feature)
+                model = self.dialogs.getValidOptions(
+                    options=getLlms()["ollama"]+["more ..."],
+                    title="Groq Cloud Models",
+                    default=config.ollamaChatModel if feature == "chat" else config.ollamaToolModel,
+                    text=f"Select a {'chat' if feature=='chat' else 'tool'} call model:\n(for {'conversations only' if feature=='chat' else 'both chat and task execution'})",
+                )
+                if model == "more ...":
+                    model = self.selectOllamaModel(feature=feature)
                 if model:
-                    downloadedOllamaModels = getDownloadedOllamaModels()
-                    if model in downloadedOllamaModels:
+                    if model in getLlms()["ollama"]:
+                        exportedPath = exportOllamaModels([model])[0]
                         if feature == "default":
-                            config.llamacppToolModel_model_path = downloadedOllamaModels[model]
+                            config.llamacppToolModel_model_path = exportedPath
                         elif feature == "chat":
-                            config.llamacppChatModel_model_path = downloadedOllamaModels[model]
+                            config.llamacppChatModel_model_path = exportedPath
                     else:
-                        if shutil.which("ollama") and not (isRemoteOllamaHost(config.ollamaToolServer_host) or isRemoteOllamaHost(config.ollamaChatServer_host)):
-                            try:
-                                Downloader.downloadOllamaModel(model, True)
-                                model_name = model.replace(":latest", "")
-                                try:
-                                    exportOllamaModels([model_name])
-                                    llm_directory = os.path.join(config.localStorage, "LLMs", "gguf")
-                                    model_path = os.path.join(llm_directory, f"{model_name}.gguf")
-                                except:
-                                    downloadedOllamaModels = getDownloadedOllamaModels()
-                                    model_path = downloadedOllamaModels[model]
-                                # refresh download list
-                                
-                                if feature == "default":
-                                    config.llamacppToolModel_model_path = model_path
-                                elif feature == "chat":
-                                    config.llamacppChatModel_model_path = model_path
-                            except:
-                                print2(f"Failed to download '{model}'! Please make sure you enter a valid model name or tag.")
-                        else:
-                            print("Ollama not found! Install Ollama first to use Ollama model library!")
-                            print("To install Ollama, visit https://ollama.com")
+                        try:
+                            Downloader.downloadOllamaModel(model, True)
+                            model_name = model.replace(":latest", "")
+                            model_path = exportOllamaModels([model_name])[0]
+                            # refresh download list
+                            
+                            if feature == "default":
+                                config.llamacppToolModel_model_path = model_path
+                            elif feature == "chat":
+                                config.llamacppChatModel_model_path = model_path
+                        except:
+                            print2(f"Failed to download '{model}'! Please make sure Ollama server is running and specify a valid model name.")
                     if feature == "default":
                         config.llamacppToolModel_ollama_tag = model
                     elif feature == "chat":
@@ -1747,23 +1724,7 @@ class ToolMate:
 
     def setLlmModel_groq(self, feature="default"):
         model = self.dialogs.getValidOptions(
-            options=(
-                "mixtral-8x7b-32768",
-                "gemma2-9b-it",
-                "gemma-7b-it",
-                "llama-3.2-90b-vision-preview",
-                "llama-3.2-11b-vision-preview",
-                "llama-3.2-3b",
-                "llama-3.2-1b",
-                #"llama-3.1-405b-reasoning",
-                "llama-3.1-70b-versatile",
-                "llama-3.1-8b-instant",
-                "llama3-70b-8192",
-                "llama3-8b-8192",
-                "llama-guard-3-8b",
-                "llama3-groq-70b-8192-tool-use-preview",
-                "llama3-groq-8b-8192-tool-use-preview",
-            ),
+            options=getLlms()["groq"],
             title="Groq Cloud Models",
             default=config.groqApi_chat_model if feature == "chat" else config.groqApi_tool_model,
             text=f"Select a {'chat' if feature=='chat' else 'tool'} call model:\n(for {'conversations only' if feature=='chat' else 'both chat and task execution'})",
@@ -1777,16 +1738,7 @@ class ToolMate:
 
     def setLlmModel_mistral(self, feature="default"):
         model = self.dialogs.getValidOptions(
-            options=(
-                "mistral-large-latest",
-                "mistral-small-latest",
-                "codestral-latest",
-                "ministral-8b-latest",
-                "ministral-3b-latest",
-                "pixtral-12b-2409",
-                "open-mixtral-8x22b",
-                "open-mistral-nemo",
-            ),
+            options=getLlms()["mistral"],
             title="Mistral AI Models",
             default=config.mistralApi_chat_model if feature == "chat" else config.mistralApi_tool_model,
             text=f"Select a {'chat' if feature=='chat' else 'tool'} call model:\n(for {'conversations only' if feature=='chat' else 'both chat and task execution'})",
@@ -1799,9 +1751,8 @@ class ToolMate:
             print3(f"Mistral model: {model}")
 
     def setLlmModel_googleai(self):
-        models = ["gemini-1.5-flash", "gemini-1.5-flash-8b", "gemini-1.5-pro"]
         model = self.dialogs.getValidOptions(
-            options=models,
+            options=getLlms()["googleai"],
             title="Google AI Studio Models",
             default=config.googleaiApi_tool_model if config.googleaiApi_tool_model in models else models[0],
             text="Select a tool call model:\n(for both chat and task execution)",
@@ -1813,7 +1764,7 @@ class ToolMate:
             print3(f"Maximum output tokens: {config.googleaiApi_tool_model_max_tokens}")
 
     def setLlmModel_xai(self):
-        models = ["grok-beta"]
+        models = getLlms()["xai"],
         model = self.dialogs.getValidOptions(
             options=models,
             title="X AI Models",
@@ -1827,7 +1778,7 @@ class ToolMate:
             print3(f"Maximum output tokens: {config.xaiApi_tool_model_max_tokens}")
 
     def setLlmModel_vertexai(self):
-        models = ["gemini-1.5-pro", "gemini-1.5-flash"]
+        models = getLlms()["vertexai"],
         model = self.dialogs.getValidOptions(
             options=models,
             title="Google Vertex AI Models",
@@ -1841,10 +1792,11 @@ class ToolMate:
             print3(f"Maximum output tokens: {config.gemini_max_output_tokens}")
 
     def setLlmModel_chatgpt(self):
+        models = list(chatgptTokenLimits.keys())
         model = self.dialogs.getValidOptions(
-            options=self.models,
+            options=models,
             title="ChatGPT Model",
-            default=config.chatGPTApiModel if config.chatGPTApiModel in self.models else self.models[0],
+            default=config.chatGPTApiModel if config.chatGPTApiModel in models else models[0],
             text="Select a tool call model:\n(for both chat and task execution)",
         )
         if model:
@@ -2094,7 +2046,7 @@ class ToolMate:
             print3(f"Minimum output tokens: {config.chatGPTApiMinTokens}")
 
     def getMaxTokens(self):
-        contextWindowLimit = tokenLimits[config.chatGPTApiModel]
+        contextWindowLimit = chatgptTokenLimits[config.chatGPTApiModel]
         functionTokens = count_tokens_from_functions(config.toolFunctionSchemas.values())
         maxToken = contextWindowLimit - functionTokens - config.chatGPTApiMinTokens
         if maxToken > 65536 and config.chatGPTApiModel in (
@@ -2144,6 +2096,8 @@ class ToolMate:
             default = config.llamacppChatModel_n_ctx if feature == "chat" else config.llamacppToolModel_n_ctx
         elif config.llmInterface == "ollama":
             default = config.ollamaChatModel_num_ctx if feature == "chat" else config.ollamaToolModel_num_ctx
+        else:
+            default = ""
         return default
 
     def setContextWindowSize(self, feature="default", customContextWindowSize=None):

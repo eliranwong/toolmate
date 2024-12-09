@@ -1,7 +1,8 @@
 from toolmate import config
 from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
-import sys, os, html, geocoder, platform, socket, datetime, requests, getpass, pkg_resources, webbrowser, unicodedata
+import sys, os, html, geocoder, platform, socket, datetime, requests, getpass, webbrowser, unicodedata
 import traceback, uuid, re, textwrap, signal, wcwidth, shutil, threading, time, subprocess, json, base64, html2text, pydoc, codecs, psutil
+from importlib_metadata import version as lib_version
 from packaging import version
 import importlib.resources
 import pygments
@@ -20,6 +21,7 @@ from typing import Union
 from groq import Groq
 from mistralai import Mistral
 from ollama import Client
+from ollama import list as ollama_ls
 import speech_recognition as sr
 import zipfile
 from openai import OpenAI
@@ -283,6 +285,127 @@ Action: {select(tool_names, name="tool")}"""
     return lm.get("tool")
 
 # llm
+
+def getLlms() -> dict:
+    try:
+        ollamaModels = [i.get("model") for i in ollama_ls()["models"]]
+    except:
+        ollamaModels = []
+    llms = {
+        "llamacpp": ["llamacpp"],
+        "llamacppserver": ["llamacppserver"],
+        "ollama": ollamaModels,
+        "groq": [
+            "mixtral-8x7b-32768",
+            "gemma2-9b-it",
+            "gemma-7b-it",
+            "llama-3.3-70b-versatile",
+            "llama-3.2-90b-vision-preview",
+            "llama-3.2-11b-vision-preview",
+            "llama-3.2-3b-preview",
+            "llama-3.2-1b-preview",
+            "llama-3.1-70b-versatile",
+            "llama-3.1-8b-instant",
+            "llama3-70b-8192",
+            "llama3-8b-8192",
+            "llama-guard-3-8b",
+            "llama3-groq-70b-8192-tool-use-preview",
+            "llama3-groq-8b-8192-tool-use-preview",
+        ],
+        "mistral": [
+            "mistral-large-latest",
+            "mistral-small-latest",
+            "codestral-latest",
+            "ministral-8b-latest",
+            "ministral-3b-latest",
+            "pixtral-12b-2409",
+            "open-mixtral-8x22b",
+            "open-mistral-nemo",
+        ],
+        "xai": [
+            "grok-beta",
+        ],
+        "googleai": [
+            "gemini-1.5-flash",
+            "gemini-1.5-flash-8b",
+            "gemini-1.5-pro"
+        ],
+        "vertexai": [
+            "gemini-1.5-flash",
+            "gemini-1.5-pro",
+        ],
+        "chatgpt": list(chatgptTokenLimits.keys()),
+        "letmedoit": list(chatgptTokenLimits.keys()),
+    }
+    # check if llama-cpp-python is installed
+    try:
+        from llama_cpp import Llama
+    except:
+        del llms["llamacpp"]
+    # check if vertexai is installed
+    try:
+        from vertexai.generative_models import GenerativeModel
+    except:
+        del llms["vertexai"]
+    return llms
+
+def changeBackendAndModel(backend, model):
+    config.llmInterface = backend
+    print3(f"Backend configured: {config.llmInterface}")
+    if backend == "ollama":
+        config.ollamaToolModel = model
+    elif backend == "groq":
+        config.groqApi_tool_model = model
+    elif backend == "mistral":
+        config.mistralApi_tool_model = model
+    elif backend == "xai":
+        config.xaiApi_tool_model = model
+    elif backend == "googleai":
+        config.googleaiApi_tool_model = model
+    elif backend == "vertexai":
+        config.gemini_model = model
+    elif backend in ("chatgpt", "letmedoit"):
+        config.chatGPTApiModel = model
+    print3(f"Model configured: {model}")
+
+def changeModel(model):
+    for backend, models in llms.items():
+        if model in models:
+            changeBackendAndModel(backend, model)
+            break
+        print2(f"Model option '{model}' invalid!")
+
+def getCurrentModel():
+    if config.llmInterface == "ollama":
+        return config.ollamaToolModel
+    elif config.llmInterface == "groq":
+        return config.groqApi_tool_model
+    elif config.llmInterface == "mistral":
+        return config.mistralApi_tool_model
+    elif config.llmInterface == "xai":
+        return config.xaiApi_tool_model
+    elif config.llmInterface == "googleai":
+        return config.googleaiApi_tool_model
+    elif config.llmInterface == "vertexai":
+        return config.gemini_model
+    elif config.llmInterface in ("chatgpt", "letmedoit"):
+        return config.chatGPTApiModel
+    elif config.llmInterface == "llamacpp":
+        return config.llamacppToolModel_model_path if config.llamacppToolModel_model_path else config.llamacppToolModel_filename
+    return ""
+
+def unloadLocalModels():
+    # unload local models to free VRAM
+    try:
+        config.llamacppToolModel.close()
+        print("Llama.cpp model unloaded!")
+    except:
+        pass
+    if hasattr(config, "llamacppToolModel"):
+        del config.llamacppToolModel
+    if config.llmInterface == "ollama":
+        getOllamaServerClient().generate(model=config.ollamaToolModel, keep_alive=0, stream=False,)
+        print(f"Ollama model '{config.ollamaToolModel}' unloaded!")
 
 def getOpenweathermapApi_key():
     '''
@@ -644,11 +767,12 @@ def getDownloadedOllamaModels() -> dict:
                                 pass
     return models
 
-def exportOllamaModels(selection: list=[]) -> None:
+def exportOllamaModels(selection: list=[]) -> list:
     print2("# Exporting Ollama models ...")
     llm_directory = os.path.join(config.localStorage, "LLMs", "gguf")
     Path(llm_directory).mkdir(parents=True, exist_ok=True)
     models = getDownloadedOllamaModels()
+    exportedFiles = []
     for model, originalpath in models.items():
         filename = model.replace(":", "_")
         exportpath = os.path.join(llm_directory, f"{filename}.gguf")
@@ -656,6 +780,9 @@ def exportOllamaModels(selection: list=[]) -> None:
             print3(f"Model: {model}")
             shutil.copy2(originalpath, exportpath)
             print3(f"Exported: {exportpath}")
+        if os.path.isfile(exportpath):
+            exportedFiles.append(exportpath)
+    return exportedFiles
 
 def getDownloadedGgufModels() -> dict:
     llm_directory = os.path.join(config.localStorage, "LLMs", "gguf")
@@ -1571,21 +1698,16 @@ Current time: {str(datetime.datetime.now())}
 
 # token management
 
-# token limit
+# chatgpt model token limits
 # reference: https://platform.openai.com/docs/models/gpt-4
-tokenLimits = {
+chatgptTokenLimits = {
     #"o1-preview": 128000,
     #"o1-mini": 128000,
     "gpt-4o": 128000,
     "gpt-4o-mini": 128000,
     "gpt-4-turbo": 128000, # Returns a maximum of 4,096 output tokens.
     "gpt-4": 8192,
-    #"gpt-4-turbo-preview": 128000, # Returns a maximum of 4,096 output tokens.
-    #"gpt-4-0125-preview": 128000, # Returns a maximum of 4,096 output tokens.
-    #"gpt-4-1106-preview": 128000, # Returns a maximum of 4,096 output tokens.
     "gpt-3.5-turbo": 16385, # Returns a maximum of 4,096 output tokens.
-    #"gpt-3.5-turbo-16k": 16385,
-    #"gpt-4-32k": 32768,
 }
 
 def getDynamicTokens(messages, functionSignatures=None):
@@ -1593,7 +1715,7 @@ def getDynamicTokens(messages, functionSignatures=None):
         functionTokens = 0
     else:
         functionTokens = count_tokens_from_functions(functionSignatures)
-    tokenLimit = tokenLimits[config.chatGPTApiModel]
+    tokenLimit = chatgptTokenLimits[config.chatGPTApiModel]
     currentMessagesTokens = count_tokens_from_messages(messages) + functionTokens
     availableTokens = tokenLimit - currentMessagesTokens
     if availableTokens >= config.chatGPTApiMaxTokens:
@@ -1695,7 +1817,7 @@ def setChatGPTAPIkey():
     config.oai_client = OpenAI()
     # set variable 'OAI_CONFIG_LIST' to work with pyautogen
     oai_config_list = []
-    for model in tokenLimits.keys():
+    for model in chatgptTokenLimits.keys():
         oai_config_list.append({"model": model, "api_key": config.openaiApiKey})
     os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
 
@@ -1761,9 +1883,9 @@ def isCommandInstalled(package):
 
 def getPackageInstalledVersion(package):
     try:
-        installed_version = pkg_resources.get_distribution(package).version
+        installed_version = lib_version(package)
         return version.parse(installed_version)
-    except pkg_resources.DistributionNotFound:
+    except:
         return None
 
 def getPackageLatestVersion(package):

@@ -1,3 +1,9 @@
+# 0.5.57
+
+* added backend and model options to api client
+
+* skipped some plugins if no internet connection
+
 # 0.5.56
 
 * Support Llama.cpp server on Lite version and running on Android

@@ -1,4 +1,4 @@
-from toolmate import showErrors, isValidPythodCode, executeToolFunction, toParameterSchema, useChatSystemMessage, isRemoteOllamaHost
+from toolmate import showErrors, isValidPythodCode, executeToolFunction, toParameterSchema, useChatSystemMessage
 from toolmate import print1, print2, print3, getPythonFunctionResponse, extractPythonCode, isValidPythodCode, validParameters, getRagPrompt
 from toolmate import config, getOllamaServerClient, getRagPrompt
 import shutil, re, traceback, json, ollama, pprint, copy, datetime
@@ -29,18 +29,10 @@ class CallOllama:
     @staticmethod
     @check_ollama_errors
     def checkCompletion():
-        if shutil.which("ollama") and not isRemoteOllamaHost(config.ollamaToolServer_host):
-            Downloader.downloadOllamaModel(config.ollamaToolModel)
-        if config.useAdditionalChatModel and not isRemoteOllamaHost(config.ollamaChatServer_host):
+        Downloader.downloadOllamaModel(config.ollamaToolModel)
+        if config.useAdditionalChatModel:
             Downloader.downloadOllamaModel(config.ollamaChatModel)
-        if not shutil.which("ollama") and not (isRemoteOllamaHost(config.ollamaToolServer_host) or isRemoteOllamaHost(config.ollamaChatServer_host)):
-            print("Ollama not found! Install it first!")
-            print("Check https://ollama.com")
-            config.llmInterface = "llamacpp"
-            config.saveConfig()
-            print("LLM interface changed back to 'llamacpp'")
-            #print("Restarting 'ToolMate AI' ...")
-            #restartApp()
+        getOllamaServerClient().generate(model=config.ollamaToolModel, keep_alive=0, stream=False,)
 
     @staticmethod
     def autoCorrectPythonCode(code, trace):

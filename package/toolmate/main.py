@@ -3,7 +3,7 @@ from toolmate import config
 import os, shutil, argparse, pyperclip, subprocess
 from pathlib import Path
 
-from toolmate import updateApp, configFile, getOllamaServerClient
+from toolmate import updateApp, configFile, getOllamaServerClient, unloadLocalModels
 from toolmate.utils.assistant import ToolMate
 from prompt_toolkit.shortcuts import set_title, clear_title
 
@@ -150,11 +150,8 @@ def main(tempInterface=""):
     if os.path.isdir(config.localStorage):
         shutil.copy(configFile, os.path.join(config.localStorage, "config_lite_backup.py" if config.isLite else "config_backup.py"))
     # unload llama.cpp model to free VRAM
-    try:
-        config.llamacppToolModel.close()
-        print("Llama.cpp model unloaded!")
-    except:
-        pass
+    unloadLocalModels()
+
     # delete temporary content
     try:
         tempFolder = os.path.join(config.toolMateAIFolder, "temp")
@@ -164,12 +161,6 @@ def main(tempInterface=""):
         pass
     # clear title
     clear_title()
-
-    if config.llmInterface == "ollama":
-        getOllamaServerClient().generate(model=config.ollamaToolModel, keep_alive=0, stream=False,)
-        print(f"Ollama model '{config.ollamaToolModel}' unloaded!")
-    if hasattr(config, "llamacppToolModel"):
-        del config.llamacppToolModel
 
 if __name__ == "__main__":
     main()

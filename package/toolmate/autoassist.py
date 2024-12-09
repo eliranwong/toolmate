@@ -12,7 +12,7 @@ if not hasattr(config, "max_consecutive_auto_reply"):
     config.max_consecutive_auto_reply = 10
 
 import autogen, os, json, traceback
-from toolmate import getDeviceInfo, startLlamacppServer, stopLlamacppServer, getGroqApi_key, tokenLimits
+from toolmate import getDeviceInfo, startLlamacppServer, stopLlamacppServer, getGroqApi_key, chatgptTokenLimits
 from toolmate.utils.prompts import Prompts
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.styles import Style
@@ -29,9 +29,9 @@ class AutoGenAssistant:
         #    api_version=None,
         #)
         oai_config_list = []
-        for model in tokenLimits.keys():
+        for model in chatgptTokenLimits.keys():
             oai_config_list.append({"model": model, "api_key": config.openaiApiKey})
-        if not config.chatGPTApiModel in tokenLimits:
+        if not config.chatGPTApiModel in chatgptTokenLimits:
             oai_config_list.append({"model": config.chatGPTApiModel, "api_key": config.openaiApiKey})
         os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
         """

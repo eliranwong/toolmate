@@ -1,7 +1,7 @@
 import ollama, os, argparse, threading, shutil, json
 from ollama import Options, pull
 from toolmate.utils.download import Downloader
-from toolmate import config, is_valid_image_file, getOllamaServerClient, isRemoteOllamaHost
+from toolmate import config, is_valid_image_file, getOllamaServerClient
 from toolmate import print1, print2, print3, toggleinputaudio, toggleoutputaudio
 from toolmate.utils.ollama_models import ollama_models
 from toolmate.utils.streaming_word_wrapper import StreamingWordWrapper
@@ -27,9 +27,10 @@ promptStyle = Style.from_dict({
 class OllamaChat:
 
     def __init__(self):
-        self.remote = (isRemoteOllamaHost(config.ollamaToolServer_host) or isRemoteOllamaHost(config.ollamaChatServer_host))
         # authentication
-        if shutil.which("ollama") or self.remote:
+        if config.useAdditionalChatModel and isServerAlive(config.ollamaChatServer_host if config.ollamaChatServer_host else get_local_ip(), config.ollamaChatServer_port):
+            self.runnable = True
+        elif not config.useAdditionalChatModel and isServerAlive(config.ollamaToolServer_host if config.ollamaToolServer_host else get_local_ip(), config.ollamaToolServer_port):
             self.runnable = True
         else:
             print("Local LLM Server 'Ollama' not found! Install Ollama first!")
@@ -128,9 +129,9 @@ Here is my request:
             return None
 
         # check model
-        if not self.remote and not Downloader.downloadOllamaModel(model):
+        if not Downloader.downloadOllamaModel(model):
             return None
-        if not self.remote and model.startswith("llava"):
+        if model.startswith("llava"):
             Downloader.downloadOllamaModel("gemma:2b")
         
         previoiusModel = config.ollamaToolModel

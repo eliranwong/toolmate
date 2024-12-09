@@ -22,7 +22,7 @@ Reference: https://platform.openai.com/docs/guides/vision
 """
 
 from toolmate import config
-from toolmate import print1, print2, is_valid_image_file, is_valid_image_url, is_valid_url, encode_image, isRemoteOllamaHost
+from toolmate import print1, print2, is_valid_image_file, is_valid_image_url, is_valid_url, encode_image
 from toolmate.utils.call_ollama import CallOllama
 from toolmate.utils.download import Downloader
 import os, shutil
@@ -30,8 +30,7 @@ import os, shutil
 def examine_images_ollama(function_args):
     from toolmate import config
 
-    if shutil.which("ollama") and not (isRemoteOllamaHost(config.ollamaToolServer_host) or isRemoteOllamaHost(config.ollamaChatServer_host)):
-        Downloader.downloadOllamaModel(config.ollamaVisionModel)
+    Downloader.downloadOllamaModel(config.ollamaVisionModel)
 
     query = function_args.get("query") # required
     files = function_args.get("image_filepath") # required

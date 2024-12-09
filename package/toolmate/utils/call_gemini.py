@@ -47,9 +47,9 @@ class CallVertexAI:
         else:
             print("Vertex AI is not enabled!")
             print("Read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Google%20Cloud%20Service%20Credential%20Setup.md for setting up Google API.")
-            config.llmInterface = "llamacpp"
+            config.llmInterface = ""
             config.saveConfig()
-            print("LLM interface changed back to 'llamacpp'")
+            print("LLM interface not configured!")
 
     @staticmethod
     def autoCorrectPythonCode(code, trace):

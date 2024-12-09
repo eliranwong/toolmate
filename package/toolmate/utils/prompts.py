@@ -1,5 +1,5 @@
 from toolmate import config, getDeviceInfo, restartApp, count_tokens_from_messages, isCommandInstalled, getCpuThreads
-from toolmate import print1, print2, print3, count_tokens_from_functions, voiceTyping, tokenLimits
+from toolmate import print1, print2, print3, count_tokens_from_functions, voiceTyping, chatgptTokenLimits
 import pydoc, textwrap, re
 from prompt_toolkit import prompt
 from prompt_toolkit.application import run_in_terminal
@@ -163,7 +163,7 @@ class Prompts:
                 #availableFunctionTokens = count_tokens_from_functions(config.toolFunctionSchemas)
                 currentInputTokens = len(encoding.encode(config.addPredefinedContext(currentInput)))
                 loadedMessageTokens = count_tokens_from_messages(config.currentMessages)
-                #selectedModelLimit = tokenLimits[config.chatGPTApiModel]
+                #selectedModelLimit = chatgptTokenLimits[config.chatGPTApiModel]
                 #estimatedAvailableTokens = selectedModelLimit - availableFunctionTokens - loadedMessageTokens - currentInputTokens
 
                 content = f"""# Token Count

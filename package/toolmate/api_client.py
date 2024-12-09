@@ -1,5 +1,5 @@
 import requests, argparse, json, sys, os, pprint, re, shutil
-from toolmate import config, convertOutputText, wrapText, startSpinning, stopSpinning, readTextFile, writeTextFile, print2, print3, getPygmentsStyle, showErrors, isServerAlive
+from toolmate import config, configFile, convertOutputText, wrapText, startSpinning, stopSpinning, readTextFile, writeTextFile, print2, print3, getPygmentsStyle, showErrors, isServerAlive, getLlms
 from toolmate.utils.tts_utils import TTSUtil
 from toolmate.utils.single_prompt import SinglePrompt
 
@@ -18,6 +18,7 @@ from pathlib import Path
 parser = argparse.ArgumentParser(description="ToolMate AI API client cli options")
 # Add arguments
 parser.add_argument("default", nargs="?", default=None, help="instruction sent to ToolMate API server; work on previous conversation if not given.")
+parser.add_argument('-b', '--backend', action='store', dest='backend', help="AI backend; optionally use it together with '-bc' to make a change persistant")
 parser.add_argument('-bc', '--backupchat', action='store_true', dest='backupchat', help="back up the current conversation in ToolMate AI user directory")
 parser.add_argument('-bs', '--backupsettings', action='store_true', dest='backupsettings', help="back up the current settings in ToolMate AI user directory")
 parser.add_argument('-c', '--chat', action='store', dest='chat', help="enable or disable to chat as an on-going conversation; true / false")
@@ -27,12 +28,16 @@ parser.add_argument('-dt', '--defaulttool', action='store', dest='defaulttool', 
 parser.add_argument('-e', '--export', action='store', dest='export', help="export conversation; optionally used with -f option to specify a format for the export")
 parser.add_argument('-f', '--format', action='store', dest='format', help="conversation output format; plain or list; useful for sharing or backup; only output the last assistant response if this option is not used")
 parser.add_argument('-i', '--interactive', action='store_true', dest='interactive', help="interactive prompt, with auto-suggestions enabled, for writing instruction; do not use this option together with standard input or output")
+parser.add_argument('-if', '--info', action='store_true', dest='info', help="show server info")
 parser.add_argument('-k', '--key', action='store', dest='key', help="specify the API key for authenticating access to the ToolMate AI server")
+parser.add_argument('-m', '--model', action='store', dest='model', help="AI model; override backend option if the model's backend is different; optionally use it together with '-bc' to make a change persistant")
+parser.add_argument('-ms', '--models', action='store_true', dest='models', help="show available models")
 parser.add_argument('-md', '--markdown', action='store', dest='markdown', help="highlight assistant response in markdown format; true / false")
 parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', help="override maximum output tokens for a single request; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
 parser.add_argument('-p', '--port', action='store', dest='port', help="server port")
 parser.add_argument('-pd', '--powerdown', action='store_true', dest='powerdown', help="power down server")
 parser.add_argument('-r', '--read', action='store_true', dest='read', help="read text output")
+parser.add_argument('-rs', '--reloadsettings', action='store_true', dest='reloadsettings', help=f"Reload configurations: {configFile}")
 parser.add_argument('-s', '--server', action='store', dest='server', help="server address; 'http://localhost' by default")
 parser.add_argument('-sd', '--showdescription', action='store_true', dest='showdescription', help="show description of the found items in search results; used together with 'sc', 'ss' and 'st'")
 parser.add_argument('-sc', '--searchcontexts', action='store', dest='searchcontexts', help="search predefined contexts; use '@' to display all; use regex pattern to filter")
@@ -40,6 +45,7 @@ parser.add_argument('-ss', '--searchsystems', action='store', dest='searchsystem
 parser.add_argument('-st', '--searchtools', action='store', dest='searchtools', help="search enabled tools; use '@' to display all; use regex pattern to filter")
 parser.add_argument('-t', '--temperature', action='store', dest='temperature', help="override inference temperature for a single request; optionally use it together with '-bc' to make a change persistant; accepted range: 0.0-2.0; unaccepted values will be ignored without notification")
 parser.add_argument('-ta', '--toolagent', action='store', dest='toolagent', help="override tool selection agent for a single request; optionally use it together with '-bc' to make a change persistant; true / false; unaccepted values will be ignored without notification")
+parser.add_argument('-vc', '--viewconfigs', action='store_true', dest='viewconfigs', help="view current server configurations")
 parser.add_argument('-wd', '--workingdirectory', action='store', dest='workingdirectory', help="working directory; current location by default")
 parser.add_argument('-ws', '--windowsize', action='store', dest='windowsize', help="override context window size for a single request; applicable to backends `llama.cpp` amd `ollama` only; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
 parser.add_argument('-ww', '--wordwrap', action='store', dest='wordwrap', help="word wrap; true / false; determined by 'config.wrapWords' if not given")
@@ -109,7 +115,7 @@ def main(chat: bool = False):
     port = args.port if args.port else config.toolmate_api_client_port
     if not isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
         configFile = os.path.join(config.toolMateAIFolder, "config.py")
-        if os.path.getsize(configFile) == 0 and shutil.which("tmsetup"):
+        if (os.path.getsize(configFile) == 0 or not hasattr(config, "llmInterface") or not config.llmInterface) and shutil.which("tmsetup"):
             os.system("tmsetup")
         if shutil.which("nohup") and shutil.which("toolmateserver"):
             startSpinning()
@@ -126,7 +132,39 @@ def main(chat: bool = False):
     cliDefault = args.default.strip() if args.default is not None and args.default.strip() else ""
     stdin_text = sys.stdin.read() if not sys.stdin.isatty() else ""
 
-    if args.searchtools is not None and args.searchtools.strip(): # -st given; search tools; ignore all other arguments
+    if args.info or args.models or args.viewconfigs:
+
+        #startSpinning()
+
+        if args.info:
+            query = "info"
+        elif args.models:
+            query = "models"
+        elif args.viewconfigs:
+            query = "configs"
+        endpoint = f"{host}:{port}/api/status"
+
+        url = f"""{endpoint}?query={query}"""
+        headers = {
+            "Content-Type": "application/json",
+            "X-API-Key": args.key if args.key else config.toolmate_api_client_key,
+        }
+        try:
+            response = requests.post(url, headers=headers)
+        except Exception as e:
+            showErrors(e=e)
+            stopSpinning()
+            return None
+
+        #stopSpinning()
+        
+        try:
+            results = response.json() if query == "configs" else json.loads(response.json())
+            print(results) if query == "configs" else highlightPythonSyntax(results)
+        except:
+            print(response.text)
+
+    elif args.searchtools is not None and args.searchtools.strip(): # -st given; search tools; ignore all other arguments
         startSpinning()
 
         query = args.searchtools.strip().lower()
@@ -231,6 +269,19 @@ def main(chat: bool = False):
             toolagent = True if args.toolagent.strip().lower() == "true" else False
         else:
             toolagent = None
+        
+        # backend and model
+        if args.backend and args.backend.lower() in getLlms().keys():
+            backend = args.backend.lower()
+        else:
+            backend = None
+        model = None
+        if args.model:
+            for b, ms in getLlms().items():
+                if args.model in ms:
+                    backend = b
+                    model = args.model
+                    break
 
         headers = {
             "Content-Type": "application/json",
@@ -238,6 +289,8 @@ def main(chat: bool = False):
         }
         data = {
             "wd": args.workingdirectory if args.workingdirectory is not None and os.path.isdir(args.workingdirectory) else os.getcwd(),
+            "backend": backend,
+            "model": model,
             "instruction": instruction,
             "chat": chat,
             "chatfile": chatfile,
@@ -249,6 +302,7 @@ def main(chat: bool = False):
             "toolagent": toolagent,
             "backupchat": True if args.backupchat else False,
             "backupsettings": True if args.backupsettings else False,
+            "reloadsettings": True if args.reloadsettings else False,
             "powerdown": True if args.powerdown else False,
         }
         try:

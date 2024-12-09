@@ -1,13 +1,13 @@
 import ollama
 from ollama import pull
 from tqdm import tqdm
-from toolmate import getDownloadedOllamaModels
+from toolmate import getLlms
 
 class Downloader:
 
     @staticmethod
     def downloadOllamaModel(model, force=False) -> bool:
-        if force or not model in getDownloadedOllamaModels():
+        if force or not model in getLlms()["ollama"]:
 
             print(f"Downloading '{model}' ...")
             

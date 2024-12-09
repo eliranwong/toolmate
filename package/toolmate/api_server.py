@@ -1,10 +1,13 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import APIKeyHeader
-from toolmate import config, configFile, isServerAlive, print2, print3, getOllamaServerClient
+from toolmate import config, configFile, isServerAlive, print2, print3, getOllamaServerClient, getLlms, unloadLocalModels, changeModel, changeBackendAndModel, getCurrentModel
 from toolmate.utils.assistant import ToolMate
 from toolmate.utils.tool_plugins import Plugins
+from toolmate.utils.call_llm import CallLLM
+from toolmate.utils.config_essential import temporaryConfigs
+from importlib_metadata import version as lib_version
 from pydantic import BaseModel
-import requests, argparse, json, uvicorn, re, os, signal, shutil
+import requests, argparse, json, uvicorn, re, os, signal, shutil, sys, pprint
 
 
 # Create the parser
@@ -12,6 +15,7 @@ parser = argparse.ArgumentParser(description="ToolMate AI API server cli options
 # Add arguments
 parser.add_argument('-b', '--backend', action='store', dest='backend', help="AI backend")
 parser.add_argument('-k', '--key', action='store', dest='key', help="specify the API key for authenticating client access")
+parser.add_argument('-m', '--model', action='store', dest='model', help="AI model; override backend option if the model's backend is different")
 parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', help="override default maximum output tokens; accepts non-negative integers")
 parser.add_argument('-p', '--port', action='store', dest='port', help="server port")
 parser.add_argument('-s', '--server', action='store', dest='server', help="server address; '0.0.0.0' by default")
@@ -36,6 +40,8 @@ async def get_api_key(api_key: str = Depends(api_key_header)):
 
 class Request(BaseModel):
     wd: str
+    backend: str | None = None
+    model: str | None = None
     instruction: str | None = "."
     chat: bool | None = False
     chatfile: str | None = None
@@ -47,11 +53,14 @@ class Request(BaseModel):
     toolagent: bool | None = None
     backupchat: bool | None = None
     backupsettings: bool | None = None
+    reloadsettings: bool | None = None
     powerdown: bool | None = None
 
 @app.post("/api/toolmate")
 async def process_instruction(request: Request, api_key: str = Depends(get_api_key) if config.toolmate_api_server_key else ""):
     wd = request.wd
+    backend = request.backend
+    model = request.model
     instruction = request.instruction
     chat = request.chat
     chatfile = request.chatfile
@@ -69,7 +78,45 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
     toolagent = request.toolagent
     backupchat = request.backupchat
     backupsettings = request.backupsettings
+    reloadsettings = request.reloadsettings
     powerdown = request.powerdown
+
+    # reload configurations
+    if reloadsettings:
+        config.loadConfig(configFile)
+        print2("Configurations reloaded!")
+
+    # change backend
+    current_llmInterface = config.llmInterface
+    current_ollamaToolModel = config.ollamaToolModel
+    if model and backend:
+        changeBackendAndModel(backend, model)
+    if model and not backend:
+        changeModel(model)
+    elif backend and backend.lower() in getLlms().keys():
+        config.llmInterface = backend.lower()
+        print3(f"Backend configured: {config.llmInterface}")
+    # when backend or model is change
+    if (not current_llmInterface == config.llmInterface and current_llmInterface == "ollama") or (not current_ollamaToolModel == config.ollamaToolModel):
+        getOllamaServerClient().generate(model=config.ollamaToolModel, keep_alive=0, stream=False,)
+        print(f"Ollama model '{config.ollamaToolModel}' unloaded!")
+    elif (not current_llmInterface == config.llmInterface and current_llmInterface == "llamacpp"):
+        try:
+            config.llamacppToolModel.close()
+            print("Llama.cpp model unloaded!")
+        except:
+            pass
+        if hasattr(config, "llamacppToolModel"):
+            del config.llamacppToolModel
+    if not current_llmInterface == config.llmInterface:
+        try:
+            CallLLM.checkCompletion()
+        except:
+            print3(f"Failed to configure backend: {config.llmInterface}")
+            config.llmInterface = current_llmInterface
+            print3(f"Backend changed back to: {config.llmInterface}")
+        if not config.llmInterface:
+            config.llmInterface = current_llmInterface
 
     # override chat system message agent once
     if chatsystem:
@@ -171,26 +218,57 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
             print3(f"Temperature changed restored: {current_temperature}")
 
     if powerdown:
-        # unload local models to free VRAM
-        try:
-            config.llamacppToolModel.close()
-            print("Llama.cpp model unloaded!")
-        except:
-            pass
-        if hasattr(config, "llamacppToolModel"):
-            del config.llamacppToolModel
-        if config.llmInterface == "ollama":
-            getOllamaServerClient().generate(model=config.ollamaToolModel, keep_alive=0, stream=False,)
-            print(f"Ollama model '{config.ollamaToolModel}' unloaded!")
+        unloadLocalModels()
         # kill server process
         os.kill(config.api_server_id, signal.SIGINT)
 
     return json.dumps(response)
 
+@app.post("/api/status")
+async def process_status(query: str, api_key: str = Depends(get_api_key) if config.toolmate_api_server_key else ""):
+    if query := query.strip():
+        try:
+            tmversion = lib_version("toolmate")
+        except:
+            tmversion = f"""{lib_version("toolmate_lite")} (lite)"""
+        if query == "info":
+            info = {
+                "Toolmate version": tmversion,
+                "Python version": sys.version,
+                "Python interpreter": sys.executable,
+                "Library": config.toolMateAIFolder,
+                "User data": config.localStorage,
+                "Server host": config.this_api_server_host,
+                "Server port": config.this_api_server_port,
+                "AI Backend": config.llmInterface,
+                "AI Model": getCurrentModel(),
+                "Context window size": config.toolmate.getCurrentContextWindowSize(),
+                "Maximum output token": config.toolmate.getCurrentMaxTokens(showMessage=False),
+                "Temperature": config.llmTemperature,
+                "Chat system message": config.toolmate.getCurrentChatSystemMessage(),
+                "Tool system message": config.systemMessage_tool_current,
+                "Tool agent": config.tool_selection_agent,
+                "Default tool": config.defaultTool,
+            }
+        elif query == "models":
+            info = getLlms()
+        elif query == "configs":
+            info = []
+            for name in dir(config):
+                excludeConfigList = temporaryConfigs + config.excludeConfigList
+                if not name.startswith("__") and not name in excludeConfigList:
+                    try:
+                        value = eval(f"config.{name}")
+                        if not callable(value) and not str(value).startswith("<"):
+                            info.append("{0} = {1}".format(name, pprint.pformat(value)))
+                    except:
+                        pass
+            return "\n".join(info)
+        return json.dumps(info)
+
 @app.post("/api/tools")
 async def process_tools(query: str, api_key: str = Depends(get_api_key) if config.toolmate_api_server_key else ""):
-    if query := query.strip():
-        searchPattern = query.strip()
+    if searchPattern := query.strip():
         availableTools = Plugins.checkAvailableTools(display=False, includeRequirements=True)
         if searchPattern == "@":
             results = availableTools
@@ -200,8 +278,7 @@ async def process_tools(query: str, api_key: str = Depends(get_api_key) if confi
 
 @app.post("/api/systems")
 async def process_systems(query: str, api_key: str = Depends(get_api_key) if config.toolmate_api_server_key else ""):
-    if query := query.strip():
-        searchPattern = query.strip()
+    if searchPattern := query.strip():
         if searchPattern == "@":
             results = config.predefinedChatSystemMessages
         else:
@@ -210,8 +287,7 @@ async def process_systems(query: str, api_key: str = Depends(get_api_key) if con
 
 @app.post("/api/contexts")
 async def process_contexts(query: str, api_key: str = Depends(get_api_key) if config.toolmate_api_server_key else ""):
-    if query := query.strip():
-        searchPattern = query.strip()
+    if searchPattern := query.strip():
         if searchPattern == "@":
             results = config.predefinedContexts
         else:
@@ -219,8 +295,8 @@ async def process_contexts(query: str, api_key: str = Depends(get_api_key) if co
         return json.dumps({"results": results})
 
 def main():
-    host = args.server if args.server else config.toolmate_api_server_host
-    port = args.port if args.port else config.toolmate_api_server_port
+    config.this_api_server_host = host = args.server if args.server else config.toolmate_api_server_host
+    config.this_api_server_port = port = args.port if args.port else config.toolmate_api_server_port
     if not isServerAlive(host, port):
         # configurations in API server
         config.initialCompletionCheck = False
@@ -229,9 +305,11 @@ def main():
         config.ttsInput = False
         config.ttsOutput = False
         # backend
-        backends = ("llamacpp", "llamacppserver", "ollama", "groq", "xai", "googleai", "vertexai", "chatgpt", "letmedoit")
-        if args.backend and args.backend.lower() in backends:
+        if args.backend and args.backend.lower() in getLlms().keys():
             config.llmInterface = args.backend.lower()
+            print3(f"Backend configured: {config.llmInterface}")
+        if args.model:
+            changeModel(args.model)
         # initiate assistant
         config.toolmate = ToolMate()
         # backend-dependent configurations

@@ -51,7 +51,7 @@ joblib==1.4.2
 multitasking==0.0.11
 #matplotlib==3.9.2
 #onnxruntime==1.19.2
-#importlib_metadata==8.4.0
+importlib_metadata==8.5.0
 jedi==0.19.1
 kiwisolver==1.4.7
 #llvmlite==0.43.0

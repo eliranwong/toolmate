@@ -8,20 +8,6 @@ from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit import prompt
 from typing import Optional
 
-# token limit
-# reference: https://platform.openai.com/docs/models/gpt-4
-tokenLimits = {
-    "gpt-4o": 128000,
-    "gpt-4-turbo": 128000, # Returns a maximum of 4,096 output tokens.
-    "gpt-4-turbo-preview": 128000, # Returns a maximum of 4,096 output tokens.
-    "gpt-4-0125-preview": 128000, # Returns a maximum of 4,096 output tokens.
-    "gpt-4-1106-preview": 128000, # Returns a maximum of 4,096 output tokens.
-    "gpt-3.5-turbo": 16385, # Returns a maximum of 4,096 output tokens.
-    "gpt-3.5-turbo-16k": 16385,
-    "gpt-4": 8192,
-    "gpt-4-32k": 32768,
-}
-
 def check_openai_errors(func):
     def wrapper(*args, **kwargs):
         def finishError():

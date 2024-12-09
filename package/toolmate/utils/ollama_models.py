@@ -1,4 +1,12 @@
 ollama_models = (
+    "llama3.3",
+    "llama3.3:70b",
+    "snowflake-arctic-embed2",
+    "snowflake-arctic-embed2:568m",
+    "sailor2",
+    "sailor2:1b",
+    "sailor2:8b",
+    "sailor2:20b",
     "qwq",
     "qwq:32b",
     "marco-o1",

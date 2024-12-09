@@ -1,4 +1,5 @@
 import os, sys, platform, shutil
+from importlib_metadata import version as lib_version
 
 # check python version
 # requires python 3.8+; required by package 'tiktoken'
@@ -28,8 +29,7 @@ if not os.path.isfile(configFile):
 from toolmate import config
 if not hasattr(config, "isLite"):
     try:
-        from lightrag import LightRAG
-        config.isLite = False
+        lib_version("toolmate")
     except:
         config.isLite = True
 config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") and not os.getcwd().startswith("/root") else False
@@ -119,7 +119,7 @@ if not config.isTermux:
     setGoogleCredentials()
 
 # context
-if isServerAlive("8.8.8.8", 53):
+if isServerAlive("8.8.8.8", 53): # check internet connection
     g = geocoder.ip('me')
     config.country = g.country
     config.state = g.state

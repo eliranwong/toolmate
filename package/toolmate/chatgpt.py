@@ -1,5 +1,5 @@
 from toolmate import config, count_tokens_from_messages
-from toolmate import print1, print2, print3, tokenLimits, toggleinputaudio, toggleoutputaudio
+from toolmate import print1, print2, print3, chatgptTokenLimits, toggleinputaudio, toggleoutputaudio
 from toolmate.utils.streaming_word_wrapper import StreamingWordWrapper
 from toolmate.utils.single_prompt import SinglePrompt
 from toolmate.utils.tool_plugins import Plugins
@@ -58,7 +58,7 @@ class ChatGPT:
             print("New chat started!")
 
     def getDynamicTokens(self):
-        tokenLimit = tokenLimits[config.chatGPTApiModel]
+        tokenLimit = chatgptTokenLimits[config.chatGPTApiModel]
         currentMessagesTokens = count_tokens_from_messages(self.messages)
         availableTokens = tokenLimit - currentMessagesTokens
         if availableTokens >= self.max_output_tokens:

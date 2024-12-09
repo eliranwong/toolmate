@@ -1,4 +1,4 @@
-from toolmate import config, count_tokens_from_messages, count_tokens_from_functions, tokenLimits
+from toolmate import config, count_tokens_from_messages, count_tokens_from_functions, chatgptTokenLimits
 from prompt_toolkit.validation import Validator, ValidationError
 from prompt_toolkit.application import run_in_terminal
 import re
@@ -18,7 +18,7 @@ class TokenValidator(Validator):
             availableFunctionTokens = count_tokens_from_functions(config.toolFunctionSchemas)
             currentInputTokens = len(encoding.encode(config.addPredefinedContext(currentInput)))
             loadedMessageTokens = count_tokens_from_messages(config.currentMessages)
-            selectedModelLimit = tokenLimits[config.chatGPTApiModel]
+            selectedModelLimit = chatgptTokenLimits[config.chatGPTApiModel]
             #estimatedAvailableTokens = selectedModelLimit - availableFunctionTokens - loadedMessageTokens - currentInputTokens
 
             config.dynamicToolBarText = f""" Tokens: {(availableFunctionTokens + loadedMessageTokens + currentInputTokens)}/{selectedModelLimit} {str(config.hotkey_display_key_combo).replace("'", "")} shortcuts """

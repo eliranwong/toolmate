@@ -1,9 +1,11 @@
 from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, refinePath, displayLoadedMessages, removeDuplicatedListItems, getElevenlabsApi_key, getLlms
-from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, chatgptTokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getUserPreviousRequest, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText
-from toolmate import installPipPackage, exportOllamaModels, getDownloadedGgufModels, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runToolMateCommand, displayPythonCode, selectTool, showRisk, confirmExecution
+from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, chatgptTokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getUserPreviousRequest, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText, refineToolTextOutput
+from toolmate import installPipPackage, exportOllamaModels, getDownloadedGgufModels, extractSystemCommand, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runToolMateCommand, displayPythonCode, selectTool, showRisk, confirmExecution, getPythonFunctionResponse
 from toolmate.utils.call_llm import CallLLM
-import threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, sys, copy
+import threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, copy
 import edge_tts, asyncio, requests
+import io, sys
+from io import StringIO
 from flashtext import KeywordProcessor
 from typing import Optional
 from pathlib import Path
@@ -992,9 +994,9 @@ class ToolMate:
             print3(f"Latest Online Searches: {option}")
 
     def manageCodeExecutionRisk(self):
-        options = ("always", "medium_risk_or_above", "high_risk_only", "none")
-        if not config.confirmExecution in options:
-            config.confirmExecution = "always"
+        options = ("0", "1", "2", "3")
+        if not str(config.riskThreshold) in options:
+            config.riskThreshold = 0
         descriptions = (
             "always",
             "medium risk or above",
@@ -1004,14 +1006,14 @@ class ToolMate:
         option = self.dialogs.getValidOptions(
             options=options,
             descriptions=descriptions,
-            title="Generated Code Execution Risk Management",
-            text=f"To fulfill your requests, our built-in tools can generate and execute Python code. To protect you from running generated code that could pose a risk to your system, such as file deletion, ToolMate AI has a built-in risk management agent. This agent assesses the risk level of generated code and prompts you for confirmation before execution. You can specify the risk threshold below, determining the level at which you will be asked for confirmation. (Note: Confirming code execution is done at your own risk.)",
-            default=config.confirmExecution,
+            title="Configure Risk Threshold",
+            text=f"To fulfill your requests, our built-in tools can generate and execute codes or commands. To protect you from running generated codes that may pose a risk to your system, such as file deletion, ToolMate AI has a built-in risk management agent. This agent assesses the risk level of generated code and prompts you for confirmation before execution. You can specify the risk threshold below, determining the level at which you will be asked for confirmation. (Note: Confirming code execution is done at your own risk.)",
+            default=config.riskThreshold,
         )
         if option:
-            config.confirmExecution = option
+            config.riskThreshold = int(option)
             config.saveConfig()
-            print3(f"Command Confirmation Protocol: {option}")
+            print3(f"Risk threshold: {option}")
 
     def setPagerView(self):
         manuel = f"""manual '{str(config.hotkey_launch_pager_view).replace("'", "")}'"""
@@ -2799,11 +2801,26 @@ class ToolMate:
         print_formatted_text(HTML(f"<{config.terminalCommandEntryColor2}>{logo}</{config.terminalCommandEntryColor2}>"))
 
     def runPythonScript(self, script):
+        # Create a StringIO object to capture the output
+        thisOutput = StringIO()
+        # Redirect stdout to the StringIO object
+        old_stdout = sys.stdout
+        sys.stdout = thisOutput
+
         script = re.sub("^```(.+?)```", r"\1", script)
         try:
             exec(script, globals())
+            # Restore the original stdout
+            sys.stdout = old_stdout
+
+            config.toolTextOutput = thisOutput.getvalue()
+            if not config.toolTextOutput.strip():
+                config.toolTextOutput = getPythonFunctionResponse()
             return ""
         except:
+            # Restore the original stdout
+            sys.stdout = old_stdout
+
             trace = traceback.format_exc()
             print(trace if config.developer else "Error encountered!")
             print1(config.divider)
@@ -2860,7 +2877,7 @@ My writing:
 {request}"""
         cli = CallLLM.getSingleChatResponse(instruction, prefill="```\n", stop=["```"], keepSystemMessage=True)
         if cli := cli.strip():
-            cli = cli[3:-3].strip() if cli.startswith("```") and cli.endswith("```") else re.sub("^.*?```(.*?)```.*?$", r"\1", cli).strip()
+            cli = extractSystemCommand(cli).strip()
         if config.developer:
             print2(f"```command")
             print(cli)
@@ -2893,6 +2910,8 @@ Acess the risk level of the following `{target.capitalize()}`:
             risk = "high"
         showRisk(risk)
         if confirmExecution(risk):
+            if hasattr(config, "api_server_id"):
+                return f"#{risk}"
             print1("Do you want to continue? [y]es / [N]o")
             confirmation = prompt(style=config.promptStyle2, default="y")
             if not confirmation.lower() in ("y", "yes"):
@@ -3043,7 +3062,9 @@ Acess the risk level of the following `{target.capitalize()}`:
                 # execute
                 response = self.runPythonScript(python_code)
                 if config.toolTextOutput.strip():
+                    config.toolTextOutput = refineToolTextOutput(config.toolTextOutput)
                     message = config.toolTextOutput
+                    config.toolTextOutput = ""
                 elif not response:
                     message = "Done!"
                 elif response == "[INVALID]":
@@ -3091,6 +3112,9 @@ Acess the risk level of the following `{target.capitalize()}`:
             if stderr and not stdout:
                 cli = self.generateTermuxAPICommand(description)
                 if risk := self.riskAssessment(cli, target="system command"):
+                    if risk.startswith("#"): # api server running
+                        config.currentMessages.append({"role": "assistant", "content": getPromptExecutionMessage(cli, risk, description="command")})
+                        return None
                     stdout, stderr = subprocess.Popen(cli, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
             # refine description
             description = f'''Run Termux command:\n```command\n{description}\n```'''
@@ -3116,11 +3140,14 @@ Acess the risk level of the following `{target.capitalize()}`:
                 config.currentMessages.append({"role": "assistant", "content": done})
             return None
         elif action == "command":
-            cli = description
-            stdout, stderr = subprocess.Popen(description, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+            cli = extractSystemCommand(description)
+            stdout, stderr = subprocess.Popen(cli, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
             if stderr and not stdout:
                 cli = self.generateSystemCommand(description)
                 if risk := self.riskAssessment(cli, target="system command"):
+                    if risk.startswith("#"): # api server running
+                        config.currentMessages.append({"role": "assistant", "content": getPromptExecutionMessage(cli, risk, description="command")})
+                        return None
                     stdout, stderr = subprocess.Popen(cli, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
             # refine description
             description = f'''Run system command:\n```command\n{description}\n```'''
@@ -3149,11 +3176,15 @@ Acess the risk level of the following `{target.capitalize()}`:
             previousResponse = getAssistantPreviousResponse()[0]
             if previousResponse:
                 previousResponse = previousResponse.replace('"', '\\"')
-                cli = description = f'''{description.strip()} "{previousResponse}"'''
-                stdout, stderr = subprocess.Popen(description, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                description = f'''{description.strip()} "{previousResponse}"'''
+                cli = extractSystemCommand(description)
+                stdout, stderr = subprocess.Popen(cli, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
                 if stderr and not stdout:
                     cli = self.generateSystemCommand(description)
                     if risk := self.riskAssessment(cli, target="system command"):
+                        if risk.startswith("#"): # api server running
+                            config.currentMessages.append({"role": "assistant", "content": getPromptExecutionMessage(cli, risk, description="command")})
+                            return None
                         stdout, stderr = subprocess.Popen(cli, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
                 description = f'''Run system command:\n```command\n{description}\n```'''
                 config.currentMessages[-1]["content"] = description

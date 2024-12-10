@@ -21,33 +21,35 @@ parser.add_argument("default", nargs="?", default=None, help="instruction sent t
 parser.add_argument('-b', '--backend', action='store', dest='backend', help="AI backend; optionally use it together with '-bc' to make a change persistant")
 parser.add_argument('-bc', '--backupchat', action='store_true', dest='backupchat', help="back up the current conversation in ToolMate AI user directory")
 parser.add_argument('-bs', '--backupsettings', action='store_true', dest='backupsettings', help="back up the current settings in ToolMate AI user directory")
-parser.add_argument('-c', '--chat', action='store', dest='chat', help="enable or disable to chat as an on-going conversation; true / false")
+parser.add_argument('-c', '--chat', action='store_true', dest='chat', help="enable to chat as an on-going conversation")
 parser.add_argument('-cf', '--chatfile', action='store', dest='chatfile', help="a chat file containing a saved conversation")
 parser.add_argument('-cs', '--chatsystem', action='store', dest='chatsystem', help="override chat system message for a single request; optionally use it together with '-bc' to make a change persistant")
 parser.add_argument('-dt', '--defaulttool', action='store', dest='defaulttool', help="override default tool for a single request; optionally use it together with '-bc' to make a change persistant; applied when 'Tool Selection Agent' is disabled and no tool is specified in the request")
 parser.add_argument('-e', '--export', action='store', dest='export', help="export conversation; optionally used with -f option to specify a format for the export")
+parser.add_argument('-exec', '--execute', action='store_true', dest='execute', help="execute python code or system command; format a block of python code starting with '```python' or a block of system command starting with '```command'; ends the block with '```'")
 parser.add_argument('-f', '--format', action='store', dest='format', help="conversation output format; plain or list; useful for sharing or backup; only output the last assistant response if this option is not used")
 parser.add_argument('-i', '--interactive', action='store_true', dest='interactive', help="interactive prompt, with auto-suggestions enabled, for writing instruction; do not use this option together with standard input or output")
-parser.add_argument('-if', '--info', action='store_true', dest='info', help="show server info")
+parser.add_argument('-info', '--information', action='store_true', dest='information', help="show server info")
 parser.add_argument('-k', '--key', action='store', dest='key', help="specify the API key for authenticating access to the ToolMate AI server")
 parser.add_argument('-m', '--model', action='store', dest='model', help="AI model; override backend option if the model's backend is different; optionally use it together with '-bc' to make a change persistant")
 parser.add_argument('-ms', '--models', action='store_true', dest='models', help="show available models")
 parser.add_argument('-md', '--markdown', action='store', dest='markdown', help="highlight assistant response in markdown format; true / false")
-parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', help="override maximum output tokens for a single request; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
-parser.add_argument('-p', '--port', action='store', dest='port', help="server port")
+parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', type=int, help="override maximum output tokens for a single request; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
+parser.add_argument('-p', '--port', action='store', dest='port', type=int, help="server port")
 parser.add_argument('-pd', '--powerdown', action='store_true', dest='powerdown', help="power down server")
 parser.add_argument('-r', '--read', action='store_true', dest='read', help="read text output")
 parser.add_argument('-rs', '--reloadsettings', action='store_true', dest='reloadsettings', help=f"Reload configurations: {configFile}")
+parser.add_argument('-rt', '--riskthreshold', action='store', dest='riskthreshold', type=int, help="risk threshold for user confirmation before code execution; 0 - always require confirmation; 1 - require confirmation only when risk level is medium or higher; 2 - require confirmation only when risk level is high or higher; 3 or higher - no confirmation required")
 parser.add_argument('-s', '--server', action='store', dest='server', help="server address; 'http://localhost' by default")
 parser.add_argument('-sd', '--showdescription', action='store_true', dest='showdescription', help="show description of the found items in search results; used together with 'sc', 'ss' and 'st'")
 parser.add_argument('-sc', '--searchcontexts', action='store', dest='searchcontexts', help="search predefined contexts; use '@' to display all; use regex pattern to filter")
 parser.add_argument('-ss', '--searchsystems', action='store', dest='searchsystems', help="search predefined system messages; use '@' to display all; use regex pattern to filter")
 parser.add_argument('-st', '--searchtools', action='store', dest='searchtools', help="search enabled tools; use '@' to display all; use regex pattern to filter")
-parser.add_argument('-t', '--temperature', action='store', dest='temperature', help="override inference temperature for a single request; optionally use it together with '-bc' to make a change persistant; accepted range: 0.0-2.0; unaccepted values will be ignored without notification")
+parser.add_argument('-t', '--temperature', action='store', dest='temperature', type=float, help="override inference temperature for a single request; optionally use it together with '-bc' to make a change persistant; accepted range: 0.0-2.0; unaccepted values will be ignored without notification")
 parser.add_argument('-ta', '--toolagent', action='store', dest='toolagent', help="override tool selection agent for a single request; optionally use it together with '-bc' to make a change persistant; true / false; unaccepted values will be ignored without notification")
 parser.add_argument('-vc', '--viewconfigs', action='store_true', dest='viewconfigs', help="view current server configurations")
 parser.add_argument('-wd', '--workingdirectory', action='store', dest='workingdirectory', help="working directory; current location by default")
-parser.add_argument('-ws', '--windowsize', action='store', dest='windowsize', help="override context window size for a single request; applicable to backends `llama.cpp` amd `ollama` only; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
+parser.add_argument('-ws', '--windowsize', action='store', dest='windowsize', type=int, help="override context window size for a single request; applicable to backends `llama.cpp` amd `ollama` only; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
 parser.add_argument('-ww', '--wordwrap', action='store', dest='wordwrap', help="word wrap; true / false; determined by 'config.wrapWords' if not given")
 # Parse arguments
 args = parser.parse_args()
@@ -108,9 +110,15 @@ def getPrefix(host, port):
     return ""
 
 def chat():
-    main(True if not (args.chat is not None and args.chat.lower() == "false") else False)
+    main(chat=True)
 
-def main(chat: bool = False):
+def cmd():
+    main(defaultTool="command")
+
+def task():
+    main(defaultTool="execute_computing_task")
+
+def main(chat: bool = False, defaultTool=None):
     host = args.server if args.server else config.toolmate_api_client_host
     port = args.port if args.port else config.toolmate_api_client_port
     if not isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
@@ -132,12 +140,12 @@ def main(chat: bool = False):
     cliDefault = args.default.strip() if args.default is not None and args.default.strip() else ""
     stdin_text = sys.stdin.read() if not sys.stdin.isatty() else ""
 
-    if args.info or args.models or args.viewconfigs:
+    if args.information or args.models or args.viewconfigs:
 
         #startSpinning()
 
-        if args.info:
-            query = "info"
+        if args.information:
+            query = "information"
         elif args.models:
             query = "models"
         elif args.viewconfigs:
@@ -263,7 +271,7 @@ def main(chat: bool = False):
         if not instruction:
             instruction = "."
         chatfile = args.chatfile if args.chatfile is not None and os.path.isfile(args.chatfile) else ""
-        if chatfile or (args.chat is not None and args.chat.lower() == "true"):
+        if chatfile or args.chat:
             chat = True
         if args.toolagent is not None and args.toolagent.strip().lower() in ("true", "false"):
             toolagent = True if args.toolagent.strip().lower() == "true" else False
@@ -298,8 +306,10 @@ def main(chat: bool = False):
             "windowsize": args.windowsize,
             "maximumoutput": args.maximumoutput,
             "temperature": args.temperature,
-            "defaulttool": args.defaulttool,
+            "defaulttool": defaultTool if defaultTool is not None else args.defaulttool,
             "toolagent": toolagent,
+            "riskthreshold": args.riskthreshold,
+            "execute": True if args.execute else False,
             "backupchat": True if args.backupchat else False,
             "backupsettings": True if args.backupsettings else False,
             "reloadsettings": True if args.reloadsettings else False,

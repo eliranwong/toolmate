@@ -26,7 +26,6 @@ if config.isLite:
 
 defaultSettings = (
     # unique configs in ToolMate AI
-    ('autoCorrectionInterface', ''),
     ('toolmate_api_server_key', 'toolmateai'),
     ('toolmate_api_server_port', 5555),
     ('toolmate_api_server_host', "0.0.0.0"), # use ip address for this value
@@ -34,6 +33,7 @@ defaultSettings = (
     ('toolmate_api_client_port', 5555),
     ('toolmate_api_client_host', 'http://localhost'),
     ('toolmate_api_client_markdown', True),
+    ('autoCorrectionInterface', ''),
     ('last_conversation', ''),
     ('last_workflow', ''),
     ('defaultTool', 'chat'),
@@ -265,7 +265,8 @@ defaultSettings = (
     ('terminalSearchHighlightForeground', 'ansidefault'),
     ('pygments_style', ''),
     ('developer', False),
-    ('confirmExecution', "always"), # 'always', 'high_risk_only', 'medium_risk_or_above', 'none'
+    #('confirmExecution', "always"), # 'always', 'high_risk_only', 'medium_risk_or_above', 'none'
+    ('riskThreshold', 0), # 0 - no risk automatically accepted; 1 - automatically accepts low risk only; 2 - automatically accepts low or medium risk; 3 - automatically accepts all risk levels, high, medium or low
     ('codeDisplay', False),
     ('terminalEditorScrollLineCount', 20),
     ('terminalEditorTabText', "    "),

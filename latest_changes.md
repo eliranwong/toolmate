@@ -1,4 +1,10 @@
-# 0.5.57
+# 0.5.57-0.5.67
+
+* improved support of ollama
+
+* improved handling of code execution
+
+* implemented risk assessment agent in api client
 
 * added backend and model options to api client
 

@@ -2,6 +2,8 @@ from toolmate import config, fineTunePythonCode, displayPythonCode
 from toolmate import print1, print2, print3
 import traceback
 from toolmate import installPipPackage
+import io, sys
+from io import StringIO
 
 """
 ToolMate AI Plugin - auto correct python code
@@ -17,6 +19,13 @@ The default value of config.max_consecutive_auto_correction is 3.
 """
 
 def correct_python_code(function_args):
+
+    # Create a StringIO object to capture the output
+    thisOutput = StringIO()
+    # Redirect stdout to the StringIO object
+    old_stdout = sys.stdout
+    sys.stdout = thisOutput
+
     # get the sql query statement
     issue = function_args.get("issue") # required
     print(f"Issue: {issue}")
@@ -37,8 +46,15 @@ def correct_python_code(function_args):
         if config.developer or config.codeDisplay:
             displayPythonCode(fix)
         exec(fineTunePythonCode(fix), globals())
-        return "EXECUTED"
+
+        # Restore the original stdout
+        sys.stdout = old_stdout
+
+        return f"[EXECUTED]{thisOutput.getvalue().strip()}"
     except:
+        # Restore the original stdout
+        sys.stdout = old_stdout
+
         return traceback.format_exc()
 
 functionSignature = {

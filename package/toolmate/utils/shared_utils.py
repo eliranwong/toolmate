@@ -1351,7 +1351,19 @@ def isValidPythodCode(code):
     except:
         return None
 
+def extractSystemCommand(content):
+    try:
+        content = re.search("""(```command|```bash|```shell|```sh|```)(.+?)```""", content, re.DOTALL).group(2)
+        return content if keepInvalid or isValidPythodCode(content) is not None else ""
+    except:
+        return content
+
 def extractPythonCode(content, keepInvalid=False):
+    try:
+        content = re.search("""(```python|```)(.+?)```""", content, re.DOTALL).group(2)
+        return content if keepInvalid or isValidPythodCode(content) is not None else ""
+    except:
+        pass
     content = content.replace("<python>", "")
     content = content.replace("</python>", "")
     content = content.replace(r"<\/python>", "")
@@ -1402,20 +1414,38 @@ def fineTunePythonCode(code):
         code = f"{insert_string}{code}"
     return f"{code}{main}"
 
-def getPythonFunctionResponse(code):
+def getPythonFunctionResponse():
     #return str(config.pythonFunctionResponse) if config.pythonFunctionResponse is not None and (type(config.pythonFunctionResponse) in (int, float, str, list, tuple, dict, set, bool) or str(type(config.pythonFunctionResponse)).startswith("<class 'numpy.")) and not ("os.system(" in code) else ""
     return "" if config.pythonFunctionResponse is None else str(config.pythonFunctionResponse)
 
+def getPromptExecutionMessage(content, risk, description="python code"):
+    return f"""# Confirmation Required
+
+Your confirmation is required for executing the following {description}:
+
+```{description.split()[0]}
+{content}
+```
+
+Risk level: {risk}
+
+Run `tm -exec` or `tmc -exec` to confirm!"""
+
 def showRisk(risk):
-    if not config.confirmExecution in ("always", "medium_risk_or_above", "high_risk_only", "none"):
-        config.confirmExecution = "always"
+    if not config.riskThreshold in (0, 1, 2, 3):
+        config.riskThreshold = 0
     print1(f"[risk level: {risk}]")
 
 def confirmExecution(risk):
-    if config.confirmExecution == "always" or (risk == "high" and config.confirmExecution == "high_risk_only") or (not risk == "low" and config.confirmExecution == "medium_risk_or_above"):
+    riskScores = {
+        "high": 3,
+        "medium": 2,
+        "low": 1,
+    }
+    riskScore = riskScores.get(risk, 3)
+    if riskScore > config.riskThreshold:
         return True
-    else:
-        return False
+    return False
 
 # spinning
 

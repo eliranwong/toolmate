@@ -6,7 +6,7 @@ execute computing tasks
 [TOOL_CALL]
 """
 
-from toolmate import config, fineTunePythonCode, showRisk, confirmExecution, getPygmentsStyle
+from toolmate import config, fineTunePythonCode, showRisk, confirmExecution, getPygmentsStyle, getPromptExecutionMessage
 from toolmate import print1
 from toolmate.utils.python_utils import PythonUtil
 from toolmate.utils.single_prompt import SinglePrompt
@@ -47,6 +47,9 @@ def execute_computing_task(function_args):
     if not config.runPython:
         return "[INVALID]"
     elif confirmExecution(risk):
+        if hasattr(config, "api_server_id"):
+            config.toolTextOutput = getPromptExecutionMessage(refinedCode, risk)
+            return ""
         print1("Do you want to execute it? [y]es / [N]o")
         confirmation = SinglePrompt.run(style=promptStyle, default="y")
         if not confirmation.lower() in ("y", "yes"):
@@ -99,3 +102,5 @@ functionSignature = {
 }
 
 config.addFunctionCall(signature=functionSignature, method=execute_computing_task)
+config.aliases["@task "] = "@execute_computing_task "
+config.builtinTools["task"] = "Execute computing task or gain access to device information"

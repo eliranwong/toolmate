@@ -43,7 +43,7 @@ open(os.path.join(package, "config.py"), "w").close()
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name=package,
-    version="0.5.64",
+    version="0.5.67",
     python_requires=">=3.8, <3.13",
     description=f"ToolMate AI, developed by Eliran Wong, is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. Supports custom workflow and plugins to automate multi-step actions.",
     long_description=long_description,
@@ -142,8 +142,10 @@ setup(
             f"{package}server={package}.api_server:main",
             f"tmserver={package}.api_server:main", # a shortcut of toolmateserver
             f"{package}client={package}.api_client:main",
-            f"tm={package}.api_client:main", # a shortcut of toolmateclient
-            f"tmc={package}.api_client:chat", # a shortcut of toolmateclient; with chat feature enabled
+            f"tm={package}.api_client:main", # essentially `tmclient`
+            f"tmc={package}.api_client:chat", # practically equal to `tmclient -c` or `tm -c`
+            f"tmcmd={package}.api_client:cmd", # practically equal to `tmclient -dt command` or `tm -dt command`
+            f"tmtask={package}.api_client:task", # practically equal to `tmclient -dt execute_computing_task` or `tm -dt execute_computing_task`
             f"tmconfigs={package}.api_client:configs",
             f"{package}ai={package}.systemtray:main",
             f"toolserver={package}.servers:main",

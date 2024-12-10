@@ -90,16 +90,18 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             if config.developer:
                 print(function_call_response)
             else:
-                print1("Executed!" if function_call_response == "EXECUTED" else "Failed!")
-            if function_call_response == "EXECUTED":
+                print1("Executed!" if function_call_response.startswith("[EXECUTED]") else "Failed!")
+            if function_call_response.startswith("[EXECUTED]"):
                 break
             else:
                 trace = function_call_response
             print1(config.divider)
         
         # return information if any
-        if function_call_response == "EXECUTED":
-            pythonFunctionResponse = getPythonFunctionResponse(code)
+        if function_call_response.startswith("[EXECUTED]"):
+            pythonFunctionResponse = function_call_response[10:]
+            if not pythonFunctionResponse:
+                pythonFunctionResponse = getPythonFunctionResponse()
             if pythonFunctionResponse:
                 return json.dumps({"information": pythonFunctionResponse})
             else:

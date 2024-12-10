@@ -17,11 +17,13 @@ def main():
     parser.add_argument('-b', '--backend', action='store_true', dest='backend', help="configure AI backend and models")
     parser.add_argument('-cs', '--chatsystem', action='store_true', dest='chatsystem', help="configure chat system message")
     parser.add_argument('-d', '--developer', action='store', dest='developer', help="configure developer mode; true / false")
+    parser.add_argument('-ed', '--editor', action='store_true', dest='editor', help="configure custom editor")
     parser.add_argument('-ec', '--editconfigs', action='store_true', dest='editconfigs', help="configure config.py")
-    parser.add_argument('-em', '--exportmodels', action='store', dest='exportmodels', help="""export models, downloaded with ollama, to ~/toolmate/LLMs/gguf/; specify a model, e.g. 'llama3.2:1b' or pass a list of models for the export, e.g. "['llama3.2:1b','llama3.2:3b']"; pass an empty list "[]" to export all downloaded models""")
+    parser.add_argument('-em', '--exportmodels', action='store', dest='exportmodels', help="""export models, downloaded with ollama, to ~/toolmate/LLMs/gguf/; pass a list of models for the export, e.g. "['llama3.2:1b','llama3.2:3b']"; pass an empty list "[]" to export all downloaded models""")
     parser.add_argument('-k', '--apikeys', action='store_true', dest='apikeys', help="configure API keys")
     parser.add_argument('-mo', '--maximumoutput', action='store_true', dest='maximumoutput', help="configure maximum output tokens")
     parser.add_argument('-p', '--plugins', action='store_true', dest='plugins', help="configure plugins")
+    parser.add_argument('-rt', '--riskthreshold', action='store_true', dest='riskthreshold', help="configure the risk threshold for user confirmation before code execution")
     parser.add_argument('-sg', '--speechgeneration', action='store_true', dest='speechgeneration', help="configure speech generation")
     parser.add_argument('-sr', '--speechrecognition', action='store_true', dest='speechrecognition', help="configure speech recognition")
     parser.add_argument('-t', '--temperature', action='store_true', dest='temperature', help="configure inference temperature")
@@ -53,8 +55,6 @@ def main():
             exportOllamaModels(exportmodels.split())
         else:
             print2("""To export models, downloaded with ollama, either:
-* specify a single model, e.g. "llama3.2:1b"
-* specify multiple models, separated by spaces, e.g. "llama3.2:1b llama3.2:3b"
 * pass a list of models for the export, e.g. "['llama3.2:1b','llama3.2:3b']"
 * pass an empty list "[]" to export all downloaded models""")
 
@@ -87,6 +87,8 @@ def main():
         config.toolmate.setTemperature()
     if args.toolagent:
         config.toolmate.setToolSelectionConfigs()
+    if args.riskthreshold:
+        config.toolmate.manageCodeExecutionRisk()
     if args.windowsize:
         config.toolmate.setContextWindowSize()
     if args.wordwrap:
@@ -98,6 +100,8 @@ def main():
             print2("Word wrap disabled!")
         else:
             print2("Word wrap unchanged! Accept 'True' or 'False' only!")
+    if args.editor:
+        config.toolmate.setCustomTextEditor()
 
     # unload llama.cpp model to free VRAM
     try:

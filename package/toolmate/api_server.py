@@ -16,11 +16,12 @@ parser = argparse.ArgumentParser(description="ToolMate AI API server cli options
 parser.add_argument('-b', '--backend', action='store', dest='backend', help="AI backend")
 parser.add_argument('-k', '--key', action='store', dest='key', help="specify the API key for authenticating client access")
 parser.add_argument('-m', '--model', action='store', dest='model', help="AI model; override backend option if the model's backend is different")
-parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', help="override default maximum output tokens; accepts non-negative integers")
-parser.add_argument('-p', '--port', action='store', dest='port', help="server port")
+parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', type=int, help="override default maximum output tokens; accepts non-negative integers")
+parser.add_argument('-p', '--port', action='store', dest='port', type=int, help="server port")
+parser.add_argument('-rt', '--riskthreshold', action='store', dest='riskthreshold', type=int, help="risk threshold for user confirmation before code execution; 0 - always require confirmation; 1 - require confirmation only when risk level is medium or higher; 2 - require confirmation only when risk level is high or higher; 3 or higher - no confirmation required")
 parser.add_argument('-s', '--server', action='store', dest='server', help="server address; '0.0.0.0' by default")
-parser.add_argument('-t', '--temperature', action='store', dest='temperature', help="override default inference temperature; accepted range: 0.0-2.0")
-parser.add_argument('-ws', '--windowsize', action='store', dest='windowsize', help="override default context window size; applicable to backends `llama.cpp` amd `ollama` only; accepts non-negative integers")
+parser.add_argument('-t', '--temperature', action='store', dest='temperature', type=float, help="override default inference temperature; acceptable range: 0.0-2.0")
+parser.add_argument('-ws', '--windowsize', action='store', dest='windowsize', type=int, help="override default context window size; applicable to backends `llama.cpp` amd `ollama` only; accepts non-negative integers")
 # Parse arguments
 args = parser.parse_args()
 
@@ -46,11 +47,13 @@ class Request(BaseModel):
     chat: bool | None = False
     chatfile: str | None = None
     chatsystem: str | None = None
-    windowsize: str | None = None
-    maximumoutput: str | None = None
-    temperature: str | None = None
+    windowsize: int | None = None
+    maximumoutput: int | None = None
+    temperature: float | None = None
     defaulttool: str | None = None
     toolagent: bool | None = None
+    riskthreshold: int | None = None
+    execute: bool | None = None
     backupchat: bool | None = None
     backupsettings: bool | None = None
     reloadsettings: bool | None = None
@@ -76,6 +79,8 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
     if defaulttool is not None:
         defaulttool = re.sub("^@", "", defaulttool)
     toolagent = request.toolagent
+    riskthreshold = request.riskthreshold
+    execute = request.execute
     backupchat = request.backupchat
     backupsettings = request.backupsettings
     reloadsettings = request.reloadsettings
@@ -137,45 +142,40 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
         print3(f"Default tool changed for this request: {defaulttool}")
 
     # override context window size; applicable to backends `ollama` and `llama.cpp` only
-    if windowsize and config.llmInterface in ("llamacpppython", "ollama"):
-        current_windowsize = config.toolmate.getCurrentContextWindowSize()
-        try:
-            windowsize = int(windowsize)
+    if windowsize is not None:
+        if config.llmInterface in ("llamacpppython", "ollama"):
+            current_windowsize = config.toolmate.getCurrentContextWindowSize()
             if windowsize < 0:
                 print2("No change in context window size! Negative values not accepted!")
             else:
                 config.toolmate.setContextWindowSize(customContextWindowSize=windowsize)
                 print3(f"Context window size changed for this request: {windowsize}")
-        except:
-            print2("No change in context window size! Non-integer values not accepted!")
-    elif windowsize:
-        print2("No change in context window size! This option applicable to backends `llama.cpp` and `ollama` only!")
+        else:
+            print2("No change in context window size! This option is applicable to backends `llama.cpp` and `ollama` only!")
 
     # override maximum output tokens once
-    if maximumoutput:
+    if maximumoutput is not None:
         current_maximumoutput = config.toolmate.getCurrentMaxTokens(showMessage=False)
-        try:
-            maximumoutput = int(maximumoutput)
-            if maximumoutput < 0:
-                print2("No change in maximum output tokens! Negative values not accepted!")
-            else:
-                config.toolmate.setMaxTokens(customMaxtokens=maximumoutput)
-                print3(f"Maximum output tokens changed for this request: {maximumoutput}")
-        except:
-            print2("No change in maximum output tokens! Non-integer values not accepted!")
-    
+        if maximumoutput < 0:
+            print2("No change in maximum output tokens! Negative values not accepted!")
+        else:
+            config.toolmate.setMaxTokens(customMaxtokens=maximumoutput)
+            print3(f"Maximum output tokens changed for this request: {maximumoutput}")
+
     # override current temperature once
     if temperature:
         current_temperature = config.llmTemperature
-        try:
-            temperature = float(temperature)
-            if temperature < 0.0 or temperature > 2.0:
-                print2("No change in temperature! Given value is out of acceptted range 0.0-2.0!")
-            else:
-                config.toolmate.setTemperature(temperature=temperature)
-                print3(f"Temperature changed for this request: {temperature}")
-        except:
-            print2("No change in temperature! Non-float values not accepted!")
+        if temperature < 0.0 or temperature > 2.0:
+            print2("No change in temperature! Given value is out of acceptted range 0.0-2.0!")
+        else:
+            config.toolmate.setTemperature(temperature=temperature)
+            print3(f"Temperature changed for this request: {temperature}")
+
+    # override risk threshold
+    if execute or (riskthreshold is not None and riskthreshold >= 0):
+        current_riskThreshold = config.riskThreshold
+        config.riskThreshold = 3 if execute else riskthreshold
+        print3(f"Risk threshold changed for this request: {config.riskThreshold}")
 
     if os.path.isdir(wd):
         os.chdir(wd)
@@ -186,6 +186,8 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
         if not chat:
             config.currentMessages = config.toolmate.resetMessages()
         config.toolmate.runMultipleActions(instruction)
+    if execute:
+        config.toolmate.runMultipleActions("@command" if "```command" in config.currentMessages[-1].get("content", "") else "@execute_python_code")
     response = [i for i in config.currentMessages if i.get("role", "") in ("user", "assistant")]
 
     # save current conversation
@@ -216,6 +218,9 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
         if temperature:
             config.toolmate.setTemperature(temperature=current_temperature)
             print3(f"Temperature changed restored: {current_temperature}")
+        if execute or riskthreshold is not None:
+            config.riskThreshold = current_riskThreshold
+            print3(f"Risk threshold restored: {current_riskThreshold}")
 
     if powerdown:
         unloadLocalModels()
@@ -231,12 +236,12 @@ async def process_status(query: str, api_key: str = Depends(get_api_key) if conf
             tmversion = lib_version("toolmate")
         except:
             tmversion = f"""{lib_version("toolmate_lite")} (lite)"""
-        if query == "info":
+        if query == "information":
             info = {
                 "Toolmate version": tmversion,
                 "Python version": sys.version,
                 "Python interpreter": sys.executable,
-                "Library": config.toolMateAIFolder,
+                "Library path": config.toolMateAIFolder,
                 "User data": config.localStorage,
                 "Server host": config.this_api_server_host,
                 "Server port": config.this_api_server_port,
@@ -248,6 +253,7 @@ async def process_status(query: str, api_key: str = Depends(get_api_key) if conf
                 "Chat system message": config.toolmate.getCurrentChatSystemMessage(),
                 "Tool system message": config.systemMessage_tool_current,
                 "Tool agent": config.tool_selection_agent,
+                "Tool risk threshold": config.riskThreshold,
                 "Default tool": config.defaultTool,
             }
         elif query == "models":
@@ -301,7 +307,6 @@ def main():
         # configurations in API server
         config.initialCompletionCheck = False
         config.auto_tool_selection = True
-        config.confirmExecution = 'none'
         config.ttsInput = False
         config.ttsOutput = False
         # backend
@@ -313,38 +318,29 @@ def main():
         # initiate assistant
         config.toolmate = ToolMate()
         # backend-dependent configurations
-        if args.windowsize and args.windowsize.strip() and config.llmInterface in ("llamacpppython", "ollama"):
-            try:
-                windowsize = int(args.windowsize)
-                if windowsize < 0:
+        if args.riskthreshold is not None and args.riskthreshold >= 0:
+            config.riskThreshold = args.riskthreshold
+        if args.windowsize is not None:
+            if config.llmInterface in ("llamacpppython", "ollama"):
+                if args.windowsize < 0:
                     print2("No change in context window size! Negative values not accepted!")
                 else:
-                    config.toolmate.setContextWindowSize(customContextWindowSize=windowsize)
-                    print3(f"Context window size configured: {windowsize}")
-            except:
-                print2("No change in context window size! Non-integer values not accepted!")
-        elif args.windowsize:
-            print2("No change in context window size! This option applicable to backends `llama.cpp` and `ollama` only!")
-        if args.maximumoutput and args.maximumoutput.strip():
-            try:
-                maximumoutput = int(args.maximumoutput)
-                if maximumoutput < 0:
-                    print2("No change in maximum output tokens! Negative values not accepted!")
-                else:
-                    config.toolmate.setMaxTokens(customMaxtokens=maximumoutput)
-                    print3(f"Maximum output tokens configured: {maximumoutput}")
-            except:
-                print2("No change in maximum output tokens! Non-integer values not accepted!")
-        if args.temperature and args.temperature.strip():
-            try:
-                temperature = float(args.temperature)
-                if temperature < 0.0 or temperature > 2.0:
-                    print2("No change in temperature! Given value is out of acceptted range 0.0-2.0!")
-                else:
-                    config.toolmate.setTemperature(temperature=temperature)
-                    print3(f"Temperature configured: {temperature}")
-            except:
-                print2("No change in temperature! Non-float values not accepted!")
+                    config.toolmate.setContextWindowSize(customContextWindowSize=args.windowsize)
+                    print3(f"Context window size configured: {args.windowsize}")
+            else:
+                print2("No change in context window size! This option applicable to backends `llama.cpp` and `ollama` only!")
+        if args.maximumoutput is not None:
+            if args.maximumoutput < 0:
+                print2("No change in maximum output tokens! Negative values not accepted!")
+            else:
+                config.toolmate.setMaxTokens(customMaxtokens=args.maximumoutput)
+                print3(f"Maximum output tokens configured: {args.maximumoutput}")
+        if args.temperature is not None:
+            if args.temperature < 0.0 or args.temperature > 2.0:
+                print2("No change in temperature! Given value is out of acceptable range 0.0-2.0!")
+            else:
+                config.toolmate.setTemperature(temperature=args.temperature)
+                print3(f"Temperature configured: {args.temperature}")
         # say hi to test
         config.toolmate.runMultipleActions("Hi!")
         config.conversationStarted = True

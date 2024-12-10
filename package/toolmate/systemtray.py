@@ -95,7 +95,7 @@ class ToolMateHub(QSystemTrayIcon):
         # submenu - cahtbots
         submenu = QMenu()
         for i in (
-            "llamacpp",
+            "llamacpppython",
             "llamacppserver",
             "ollamachat",
             "groqchat",

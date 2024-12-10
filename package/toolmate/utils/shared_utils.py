@@ -292,7 +292,7 @@ def getLlms() -> dict:
     except:
         ollamaModels = []
     llms = {
-        "llamacpp": ["llamacpp"],
+        "llamacpppython": ["llamacpppython"],
         "llamacppserver": ["llamacppserver"],
         "ollama": ollamaModels,
         "groq": [
@@ -341,7 +341,7 @@ def getLlms() -> dict:
     try:
         from llama_cpp import Llama
     except:
-        del llms["llamacpp"]
+        del llms["llamacpppython"]
     # check if vertexai is installed
     try:
         from vertexai.generative_models import GenerativeModel
@@ -390,7 +390,7 @@ def getCurrentModel():
         return config.gemini_model
     elif config.llmInterface in ("chatgpt", "letmedoit"):
         return config.chatGPTApiModel
-    elif config.llmInterface == "llamacpp":
+    elif config.llmInterface == "llamacpppython":
         return config.llamacppToolModel_model_path if config.llamacppToolModel_model_path else config.llamacppToolModel_filename
     return ""
 
@@ -793,6 +793,16 @@ def getDownloadedGgufModels() -> dict:
     return models
 
 # text
+
+def refineToolTextOutput(toolTextOutput):
+    try:
+        output = json.loads(toolTextOutput)
+        if isinstance(output, dict) and len(output) == 1 and "information" in output:
+            return str(output.get("information"))
+        else:
+            return toolTextOutput
+    except:
+        return toolTextOutput
 
 def plainTextToUrl(text):
     # https://wiki.python.org/moin/EscapingHtml
@@ -1264,7 +1274,7 @@ def useChatSystemMessage(messages: dict, mergeSystemIntoUserMessage=False, thisS
                 messages[originalIndex]["content"] = config.systemMessage_mistral
             elif config.llmInterface == "llamacppserver":
                 messages[originalIndex]["content"] = config.systemMessage_llamacppserver
-            elif config.llmInterface == "llamacpp":
+            elif config.llmInterface == "llamacpppython":
                 messages[originalIndex]["content"] = config.systemMessage_llamacpp
             elif config.llmInterface == "googleai":
                 messages[originalIndex]["content"] = config.systemMessage_googleai

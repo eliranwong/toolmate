@@ -21,9 +21,13 @@ if config.online:
         def search_weather_info(function_args):
             code = function_args.get("code") # required
             information = PythonUtil.showAndExecutePythonCode(code)
-            if information:
+            if information == "[INVALID]":
+                return "[INVALID]"
+            elif information.startswith("```executed\n"):
+                config.toolTextOutput = information
+            elif information:
                 return json.loads(information)["information"]
-            return "Not found!"
+            return ""
 
         functionSignature = {
             "examples": [

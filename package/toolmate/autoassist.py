@@ -43,11 +43,11 @@ class AutoGenAssistant:
         """
         os.environ["AUTOGEN_USE_DOCKER"] = "False"
 
-        if config.llmInterface == "llamacpp":
+        if config.llmInterface == "llamacpppython":
             startLlamacppServer()
 
     def __del__(self):
-        if config.llmInterface == "llamacpp":
+        if config.llmInterface == "llamacpppython":
             stopLlamacppServer()
 
     def getResponse(self, message, auto=False):
@@ -67,7 +67,7 @@ Below is my message:
                     "api_key": "toolmate",
                 }
             ]
-        elif config.llmInterface == "llamacpp":
+        elif config.llmInterface == "llamacpppython":
             config_list = [
                 {
                     "model": config.llamacppToolModel_model_path,

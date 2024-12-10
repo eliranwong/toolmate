@@ -1,11 +1,8 @@
 from toolmate.utils.call_llm import CallLLM
 
-from toolmate import config, getPythonFunctionResponse, fineTunePythonCode, getPygmentsStyle, showErrors
+from toolmate import config, getPythonFunctionResponse, fineTunePythonCode, showErrors
 from toolmate import print1, extractPythonCode, displayPythonCode
-import json, pygments
-from pygments.lexers.python import PythonLexer
-from prompt_toolkit import print_formatted_text
-from prompt_toolkit.formatted_text import PygmentsTokens
+import json
 
 
 class PythonUtil:
@@ -35,5 +32,5 @@ class PythonUtil:
             else:
                 return "[INVALID]"
         if not pythonFunctionResponse:
-            return ""
+            return f"```executed\n{code}\n```"
         return json.dumps({"information": pythonFunctionResponse})

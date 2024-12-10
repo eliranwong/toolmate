@@ -15,6 +15,8 @@ def create_statistical_graphics(function_args):
 
     code = function_args.get("code") # required
     information = PythonUtil.showAndExecutePythonCode(code)
+    if information == "[INVALID]":
+        return "[INVALID]"
 
     pngPattern = r"""\.savefig\(["']([^\(\)]+\.png)["']\)"""
     match = re.search(pngPattern, code)
@@ -27,6 +29,8 @@ def create_statistical_graphics(function_args):
             print3(config.toolTextOutput)
         except:
             print(config.toolTextOutput)
+    elif information.startswith("```executed\n"):
+        config.toolTextOutput = information
     elif information:
         return information
     return ""

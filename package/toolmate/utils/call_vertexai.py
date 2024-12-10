@@ -1,4 +1,4 @@
-from toolmate import getDeviceInfo, showErrors, toGeminiMessages, executeToolFunction, extractPythonCode, getRagPrompt
+from toolmate import getDeviceInfo, showErrors, toGeminiMessages, executeToolFunction, extractPythonCode, getRagPrompt, refineToolTextOutput
 from toolmate import print1, print2, print3, getPythonFunctionResponse, isValidPythodCode, validParameters, useChatSystemMessage
 from toolmate import config
 from prompt_toolkit import prompt
@@ -84,7 +84,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                     function_call_response = executeToolFunction(arguments, "correct_python_code")
                 else:
                     continue
-
+            code = arguments.get("code")
             # display response
             print1(config.divider)
             if config.developer:
@@ -94,7 +94,6 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             if function_call_response == "EXECUTED":
                 break
             else:
-                code = arguments.get("code")
                 trace = function_call_response
             print1(config.divider)
         
@@ -104,7 +103,9 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             if pythonFunctionResponse:
                 return json.dumps({"information": pythonFunctionResponse})
             else:
-                return ""
+                return f"```executed\n{code}\n```"
+        if hasattr(config, "api_server_id"):
+            return "[INVALID]"
         # ask if user want to manually edit the code
         print1(f"Failed to execute the code {(config.max_consecutive_auto_correction + 1)} times in a row!")
         print1("Do you want to manually edit it? [y]es / [N]o")
@@ -257,6 +258,8 @@ Remember, give me the python code ONLY, without additional notes or explanation.
                     return CallVertexAI.regularCall(messages)
                 elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
                     # tool function executed without chat extension
+                    if config.toolTextOutput:
+                        config.toolTextOutput = refineToolTextOutput(config.toolTextOutput)
                     config.currentMessages.append({"role": "assistant", "content": config.toolTextOutput if config.toolTextOutput else "Done!"})
                     config.toolTextOutput = ""
                     config.conversationStarted = True

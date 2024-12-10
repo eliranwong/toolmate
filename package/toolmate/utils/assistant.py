@@ -142,10 +142,10 @@ class ToolMate:
             print("Failed saving history!")
         config.saveConfig()
         
-        if not config.llmInterface:
+        if not config.llmInterface or not config.llmInterface in getLlms():
             self.setLlmModel()
         if not config.llmInterface:
-            config.llmInterface = "llamacpp"
+            config.llmInterface = "llamacpppython"
             config.saveConfig()
 
         # check availability of api keys
@@ -1323,7 +1323,7 @@ class ToolMate:
         print1(instruction)
         options = {
             "llamacppserver": "Llama.cpp",
-            "llamacpp": "Llama-cpp-python",
+            "llamacpppython": "Llama-cpp-python",
             "ollama": "Ollama",
             "groq": "Groq Cloud API",
             "mistral": "Mistral AI API",
@@ -1336,7 +1336,7 @@ class ToolMate:
         try:
             from llama_cpp import Llama
         except:
-            del options["llamacpp"]
+            del options["llamacpppython"]
         try:
             from vertexai.generative_models import GenerativeModel
         except:
@@ -1345,12 +1345,12 @@ class ToolMate:
             options=options.keys(),
             descriptions=list(options.values()),
             title="LLM Interface",
-            default=config.llmInterface if config.llmInterface else "llamacpp",
+            default=config.llmInterface if config.llmInterface else "llamacpppython",
             text=instruction,
         )
         if llmInterface:
             config.llmInterface = llmInterface
-            if not config.llmInterface == "llamacpp" and hasattr(config, "llamacppToolModel"):
+            if not config.llmInterface == "llamacpppython" and hasattr(config, "llamacppToolModel"):
                 config.llamacppToolModel = None
 
     def setLlmModel(self):
@@ -1387,7 +1387,7 @@ class ToolMate:
                 self.setLlmModel_ollama("chat")
                 self.setContextWindowSize(feature="chat")
                 self.setMaxTokens(feature="chat")
-        elif config.llmInterface == "llamacpp":
+        elif config.llmInterface == "llamacpppython":
             print2("# Tool Model - for both task execution and conversation")
             self.setLlmModel_llamacpp()
             self.setContextWindowSize(feature="default")
@@ -1478,7 +1478,7 @@ class ToolMate:
         bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
         if feature == "embedding":
             default = config.embeddingModel[8:] if config.embeddingModel.startswith("_ollama_") else "nomic-embed-text"
-        elif config.llmInterface == "llamacpp":
+        elif config.llmInterface == "llamacpppython":
             if feature == "default" and config.llamacppToolModel_ollama_tag:
                 default = config.llamacppToolModel_ollama_tag
             elif feature == "chat" and config.llamacppChatModel_ollama_tag:
@@ -1527,7 +1527,18 @@ class ToolMate:
         setPort(feature=feature)
 
         # select model
-        model = self.selectOllamaModel(feature=feature)
+        downloadedOllamaModels = getLlms()["ollama"]
+        if downloadedOllamaModels:
+            model = self.dialogs.getValidOptions(
+                options=downloadedOllamaModels+["more ..."],
+                title="Ollama Models",
+                default=config.ollamaChatModel if feature == "chat" else config.ollamaToolModel,
+                text=f"Select a {'chat' if feature=='chat' else 'tool'} call model:\n(for {'conversations only' if feature=='chat' else 'both chat and task execution'})",
+            )
+            if model == "more ...":
+                model = self.selectOllamaModel(feature=feature)
+        else:
+            model = self.selectOllamaModel(feature=feature)
         if model:
             try:
                 if not model in getLlms()["ollama"]:
@@ -1629,13 +1640,17 @@ class ToolMate:
         )
         if library:
             if library == "Ollama Library":
-                model = self.dialogs.getValidOptions(
-                    options=getLlms()["ollama"]+["more ..."],
-                    title="Groq Cloud Models",
-                    default=config.ollamaChatModel if feature == "chat" else config.ollamaToolModel,
-                    text=f"Select a {'chat' if feature=='chat' else 'tool'} call model:\n(for {'conversations only' if feature=='chat' else 'both chat and task execution'})",
-                )
-                if model == "more ...":
+                downloadedOllamaModels = getLlms()["ollama"]
+                if downloadedOllamaModels:
+                    model = self.dialogs.getValidOptions(
+                        options=downloadedOllamaModels+["more ..."],
+                        title="Ollama Models",
+                        default=config.ollamaChatModel if feature == "chat" else config.ollamaToolModel,
+                        text=f"Select a {'chat' if feature=='chat' else 'tool'} call model:\n(for {'conversations only' if feature=='chat' else 'both chat and task execution'})",
+                    )
+                    if model == "more ...":
+                        model = self.selectOllamaModel(feature=feature)
+                else:
                     model = self.selectOllamaModel(feature=feature)
                 if model:
                     if model in getLlms()["ollama"]:
@@ -1920,7 +1935,7 @@ class ToolMate:
             systemMessage_chat = config.systemMessage_mistral
         elif config.llmInterface == "llamacppserver":
             systemMessage_chat = config.systemMessage_llamacppserver
-        elif config.llmInterface == "llamacpp":
+        elif config.llmInterface == "llamacpppython":
             systemMessage_chat = config.systemMessage_llamacpp
         elif config.llmInterface == "vertexai":
             systemMessage_chat = config.systemMessage_vertexai
@@ -1958,7 +1973,7 @@ class ToolMate:
                 config.systemMessage_mistral = message
             elif config.llmInterface == "llamacppserver":
                 config.systemMessage_llamacppserver = message
-            elif config.llmInterface == "llamacpp":
+            elif config.llmInterface == "llamacpppython":
                 config.systemMessage_llamacpp = message
             elif config.llmInterface == "vertexai":
                 config.systemMessage_vertexai = message
@@ -2074,16 +2089,16 @@ class ToolMate:
         return contextWindowLimit, functionTokens, maxToken
 
     def setGpuLayers(self, feature="default"):
-        if not config.llmInterface in ("llamacpp",):
+        if not config.llmInterface in ("llamacpppython",):
             print1("Option `GPU Layers` applies to backend `llamacpp` only.")
             return None
         print1("Please specify the number of layers to store in VRAM (-1: all layers ):")
-        if config.llmInterface == "llamacpp":
+        if config.llmInterface == "llamacpppython":
             default = config.llamacppChatModel_n_gpu_layers if feature == "chat" else config.llamacppToolModel_n_gpu_layers
         gpuLayers = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(default))
         if gpuLayers and not gpuLayers.strip().lower() == config.exit_entry and int(gpuLayers) >= -1:
             gpuLayers = int(gpuLayers)
-            if config.llmInterface == "llamacpp":
+            if config.llmInterface == "llamacpppython":
                 if feature == "chat":
                     config.llamacppChatModel_n_gpu_layers = gpuLayers
                 else:
@@ -2092,7 +2107,7 @@ class ToolMate:
             print3(f"GPU Layers: {gpuLayers}")
 
     def getCurrentContextWindowSize(self, feature="default"):
-        if config.llmInterface == "llamacpp":
+        if config.llmInterface == "llamacpppython":
             default = config.llamacppChatModel_n_ctx if feature == "chat" else config.llamacppToolModel_n_ctx
         elif config.llmInterface == "ollama":
             default = config.ollamaChatModel_num_ctx if feature == "chat" else config.ollamaToolModel_num_ctx
@@ -2101,7 +2116,7 @@ class ToolMate:
         return default
 
     def setContextWindowSize(self, feature="default", customContextWindowSize=None):
-        if not config.llmInterface in ("llamacpp", "ollama"):
+        if not config.llmInterface in ("llamacpppython", "ollama"):
             print2("Option `Context window size` applies to backends `llamacpp` and `ollama` only!")
             return None
         if customContextWindowSize is None:
@@ -2112,7 +2127,7 @@ class ToolMate:
             contextWindowSize = str(customContextWindowSize)
         if contextWindowSize and not contextWindowSize.strip().lower() == config.exit_entry and int(contextWindowSize) >= 0:
             contextWindowSize = int(contextWindowSize)
-            if config.llmInterface == "llamacpp":
+            if config.llmInterface == "llamacpppython":
                 if feature == "chat":
                     config.llamacppChatModel_n_ctx = contextWindowSize
                 else:
@@ -2139,7 +2154,7 @@ class ToolMate:
             if showMessage:
                 print1("Visit https://docs.x.ai/docs#models to read about tokens limits. In our latest test, the maximum value accepts 127999.")
             currentMaxTokens = config.xaiApi_tool_model_max_tokens
-        elif config.llmInterface in ("llamacpp", "llamacppserver"):
+        elif config.llmInterface in ("llamacpppython", "llamacppserver"):
             currentMaxTokens = config.llamacppChatModel_max_tokens if feature == "chat" else config.llamacppToolModel_max_tokens
         elif config.llmInterface == "ollama":
             currentMaxTokens = config.ollamaChatModel_num_predict if feature == "chat" else config.ollamaToolModel_num_predict
@@ -2168,7 +2183,7 @@ class ToolMate:
                 config.googleaiApi_tool_model_max_tokens = maxtokens
             elif config.llmInterface == "xai":
                 config.xaiApi_tool_model_max_tokens = maxtokens
-            elif config.llmInterface in ("llamacpp", "llamacppserver"):
+            elif config.llmInterface in ("llamacpppython", "llamacppserver"):
                 if feature == "chat":
                     config.llamacppChatModel_max_tokens = maxtokens
                 else:
@@ -2787,12 +2802,15 @@ class ToolMate:
         script = re.sub("^```(.+?)```", r"\1", script)
         try:
             exec(script, globals())
+            return ""
         except:
             trace = traceback.format_exc()
             print(trace if config.developer else "Error encountered!")
             print1(config.divider)
             if config.max_consecutive_auto_correction > 0:
-                CallLLM.autoCorrectPythonCode(script, trace)
+                return CallLLM.autoCorrectPythonCode(script, trace)
+            else:
+                return "[INVALID]"
 
     def improveWriting(self, writing: str):
         # Feature: improve writing:
@@ -3019,15 +3037,19 @@ Acess the risk level of the following `{target.capitalize()}`:
         elif action == "execute_python_code":
             # extract
             python_code = extractPythonCode(description)
-            # execute
-            self.runPythonScript(python_code)
-            # display and update
             if not python_code:
                 message = "Python code not found!"
-            elif config.toolTextOutput.strip():
-                message = config.toolTextOutput
             else:
-                message = "Done!"
+                # execute
+                response = self.runPythonScript(python_code)
+                if config.toolTextOutput.strip():
+                    message = config.toolTextOutput
+                elif not response:
+                    message = "Done!"
+                elif response == "[INVALID]":
+                    message = "Failed to execute!"
+                else:
+                    message = response
             print1(f"\n{message}")
             config.currentMessages[-1]["content"] = f"Run the python code in:\n\n{description}"
             config.currentMessages.append({"role": "assistant", "content": message})
@@ -3064,6 +3086,7 @@ Acess the risk level of the following `{target.capitalize()}`:
                 config.currentMessages = config.currentMessages[:-1]
             return None
         elif action == "termux" and config.isTermux:
+            cli = description
             stdout, stderr = subprocess.Popen(description, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
             if stderr and not stdout:
                 cli = self.generateTermuxAPICommand(description)
@@ -3082,16 +3105,18 @@ Acess the risk level of the following `{target.capitalize()}`:
                 print2("```\n")
                 config.currentMessages.append({"role": "assistant", "content": stdout.strip()})
             elif not stdout and not stderr:
-                done = "Done!"
+                done = f"```executed\n{cli}\n```"
                 config.currentMessages.append({"role": "assistant", "content": done})
                 print2(done)
             elif stderr:
                 print2("\n```error")
                 print(stderr.strip())
                 print2("```\n")
-                config.currentMessages = config.currentMessages[:-1]
+                done = f"```error\n{stderr.strip()}\n```" if config.developer else "Error encountered!"
+                config.currentMessages.append({"role": "assistant", "content": done})
             return None
         elif action == "command":
+            cli = description
             stdout, stderr = subprocess.Popen(description, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
             if stderr and not stdout:
                 cli = self.generateSystemCommand(description)
@@ -3110,20 +3135,21 @@ Acess the risk level of the following `{target.capitalize()}`:
                 print2("```\n")
                 config.currentMessages.append({"role": "assistant", "content": stdout.strip()})
             elif not stdout and not stderr:
-                done = "Done!"
+                done = f"```executed\n{cli}\n```"
                 config.currentMessages.append({"role": "assistant", "content": done})
                 print2(done)
             elif stderr:
                 print2("\n```error")
                 print(stderr.strip())
                 print2("```\n")
-                config.currentMessages = config.currentMessages[:-1]
+                done = f"```error\n{stderr.strip()}\n```" if config.developer else "Error encountered!"
+                config.currentMessages.append({"role": "assistant", "content": done})
             return None
         elif action == "append_command":
             previousResponse = getAssistantPreviousResponse()[0]
             if previousResponse:
                 previousResponse = previousResponse.replace('"', '\\"')
-                description = f'''{description.strip()} "{previousResponse}"'''
+                cli = description = f'''{description.strip()} "{previousResponse}"'''
                 stdout, stderr = subprocess.Popen(description, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
                 if stderr and not stdout:
                     cli = self.generateSystemCommand(description)
@@ -3141,14 +3167,15 @@ Acess the risk level of the following `{target.capitalize()}`:
                     print2("```\n")
                     config.currentMessages.append({"role": "assistant", "content": stdout.strip()})
                 elif not stdout and not stderr:
-                    done = "Done!"
+                    done = f"```executed\n{cli}\n```"
                     config.currentMessages.append({"role": "assistant", "content": done})
                     print2(done)
                 elif stderr:
                     print2("\n```error")
                     print(stderr.strip())
                     print2("```\n")
-                    config.currentMessages = config.currentMessages[:-1]
+                    done = f"```error\n{stderr.strip()}\n```" if config.developer else "Error encountered!"
+                    config.currentMessages.append({"role": "assistant", "content": done})
             else:
                 config.currentMessages = config.currentMessages[:-1]
             return None
@@ -3551,7 +3578,7 @@ Acess the risk level of the following `{target.capitalize()}`:
         if not chatbot:
             chatbot = config.llmInterface
         chatbots = {
-            "llamacpp": lambda: LlamacppChat(model=None if config.useAdditionalChatModel else config.llamacppToolModel).run(userInput),
+            "llamacpppython": lambda: LlamacppChat(model=None if config.useAdditionalChatModel else config.llamacppToolModel).run(userInput),
             "llamacppserver": lambda: LlamacppServerChat().run(userInput),
             "ollama": lambda: OllamaChat().run(userInput, model=config.ollamaChatModel if config.useAdditionalChatModel else config.ollamaToolModel),
             "groq": lambda: GroqChatbot().run(userInput),

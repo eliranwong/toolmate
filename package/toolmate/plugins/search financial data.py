@@ -16,11 +16,12 @@ if not config.isLite and config.online:
     def search_finance(function_args):
         code = function_args.get("code") # required
         information = PythonUtil.showAndExecutePythonCode(code)
-        if information:
-            info = {
-                "information": information,
-            }
-            return json.dumps(info)
+        if information == "[INVALID]":
+            return "[INVALID]"
+        elif information.startswith("```executed\n"):
+            config.toolTextOutput = information
+        elif information:
+            return information
         return ""
 
     functionSignature = {

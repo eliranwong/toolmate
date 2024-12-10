@@ -26,6 +26,7 @@ if config.isLite:
 
 defaultSettings = (
     # unique configs in ToolMate AI
+    ('autoCorrectionInterface', ''),
     ('toolmate_api_server_key', 'toolmateai'),
     ('toolmate_api_server_port', 5555),
     ('toolmate_api_server_host', "0.0.0.0"), # use ip address for this value
@@ -41,7 +42,7 @@ defaultSettings = (
     ('appName', ''),
     ('text2art_font1', 'cybermedum'),
     ('text2art_font2', 'white_bubble'),
-    ('llmInterface', ""), # "llamacpp", "llamacppserver", "ollama", "chatgpt", "letmedoit", "groq", "mistral", "xai", "googleai", "vertexai"
+    ('llmInterface', ""), # "llamacpppython", "llamacppserver", "ollama", "chatgpt", "letmedoit", "groq", "mistral", "xai", "googleai", "vertexai"
     ('tool_selection_agent', False), # automatically screens user request and recommend tools, can also be manually triggered by tool `@recommend_tool`
     ('tool_selection_requirements', False), # convey each tool's requirements to the tool selection agent for the tool selection process.
     ('auto_tool_selection', False), # apply only if tool_selection_agent is set to True

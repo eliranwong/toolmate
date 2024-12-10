@@ -1,6 +1,6 @@
 # Speed Up with GPU Acceleration
 
-It applies to backends 'llamacpp' and 'ollama' only. Speed of online API inference, e.g. ChatGPT or Gemini, does not depend on local hardware.
+It applies to backends 'llamacpppython' and 'ollama' only. Speed of online API inference, e.g. ChatGPT or Gemini, does not depend on local hardware.
 
 # Llama.cpp
 

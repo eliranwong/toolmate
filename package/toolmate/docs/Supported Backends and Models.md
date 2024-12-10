@@ -30,7 +30,7 @@ ToolMate AI supports nine interfaces: llamcpp, llama-cpp-python, ollama, googlea
 
 Even on CPU-only devices, ToolMate AI works well with a wide range of tested LLMs, particularly [wizardlm2:7b](https://ollama.com/library/wizardlm2). Download [ollama](https://ollama.com/) so that you may select open source LLMs easily via ToolMate AI prompt.
 
-Note: Ollama hosted models work with both "llamacpp" and "ollama" interfaces.
+Note: Ollama hosted models work with both "llamacpppython" and "ollama" interfaces.
 
 Read more for chainging models at: https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Change%20AI%20Backends%20and%20Models.md
 

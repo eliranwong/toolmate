@@ -18,7 +18,7 @@ if not config.isLite and config.online:
             HarmBlockThreshold,
         )
         from toolmate import config
-        from toolmate.utils.call_gemini import CallVertexAI
+        from toolmate.utils.call_vertexai import CallVertexAI
 
         def ask_gemini(function_args):
             config.stopSpinning()

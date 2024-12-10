@@ -13,6 +13,8 @@ import re, os, shutil
 def create_map(function_args):
     code = function_args.get("code") # required
     information = PythonUtil.showAndExecutePythonCode(code)
+    if information == "[INVALID]":
+        return "[INVALID]"
     htmlPattern = r"""\.save\(["']([^\(\)]+\.html)["']\)"""
     match = re.search(htmlPattern, code)
     if match:
@@ -22,6 +24,8 @@ def create_map(function_args):
         config.toolTextOutput = f"Saved: {htmlFile}"
         print3(config.toolTextOutput)
         return ""
+    elif information.startswith("```executed\n"):
+        config.toolTextOutput = information
     elif information:
         return information
     return ""

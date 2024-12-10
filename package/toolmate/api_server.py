@@ -100,7 +100,7 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
     if (not current_llmInterface == config.llmInterface and current_llmInterface == "ollama") or (not current_ollamaToolModel == config.ollamaToolModel):
         getOllamaServerClient().generate(model=config.ollamaToolModel, keep_alive=0, stream=False,)
         print(f"Ollama model '{config.ollamaToolModel}' unloaded!")
-    elif (not current_llmInterface == config.llmInterface and current_llmInterface == "llamacpp"):
+    elif (not current_llmInterface == config.llmInterface and current_llmInterface == "llamacpppython"):
         try:
             config.llamacppToolModel.close()
             print("Llama.cpp model unloaded!")
@@ -137,7 +137,7 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
         print3(f"Default tool changed for this request: {defaulttool}")
 
     # override context window size; applicable to backends `ollama` and `llama.cpp` only
-    if windowsize and config.llmInterface in ("llamacpp", "ollama"):
+    if windowsize and config.llmInterface in ("llamacpppython", "ollama"):
         current_windowsize = config.toolmate.getCurrentContextWindowSize()
         try:
             windowsize = int(windowsize)
@@ -207,7 +207,7 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
         if defaulttool and defaulttool in config.allEnabledTools:
             config.defaultTool = current_defaulttool
             print3(f"Default tool restored: {current_defaulttool}")
-        if windowsize and config.llmInterface in ("llamacpp", "ollama"):
+        if windowsize and config.llmInterface in ("llamacpppython", "ollama"):
             config.toolmate.setContextWindowSize(customContextWindowSize=current_windowsize)
             print3(f"Context window size restored: {current_windowsize}")
         if maximumoutput:
@@ -313,7 +313,7 @@ def main():
         # initiate assistant
         config.toolmate = ToolMate()
         # backend-dependent configurations
-        if args.windowsize and args.windowsize.strip() and config.llmInterface in ("llamacpp", "ollama"):
+        if args.windowsize and args.windowsize.strip() and config.llmInterface in ("llamacpppython", "ollama"):
             try:
                 windowsize = int(args.windowsize)
                 if windowsize < 0:

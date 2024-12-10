@@ -48,11 +48,11 @@ class AutoGenRetriever:
         """
         os.environ["AUTOGEN_USE_DOCKER"] = "False"
 
-        if config.llmInterface == "llamacpp":
+        if config.llmInterface == "llamacpppython":
             startLlamacppServer()
 
     def __del__(self):
-        if config.llmInterface == "llamacpp":
+        if config.llmInterface == "llamacpppython":
             stopLlamacppServer()
 
     def getResponse(self, docs_path, message, auto=False):
@@ -98,7 +98,7 @@ class AutoGenRetriever:
                     "api_key": "toolmate",
                 }
             ]
-        elif config.llmInterface == "llamacpp":
+        elif config.llmInterface == "llamacpppython":
             llm = config.llamacppToolModel_model_path
             config_list = [
                 {

@@ -13,7 +13,7 @@ if not config.isLite:
         from toolmate.utils.call_llamacpp import CallLlamaCpp
     except:
         pass
-    from toolmate.utils.call_gemini import CallVertexAI
+    from toolmate.utils.call_vertexai import CallVertexAI
 
 class CallLLM:
 
@@ -23,7 +23,7 @@ class CallLLM:
         # upload Ollama model
         if config.llmInterface == "ollama":
             CallOllama.unloadModels()
-        #elif config.llmInterface == "llamacpp":
+        #elif config.llmInterface == "llamacpppython":
         #    CallLlamaCpp.unloadModels()
 
         if config.systemMessage_tool:
@@ -66,7 +66,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
     @staticmethod
     def checkCompletion(llmInterface=""):
         if not config.llmInterface:
-            config.llmInterface = "llamacpp"
+            config.llmInterface = "llamacpppython"
             config.saveConfig()
         if not llmInterface:
             llmInterface = config.llmInterface
@@ -78,7 +78,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallMistral.checkCompletion()
         elif llmInterface == "llamacppserver":
             return CallLlamaCppServer.checkCompletion()
-        elif llmInterface == "llamacpp":
+        elif llmInterface == "llamacpppython":
             return CallLlamaCpp.checkCompletion()
         elif llmInterface == "vertexai":
             return CallVertexAI.checkCompletion()
@@ -93,23 +93,24 @@ Always remember that you are much more than a text-based AI. You possess both vi
 
     @staticmethod
     def autoCorrectPythonCode(code, trace):
-        if config.llmInterface == "ollama":
+        llmInterface = config.autoCorrectionInterface if config.autoCorrectionInterface else config.llmInterface
+        if llmInterface == "ollama":
             return CallOllama.autoCorrectPythonCode(code, trace)
-        elif config.llmInterface == "groq":
+        elif llmInterface == "groq":
             return CallGroq.autoCorrectPythonCode(code, trace)
-        elif config.llmInterface == "mistral":
+        elif llmInterface == "mistral":
             return CallMistral.autoCorrectPythonCode(code, trace)
-        elif config.llmInterface == "llamacppserver":
+        elif llmInterface == "llamacppserver":
             return CallLlamaCppServer.autoCorrectPythonCode(code, trace)
-        elif config.llmInterface == "llamacpp":
+        elif llmInterface == "llamacpppython":
             return CallLlamaCpp.autoCorrectPythonCode(code, trace)
-        elif config.llmInterface == "vertexai":
+        elif llmInterface == "vertexai":
             return CallVertexAI.autoCorrectPythonCode(code, trace)
-        elif config.llmInterface == "googleai":
+        elif llmInterface == "googleai":
             return CallGoogleAI.autoCorrectPythonCode(code, trace)
-        elif config.llmInterface == "xai":
+        elif llmInterface == "xai":
             return CallXAI.autoCorrectPythonCode(code, trace)
-        elif config.llmInterface == "chatgpt":
+        elif llmInterface == "chatgpt":
             return CallChatGPT.autoCorrectPythonCode(code, trace)
         # letmedoit
         return CallLetMeDoIt.autoCorrectPythonCode(code, trace)
@@ -124,7 +125,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallMistral.runSingleFunctionCall(messages, function_name)
         elif config.llmInterface == "llamacppserver":
             return CallLlamaCppServer.runSingleFunctionCall(messages, function_name)
-        elif config.llmInterface == "llamacpp":
+        elif config.llmInterface == "llamacpppython":
             return CallLlamaCpp.runSingleFunctionCall(messages, function_name)
         elif config.llmInterface == "vertexai":
             return CallVertexAI.runSingleFunctionCall(messages, function_name)
@@ -148,7 +149,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallMistral.regularCall(chatMessages)
         elif config.llmInterface == "llamacppserver":
             return CallLlamaCppServer.regularCall(chatMessages)
-        elif config.llmInterface == "llamacpp":
+        elif config.llmInterface == "llamacpppython":
             return CallLlamaCpp.regularCall(chatMessages)
         elif config.llmInterface == "vertexai":
             return CallVertexAI.regularCall(chatMessages)
@@ -176,7 +177,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallXAI.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "llamacppserver":
             return CallLlamaCppServer.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
-        elif config.llmInterface == "llamacpp":
+        elif config.llmInterface == "llamacpppython":
             return CallLlamaCpp.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "vertexai":
             history, systemMessage, lastUserMessage = toGeminiMessages(messages=chatMessages)
@@ -206,7 +207,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallMistral.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmInterface == "llamacppserver":
             return CallLlamaCppServer.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
-        elif config.llmInterface == "llamacpp":
+        elif config.llmInterface == "llamacpppython":
             return CallLlamaCpp.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmInterface == "vertexai":
             return CallVertexAI.getSingleFunctionCallResponse(messages, function_name)
@@ -229,7 +230,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallMistral.runToolCall(messages)
         elif config.llmInterface == "llamacppserver":
             return CallLlamaCppServer.runToolCall(messages)
-        elif config.llmInterface == "llamacpp":
+        elif config.llmInterface == "llamacpppython":
             return CallLlamaCpp.runToolCall(messages)
         elif config.llmInterface == "vertexai":
             return CallVertexAI.runToolCall(messages)

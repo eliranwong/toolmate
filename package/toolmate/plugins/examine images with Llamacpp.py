@@ -34,7 +34,7 @@ if not config.isLite:
     def examine_images_llamacpp(function_args):
         from toolmate import config
 
-        llmInterface = "llamacpp"
+        llmInterface = "llamacpppython"
 
         if llmInterface == "vertexai":
             answer = GeminiProVision(temperature=config.llmTemperature).examine_images_llamacpp(function_args)
@@ -98,7 +98,7 @@ if not config.isLite:
             print2("```")
 
             # stop llama.cpp vision server
-            if llmInterface == "llamacpp":
+            if llmInterface == "llamacpppython":
                 stopLlamacppVisionServer()
 
             return ""

@@ -12,9 +12,10 @@ import pprint, json
 
 def datetimes(function_args):
     code = function_args.get("code") # required
-    #information = PythonUtil.showAndExecutePythonCode(code)
-    #return information
     config.toolTextOutput = PythonUtil.showAndExecutePythonCode(code)
+    if config.toolTextOutput == "[INVALID]":
+        config.toolTextOutput = ""
+        return "[INVALID]"
     try:
         pprint.pprint(json.loads(config.toolTextOutput))
     except:

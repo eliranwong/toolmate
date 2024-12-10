@@ -26,13 +26,12 @@ from toolmate import config
 
 if config.online:
 
-    from toolmate import print1, print2, is_valid_image_file, is_valid_image_url, is_valid_url, encode_image
+    from toolmate import print1, print2, is_valid_image_file, is_valid_image_url, is_valid_url, encode_image, getGoogleGenAIClient
     from toolmate.utils.call_chatgpt import check_openai_errors
     import os
-    from openai import OpenAI
 
     @check_openai_errors
-    def examine_images_chatgpt(function_args):
+    def examine_images_googleai(function_args):
         from toolmate import config
 
         llmInterface = "chatgpt"
@@ -68,7 +67,7 @@ if config.online:
                 files.remove(i)
 
         if content:
-            client = OpenAI()
+            client = getGoogleGenAIClient()
 
             content.insert(0, {"type": "text", "text": query,})
 
@@ -99,7 +98,7 @@ if config.online:
             "compare images",
             "analyze image",
         ],
-        "name": "examine_images_chatgpt",
+        "name": "examine_images_googleai",
         "description": "Describe or compare images with ChatGPT",
         "parameters": {
             "type": "object",
@@ -117,4 +116,4 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=examine_images_chatgpt)
+    config.addFunctionCall(signature=functionSignature, method=examine_images_googleai)

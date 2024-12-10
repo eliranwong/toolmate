@@ -29,10 +29,10 @@ if not config.isLite and config.online:
     from toolmate.geminiprovision import GeminiProVision
 
     @check_openai_errors
-    def examine_images_gemini(function_args):
+    def examine_images_vertexai(function_args):
         from toolmate import config
 
-        answer = GeminiProVision(temperature=config.llmTemperature).examine_images_gemini(function_args)
+        answer = GeminiProVision(temperature=config.llmTemperature).examine_images_vertexai(function_args)
         if answer:
             config.toolTextOutput = answer
             return ""
@@ -45,7 +45,7 @@ if not config.isLite and config.online:
             "compare images",
             "analyze image",
         ],
-        "name": "examine_images_gemini",
+        "name": "examine_images_vertexai",
         "description": "Describe or compare images with Gemini",
         "parameters": {
             "type": "object",
@@ -63,4 +63,4 @@ if not config.isLite and config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=examine_images_gemini)
+    config.addFunctionCall(signature=functionSignature, method=examine_images_vertexai)

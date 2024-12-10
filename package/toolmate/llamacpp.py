@@ -85,7 +85,7 @@ class LlamacppChat:
             prompt, self.defaultPrompt = self.defaultPrompt, ""
         historyFolder = os.path.join(config.localStorage, "history")
         Path(historyFolder).mkdir(parents=True, exist_ok=True)
-        chat_history = os.path.join(historyFolder, "llamacpp")
+        chat_history = os.path.join(historyFolder, "llamacpppython")
         chat_session = PromptSession(history=FileHistory(chat_history))
 
         promptStyle = Style.from_dict({

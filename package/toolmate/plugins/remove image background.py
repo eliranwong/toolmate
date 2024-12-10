@@ -49,7 +49,11 @@ if not config.isLite:
     def remove_image_background2(function_args):
         code = function_args.get("code") # required
         information = PythonUtil.showAndExecutePythonCode(code)
-        if information:
+        if information == "[INVALID]":
+            return "[INVALID]"
+        elif information.startswith("```executed\n"):
+            config.toolTextOutput = information
+        elif information:
             filepath = json.loads(information)["information"]
             if os.path.isfile(filepath):
                 if shutil.which(config.open):

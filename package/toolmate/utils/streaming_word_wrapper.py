@@ -89,7 +89,7 @@ class StreamingWordWrapper:
             config.wrapWords = wrapWords
             # reset config.llmTextChunk
             config.llmTextChunk = ""
-            print("" if config.llmInterface == "llamacpp" else "\n")
+            print("" if config.llmInterface == "llamacpppython" else "\n")
             # add chat response to messages
             if chat_response:
                 config.new_chat_response = chat_response

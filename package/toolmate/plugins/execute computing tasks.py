@@ -53,6 +53,9 @@ def execute_computing_task(function_args):
             config.runPython = False
             return "[INVALID]"
     config.toolTextOutput = PythonUtil.executePythonCode(refinedCode)
+    if config.toolTextOutput == "[INVALID]":
+        config.toolTextOutput = ""
+        return "[INVALID]"
     try:
         pprint.pprint(json.loads(config.toolTextOutput))
     except:

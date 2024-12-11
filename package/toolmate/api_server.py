@@ -90,6 +90,8 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
     if reloadsettings:
         config.loadConfig(configFile)
         print2("Configurations reloaded!")
+        Plugins.runPlugins()
+        print2("Plugins reloaded!")
 
     # change backend
     current_llmInterface = config.llmInterface

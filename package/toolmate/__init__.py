@@ -30,6 +30,7 @@ from toolmate import config
 if not hasattr(config, "isLite"):
     try:
         lib_version("toolmate")
+        config.isLite = False
     except:
         config.isLite = True
 config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") and not os.getcwd().startswith("/root") else False

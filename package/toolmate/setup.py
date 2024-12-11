@@ -25,8 +25,11 @@ def main():
     parser.add_argument('-p', '--plugins', action='store_true', dest='plugins', help="configure plugins")
     parser.add_argument('-rt', '--riskthreshold', action='store_true', dest='riskthreshold', help="configure the risk threshold for user confirmation before code execution")
     parser.add_argument('-sg', '--speechgeneration', action='store_true', dest='speechgeneration', help="configure speech generation")
+    parser.add_argument('-so', '--searchoptions', action='store_true', dest='searchoptions', help="configure search options")
     parser.add_argument('-sr', '--speechrecognition', action='store_true', dest='speechrecognition', help="configure speech recognition")
     parser.add_argument('-t', '--temperature', action='store_true', dest='temperature', help="configure inference temperature")
+    parser.add_argument('-tms', '--tmsystems', action='store_true', dest='tmsystems', help="configure chat system messages for running with commands `tms1`, `tms2`, `tms3`, ... `tms20`")
+    parser.add_argument('-tmt', '--tmtools', action='store_true', dest='tmtools', help="configure tools for running with commands `tmt1`, `tmt2`, `tmt3`, ... `tmt20`")
     parser.add_argument('-ta', '--toolagent', action='store_true', dest='toolagent', help="configure tool selection agent")
     parser.add_argument('-ws', '--windowsize', action='store_true', dest='windowsize', help="configure context window size")
     parser.add_argument('-ww', '--wordwrap', action='store', dest='wordwrap', help="configure word wrap; true / false")
@@ -45,7 +48,7 @@ def main():
     # set window title
     set_title(config.toolMateAIName)
 
-    config.toolmate = ToolMate(plugins=False)
+    config.toolmate = ToolMate(plugins=True if args.tmsystems or args.tmtools else False)
 
     if args.exportmodels:
         exportmodels = eval(args.exportmodels)
@@ -79,6 +82,10 @@ def main():
         config.toolmate.setMaxTokens()
     if args.plugins:
         config.toolmate.selectPlugins()
+    if args.tmsystems:
+        config.toolmate.setTmsMessages()
+    if args.tmtools:
+        config.toolmate.setTmtTools()
     if args.speechgeneration:
         config.toolmate.setTextToSpeechConfig()
     if args.speechrecognition:
@@ -100,6 +107,8 @@ def main():
             print2("Word wrap disabled!")
         else:
             print2("Word wrap unchanged! Accept 'True' or 'False' only!")
+    if args.searchoptions:
+        config.toolmate.changeSearchSettings()
     if args.editor:
         config.toolmate.setCustomTextEditor()
 

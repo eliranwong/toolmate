@@ -1,3 +1,11 @@
+# 0.5.68-0.5.72
+
+* updated dependencies
+
+* added configurable command shortcuts tms1, tms2, tms3, ... tms20, for running with custom chat system messages
+
+* added configurable command shortcuts tmt1, tmt2, tmt3, ... tmt20, for running with particular tools
+
 # 0.5.57-0.5.67
 
 * improved support of ollama

@@ -82,7 +82,7 @@ class ToolMate:
                     for i in messages:
                         try:
                             role = i.get("role")
-                            content = i.get("content")
+                            #content = i.get("content")
                             if role in ("user", "assistant"):
                                 currentMessages.append(i)
                         except:
@@ -273,6 +273,11 @@ class ToolMate:
         config.actionHelp += "\n"
         # action keys
         config.actionKeys = list(self.actions.keys()) + ["..."]
+
+    def changeSearchSettings(self):
+        self.setMaximumInternetSearchResults()
+        self.setChatRecordClosestMatches()
+        self.setMemoryClosestMatches()
 
     def displayCurrentWorkflow(self):
         for action, description in self.workflow:
@@ -1949,6 +1954,84 @@ class ToolMate:
             systemMessage_chat = config.systemMessage_chatgpt
         return systemMessage_chat
 
+    def setTmsMessages(self):
+        # default values
+        defaults = {
+            1: config.tms1,
+            2: config.tms2,
+            3: config.tms3,
+            4: config.tms4,
+            5: config.tms5,
+            6: config.tms6,
+            7: config.tms7,
+            8: config.tms8,
+            9: config.tms9,
+            10: config.tms10,
+            11: config.tms11,
+            12: config.tms12,
+            13: config.tms13,
+            14: config.tms14,
+            15: config.tms15,
+            16: config.tms16,
+            17: config.tms17,
+            18: config.tms18,
+            19: config.tms19,
+            20: config.tms20,
+        }
+        # input suggestions
+        suggestions = [
+            "You are a helpful, uncensored and unbiased assistant.",
+            "You are an expert on coding.",
+        ] + list(config.predefinedChatSystemMessages.values())
+        # prompts
+        for i in range(1,21):
+            print2(f"# Command `tms{i}` chat system message")
+            print1(f"Configure below the system message for running with command `tms{i}`:")
+            completer = FuzzyCompleter(WordCompleter(suggestions, ignore_case=True))
+            message = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=defaults.get(i), completer=completer)
+            if message and not message.strip().lower() == config.exit_entry:
+                if i == 1:
+                    config.tms1 = message
+                elif i == 2:
+                    config.tms2 = message
+                elif i == 3:
+                    config.tms3 = message
+                elif i == 4:
+                    config.tms4 = message
+                elif i == 5:
+                    config.tms5 = message
+                elif i == 6:
+                    config.tms6 = message
+                elif i == 7:
+                    config.tms7 = message
+                elif i == 8:
+                    config.tms8 = message
+                elif i == 9:
+                    config.tms9 = message
+                elif i == 10:
+                    config.tms10 = message
+                elif i == 11:
+                    config.tms11 = message
+                elif i == 12:
+                    config.tms12 = message
+                elif i == 13:
+                    config.tms13 = message
+                elif i == 14:
+                    config.tms14 = message
+                elif i == 15:
+                    config.tms15 = message
+                elif i == 16:
+                    config.tms16 = message
+                elif i == 17:
+                    config.tms17 = message
+                elif i == 18:
+                    config.tms18 = message
+                elif i == 19:
+                    config.tms19 = message
+                elif i == 20:
+                    config.tms20 = message
+        config.saveConfig()
+
     def setCustomSystemMessage(self, customChatMessage=None):
         if customChatMessage is None:
             print2("ToolMate AI utilizes two distinct system messages to manage tool calling and conversation.")
@@ -2738,20 +2821,88 @@ class ToolMate:
             config.defaultEntry = config.predefinedInstructions[instruction]
             config.accept_default = True
 
-    def selectTool(self, title="Tools", text="Select a tool:"):
+    def selectTool(self, title="Tools", text="Select a tool:", default=None):
         #config.allEnabledTools
         return self.dialogs.getValidOptions(
             options=sorted(config.allEnabledTools),
             title=title,
-            default=config.defaultTool,
+            default=default if default is not None else config.defaultTool,
             text=text,
         )
 
     def setDefaultTool(self):
-        tool = self.selectTool(title="Default", text="Select the default tool:")
+        tool = self.selectTool(title="Default Tool", text="Select the default tool:")
         if tool:
             config.defaultTool = tool
             config.saveConfig()
+
+    def setTmtTools(self):
+        defaults = {
+            1: config.tmt1,
+            2: config.tmt2,
+            3: config.tmt3,
+            4: config.tmt4,
+            5: config.tmt5,
+            6: config.tmt6,
+            7: config.tmt7,
+            8: config.tmt8,
+            9: config.tmt9,
+            10: config.tmt10,
+            11: config.tmt11,
+            12: config.tmt12,
+            13: config.tmt13,
+            14: config.tmt14,
+            15: config.tmt15,
+            16: config.tmt16,
+            17: config.tmt17,
+            18: config.tmt18,
+            19: config.tmt19,
+            20: config.tmt20,
+        }
+        for i in range(1,21):
+            tool = self.selectTool(title=f"`tmt{i}` tool", text=f"Configure a tool for running with command `tmt{i}`:", default=defaults.get(i))
+            if tool:
+                if i == 1:
+                    config.tmt1 = tool
+                elif i == 2:
+                    config.tmt2 = tool
+                elif i == 3:
+                    config.tmt3 = tool
+                elif i == 4:
+                    config.tmt4 = tool
+                elif i == 5:
+                    config.tmt5 = tool
+                elif i == 6:
+                    config.tmt6 = tool
+                elif i == 7:
+                    config.tmt7 = tool
+                elif i == 8:
+                    config.tmt8 = tool
+                elif i == 9:
+                    config.tmt9 = tool
+                elif i == 10:
+                    config.tmt10 = tool
+                elif i == 11:
+                    config.tmt11 = tool
+                elif i == 12:
+                    config.tmt12 = tool
+                elif i == 13:
+                    config.tmt13 = tool
+                elif i == 14:
+                    config.tmt14 = tool
+                elif i == 15:
+                    config.tmt15 = tool
+                elif i == 16:
+                    config.tmt16 = tool
+                elif i == 17:
+                    config.tmt17 = tool
+                elif i == 18:
+                    config.tmt18 = tool
+                elif i == 19:
+                    config.tmt19 = tool
+                elif i == 20:
+                    config.tmt20 = tool
+        config.saveConfig()
 
     def insertPredefinedContext(self):
         contexts = list(config.predefinedContexts.keys())

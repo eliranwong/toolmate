@@ -1,6 +1,5 @@
 from setuptools import setup
-from setuptools.command.install import install
-import os, shutil, platform, sys
+import os, shutil
 
 # package name
 package_name_0 = os.path.join("package_name.txt")
@@ -43,7 +42,7 @@ open(os.path.join(package, "config.py"), "w").close()
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name="toolmate_lite",
-    version="0.5.67",
+    version="0.5.72",
     python_requires=">=3.8, <3.13",
     description=f"ToolMate AI, developed by Eliran Wong, is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. Supports custom workflow and plugins to automate multi-step actions.",
     long_description='''# ToolMate AI Lite
@@ -97,6 +96,51 @@ This `Lite` version supports running on Android Termux as well as on Windows / m
             f"tmc={package}.api_client:chat", # practically equal to `tmclient -c` or `tm -c`
             f"tmcmd={package}.api_client:cmd", # practically equal to `tmclient -dt command` or `tm -dt command`
             f"tmtask={package}.api_client:task", # practically equal to `tmclient -dt execute_computing_task` or `tm -dt execute_computing_task`
+            f"tmpython={package}.api_client:python",
+            f"tminternet={package}.api_client:internet",
+            f"tmgoogle={package}.api_client:google",
+            f"tmr={package}.api_client:reflection",
+            f"tmdr={package}.api_client:deepReflection",
+            f"tmt1={package}.api_client:tmt1",
+            f"tmt2={package}.api_client:tmt2",
+            f"tmt3={package}.api_client:tmt3",
+            f"tmt4={package}.api_client:tmt4",
+            f"tmt5={package}.api_client:tmt5",
+            f"tmt6={package}.api_client:tmt6",
+            f"tmt7={package}.api_client:tmt7",
+            f"tmt8={package}.api_client:tmt8",
+            f"tmt9={package}.api_client:tmt9",
+            f"tmt10={package}.api_client:tmt10",
+            f"tmt11={package}.api_client:tmt11",
+            f"tmt12={package}.api_client:tmt12",
+            f"tmt13={package}.api_client:tmt13",
+            f"tmt14={package}.api_client:tmt14",
+            f"tmt15={package}.api_client:tmt15",
+            f"tmt16={package}.api_client:tmt16",
+            f"tmt17={package}.api_client:tmt17",
+            f"tmt18={package}.api_client:tmt18",
+            f"tmt19={package}.api_client:tmt19",
+            f"tmt20={package}.api_client:tmt20",
+            f"tms1={package}.api_client:tms1",
+            f"tms2={package}.api_client:tms2",
+            f"tms3={package}.api_client:tms3",
+            f"tms4={package}.api_client:tms4",
+            f"tms5={package}.api_client:tms5",
+            f"tms6={package}.api_client:tms6",
+            f"tms7={package}.api_client:tms7",
+            f"tms8={package}.api_client:tms8",
+            f"tms9={package}.api_client:tms9",
+            f"tms10={package}.api_client:tms10",
+            f"tms11={package}.api_client:tms11",
+            f"tms12={package}.api_client:tms12",
+            f"tms13={package}.api_client:tms13",
+            f"tms14={package}.api_client:tms14",
+            f"tms15={package}.api_client:tms15",
+            f"tms16={package}.api_client:tms16",
+            f"tms17={package}.api_client:tms17",
+            f"tms18={package}.api_client:tms18",
+            f"tms19={package}.api_client:tms19",
+            f"tms20={package}.api_client:tms20",
             f"tmconfigs={package}.api_client:configs",
             f"commandprompt={package}.commandprompt:main",
             f"etextedit={package}.eTextEdit:main",

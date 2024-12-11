@@ -38,7 +38,7 @@ parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutpu
 parser.add_argument('-p', '--port', action='store', dest='port', type=int, help="server port")
 parser.add_argument('-pd', '--powerdown', action='store_true', dest='powerdown', help="power down server")
 parser.add_argument('-r', '--read', action='store_true', dest='read', help="read text output")
-parser.add_argument('-rs', '--reloadsettings', action='store_true', dest='reloadsettings', help=f"Reload configurations: {configFile}")
+parser.add_argument('-rs', '--reloadsettings', action='store_true', dest='reloadsettings', help=f"Reload: 1. configurations in {configFile} 2. plugins")
 parser.add_argument('-rt', '--riskthreshold', action='store', dest='riskthreshold', type=int, help="risk threshold for user confirmation before code execution; 0 - always require confirmation; 1 - require confirmation only when risk level is medium or higher; 2 - require confirmation only when risk level is high or higher; 3 or higher - no confirmation required")
 parser.add_argument('-s', '--server', action='store', dest='server', help="server address; 'http://localhost' by default")
 parser.add_argument('-sd', '--showdescription', action='store_true', dest='showdescription', help="show description of the found items in search results; used together with 'sc', 'ss' and 'st'")
@@ -118,7 +118,104 @@ def cmd():
 def task():
     main(defaultTool="execute_computing_task")
 
-def main(chat: bool = False, defaultTool=None):
+def python():
+    main(defaultTool="execute_python_code")
+
+def internet():
+    main(defaultTool="ask_internet")
+
+def google():
+    main(defaultTool="search_google")
+
+def reflection():
+    main(defaultTool="reflection")
+
+def deepReflection():
+    main(defaultTool="deep_reflection")
+
+def tms1():
+    main(chatSystem=config.tms1)
+def tms2():
+    main(chatSystem=config.tms2)
+def tms3():
+    main(chatSystem=config.tms3)
+def tms4():
+    main(chatSystem=config.tms4)
+def tms5():
+    main(chatSystem=config.tms5)
+def tms6():
+    main(chatSystem=config.tms6)
+def tms7():
+    main(chatSystem=config.tms7)
+def tms8():
+    main(chatSystem=config.tms8)
+def tms9():
+    main(chatSystem=config.tms9)
+def tms10():
+    main(chatSystem=config.tms10)
+def tms11():
+    main(chatSystem=config.tms11)
+def tms12():
+    main(chatSystem=config.tms12)
+def tms13():
+    main(chatSystem=config.tms13)
+def tms14():
+    main(chatSystem=config.tms14)
+def tms15():
+    main(chatSystem=config.tms15)
+def tms16():
+    main(chatSystem=config.tms16)
+def tms17():
+    main(chatSystem=config.tms17)
+def tms18():
+    main(chatSystem=config.tms18)
+def tms19():
+    main(chatSystem=config.tms19)
+def tms20():
+    main(chatSystem=config.tms20)
+
+def tmt1():
+    main(chatSystem=config.tmt1)
+def tmt2():
+    main(chatSystem=config.tmt2)
+def tmt3():
+    main(chatSystem=config.tmt3)
+def tmt4():
+    main(chatSystem=config.tmt4)
+def tmt5():
+    main(chatSystem=config.tmt5)
+def tmt6():
+    main(chatSystem=config.tmt6)
+def tmt7():
+    main(chatSystem=config.tmt7)
+def tmt8():
+    main(chatSystem=config.tmt8)
+def tmt9():
+    main(chatSystem=config.tmt9)
+def tmt10():
+    main(chatSystem=config.tmt10)
+def tmt11():
+    main(chatSystem=config.tmt11)
+def tmt12():
+    main(chatSystem=config.tmt12)
+def tmt13():
+    main(chatSystem=config.tmt13)
+def tmt14():
+    main(chatSystem=config.tmt14)
+def tmt15():
+    main(chatSystem=config.tmt15)
+def tmt16():
+    main(chatSystem=config.tmt16)
+def tmt17():
+    main(chatSystem=config.tmt17)
+def tmt18():
+    main(chatSystem=config.tmt18)
+def tmt19():
+    main(chatSystem=config.tmt19)
+def tmt20():
+    main(chatSystem=config.tmt20)
+
+def main(chat: bool = False, defaultTool=None, chatSystem=None):
     host = args.server if args.server else config.toolmate_api_client_host
     port = args.port if args.port else config.toolmate_api_client_port
     if not isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
@@ -302,7 +399,7 @@ def main(chat: bool = False, defaultTool=None):
             "instruction": instruction,
             "chat": chat,
             "chatfile": chatfile,
-            "chatsystem": args.chatsystem,
+            "chatsystem": chatSystem if chatSystem is not None else args.chatsystem,
             "windowsize": args.windowsize,
             "maximumoutput": args.maximumoutput,
             "temperature": args.temperature,

@@ -7,11 +7,11 @@ from toolmate.utils.call_llm import CallLLM
 from toolmate.utils.config_essential import temporaryConfigs
 from importlib_metadata import version as lib_version
 from pydantic import BaseModel
-import requests, argparse, json, uvicorn, re, os, signal, shutil, sys, pprint
+import argparse, json, uvicorn, re, os, signal, shutil, sys, pprint
 
 
 # Create the parser
-parser = argparse.ArgumentParser(description="ToolMate AI API server cli options")
+parser = argparse.ArgumentParser(description=f"ToolMate AI API server `tmserver` cli options; run `tmconfigs` to view configurations; run `tmsetup` to edit configurations; run `tmsetup -h` to check for setup options; configurations are stored in `{configFile}`")
 # Add arguments
 parser.add_argument('-b', '--backend', action='store', dest='backend', help="AI backend")
 parser.add_argument('-k', '--key', action='store', dest='key', help="specify the API key for authenticating client access")
@@ -54,7 +54,7 @@ class Request(BaseModel):
     toolagent: bool | None = None
     riskthreshold: int | None = None
     execute: bool | None = None
-    backupchat: bool | None = None
+    backupconversation: bool | None = None
     backupsettings: bool | None = None
     reloadsettings: bool | None = None
     powerdown: bool | None = None
@@ -81,7 +81,7 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
     toolagent = request.toolagent
     riskthreshold = request.riskthreshold
     execute = request.execute
-    backupchat = request.backupchat
+    backupconversation = request.backupconversation
     backupsettings = request.backupsettings
     reloadsettings = request.reloadsettings
     powerdown = request.powerdown
@@ -193,7 +193,7 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
     response = [i for i in config.currentMessages if i.get("role", "") in ("user", "assistant")]
 
     # save current conversation
-    if backupchat:
+    if backupconversation:
         config.toolmate.saveChat(config.currentMessages)
     
     # persist changes or restore server configurations
@@ -243,17 +243,18 @@ async def process_status(query: str, api_key: str = Depends(get_api_key) if conf
                 "Toolmate version": tmversion,
                 "Python version": sys.version,
                 "Python interpreter": sys.executable,
-                "Library path": config.toolMateAIFolder,
-                "User data": config.localStorage,
+                "Path - onfigurations": configFile,
+                "Path - library": config.toolMateAIFolder,
+                "Path - user data": config.localStorage,
                 "Server host": config.this_api_server_host,
                 "Server port": config.this_api_server_port,
                 "AI Backend": config.llmInterface,
                 "AI Model": getCurrentModel(),
-                "Context window size": config.toolmate.getCurrentContextWindowSize(),
-                "Maximum output token": config.toolmate.getCurrentMaxTokens(showMessage=False),
-                "Temperature": config.llmTemperature,
-                "Chat system message": config.toolmate.getCurrentChatSystemMessage(),
-                "Tool system message": config.systemMessage_tool_current,
+                "Model context window size": config.toolmate.getCurrentContextWindowSize(),
+                "Model maximum output token": config.toolmate.getCurrentMaxTokens(showMessage=False),
+                "Model temperature": config.llmTemperature,
+                "System message - chat": config.toolmate.getCurrentChatSystemMessage(),
+                "System message - tool": config.systemMessage_tool_current,
                 "Tool agent": config.tool_selection_agent,
                 "Tool risk threshold": config.riskThreshold,
                 "Default tool": config.defaultTool,

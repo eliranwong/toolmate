@@ -15,11 +15,25 @@ from prompt_toolkit.completion import WordCompleter, FuzzyCompleter
 from pathlib import Path
 
 # Create the parser
-parser = argparse.ArgumentParser(description="ToolMate AI API client cli options")
+parser = argparse.ArgumentParser(description = """ToolMate AI API client `tm` cli options;
+                                 available shortcuts:
+                                 `tmc` -> `tm -c`;
+                                 `tmcmd` -> `tm -dt command`;
+                                 `tmpython` -> `tm -dt execute_python_code`;
+                                 `tmtask` -> `tm -dt execute_computing_task`;
+                                 `tmgoogle` -> `tm -dt search_google` (internet connection required);
+                                 `tminternet` -> `tm -dt ask_internet` (internet connection and SearXNG required);
+                                 `tmmp3` -> `tm -dt download_youtube_audio` (internet connection required);
+                                 `tmmp4` -> `tm -dt download_youtube_video` (internet connection required);
+                                 `tmr` -> `tm -dt reflection`;
+                                 `tmdr` -> `tm -dt deep_reflection`;
+                                 `tmt1` ... `tmt20` -> `tm -dt <custom_tool>` (determined by `config.tmt1` ... `config.tmt20`);
+                                 `tms1` ... `tms20` -> `tm -cs <custom_chat_system_message>` (determined by `config.tms1` ... `config.tms20`);
+                                 You may create your own aliases to make the shortcuts more memorable.""")
 # Add arguments
 parser.add_argument("default", nargs="?", default=None, help="instruction sent to ToolMate API server; work on previous conversation if not given.")
 parser.add_argument('-b', '--backend', action='store', dest='backend', help="AI backend; optionally use it together with '-bc' to make a change persistant")
-parser.add_argument('-bc', '--backupchat', action='store_true', dest='backupchat', help="back up the current conversation in ToolMate AI user directory")
+parser.add_argument('-bc', '--backupconversation', action='store_true', dest='backupconversation', help="back up the current conversation in ToolMate AI user directory")
 parser.add_argument('-bs', '--backupsettings', action='store_true', dest='backupsettings', help="back up the current settings in ToolMate AI user directory")
 parser.add_argument('-c', '--chat', action='store_true', dest='chat', help="enable to chat as an on-going conversation")
 parser.add_argument('-cf', '--chatfile', action='store', dest='chatfile', help="a chat file containing a saved conversation")
@@ -29,10 +43,10 @@ parser.add_argument('-e', '--export', action='store', dest='export', help="expor
 parser.add_argument('-exec', '--execute', action='store_true', dest='execute', help="execute python code or system command; format a block of python code starting with '```python' or a block of system command starting with '```command'; ends the block with '```'")
 parser.add_argument('-f', '--format', action='store', dest='format', help="conversation output format; plain or list; useful for sharing or backup; only output the last assistant response if this option is not used")
 parser.add_argument('-i', '--interactive', action='store_true', dest='interactive', help="interactive prompt, with auto-suggestions enabled, for writing instruction; do not use this option together with standard input or output")
-parser.add_argument('-info', '--information', action='store_true', dest='information', help="show server info")
+parser.add_argument('-info', '--information', action='store_true', dest='information', help="quick overview of server information")
 parser.add_argument('-k', '--key', action='store', dest='key', help="specify the API key for authenticating access to the ToolMate AI server")
 parser.add_argument('-m', '--model', action='store', dest='model', help="AI model; override backend option if the model's backend is different; optionally use it together with '-bc' to make a change persistant")
-parser.add_argument('-ms', '--models', action='store_true', dest='models', help="show available models")
+parser.add_argument('-ms', '--models', action='store_true', dest='models', help="show available AI backends and models")
 parser.add_argument('-md', '--markdown', action='store', dest='markdown', help="highlight assistant response in markdown format; true / false")
 parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', type=int, help="override maximum output tokens for a single request; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
 parser.add_argument('-p', '--port', action='store', dest='port', type=int, help="server port")
@@ -121,11 +135,17 @@ def task():
 def python():
     main(defaultTool="execute_python_code")
 
+def google():
+    main(defaultTool="search_google")
+
 def internet():
     main(defaultTool="ask_internet")
 
-def google():
-    main(defaultTool="search_google")
+def mp3():
+    main(defaultTool="download_youtube_audio")
+
+def mp4():
+    main(defaultTool="download_youtube_video")
 
 def reflection():
     main(defaultTool="reflection")
@@ -407,7 +427,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None):
             "toolagent": toolagent,
             "riskthreshold": args.riskthreshold,
             "execute": True if args.execute else False,
-            "backupchat": True if args.backupchat else False,
+            "backupconversation": True if args.backupconversation else False,
             "backupsettings": True if args.backupsettings else False,
             "reloadsettings": True if args.reloadsettings else False,
             "powerdown": True if args.powerdown else False,

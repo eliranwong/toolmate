@@ -1415,7 +1415,8 @@ def fineTunePythonCode(code):
     return f"{code}{main}"
 
 def getPythonFunctionResponse():
-    #return str(config.pythonFunctionResponse) if config.pythonFunctionResponse is not None and (type(config.pythonFunctionResponse) in (int, float, str, list, tuple, dict, set, bool) or str(type(config.pythonFunctionResponse)).startswith("<class 'numpy.")) and not ("os.system(" in code) else ""
+    if not hasattr(config, "pythonFunctionResponse"):
+        config.pythonFunctionResponse = ""
     return "" if config.pythonFunctionResponse is None else str(config.pythonFunctionResponse)
 
 def getPromptExecutionMessage(content, risk, description="python code"):

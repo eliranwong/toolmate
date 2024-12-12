@@ -1,4 +1,10 @@
-# 0.5.68-0.5.74
+# 0.5.75
+
+* support the latest structured output feature, offered by Ollama version 0.5.0+.  Users need to upgrade Ollama to version 0.5.0+, to work with Toolmate AI.
+
+* unload ollama previous model when ollama model is changed
+
+# 0.5.68-0.5.76
 
 * updated dependencies
 

@@ -105,8 +105,8 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
         print3(f"Backend configured: {config.llmInterface}")
     # when backend or model is change
     if (not current_llmInterface == config.llmInterface and current_llmInterface == "ollama") or (not current_ollamaToolModel == config.ollamaToolModel):
-        getOllamaServerClient().generate(model=config.ollamaToolModel, keep_alive=0, stream=False,)
-        print(f"Ollama model '{config.ollamaToolModel}' unloaded!")
+        getOllamaServerClient().generate(model=current_ollamaToolModel, keep_alive=0, stream=False,)
+        print(f"Ollama model '{current_ollamaToolModel}' unloaded!")
     elif (not current_llmInterface == config.llmInterface and current_llmInterface == "llamacpppython"):
         try:
             config.llamacppToolModel.close()

@@ -2,6 +2,10 @@
 
 https://github.com/ollama/ollama/blob/main/docs/faq.md#how-do-i-configure-ollama-server
 
+# Minimum Ollama Version
+
+From Toolmate AI version 0.5.75, we support Ollama v0.5.0+ latest structured output featue. Users need to upgrade Ollama to version 0.5.0 or higher to work with Toolmate AI.  Read https://ollama.com/ for downloading the latest Ollama version.
+
 # Ubuntu
 
 Official guide uses "systemctl edit ollama.service", however it does not work for some users.
@@ -36,3 +40,13 @@ Reload:
 > sudo systemctl daemon-reload
 
 > sudo systemctl restart ollama
+
+# Android
+
+Install Ollama on Android via Termux
+
+https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Termux%20Setup.md#instal-ollama-on-termux
+
+Install Ollama on Android via Ubuntu container in Termux
+
+https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Termux%20Setup.md#install-toolmate-ai

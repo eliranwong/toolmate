@@ -33,6 +33,8 @@ Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/d
 
 # New Additions
 
+[NEW! Support Ollama v0.5.0+ latest structured output feature](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Configure%20Ollama%20Server.md)
+
 [NEW! Support Llama.cpp server running on Android](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Android%20Versions.md)
 
 [NEW! Support X AI / Grok API Keys](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/xAI.md)

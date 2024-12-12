@@ -1,8 +1,8 @@
 from toolmate import showErrors, isValidPythodCode, executeToolFunction, toParameterSchema, useChatSystemMessage
 from toolmate import print1, print2, print3, getPythonFunctionResponse, extractPythonCode, isValidPythodCode, validParameters, getRagPrompt
 from toolmate import config, getOllamaServerClient, getRagPrompt, refineToolTextOutput
-import shutil, re, traceback, json, ollama, pprint, copy, datetime
-from typing import Optional
+import re, traceback, json, ollama, pprint, copy
+from typing import Optional, Union
 from toolmate.utils.download import Downloader
 from ollama import Options
 from prompt_toolkit import prompt
@@ -132,14 +132,15 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     @check_ollama_errors
-    def getDictionaryOutput(messages: list, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None):
+    def getDictionaryOutput(messages: list, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, schema=Optional[Union[str,dict]]="json"):
         #pprint.pprint(messages)
         try:
             completion = getOllamaServerClient().chat(
                 keep_alive=config.ollamaToolModel_keep_alive,
                 model=config.ollamaToolModel,
                 messages=messages,
-                format="json",
+                #format="json",
+                format=schema,
                 stream=False,
                 options=Options(
                     temperature=temperature if temperature is not None else config.llmTemperature,
@@ -346,7 +347,7 @@ Remember, response in JSON with the filled template ONLY.""",
             },
         ]
 
-        parameters = CallOllama.getDictionaryOutput(messages, temperature=temperature, num_ctx=num_ctx, num_batch=num_batch, num_predict=num_predict)
+        parameters = CallOllama.getDictionaryOutput(messages, temperature=temperature, num_ctx=num_ctx, num_batch=num_batch, num_predict=num_predict, schema=schemaCopy)
         if code:
             parameters["code"] = code
 

@@ -363,7 +363,7 @@ def changeBackendAndModel(backend, model):
     elif backend == "googleai":
         config.googleaiApi_tool_model = model
     elif backend == "vertexai":
-        config.gemini_model = model
+        config.vertexai_model = model
     elif backend in ("chatgpt", "letmedoit"):
         config.chatGPTApiModel = model
     print3(f"Model configured: {model}")
@@ -387,7 +387,7 @@ def getCurrentModel():
     elif config.llmInterface == "googleai":
         return config.googleaiApi_tool_model
     elif config.llmInterface == "vertexai":
-        return config.gemini_model
+        return config.vertexai_model
     elif config.llmInterface in ("chatgpt", "letmedoit"):
         return config.chatGPTApiModel
     elif config.llmInterface == "llamacpppython":
@@ -517,6 +517,109 @@ def getMistralApi_key():
 def getMistralClient():
     return Mistral(api_key=getMistralApi_key())
 
+def getAutogenConfigList():
+    # reference: https://ag2ai.github.io/ag2/docs/topics/llm_configuration
+    config_list = []
+    # groq
+    if config.groqApi_key:
+        if isinstance(config.groqApi_key, str):
+            config_list.append({
+                "api_type": "groq",
+                "model": config.groqApi_tool_model,
+                "api_key": config.groqApi_key,
+                "tags": ["groq"],
+            })
+        elif isinstance(config.groqApi_key, list):
+            for key in config.groqApi_key:
+                config_list.append({
+                    "api_type": "groq",
+                    "model": config.groqApi_tool_model,
+                    "api_key": key,
+                    "tags": ["groq"],
+                })
+    # mistral
+    if config.mistralApi_key:
+        if isinstance(config.mistralApi_key, str):
+            config_list.append({
+                "api_type": "mistral",
+                "model": config.mistralApi_tool_model,
+                "api_key": config.mistralApi_key,
+                "tags": ["mistral"],
+            })
+        elif isinstance(config.mistralApi_key, list):
+            for key in config.mistralApi_key:
+                config_list.append({
+                    "api_type": "mistral",
+                    "model": config.mistralApi_tool_model,
+                    "api_key": key,
+                    "tags": ["mistral"],
+                })
+    # vertexai
+    if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enabledGoogleAPIs:
+        config_list.append({
+            "api_type": "google",
+            "model": config.vertexai_model,
+            "project_id": config.vertexai_project_id,
+            "location": config.vertexai_service_location,
+            "google_application_credentials": os.environ["GOOGLE_APPLICATION_CREDENTIALS"],
+            "tags": ["vertexai"],
+        })
+    # ollama
+    if config.ollamaToolModel in getLlms()["ollama"]:
+        config_list.append({
+            "api_type": "ollama",
+            "model": config.ollamaToolModel,
+            "client_host": getOllamaServerHost(),
+            "tags": ["ollama"],
+        })
+    # openai
+    if config.openaiApiKey:
+        config_list.append({
+            "api_type": "open_ai",
+            "model": config.chatGPTApiModel,
+            "api_key": config.openaiApiKey,
+            "tags": ["chatgpt", "letmedoit"],
+        })
+    # googleai
+    if config.googleaiApi_key:
+        config_list.append({
+            "api_type": "open_ai",
+            "model": config.googleaiApi_tool_model,
+            "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+            "api_key": config.googleaiApi_key,
+            "tags": ["googleai"],
+        })
+    # xai
+    if config.xaiApi_key:
+        config_list.append({
+            "api_type": "open_ai",
+            "model": config.xaiApi_tool_model,
+            "base_url": "https://api.x.ai/v1",
+            "api_key": config.xaiApi_key,
+            "tags": ["xai"],
+        })
+    # llamacpppython
+    if isServerAlive(config.llamacppToolModel_server_ip, config.llamacppToolModel_server_port):
+        config_list.append({
+            "api_type": "open_ai",
+            "model": config.llamacppToolModel_model_path,
+            "base_url": f"{config.llamacppToolModel_server_protocol}{config.llamacppToolModel_server_ip}:{config.llamacppToolModel_server_port}/v1",
+            "api_key": "toolmate",
+            "tags": ["llamacpppython"],
+        })
+    # llamacppserver
+    if isServerAlive(config.customToolServer_ip, config.customToolServer_port):
+        config_list.append({
+            "api_type": "open_ai",
+            "model": config.llamacppToolModel_model_path,
+            "base_url": f"{config.customToolServer_protocol}{config.customToolServer_ip}:{config.customToolServer_port}/v1",
+            "api_key": "toolmate",
+            "tags": ["llamacppserver"],
+        })
+    os.environ["OAI_CONFIG_LIST"] = json.dumps(config_list)
+    os.environ["AUTOGEN_USE_DOCKER"] = str(config.autogen_use_docker)
+    return config_list
+
 def downloadStableDiffusionFiles():
     # llm directory
     llm_directory = os.path.join(config.localStorage, "LLMs", "stable_diffusion")
@@ -582,7 +685,7 @@ def isRemoteOllamaHost(url):
     #host = re.sub(":[0-9]+?$", "", host)
     return False if url.lower() in ("127.0.0.1", "localhost") else True
 
-def getOllamaServerClient(server="tool"):
+def getOllamaServerHost(server="tool"):
     if server=="chat":
         if not config.ollamaChatServer_host or (config.ollamaChatServer_host == "127.0.0.1" and not isServerAlive(config.ollamaChatServer_host, config.ollamaChatServer_port)):
             ollamaChatHost_localIp = True
@@ -594,10 +697,13 @@ def getOllamaServerClient(server="tool"):
         else:
             ollamaToolHost_localIp = False
     if server=="chat" and ollamaChatHost_localIp:
-        return Client(host=f"{config.ollamaToolServer_protocol}{get_local_ip()}:{config.ollamaChatServer_port}")
+        return f"{config.ollamaToolServer_protocol}{get_local_ip()}:{config.ollamaChatServer_port}"
     elif server=="tool" and ollamaToolHost_localIp:
-        return Client(host=f"{config.ollamaChatServer_protocol}{get_local_ip()}:{config.ollamaToolServer_port}")
-    return Client(host=f"{config.ollamaToolServer_protocol if server=='chat' else config.ollamaChatServer_protocol}{config.ollamaChatServer_host if server=='chat' else config.ollamaToolServer_host}:{config.ollamaChatServer_port if server=='chat' else config.ollamaToolServer_port}")
+        return f"{config.ollamaChatServer_protocol}{get_local_ip()}:{config.ollamaToolServer_port}"
+    return f"{config.ollamaToolServer_protocol if server=='chat' else config.ollamaChatServer_protocol}{config.ollamaChatServer_host if server=='chat' else config.ollamaToolServer_host}:{config.ollamaChatServer_port if server=='chat' else config.ollamaToolServer_port}"
+
+def getOllamaServerClient(server="tool"):
+    return Client(host=getOllamaServerHost(server=server))
 
 def loadLlamacppChatModel():
     cpuThreads = getCpuThreads()
@@ -1857,10 +1963,10 @@ def setChatGPTAPIkey():
     os.environ["OPENAI_API_KEY"] = config.openaiApiKey
     config.oai_client = OpenAI()
     # set variable 'OAI_CONFIG_LIST' to work with pyautogen
-    oai_config_list = []
-    for model in chatgptTokenLimits.keys():
-        oai_config_list.append({"model": model, "api_key": config.openaiApiKey})
-    os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
+    #oai_config_list = []
+    #for model in chatgptTokenLimits.keys():
+    #    oai_config_list.append({"model": model, "api_key": config.openaiApiKey})
+    #os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
 
 def setGoogleCredentials():
     config.google_cloud_credentials_file = os.path.join(config.localStorage, "credentials_google_cloud.json") # default path

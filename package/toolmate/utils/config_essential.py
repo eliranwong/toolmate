@@ -163,6 +163,12 @@ defaultSettings = (
     ('customToolServer_port', 8000),
     ('customChatServer_port', 8001),
     ('customVisionServer_port', 8002),
+    ('llamacppToolModel_server_ip', "127.0.0.1"),
+    ('llamacppChatModel_server_ip', "127.0.0.1"),
+    ('llamacppVisionModel_server_ip', "127.0.0.1"),
+    ('llamacppToolModel_server_protocol', "http://"),
+    ('llamacppChatModel_server_protocol', "http://"),
+    ('llamacppVisionModel_server_protocol', "http://"),
     ('llamacppToolModel_server_port', 8000),
     ('llamacppChatModel_server_port', 8001),
     ('llamacppVisionModel_server_port', 8002),
@@ -197,8 +203,10 @@ defaultSettings = (
     ('llamacppChatModel_max_tokens', 2048), # llama.cpp chat model maximum tokens
     ('llamacppChatModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
     ('llamacppChatModel_n_batch', 512), # The batch size to use per eval
-    ('gemini_model', "gemini-1.5-pro-001"), # "gemini-1.0-pro-001", "gemini-1.0-pro-002", "gemini-1.5-flash-001", "gemini-1.5-pro-001", read models that support function calling https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling
-    ('gemini_max_output_tokens', 8192), # check supported value at https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
+    ('vertexai_project_id', ""),
+    ('vertexai_service_location', "us-central1"),
+    ('vertexai_model', "gemini-1.5-flash"), # "gemini-1.5-flash", "gemini-1.5-pro"; https://cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versions; read models that support function calling https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling
+    ('vertexai_max_output_tokens', 8192), # check supported value at https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
     ('whispercpp_main', ''), # whisper.cpp main command file path
     ('whispercpp_model', ''), # whisper.cpp model file path
     ('whispercpp_additional_options', ''), # whisper.cpp additional options. See https://github.com/ggerganov/whisper.cpp/tree/master/examples/main for all options.
@@ -238,6 +246,7 @@ defaultSettings = (
     ('chatGPTApiFunctionCall', "auto"),
     ('passFunctionCallReturnToChatGPT', True),
     ('llmTemperature', 0.3),
+    ('autogen_use_docker', False),
     ('max_consecutive_auto_reply', 10), # work with pyautogen
     ('memoryClosestMatches', 5),
     ('rag_useAutoRetriever', False),
@@ -255,9 +264,9 @@ defaultSettings = (
     ('piper_additional_options', ""),
     ('tavilyApi_key', ''),
     ('groqApi_key', ''),
-    ('groqApi_tool_model', 'mixtral-8x7b-32768'),
+    ('groqApi_tool_model', 'llama-3.3-70b-versatile'),
     ('groqApi_tool_model_additional_chat_options', {}),
-    ('groqApi_chat_model', 'llama-3.1-70b-versatile'),
+    ('groqApi_chat_model', 'llama-3.3-70b-versatile'),
     ('groqApi_chat_model_additional_chat_options', {}),
     ('groqApi_tool_model_max_tokens', 2048),
     ('groqApi_chat_model_max_tokens', 2048),

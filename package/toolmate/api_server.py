@@ -243,7 +243,7 @@ async def process_status(query: str, api_key: str = Depends(get_api_key) if conf
                 "Toolmate version": tmversion,
                 "Python version": sys.version,
                 "Python interpreter": sys.executable,
-                "Path - onfigurations": configFile,
+                "Path - configurations": configFile,
                 "Path - library": config.toolMateAIFolder,
                 "Path - user data": config.localStorage,
                 "Server host": config.this_api_server_host,

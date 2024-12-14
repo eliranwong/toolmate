@@ -1,4 +1,4 @@
-import os
+import os, shutil
 thisFile = os.path.realpath(__file__)
 packageFolder = os.path.dirname(thisFile)
 package = os.path.basename(packageFolder)
@@ -11,10 +11,9 @@ from toolmate import config
 if not hasattr(config, "max_consecutive_auto_reply"):
     config.max_consecutive_auto_reply = 10
 
-from toolmate import print2, print3, chatgptTokenLimits
-
-from toolmate import getEmbeddingFunction, startLlamacppServer, stopLlamacppServer, getGroqApi_key, getGoogleGenAIClient, getXAIClient, refinePath
-import autogen, os, json, traceback, chromadb, re, zipfile, datetime, traceback
+from toolmate import print2, print3, getCurrentModel
+from toolmate import getEmbeddingFunction, refinePath, getAutogenConfigList
+import autogen, os, traceback, chromadb, re, zipfile, datetime, traceback
 from chromadb.config import Settings
 from pathlib import Path
 from toolmate.utils.prompts import Prompts
@@ -33,12 +32,6 @@ class AutoGenRetriever:
         #    api_type="openai",
         #    api_version=None,
         #)
-        oai_config_list = []
-        for model in chatgptTokenLimits.keys():
-            oai_config_list.append({"model": model, "api_key": config.openaiApiKey})
-        if not config.chatGPTApiModel in chatgptTokenLimits:
-            oai_config_list.append({"model": config.chatGPTApiModel, "api_key": config.openaiApiKey})
-        os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
         """
         Code execution is set to be run in docker (default behaviour) but docker is not running.
         The options available are:
@@ -46,14 +39,6 @@ class AutoGenRetriever:
         - Set "use_docker": False in code_execution_config
         - Set AUTOGEN_USE_DOCKER to "0/False/no" in your environment variables
         """
-        os.environ["AUTOGEN_USE_DOCKER"] = "False"
-
-        if config.llmInterface == "llamacpppython":
-            startLlamacppServer()
-
-    def __del__(self):
-        if config.llmInterface == "llamacpppython":
-            stopLlamacppServer()
 
     def getResponse(self, docs_path, message, auto=False):
         if not os.path.exists(docs_path):
@@ -69,6 +54,7 @@ class AutoGenRetriever:
         else:
             folder = os.path.join(packageFolder, "files")
         db = os.path.join(folder, "autogen", "retriever")
+        shutil.rmtree(db, ignore_errors=True) # do not reuse the old database
         Path(db).mkdir(parents=True, exist_ok=True)
 
         _, file_extension = os.path.splitext(docs_path)
@@ -88,77 +74,8 @@ class AutoGenRetriever:
                 print2("File format not supported!")
                 return None
 
-        if config.llmInterface == "ollama":
-            llm = config.ollamaToolModel
-            config_list = [
-                {
-                    "model": llm,
-                    "base_url": "http://localhost:11434/v1",
-                    "api_type": "open_ai",
-                    "api_key": "toolmate",
-                }
-            ]
-        elif config.llmInterface == "llamacpppython":
-            llm = config.llamacppToolModel_model_path
-            config_list = [
-                {
-                    "model": llm,
-                    "base_url": f"http://localhost:{config.llamacppToolModel_server_port}/v1",
-                    "api_type": "open_ai",
-                    "api_key": "toolmate",
-                }
-            ]
-        elif config.llmInterface == "llamacppserver":
-            llm = config.llamacppToolModel_model_path
-            config_list = [
-                {
-                    "model": llm,
-                    "base_url": f"http://localhost:{config.customToolServer_port}/v1",
-                    "api_type": "open_ai",
-                    "api_key": "toolmate",
-                }
-            ]
-        elif config.llmInterface == "groq":
-            llm = config.groqApi_tool_model
-            config_list = [
-                {
-                    "model": llm,
-                    "base_url": "https://api.groq.com/openai/v1",
-                    "api_type": "open_ai",
-                    "api_key": getGroqApi_key(),
-                }
-            ]
-        elif config.llmInterface == "googleai":
-            llm = config.googleaiApi_tool_model
-            config_list = [
-                {
-                    "model": llm,
-                    "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
-                    "api_type": "open_ai",
-                    "api_key": getGoogleGenAIClient(),
-                }
-            ]
-        elif config.llmInterface == "xai":
-            llm = config.xaiApi_tool_model
-            config_list = [
-                {
-                    "model": llm,
-                    "base_url": "https://api.x.ai/v1",
-                    "api_type": "open_ai",
-                    "api_key": getXAIClient(),
-                }
-            ]
-        else:
-        #if config.llmInterface in ("chatgpt", "letmedoit", "vertexai"):
-            llm = config.chatGPTApiModel
-            config_list = autogen.config_list_from_json(
-                env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
-                filter_dict={
-                    "model": {
-                        config.chatGPTApiModel,
-                    }
-                }
-            )
+        filter_dict = {"tags": [config.llmInterface]}
+        config_list = autogen.filter_config(getAutogenConfigList(), filter_dict)
 
         # https://microsoft.github.io/autogen/docs/reference/agentchat/contrib/retrieve_assistant_agent
         assistant = RetrieveAssistantAgent(
@@ -187,15 +104,16 @@ class AutoGenRetriever:
                     #"task": "qa", # the task of the retrieve chat. Possible values are "code", "qa" and "default". System prompt will be different for different tasks. The default value is default, which supports both code and qa.
                     "docs_path": docs_path,
                     "chunk_token_size": 2000, # the chunk token size for the retrieve chat. If key not provided, a default size max_tokens * 0.4 will be used.
-                    "model": llm,
+                    "model": getCurrentModel(),
                     "client": client,
                     "embedding_function": getEmbeddingFunction(),
                     #"embedding_model": "all-mpnet-base-v2", # the embedding model to use for the retrieve chat. If key not provided, a default model all-MiniLM-L6-v2 will be used. All available models can be found at https://www.sbert.net/docs/pretrained_models.html. The default model is a fast model. If you want to use a high performance model, all-mpnet-base-v2 is recommended.
-                    "get_or_create": False,  # set to False if you don't want to reuse an existing collection, but you'll need to remove the collection manually
+                    "get_or_create": True,  # set to False if you don't want to reuse an existing collection, but you'll need to remove the collection manually; however, seting it to False does not work
                     "must_break_at_empty_line": False, # (Optional, bool): chunk will only break at empty line if True. Default is True. If chunk_mode is "one_line", this parameter will be ignored.
                 },
+                code_execution_config=False,
             )
-            ragproxyagent.initiate_chat(assistant, problem=message)
+            ragproxyagent.initiate_chat(assistant, message=ragproxyagent.message_generator, problem=message)
         except:
             print(traceback.format_exc())
 

@@ -18,16 +18,16 @@ class CallVertexAI:
     def getGeminiModel(tool=None):
         config.gemini_generation_config=GenerationConfig(
             temperature=config.llmTemperature, # 0.0-1.0; default 0.9
-            max_output_tokens=config.gemini_max_output_tokens, # default
+            max_output_tokens=config.vertexai_max_output_tokens, # default
             candidate_count=1,
         )
         # the latest package requires tools to be placed in the `GenerativeModel` instead of `send_message`
         # read https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling#chat-samples
         return GenerativeModel(
-            model_name=config.gemini_model,
+            model_name=config.vertexai_model,
             generation_config=config.gemini_generation_config,
             tools=[tool],
-        ) if tool else GenerativeModel(config.gemini_model, generation_config=config.gemini_generation_config,)
+        ) if tool else GenerativeModel(config.vertexai_model, generation_config=config.gemini_generation_config,)
 
     @staticmethod
     def checkCompletion():

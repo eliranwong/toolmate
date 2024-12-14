@@ -1804,14 +1804,14 @@ class ToolMate:
         model = self.dialogs.getValidOptions(
             options=models,
             title="Google Vertex AI Models",
-            default=config.gemini_model if config.gemini_model in models else models[0],
+            default=config.vertexai_model if config.vertexai_model in models else models[0],
             text="Select a tool call model:\n(for both chat and task execution)",
         )
         if model:
-            config.gemini_model = model
+            config.vertexai_model = model
             print3(f"Gemini model: {model}")
             # set max tokens
-            print3(f"Maximum output tokens: {config.gemini_max_output_tokens}")
+            print3(f"Maximum output tokens: {config.vertexai_max_output_tokens}")
 
     def setLlmModel_chatgpt(self):
         models = list(chatgptTokenLimits.keys())
@@ -2230,7 +2230,7 @@ class ToolMate:
         if config.llmInterface == "vertexai":
             if showMessage:
                 print1("Visit https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models to read about tokens limits")
-            currentMaxTokens = config.gemini_max_output_tokens
+            currentMaxTokens = config.vertexai_max_output_tokens
         elif config.llmInterface == "googleai":
             if showMessage:
                 print1("Visit https://ai.google.dev/gemini-api/docs/models/gemini to read about tokens limits")
@@ -2263,7 +2263,7 @@ class ToolMate:
         if maxtokens and not maxtokens.strip().lower() == config.exit_entry and int(maxtokens) >= -1:
             maxtokens = int(maxtokens)
             if config.llmInterface == "vertexai":
-                config.gemini_max_output_tokens = maxtokens
+                config.vertexai_max_output_tokens = maxtokens
             elif config.llmInterface == "googleai":
                 config.googleaiApi_tool_model_max_tokens = maxtokens
             elif config.llmInterface == "xai":

@@ -7,7 +7,7 @@ if os.getcwd() != packageFolder:
 configFile = os.path.join(packageFolder, "config.py")
 if not os.path.isfile(configFile):
     open(configFile, "a", encoding="utf-8").close()
-from toolmate import config
+from toolmate import config, getAutogenConfigList
 if not hasattr(config, "max_agents"):
     config.max_agents = 5
 if not hasattr(config, "max_group_chat_round"):
@@ -15,7 +15,7 @@ if not hasattr(config, "max_group_chat_round"):
 if not hasattr(config, "use_oai_assistant"):
     config.use_oai_assistant = False
 
-from toolmate import print2
+from toolmate import print2, getCurrentModel
 
 from autogen.agentchat.contrib.agent_builder import AgentBuilder
 #from toolmate.utils.agent_builder import AgentBuilder
@@ -38,11 +38,7 @@ class AutoGenBuilder:
         #    api_version=None,
         #)
         # assign ChatGPT4 to run the builder
-        self.chatGPTmodel = "gpt-4-turbo"
-        oai_config_list = []
-        for model in (self.chatGPTmodel,):
-            oai_config_list.append({"model": model, "api_key": config.openaiApiKey})
-        os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
+        self.llm = getCurrentModel()
         """
         Code execution is set to be run in docker (default behaviour) but docker is not running.
         The options available are:
@@ -50,7 +46,7 @@ class AutoGenBuilder:
         - Set "use_docker": False in code_execution_config
         - Set AUTOGEN_USE_DOCKER to "0/False/no" in your environment variables
         """
-        os.environ["AUTOGEN_USE_DOCKER"] = "False"
+
         # prompt style
         self.promptStyle = Style.from_dict({
             # User input (default text).
@@ -80,14 +76,9 @@ class AutoGenBuilder:
 
         building_task = execution_task = task
 
-        config_list = autogen.config_list_from_json(
-            env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
-            filter_dict={
-                "model": {
-                    self.chatGPTmodel,
-                }
-            }
-        )
+        filter_dict = {"tags": ["chatgpt"]}
+        config_list = autogen.filter_config(getAutogenConfigList(), filter_dict)
+
         llm_config={
             #"cache_seed": 42,  # seed for caching and reproducibility
             "config_list": config_list,  # a list of OpenAI API configurations
@@ -97,8 +88,8 @@ class AutoGenBuilder:
 
         builder = AgentBuilder(
             #config_path=config_path, # use default
-            builder_model=self.chatGPTmodel,
-            agent_model=self.chatGPTmodel,
+            builder_model=self.llm,
+            agent_model=self.llm,
             #max_tokens=4096,
             max_agents=config.max_agents,
         )

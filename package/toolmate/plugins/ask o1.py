@@ -11,7 +11,7 @@ from toolmate import config
 
 if config.online:
 
-    from toolmate import print1
+    from toolmate import print1, useChatSystemMessage
     from toolmate.utils.call_chatgpt import CallChatGPT
     import copy
 

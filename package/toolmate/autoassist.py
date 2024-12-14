@@ -1,24 +1,26 @@
 import os
-thisFile = os.path.realpath(__file__)
+"""thisFile = os.path.realpath(__file__)
 packageFolder = os.path.dirname(thisFile)
 package = os.path.basename(packageFolder)
 if os.getcwd() != packageFolder:
     os.chdir(packageFolder)
 configFile = os.path.join(packageFolder, "config.py")
 if not os.path.isfile(configFile):
-    open(configFile, "a", encoding="utf-8").close()
+    open(configFile, "a", encoding="utf-8").close()"""
 from toolmate import config
 if not hasattr(config, "max_consecutive_auto_reply"):
     config.max_consecutive_auto_reply = 10
 
-import autogen, os, json, traceback
-from toolmate import getDeviceInfo, startLlamacppServer, stopLlamacppServer, getGroqApi_key, chatgptTokenLimits
+import autogen, os, traceback
+from toolmate import getDeviceInfo, getAutogenConfigList
 from toolmate.utils.prompts import Prompts
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.styles import Style
 #from prompt_toolkit import PromptSession
 #from prompt_toolkit.history import FileHistory
-
+from autogen.coding import LocalCommandLineCodeExecutor
+from autogen.coding import DockerCommandLineCodeExecutor
+import tempfile
 
 class AutoGenAssistant:
 
@@ -28,12 +30,6 @@ class AutoGenAssistant:
         #    api_type="openai",
         #    api_version=None,
         #)
-        oai_config_list = []
-        for model in chatgptTokenLimits.keys():
-            oai_config_list.append({"model": model, "api_key": config.openaiApiKey})
-        if not config.chatGPTApiModel in chatgptTokenLimits:
-            oai_config_list.append({"model": config.chatGPTApiModel, "api_key": config.openaiApiKey})
-        os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
         """
         Code execution is set to be run in docker (default behaviour) but docker is not running.
         The options available are:
@@ -41,14 +37,6 @@ class AutoGenAssistant:
         - Set "use_docker": False in code_execution_config
         - Set AUTOGEN_USE_DOCKER to "0/False/no" in your environment variables
         """
-        os.environ["AUTOGEN_USE_DOCKER"] = "False"
-
-        if config.llmInterface == "llamacpppython":
-            startLlamacppServer()
-
-    def __del__(self):
-        if config.llmInterface == "llamacpppython":
-            stopLlamacppServer()
 
     def getResponse(self, message, auto=False):
 
@@ -58,52 +46,18 @@ class AutoGenAssistant:
 Below is my message:
 {message}"""
 
-        if config.llmInterface == "ollama":
-            config_list = [
-                {
-                    "model": config.ollamaToolModel,
-                    "base_url": "http://localhost:11434/v1",
-                    "api_type": "open_ai",
-                    "api_key": "toolmate",
-                }
-            ]
-        elif config.llmInterface == "llamacpppython":
-            config_list = [
-                {
-                    "model": config.llamacppToolModel_model_path,
-                    "base_url": f"http://localhost:{config.llamacppToolModel_server_port}/v1",
-                    "api_type": "open_ai",
-                    "api_key": "toolmate",
-                }
-            ]
-        elif config.llmInterface == "llamacppserver":
-            config_list = [
-                {
-                    "model": config.llamacppToolModel_model_path,
-                    "base_url": f"http://localhost:{config.customToolServer_port}/v1",
-                    "api_type": "open_ai",
-                    "api_key": "toolmate",
-                }
-            ]
-        elif config.llmInterface == "groq":
-            config_list = [
-                {
-                    "model": config.groqApi_tool_model,
-                    "base_url": "https://api.groq.com/openai/v1",
-                    "api_type": "open_ai",
-                    "api_key": getGroqApi_key(),
-                }
-            ]
-        else:
-        #elif config.llmInterface == "chatgpt":
-            config_list = autogen.config_list_from_json(
-                env_or_file="OAI_CONFIG_LIST",  # or OAI_CONFIG_LIST.json if file extension is added
-                filter_dict={
-                    "model": {
-                        config.chatGPTApiModel,
-                    }
-                }
-            )
+        filter_dict = {"tags": [config.llmInterface]}
+        config_list = autogen.filter_config(getAutogenConfigList(), filter_dict)
+
+        temp_dir = tempfile.TemporaryDirectory()
+        executor =  DockerCommandLineCodeExecutor(
+            image="python:3.12-slim",  # Execute code using the given docker image name.
+            timeout=10,  # Timeout for each code execution in seconds.
+            work_dir=temp_dir.name,  # Use the temporary directory to store the code files.
+        ) if config.autogen_use_docker else LocalCommandLineCodeExecutor(
+            timeout=10,  # Timeout for each code execution in seconds.
+            work_dir=temp_dir.name,  # Use the temporary directory to store the code files.
+        )
 
         assistant = autogen.AssistantAgent(
             name="assistant",
@@ -121,8 +75,7 @@ Below is my message:
             max_consecutive_auto_reply=config.max_consecutive_auto_reply,
             is_termination_msg=lambda x: x.get("content", "").rstrip().endswith("TERMINATE"),
             code_execution_config={
-                "work_dir": os.path.join(config.toolMateAIFolder, "coding") if hasattr(config, "toolMateAIFolder") else "coding",
-                "use_docker": False,  # set to True or image name like "python:3" to use docker
+                "executor": executor,
             },
         )
         # the assistant receives a message from the user_proxy, which contains the task description

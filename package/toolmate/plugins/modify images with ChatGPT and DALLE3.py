@@ -11,7 +11,7 @@ from toolmate import config
 if config.online:
 
     from toolmate import is_valid_image_file, is_valid_image_url, print1, print3, print2, encode_image, getCliOutput
-    import os, shutil
+    import os, shutil, subprocess
     from openai import OpenAI
     from toolmate.utils.call_chatgpt import check_openai_errors
     from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
@@ -104,25 +104,41 @@ if config.online:
         title = f"Modifying '{basename}' ..."
         dialogs = TerminalModeDialogs(None)
         # size selection
-        options = ("1024x1024", "1024x1792", "1792x1024")
-        size = dialogs.getValidOptions(
-            options=options,
-            title=title,
-            default="1024x1024",
-            text="Select size below:"
-        )
-        if not size:
-            return "[INVALID]"
+        if hasattr(config, "api_server_id"):
+            if config.imagewidth and config.imageheight:
+                if config.imagewidth == config.imageheight:
+                    size = "1024x1024"
+                elif config.imagewidth > config.imageheight:
+                    size = "1792x1024"
+                elif config.imageheight < config.imagewidth:
+                    size = "1024x1792"
+            else:
+                size = "1024x1024"
+        else:
+            options = ("1024x1024", "1024x1792", "1792x1024")
+            size = dialogs.getValidOptions(
+                options=options,
+                title=title,
+                default="1024x1024",
+                text="Select size below:"
+            )
+            if not size:
+                return "[INVALID]"
+            config.imagewidth = config.imageheight = None
         # quality selection
-        options = ("standard", "hd")
-        quality = dialogs.getValidOptions(
-            options=options,
-            title=title,
-            default="hd",
-            text="Select quality below:"
-        )
-        if not quality:
-            return "[INVALID]"
+        if hasattr(config, "api_server_id"):
+            quality = "hd" if config.imagehd else "standard"
+        else:
+            options = ("standard", "hd")
+            quality = dialogs.getValidOptions(
+                options=options,
+                title=title,
+                default="hd",
+                text="Select quality below:"
+            )
+            if not quality:
+                return "[INVALID]"
+            config.config.imagehd = True if quality == "hd" else False
 
         # get responses
         #https://platform.openai.com/docs/guides/images/introduction

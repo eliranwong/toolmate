@@ -43,7 +43,7 @@ if not config.isLite:
     from toolmate.chatgpt import ChatGPT
     from toolmate.llamacpp import LlamacppChat
     from toolmate.llamacppserver import LlamacppServerChat
-    from toolmate.autobuilder import AutoGenBuilder
+    from toolmate.autobuild import AutoGenBuilder
     from toolmate.geminipro import GeminiPro
     from toolmate.palm2 import Palm2
     from toolmate.codey import Codey
@@ -117,6 +117,7 @@ class ToolMate:
         config.convertRelativeDateTime = self.convertRelativeDateTime
         config.launchPager = self.launchPager
         config.changeOpenweathermapApi = self.changeOpenweathermapApi
+        config.autoCorrectPythonCode = CallLLM.autoCorrectPythonCode
         config.selectedTool = ""
         config.addToolAt = None
         # env variables
@@ -630,8 +631,6 @@ class ToolMate:
         if not config.isLite:
             self.changeTavilyApi()
             self.selectGoogleAPIs()
-        else:
-            self.setTermuxApi()
 
     def changeGoogleaiApikey(self):
         print3("# Google AI API Key: allows access to Google AI Studio models")
@@ -1045,30 +1044,6 @@ class ToolMate:
             config.developer = (option == "enable")
             config.saveConfig()
             print3(f"Developer Mode: {option}d!")
-
-    def setTermuxApi(self):
-        options = ("enable", "disable")
-        option = self.dialogs.getValidOptions(
-            options=options,
-            title="Termux API Integration",
-            default="enable" if config.terminalEnableTermuxAPI else "disable",
-            text="To learn about Termux API, read:\nhttps://wiki.termux.com/wiki/Termux:API\nSelect an option below:"
-        )
-        if option:
-            config.terminalEnableTermuxAPI = (option == "enable")
-            if config.terminalEnableTermuxAPI and not os.path.isdir("/data/data/com.termux/files/home/"):
-                config.terminalEnableTermuxAPI = False
-                print1("Termux is not installed!")
-            if config.terminalEnableTermuxAPI:
-                # Check if Termux API package is installed
-                result = subprocess.run(['pkg', 'list-installed', 'termux-api'], capture_output=True, text=True)
-                # Check if the package is installed
-                if not "termux-api" in result.stdout:
-                    print1("Termux:API is not installed!")
-            # reset plugins
-            Plugins.runPlugins()
-            config.saveConfig()
-            print3(f"""Termux API Integration: {"enable" if config.terminalEnableTermuxAPI else "disable"}d!""")
 
     def setFunctionCall(self):
         calls = ("auto", "none")
@@ -1773,8 +1748,9 @@ class ToolMate:
             print3(f"Mistral model: {model}")
 
     def setLlmModel_googleai(self):
+        models = getLlms()["googleai"]
         model = self.dialogs.getValidOptions(
-            options=getLlms()["googleai"],
+            options=models,
             title="Google AI Studio Models",
             default=config.googleaiApi_tool_model if config.googleaiApi_tool_model in models else models[0],
             text="Select a tool call model:\n(for both chat and task execution)",
@@ -1786,7 +1762,7 @@ class ToolMate:
             print3(f"Maximum output tokens: {config.googleaiApi_tool_model_max_tokens}")
 
     def setLlmModel_xai(self):
-        models = getLlms()["xai"],
+        models = getLlms()["xai"]
         model = self.dialogs.getValidOptions(
             options=models,
             title="X AI Models",
@@ -1800,7 +1776,7 @@ class ToolMate:
             print3(f"Maximum output tokens: {config.xaiApi_tool_model_max_tokens}")
 
     def setLlmModel_vertexai(self):
-        models = getLlms()["vertexai"],
+        models = getLlms()["vertexai"]
         model = self.dialogs.getValidOptions(
             options=models,
             title="Google Vertex AI Models",
@@ -1896,7 +1872,9 @@ class ToolMate:
             config.saveConfig()
 
     def setAutoGenBuilderConfig(self):
-        if not config.isLite:
+        if config.isLite:
+            print("Autobuilder configurations are applicable in full version only!")
+        else:
             AutoGenBuilder().promptConfig()
 
     def changeMyFavouries(self):

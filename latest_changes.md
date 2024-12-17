@@ -1,3 +1,21 @@
+# 0.5.76-0.5.81
+
+* support use of image tools with api_client
+
+* support non-chatgpt backends to use autobuild tool
+
+* added downloading nltk packages for running unstructured package
+
+* added group chat options to api client cli
+
+* fixed auto code correction feature
+
+* fixed display of auto code correction results with vertexai as backend
+
+* fixed autogen tools
+
+* fixed selecting google ai, vertex ai and xai models in interactive mode
+
 # 0.5.75
 
 * support the latest structured output feature, offered by Ollama version 0.5.0+.  Users need to upgrade Ollama to version 0.5.0+, to work with Toolmate AI.

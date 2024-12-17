@@ -158,7 +158,7 @@ Acess the risk level of this Python code:
                 trace = showErrors()
                 print1(config.divider)
                 if config.max_consecutive_auto_correction > 0:
-                    return CallLlamaCppServer.autoCorrectPythonCode(refinedCode, trace)
+                    return config.autoCorrectPythonCode(refinedCode, trace)
                 else:
                     return "[INVALID]"
             if function_response:

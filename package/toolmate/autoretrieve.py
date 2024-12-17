@@ -1,16 +1,7 @@
 import os, shutil
-thisFile = os.path.realpath(__file__)
-packageFolder = os.path.dirname(thisFile)
-package = os.path.basename(packageFolder)
-if os.getcwd() != packageFolder:
-    os.chdir(packageFolder)
-configFile = os.path.join(packageFolder, "config.py")
-if not os.path.isfile(configFile):
-    open(configFile, "a", encoding="utf-8").close()
-from toolmate import config
+from toolmate import config, package, packageFolder
 if not hasattr(config, "max_consecutive_auto_reply"):
     config.max_consecutive_auto_reply = 10
-
 from toolmate import print2, print3, getCurrentModel
 from toolmate import getEmbeddingFunction, refinePath, getAutogenConfigList
 import autogen, os, traceback, chromadb, re, zipfile, datetime, traceback
@@ -44,8 +35,6 @@ class AutoGenRetriever:
         if not os.path.exists(docs_path):
             print2("Invalid path!")
             return None
-
-        package = os.path.basename(packageFolder)
         storageDir = os.path.join(os.path.expanduser('~'), package)
         if os.path.isdir(storageDir):
             folder = storageDir

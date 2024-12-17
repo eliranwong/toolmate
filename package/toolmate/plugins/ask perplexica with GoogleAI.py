@@ -34,7 +34,7 @@ if config.online:
 
     if isServerAlive(re.sub("http://|https://", "", config.perplexica_server), config.perplexica_backend_port):
 
-        def ask_perplexica_gemini(function_args):
+        def ask_perplexica_googleai(function_args):
             config.stopSpinning()
             if function_args:
                 query = function_args.get("query")
@@ -58,17 +58,14 @@ if config.online:
             # https://github.com/ItzCrazyKns/Perplexica/blob/master/docs/API/SEARCH.md
             # https://github.com/ItzCrazyKns/Perplexica/tree/master/src/lib/providers
 
-            # Google Generative AI
             data = {
                 "chatModel": {
-                    "provider": "custom_openai",
+                    "provider": "gemini",
                     "model": config.googleaiApi_tool_model,
-                    "customOpenAIBaseURL": "https://generativelanguage.googleapis.com/v1beta/openai/",
-                    "customOpenAIKey": config.googleaiApi_key,
                 },
                 "embeddingModel": {
-                    "provider": "local",
-                    "model": config.perplexica_local_embedding_model,
+                    "provider": "gemini",
+                    "model": "text-embedding-004",
                 },
                 "optimizationMode": "speed",
                 "focusMode": "webSearch",
@@ -115,7 +112,7 @@ if config.online:
             "examples": [
                 "Ask Perplexica",
             ],
-            "name": "ask_perplexica_gemini",
+            "name": "ask_perplexica_googleai",
             "description": "Request Perplexica to conduct research or provide information through internet searches.",
             "parameters": {
                 "type": "object",
@@ -129,7 +126,7 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=ask_perplexica_gemini)
+        config.addFunctionCall(signature=functionSignature, method=ask_perplexica_googleai)
         config.inputSuggestions.append("Ask Perplexica: ")
 
     else:

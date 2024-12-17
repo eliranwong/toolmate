@@ -10,22 +10,34 @@ from toolmate import config
 
 if not config.isLite and config.online:
     try:
-        from toolmate.autobuilder import AutoGenBuilder
+        from toolmate.autobuild import AutoGenBuilder
         from toolmate import print2, print3
+        import re
 
-        def build_agents(function_args):
-            if not config.openaiApiKey or config.openaiApiKey == "toolmate":
-                return "OpenAI API key not found! This feature works with ChatGPT models only!"
+        def create_agents(function_args):
             task = function_args.get("task") # required
             title = function_args.get("title") # required
             print2("AutoGen Agent Builder launched!")
             print3(f"Title: {title}")
             print3(f"Description: {task}")
             messages = AutoGenBuilder().getResponse(task, title)
-            if not messages[-1]["content"]:
+            # check last message
+            theLastMessage = messages[-1].get("content", "").strip()
+            if not theLastMessage or theLastMessage == "TERMINATE":
                 del messages[-1]
             # add context to the message chain
-            config.currentMessages += messages
+            #config.currentMessages += messages
+            for index, i in enumerate(messages):
+                content = i.get("content", "")
+                if index == len(messages) - 1:
+                    content = re.sub("TERMINATE$", "", content.rstrip()).rstrip()
+                name = i.get("name", "")
+                if index == 0:
+                    config.currentMessages[-1]["content"] = content
+                elif index > 1:
+                    config.currentMessages.append({"role": "user", "content": f"Next speaker: {name}"})
+                if index > 0:
+                    config.currentMessages.append({"role": "assistant", "content": f"(Speaker) {name}: {content}"})
             print2("\nAutoGen Agent Builder closed!")
             return ""
 
@@ -35,8 +47,8 @@ if not config.isLite and config.online:
                 "create a team of assistants",
                 "create a crew of agents",
             ],
-            "name": "build_agents",
-            "description": "build a group of AI assistants or agents to execute a complicated task that other functions cannot resolve",
+            "name": "create_agents",
+            "description": "build a group of AI agents to execute a complicated task that other functions cannot resolve",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -53,7 +65,6 @@ if not config.isLite and config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=build_agents)
+        config.addFunctionCall(signature=functionSignature, method=create_agents)
     except:
-        print("Plugin `create ai assistants` not enabled! Run `pip install pyautogen[autobuild]` first!")
-        pass
+        print("Plugin `create agents` not enabled! Run `pip install autogen[autobuild]` first!")

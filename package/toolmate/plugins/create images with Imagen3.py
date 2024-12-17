@@ -10,7 +10,7 @@ from toolmate import config
 
 if not config.isLite and config.online:
 
-  from toolmate import print3, getCurrentDateTime
+  from toolmate import print3, getCurrentDateTime, getCliOutput
   import os, subprocess, shutil
   from pathlib import Path
 
@@ -29,10 +29,7 @@ if not config.isLite and config.online:
 
       prompt = function_args.get("prompt") # required
 
-      if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enabledGoogleAPIs:
-          # initiation
-          vertexai.init()
-      else:
+      if not os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enabledGoogleAPIs:
           print("Vertex AI is not enabled!")
           print("Read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Google%20Cloud%20Service%20Credential%20Setup.md for setting up Google API.")
           return "[INVALID]"
@@ -118,8 +115,12 @@ if not config.isLite and config.online:
       #print(dir(image[0])) # ['__annotations__', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_as_base64_string', '_blob', '_gcs_uri', '_generation_parameters', '_image_bytes', '_loaded_bytes', '_loaded_image', '_mime_type', '_pil_image', '_size', 'generation_parameters', 'load_from_file', 'save', 'show']
       
       # image file path
-      folder = os.path.join(config.localStorage, "images")
-      Path(folder).mkdir(parents=True, exist_ok=True)
+      if hasattr(config, "api_server_id"):
+        folder = os.getcwd()
+      else:
+        folder = os.path.join(config.localStorage, "images")
+        Path(folder).mkdir(parents=True, exist_ok=True)
+        
       imageFile = os.path.join(folder, f"{getCurrentDateTime()}.png")
       # save image
       image[0].save(imageFile)

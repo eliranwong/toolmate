@@ -13,13 +13,7 @@ if not config.isLite and config.online:
     
     if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enabledGoogleAPIs and not config.isLite:
 
-        import vertexai
-        from vertexai.generative_models._generative_models import (
-            HarmCategory,
-            HarmBlockThreshold,
-        )
         from toolmate import config
-        import vertexai
         from vertexai.language_models import ChatModel, ChatMessage
 
         def ask_palm2(function_args):
@@ -81,17 +75,6 @@ if not config.isLite and config.online:
             },
         }
 
-        # initiation
-        vertexai.init()
-
-        # Note: BLOCK_NONE is not allowed
-        config.gemini_safety_settings={
-            HarmCategory.HARM_CATEGORY_UNSPECIFIED: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-        }
         config.addFunctionCall(signature=functionSignature, method=ask_palm2)
         config.inputSuggestions.append("Ask PaLM 2: ")
     else:

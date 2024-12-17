@@ -34,8 +34,7 @@ if not hasattr(config, "isLite"):
     except:
         config.isLite = True
 config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") and not os.getcwd().startswith("/root") else False
-if config.isTermux and shutil.which("termux-share"):
-    config.terminalEnableTermuxAPI = True
+config.terminalEnableTermuxAPI = True if config.isTermux and shutil.which("termux-share") else False
 
 # set up shared configs
 
@@ -116,8 +115,9 @@ createShortcuts()
 
 # setup optional credentials
 setChatGPTAPIkey()
-if not config.isTermux:
+if not config.isLite:
     setGoogleCredentials()
+    downloadNltkPackages()
 
 # context
 if isServerAlive("8.8.8.8", 53): # check internet connection

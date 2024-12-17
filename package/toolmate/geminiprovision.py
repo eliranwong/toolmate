@@ -1,4 +1,4 @@
-import vertexai, os, argparse, re
+import os, argparse, re
 from vertexai.generative_models import GenerativeModel
 from vertexai.generative_models._generative_models import (
     GenerationConfig,
@@ -32,7 +32,7 @@ class GeminiProVision:
             print("Read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Google%20Cloud%20Service%20Credential%20Setup.md for setting up Google API.")
             self.runnable = False
         # initiation
-        vertexai.init()
+        #vertexai.init()
         self.generation_config=GenerationConfig(
             temperature=temperature, # 0.0-1.0; default 0.9
             max_output_tokens=max_output_tokens, # default

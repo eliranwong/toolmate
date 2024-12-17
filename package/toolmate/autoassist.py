@@ -1,16 +1,7 @@
 import os
-"""thisFile = os.path.realpath(__file__)
-packageFolder = os.path.dirname(thisFile)
-package = os.path.basename(packageFolder)
-if os.getcwd() != packageFolder:
-    os.chdir(packageFolder)
-configFile = os.path.join(packageFolder, "config.py")
-if not os.path.isfile(configFile):
-    open(configFile, "a", encoding="utf-8").close()"""
 from toolmate import config
 if not hasattr(config, "max_consecutive_auto_reply"):
     config.max_consecutive_auto_reply = 10
-
 import autogen, os, traceback
 from toolmate import getDeviceInfo, getAutogenConfigList
 from toolmate.utils.prompts import Prompts

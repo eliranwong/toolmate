@@ -1428,10 +1428,11 @@ def toGeminiMessages(messages: dict=[]) -> Optional[list]:
 # python code
 
 def displayPythonCode(python_code):
-    print1("```python")
-    tokens = list(pygments.lex(python_code, lexer=PythonLexer()))
-    print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
-    print1("```")
+    print("```python")
+    print(python_code)
+    #tokens = list(pygments.lex(python_code, lexer=PythonLexer()))
+    #print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
+    print("```")
 
 def execPythonFile(script="", content=""):
     if script or content:
@@ -1968,6 +1969,29 @@ def setChatGPTAPIkey():
     #    oai_config_list.append({"model": model, "api_key": config.openaiApiKey})
     #os.environ["OAI_CONFIG_LIST"] = json.dumps(oai_config_list)
 
+def downloadNltkPackages():
+    # there is a bug in the unstructured package about downloading nltk packages
+    import nltk
+    from unstructured.nlp.tokenize import check_for_nltk_package
+    # averaged_perceptron_tagger_eng
+    tagger_available = check_for_nltk_package(
+        package_category="taggers",
+        package_name="averaged_perceptron_tagger_eng",
+    )
+    nltk.download("averaged_perceptron_tagger_eng")
+    # punkt
+    tokenizer_available = check_for_nltk_package(
+        package_category="tokenizers", package_name="punkt"
+    )
+    nltk.download("punkt")
+    # punkt_tab
+    tokenizer_available = check_for_nltk_package(
+        package_category="tokenizers", package_name="punkt_tab"
+    )
+    nltk.download("punkt_tab")
+    # extra
+    #nltk.download("popular")
+
 def setGoogleCredentials():
     config.google_cloud_credentials_file = os.path.join(config.localStorage, "credentials_google_cloud.json") # default path
     if config.google_cloud_credentials and os.path.isfile(config.google_cloud_credentials):
@@ -1985,6 +2009,29 @@ def setGoogleCredentials():
         else:
             config.google_cloud_credentials = ""
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = config.google_cloud_credentials if config.google_cloud_credentials else ""
+    if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enabledGoogleAPIs:
+        try:
+            # import
+            import vertexai
+            from vertexai.generative_models._generative_models import (
+                HarmCategory,
+                HarmBlockThreshold,
+            )
+            # initiation
+            vertexai.init()
+            # safety settings
+            # Note: BLOCK_NONE is not allowed
+            if not hasattr(config, "gemini_safety_settings"):
+                config.gemini_safety_settings={
+                    HarmCategory.HARM_CATEGORY_UNSPECIFIED: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                    HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                    HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                    HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                    HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                }
+        except:
+            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = config.google_cloud_credentials = ""
+
 
 # real-time information
 

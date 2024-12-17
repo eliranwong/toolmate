@@ -54,6 +54,13 @@ class Request(BaseModel):
     toolagent: bool | None = None
     riskthreshold: int | None = None
     execute: bool | None = None
+    autoretrieve: bool | None = None
+    groupchatagents: int | None = None
+    groupchatrounds: int | None = None
+    imagehd: bool | None = None
+    imageheight: int | None = None
+    imagewidth: int | None = None
+    imagesteps: int | None = None
     backupconversation: bool | None = None
     backupsettings: bool | None = None
     reloadsettings: bool | None = None
@@ -81,6 +88,14 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
     toolagent = request.toolagent
     riskthreshold = request.riskthreshold
     execute = request.execute
+    autoretrieve = request.autoretrieve
+    groupchatoaia = request.groupchatoaia
+    groupchatagents = request.groupchatagents
+    groupchatrounds = request.groupchatrounds
+    imagehd = request.imagehd
+    imageheight = request.imageheight
+    imagewidth = request.imagewidth
+    imagesteps = request.imagesteps
     backupconversation = request.backupconversation
     backupsettings = request.backupsettings
     reloadsettings = request.reloadsettings
@@ -173,12 +188,38 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
             config.toolmate.setTemperature(temperature=temperature)
             print3(f"Temperature changed for this request: {temperature}")
 
+    # override AutoGen utilities configurations
+    if autoretrieve:
+        current_autoretrieve = config.rag_useAutoRetriever
+        config.rag_useAutoRetriever = autoretrieve
+    if groupchatoaia:
+        current_groupchatoaia = config.use_oai_assistant
+        config.use_oai_assistant = groupchatoaia
+    if groupchatagents:
+        current_groupchatagents = config.max_agents
+        config.max_agents = groupchatagents
+    if groupchatrounds:
+        current_groupchatrounds = config.max_group_chat_round
+        config.max_group_chat_round = groupchatrounds
+
+    # override image parameters
+    if imagehd:
+        current_imagehd = config.imagehd
+        config.imagehd = imagehd
+    if imageheight and imageheight > 0:
+        config.imageheight = imageheight
+    if imagewidth and imagewidth > 0:
+        config.imagewidth = imagewidth
+    if imagesteps and imagesteps > 0:
+        config.imagesteps = imagesteps
+
     # override risk threshold
     if execute or (riskthreshold is not None and riskthreshold >= 0):
         current_riskThreshold = config.riskThreshold
         config.riskThreshold = 3 if execute else riskthreshold
         print3(f"Risk threshold changed for this request: {config.riskThreshold}")
 
+    # Main work
     if os.path.isdir(wd):
         os.chdir(wd)
     if chatfile and os.path.isfile(chatfile):
@@ -202,6 +243,26 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
         if os.path.isdir(config.localStorage):
             shutil.copy(configFile, os.path.join(config.localStorage, "config_lite_backup.py" if config.isLite else "config_backup.py"))
     else:
+        if autoretrieve:
+            config.rag_useAutoRetriever = current_autoretrieve
+            print3(f"Auto-retriever option restored: {current_autoretrieve}")
+        if groupchatoaia:
+            config.use_oai_assistant = current_groupchatoaia
+            print3(f"OpenAI assistant option restored: {current_autoretrieve}")
+        if groupchatagents:
+            config.max_agents = current_groupchatagents
+            print3(f"Group chat maximum agents restored: {current_autoretrieve}")
+        if groupchatrounds:
+            config.max_group_chat_round = current_groupchatrounds
+            print3(f"Group chat maximum rounds restored: {current_autoretrieve}")
+        if imagehd:
+            config.imagehd = current_imagehd
+        if imageheight and imageheight > 0:
+            config.imageheight = None
+        if imagewidth and imagewidth > 0:
+            config.imagewidth = None
+        if imagesteps and imagesteps > 0:
+            config.imagesteps = None
         if chatsystem:
             config.toolmate.setCustomSystemMessage(customChatMessage=current_chatsystem)
             print3(f"Chat system message restored: {current_chatsystem}")

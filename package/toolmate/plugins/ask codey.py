@@ -12,12 +12,6 @@ if not config.isLite and config.online:
     import os
     if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enabledGoogleAPIs:
 
-        import vertexai
-        from vertexai.generative_models._generative_models import (
-            HarmCategory,
-            HarmBlockThreshold,
-        )
-        import vertexai
         from vertexai.language_models import CodeChatModel, ChatMessage
 
         def ask_codey(function_args):
@@ -81,17 +75,6 @@ if not config.isLite and config.online:
             },
         }
 
-        # initiation
-        vertexai.init()
-
-        # Note: BLOCK_NONE is not allowed
-        config.gemini_safety_settings={
-            HarmCategory.HARM_CATEGORY_UNSPECIFIED: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-        }
         config.addFunctionCall(signature=functionSignature, method=ask_codey)
         config.inputSuggestions.append("Ask Codey: ")
     else:

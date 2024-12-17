@@ -2,14 +2,11 @@ from toolmate import getDeviceInfo, showErrors, toGeminiMessages, executeToolFun
 from toolmate import print1, print2, print3, getPythonFunctionResponse, isValidPythodCode, validParameters, useChatSystemMessage
 from toolmate import config
 from prompt_toolkit import prompt
-import traceback, os, json, pprint, copy, datetime, codecs
+import traceback, os, json, pprint, copy, codecs
 from typing import Optional, List, Dict, Union
-import vertexai
 from vertexai.generative_models import GenerativeModel, FunctionDeclaration, Tool
 from vertexai.generative_models._generative_models import (
     GenerationConfig,
-    HarmCategory,
-    HarmBlockThreshold,
 )
 
 class CallVertexAI:
@@ -31,20 +28,7 @@ class CallVertexAI:
 
     @staticmethod
     def checkCompletion():
-        if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enabledGoogleAPIs:
-            # initiation
-            vertexai.init()
-
-            # Note: BLOCK_NONE is not allowed
-            config.gemini_safety_settings={
-                HarmCategory.HARM_CATEGORY_UNSPECIFIED: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-            }
-
-        else:
+        if not os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and "Vertex AI" in config.enabledGoogleAPIs:
             print("Vertex AI is not enabled!")
             print("Read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Google%20Cloud%20Service%20Credential%20Setup.md for setting up Google API.")
             config.llmInterface = ""

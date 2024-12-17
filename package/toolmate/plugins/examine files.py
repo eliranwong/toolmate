@@ -13,7 +13,7 @@ if not config.isLite:
     from toolmate import is_valid_image_file, ragRefineDocsPath, ragGetSplits, ragSearchContext, getRagPrompt
     from toolmate import print2, print3
     from toolmate.utils.call_llm import CallLLM
-    from toolmate.autoretriever import AutoGenRetriever
+    from toolmate.autoretrieve import AutoGenRetriever
     import os
     #from PIL import Image
 
@@ -31,7 +31,7 @@ if not config.isLite:
                 print3("Running tool: 'examine_images'")
                 return config.toolFunctionMethods["examine_images"](function_args)
             config.stopSpinning()
-            if config.rag_useAutoRetriever and not config.llmInterface in ("vertexai",):
+            if config.rag_useAutoRetriever:
                 print2("AutoGen Retriever launched!")
                 last_message = AutoGenRetriever().getResponse(files, query, True)
                 config.currentMessages += last_message

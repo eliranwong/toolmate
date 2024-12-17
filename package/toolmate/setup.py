@@ -14,6 +14,7 @@ def main():
     # Create the parser
     parser = argparse.ArgumentParser(description="ToolMate AI setup options")
     # Add arguments
+    parser.add_argument('-ab', '--autobuilder', action='store_true', dest='autobuilder', help="configure AutoGen Builder parameters; applicable to plugin 'create_agents'.")
     parser.add_argument('-b', '--backend', action='store_true', dest='backend', help="configure AI backend and models")
     parser.add_argument('-cs', '--chatsystem', action='store_true', dest='chatsystem', help="configure chat system message")
     parser.add_argument('-d', '--developer', action='store', dest='developer', help="configure developer mode; true / false")
@@ -111,6 +112,8 @@ def main():
         config.toolmate.changeSearchSettings()
     if args.editor:
         config.toolmate.setCustomTextEditor()
+    if args.autobuilder:
+        config.toolmate.setAutoGenBuilderConfig()
 
     # unload llama.cpp model to free VRAM
     try:

@@ -14,8 +14,8 @@ except:
 
 if not config.isLite and isSDcppInstalled:
 
-    from toolmate import config, print2, print3, getCurrentDateTime, getCliOutput, getCpuThreads, downloadStableDiffusionFiles
-    import os, shutil
+    from toolmate import config, print1, print2, print3, getCurrentDateTime, getCliOutput, getCpuThreads, downloadStableDiffusionFiles
+    import os, shutil, subprocess
     from base64 import b64decode
     from toolmate.utils.call_chatgpt import check_openai_errors
     from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
@@ -44,40 +44,44 @@ if not config.isLite and isSDcppInstalled:
         prompt = function_args.get("prompt") # required
 
         # image file path
-        folder = os.path.join(config.localStorage, "images")
-        Path(folder).mkdir(parents=True, exist_ok=True)
+        if hasattr(config, "api_server_id"):
+            folder = os.getcwd()
+        else:
+            folder = os.path.join(config.localStorage, "images")
+            Path(folder).mkdir(parents=True, exist_ok=True)
         imageFile = os.path.join(folder, f"{getCurrentDateTime()}.png")
 
         config.stopSpinning()
 
         # customize width and height
-        promptStyle = Style.from_dict({
-            # User input (default text).
-            "": config.terminalCommandEntryColor2,
-            # Prompt.
-            "indicator": config.terminalPromptIndicatorColor2,
-        })
-        change = False
-        print("# Width & Height")
-        print2("Specify the width:")
-        new_width = SinglePrompt.run(style=promptStyle, default=str(config.stableDiffusion_output_width), validator=NumberValidator())
-        if new_width and not new_width.strip().lower() == config.exit_entry and int(new_width) > 0 and not new_width == config.stableDiffusion_output_width:
-            config.stableDiffusion_output_width = int(new_width)
-            change = True
-        print2("Specify the height:")
-        new_height = SinglePrompt.run(style=promptStyle, default=str(config.stableDiffusion_output_height), validator=NumberValidator())
-        if new_height and not new_height.strip().lower() == config.exit_entry and int(new_height) > 0 and not new_height == config.stableDiffusion_output_height:
-            config.stableDiffusion_output_height = int(new_height)
-            change = True
-        print("# Sample steps")
-        print1("Increasing the number of sampling steps generally enhances image quality by refining details and reducing noise, but it also requires more processing time.")
-        print2("Specify the sample steps:")
-        new_stableDiffusion_sample_steps = SinglePrompt.run(style=promptStyle, default=str(config.stableDiffusion_sample_steps), validator=NumberValidator())
-        if new_stableDiffusion_sample_steps and not new_stableDiffusion_sample_steps.strip().lower() == config.exit_entry and int(new_stableDiffusion_sample_steps) > 0 and not new_stableDiffusion_sample_steps == config.stableDiffusion_sample_steps:
-            config.stableDiffusion_sample_steps = int(new_stableDiffusion_sample_steps)
-            change = True
-        if change:
-            config.saveConfig()
+        if not hasattr(config, "api_server_id"):
+            promptStyle = Style.from_dict({
+                # User input (default text).
+                "": config.terminalCommandEntryColor2,
+                # Prompt.
+                "indicator": config.terminalPromptIndicatorColor2,
+            })
+            change = False
+            print("# Width & Height")
+            print2("Specify the width:")
+            new_width = SinglePrompt.run(style=promptStyle, default=str(config.stableDiffusion_output_width), validator=NumberValidator())
+            if new_width and not new_width.strip().lower() == config.exit_entry and int(new_width) > 0 and not new_width == config.stableDiffusion_output_width:
+                config.stableDiffusion_output_width = int(new_width)
+                change = True
+            print2("Specify the height:")
+            new_height = SinglePrompt.run(style=promptStyle, default=str(config.stableDiffusion_output_height), validator=NumberValidator())
+            if new_height and not new_height.strip().lower() == config.exit_entry and int(new_height) > 0 and not new_height == config.stableDiffusion_output_height:
+                config.stableDiffusion_output_height = int(new_height)
+                change = True
+            print("# Sample steps")
+            print1("Increasing the number of sampling steps generally enhances image quality by refining details and reducing noise, but it also requires more processing time.")
+            print2("Specify the sample steps:")
+            new_stableDiffusion_sample_steps = SinglePrompt.run(style=promptStyle, default=str(config.stableDiffusion_sample_steps), validator=NumberValidator())
+            if new_stableDiffusion_sample_steps and not new_stableDiffusion_sample_steps.strip().lower() == config.exit_entry and int(new_stableDiffusion_sample_steps) > 0 and not new_stableDiffusion_sample_steps == config.stableDiffusion_sample_steps:
+                config.stableDiffusion_sample_steps = int(new_stableDiffusion_sample_steps)
+                change = True
+            if change:
+                config.saveConfig()
 
         downloadStableDiffusionFiles()
         stable_diffusion = StableDiffusion(
@@ -90,9 +94,9 @@ if not config.isLite and isSDcppInstalled:
         )
         stable_diffusion.txt_to_img(
             prompt,
-            width=config.stableDiffusion_output_width,
-            height=config.stableDiffusion_output_height,
-            sample_steps=config.stableDiffusion_sample_steps,
+            width=config.imagewidth if config.imagewidth else config.stableDiffusion_output_width,
+            height=config.imageheight if config.imageheight else config.stableDiffusion_output_height,
+            sample_steps=config.imagesteps if config.imagesteps else config.stableDiffusion_sample_steps,
             progress_callback=callback,
         )[0].save(imageFile)
         openImageFile(imageFile)

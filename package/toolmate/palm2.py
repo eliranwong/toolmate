@@ -1,4 +1,4 @@
-import vertexai, os, traceback, argparse, threading
+import os, traceback, argparse, threading
 from vertexai.language_models import ChatModel, ChatMessage
 from toolmate import config
 from toolmate import print1, print2, print3, toggleinputaudio, toggleoutputaudio
@@ -29,7 +29,7 @@ class Palm2:
             print("Read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Google%20Cloud%20Service%20Credential%20Setup.md for setting up Google API.")
             self.runnable = False
         # initiation
-        vertexai.init()
+        #vertexai.init()
         self.name = name
         self.promptStyle = Style.from_dict({
             # User input (default text).

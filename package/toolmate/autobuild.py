@@ -1,13 +1,5 @@
 import os
-thisFile = os.path.realpath(__file__)
-packageFolder = os.path.dirname(thisFile)
-package = os.path.basename(packageFolder)
-if os.getcwd() != packageFolder:
-    os.chdir(packageFolder)
-configFile = os.path.join(packageFolder, "config.py")
-if not os.path.isfile(configFile):
-    open(configFile, "a", encoding="utf-8").close()
-from toolmate import config, getAutogenConfigList
+from toolmate import config, getAutogenConfigList, package, packageFolder
 if not hasattr(config, "max_agents"):
     config.max_agents = 5
 if not hasattr(config, "max_group_chat_round"):
@@ -57,7 +49,6 @@ class AutoGenBuilder:
         self.prompts = Prompts()
 
     def getSavePath(self, title=""):
-        package = os.path.basename(packageFolder)
         storageDir = os.path.join(os.path.expanduser('~'), package)
         if os.path.isdir(storageDir):
             folder = storageDir

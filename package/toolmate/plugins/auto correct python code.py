@@ -1,5 +1,5 @@
 from toolmate import config, fineTunePythonCode, displayPythonCode
-from toolmate import print1, print2, print3
+from toolmate import print2, print3
 import traceback
 from toolmate import installPipPackage
 import io, sys
@@ -28,24 +28,30 @@ def correct_python_code(function_args):
 
     # get the sql query statement
     issue = function_args.get("issue") # required
-    print(f"Issue: {issue}")
+    print(config.divider)
+    print(f"# Issue\n{issue}")
 
-    fix = function_args.get("code") # required
-    missing = function_args.get("missing_module") # required
+    fix = function_args.get("corrected_code") # required
+    missing = function_args.get("missing_module", "") # required
     if missing in ("[]", "???"):
         missing = ""
 
     try:
         if missing:
             try:
-                print3(f"Installing missing package: {missing}")
+                message = f"Installing missing package: {missing}"
+                print(message) if hasattr(config, "api_server_id") else print3(message)
                 installPipPackage(f"--upgrade {missing}")
             except:
                 print(traceback.format_exc())
-        print2("Running improved code ...")
         if config.developer or config.codeDisplay:
+            print("# Improved code")
             displayPythonCode(fix)
+        print("Running improved code ...")
+        print(config.divider)
         exec(fineTunePythonCode(fix), globals())
+        if config.pythonFunctionResponse:
+            print(config.pythonFunctionResponse)
 
         # Restore the original stdout
         sys.stdout = old_stdout
@@ -67,7 +73,7 @@ functionSignature = {
     "parameters": {
         "type": "object",
         "properties": {
-            "code": {
+            "corrected_code": {
                 "type": "string",
                 "description": "Generate an improved version of python code that resolved the traceback error. Return the original code only if traceback shows an import error.",
             },
@@ -80,7 +86,7 @@ functionSignature = {
                 "description": """Briefly explain the error""",
             },
         },
-        "required": ["code", "missing_module", "issue"],
+        "required": ["corrected_code", "missing_module", "issue"],
     },
 }
 

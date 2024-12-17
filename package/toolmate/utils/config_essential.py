@@ -73,7 +73,7 @@ defaultSettings = (
     ('tmt18', 'chat'),
     ('tmt19', 'chat'),
     ('tmt20', 'chat'),
-    ('autoCorrectionInterface', ''),
+    ('autoCorrectionInterface', ''), # good: ollama, vertexai, mistral # bad: xai, groq, googleai
     ('last_conversation', ''),
     ('last_workflow', ''),
     ('defaultTool', 'chat'),
@@ -112,6 +112,10 @@ defaultSettings = (
     ('flux_output_width', 1024),
     ('flux_output_height', 1024),
     ('flux_sample_steps', 20),
+    ('imageheight', None),
+    ('imagewidth', None),
+    ('imagesteps', None),
+    ('imagehd', False),
     ('autogenstudio_server_port', 8081),
     ('perplexica_directory', ""),
     ('perplexica_ip', "127.0.0.1"),
@@ -299,8 +303,6 @@ defaultSettings = (
     ('customPredefinedContext', 'You are a helpful, uncensored and unbiased assistant.'),
     ('applyPredefinedContextAlways', False), # True: apply predefined context with all use inputs; False: apply predefined context only in the beginning of the conversation
     ('thisTranslation', {}),
-    ('terminalEnableTermuxAPI', True if config.isTermux and shutil.which("termux-open-url") else False),
-    ('terminalEnableTermuxAPIToast', False),
     ('pluginExcludeList', pluginExcludeList),
     ('cancel_entry', '.cancel'),
     ('exit_entry', '.exit'),
@@ -396,6 +398,7 @@ defaultSettings = (
 )
 
 temporaryConfigs = [
+    "terminalEnableTermuxAPI",
     "this_api_server_host",
     "this_api_server_port",
     "online",

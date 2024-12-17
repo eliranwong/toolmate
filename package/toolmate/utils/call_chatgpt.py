@@ -100,7 +100,7 @@ def autoCorrectPythonCode(code, trace):
         userInput = f"Original python code:\n```\n{code}\n```\n\nTraceback:\n```\n{trace}\n```"
         messages = [{"role": "user", "content" : userInput}]
         print3(f"Auto-correction attempt: {(i + 1)}")
-        function_call_message, function_call_response = CallChatGPT.getSingleFunctionCallResponse(messages, "correct_python_code") if config.llmInterface == "chatgpt" else CallLetMeDoIt.getSingleFunctionCallResponse(messages, "correct_python_code")
+        function_call_message, function_call_response = CallChatGPT.getSingleFunctionCallResponse(messages, "correct_python_code") if config.llmInterface == "chatgpt" or config.autoCorrectionInterface == "chatgpt" else CallLetMeDoIt.getSingleFunctionCallResponse(messages, "correct_python_code")
         code = json.loads(function_call_message["function_call"]["arguments"]).get("code")
         # display response
         print1(config.divider)
@@ -268,7 +268,7 @@ def finetuneSingleFunctionCallResponse(func_arguments, function_name):
             trace = showErrors()
             print1(config.divider)
             if config.max_consecutive_auto_correction > 0:
-                return autoCorrectPythonCode(refinedCode, trace)
+                return config.autoCorrectPythonCode(refinedCode, trace)
             else:
                 return "[INVALID]"
         if function_response:

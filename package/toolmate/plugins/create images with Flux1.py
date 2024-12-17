@@ -14,12 +14,13 @@ except:
 
 if not config.isLite and isSDcppInstalled:
 
-    from toolmate import config, print2, print3, getCurrentDateTime, getCliOutput, getCpuThreads
-    import os, shutil
+    from toolmate import config, print1, print2, print3, getCurrentDateTime, getCliOutput, getCpuThreads
+    import os, shutil, subprocess
     from pathlib import Path
     from toolmate.utils.single_prompt import SinglePrompt
     from prompt_toolkit.styles import Style
     from toolmate.utils.prompt_validator import NumberValidator
+    from huggingface_hub import hf_hub_download
 
     def downloadFluxModels():
         # reference: https://github.com/william-murray1204/stable-diffusion-cpp-python#flux-image-generation
@@ -97,42 +98,47 @@ if not config.isLite and isSDcppInstalled:
         prompt = function_args.get("prompt") # required
 
         # image file path
-        folder = os.path.join(config.localStorage, "images")
-        Path(folder).mkdir(parents=True, exist_ok=True)
+        if hasattr(config, "api_server_id"):
+            folder = os.getcwd()
+        else:
+            folder = os.path.join(config.localStorage, "images")
+            Path(folder).mkdir(parents=True, exist_ok=True)
         imageFile = os.path.join(folder, f"{getCurrentDateTime()}.png")
 
         config.stopSpinning()
 
         # customize width and height
-        promptStyle = Style.from_dict({
-            # User input (default text).
-            "": config.terminalCommandEntryColor2,
-            # Prompt.
-            "indicator": config.terminalPromptIndicatorColor2,
-        })
-        change = False
-        print("# Width & Height")
-        print1("""Flux.1 natively supports any resolution up to 2 mp (1920x1088), and any aspect ratio thereof. By default will use 1MP 1024x1024 in ToolMate AI. You can take it down to 256x256 and still get good results.""")
-        print2("Specify the width:")
-        new_width = SinglePrompt.run(style=promptStyle, default=str(config.flux_output_width), validator=NumberValidator())
-        if new_width and not new_width.strip().lower() == config.exit_entry and int(new_width) > 0 and not new_width == config.flux_output_width:
-            config.flux_output_width = int(new_width)
-            change = True
-        print2("Specify the height:")
-        new_height = SinglePrompt.run(style=promptStyle, default=str(config.flux_output_height), validator=NumberValidator())
-        if new_height and not new_height.strip().lower() == config.exit_entry and int(new_height) > 0 and not new_height == config.flux_output_height:
-            config.flux_output_height = int(new_height)
-            change = True
-        print("# Sample steps")
-        print1("Increasing the number of sampling steps generally enhances image quality by refining details and reducing noise, but it also requires more processing time.")
-        print2("Specify the sample steps:")
-        new_flux_sample_steps = SinglePrompt.run(style=promptStyle, default=str(config.flux_sample_steps), validator=NumberValidator())
-        if new_flux_sample_steps and not new_flux_sample_steps.strip().lower() == config.exit_entry and int(new_flux_sample_steps) > 0 and not new_flux_sample_steps == config.flux_sample_steps:
-            config.flux_sample_steps = int(new_flux_sample_steps)
-            change = True
-        # save changes
-        if change:
-            config.saveConfig()
+        if not hasattr(config, "api_server_id"):
+            promptStyle = Style.from_dict({
+                # User input (default text).
+                "": config.terminalCommandEntryColor2,
+                # Prompt.
+                "indicator": config.terminalPromptIndicatorColor2,
+            })
+            change = False
+            print("# Width & Height")
+            print1("""Flux.1 natively supports any resolution up to 2 mp (1920x1088), and any aspect ratio thereof. By default will use 1MP 1024x1024 in ToolMate AI. You can take it down to 256x256 and still get good results.""")
+            print2("Specify the width:")
+            new_width = SinglePrompt.run(style=promptStyle, default=str(config.flux_output_width), validator=NumberValidator())
+            if new_width and not new_width.strip().lower() == config.exit_entry and int(new_width) > 0 and not new_width == config.flux_output_width:
+                config.flux_output_width = int(new_width)
+                change = True
+            print2("Specify the height:")
+            new_height = SinglePrompt.run(style=promptStyle, default=str(config.flux_output_height), validator=NumberValidator())
+            if new_height and not new_height.strip().lower() == config.exit_entry and int(new_height) > 0 and not new_height == config.flux_output_height:
+                config.flux_output_height = int(new_height)
+                change = True
+            print("# Sample steps")
+            print1("Increasing the number of sampling steps generally enhances image quality by refining details and reducing noise, but it also requires more processing time.")
+            print2("Specify the sample steps:")
+            new_flux_sample_steps = SinglePrompt.run(style=promptStyle, default=str(config.flux_sample_steps), validator=NumberValidator())
+            if new_flux_sample_steps and not new_flux_sample_steps.strip().lower() == config.exit_entry and int(new_flux_sample_steps) > 0 and not new_flux_sample_steps == config.flux_sample_steps:
+                config.flux_sample_steps = int(new_flux_sample_steps)
+                change = True
+            # save changes
+            if change:
+                config.imagewidth = config.imageheight = config.imagesteps = None
+                config.saveConfig()
 
         downloadFluxModels()
         llm_directory = os.path.join(config.localStorage, "LLMs", "flux")
@@ -150,9 +156,9 @@ if not config.isLite and isSDcppInstalled:
         )
         flux.txt_to_img(
             prompt,
-            width=config.flux_output_width,
-            height=config.flux_output_height,
-            sample_steps=config.flux_sample_steps,
+            width=config.imagewidth if config.imagewidth else config.flux_output_width,
+            height=config.imageheight if config.imageheight else config.flux_output_height,
+            sample_steps=config.imagesteps if config.imagesteps else config.flux_sample_steps,
             cfg_scale=1.0, # a cfg_scale of 1 is recommended for FLUX
             sample_method="euler", # euler is recommended for FLUX
             progress_callback=callback,

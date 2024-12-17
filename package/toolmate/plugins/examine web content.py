@@ -12,7 +12,7 @@ if not config.isLite and config.online:
 
     from toolmate import print1, print2, print3, is_valid_url, downloadWebContent, ragRefineDocsPath, ragGetSplits, ragSearchContext, getRagPrompt
     from toolmate.utils.call_llm import CallLLM
-    from toolmate.autoretriever import AutoGenRetriever
+    from toolmate.autoretrieve import AutoGenRetriever
 
     def examine_web_content(function_args):
         query = function_args.get("query") # required
@@ -33,7 +33,7 @@ if not config.isLite and config.online:
             print3("Running tool: 'examine_images'")
             return config.toolFunctionMethods["examine_images"](function_args)
 
-        if config.rag_useAutoRetriever and not config.llmInterface in ("vertexai",):
+        if config.rag_useAutoRetriever:
             # process with AutoGen Retriever
             print2("AutoGen Retriever launched!")
             last_message = AutoGenRetriever().getResponse(filename, query, True)

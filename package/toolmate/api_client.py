@@ -27,11 +27,15 @@ parser = argparse.ArgumentParser(description = """ToolMate AI API client `tm` cl
                                  `tmmp4` -> `tm -dt download_youtube_video` (internet connection required);
                                  `tmr` -> `tm -dt reflection`;
                                  `tmdr` -> `tm -dt deep_reflection`;
+                                 `tmteam` -> `tm -dt create_agents` (full version only);
+                                 `tmremember` -> `tm -dt save_memory` (full version only);
+                                 `tmrecall` -> `tm -dt search_memory` (full version only);
                                  `tmt1` ... `tmt20` -> `tm -dt <custom_tool>` (determined by `config.tmt1` ... `config.tmt20`);
                                  `tms1` ... `tms20` -> `tm -cs <custom_chat_system_message>` (determined by `config.tms1` ... `config.tms20`);
                                  You may create your own aliases to make the shortcuts more memorable.""")
 # Add arguments
 parser.add_argument("default", nargs="?", default=None, help="instruction sent to ToolMate API server; work on previous conversation if not given.")
+parser.add_argument('-ar', '--autoretrieve', action='store_true', dest='autoretrieve', help="use AutoGen retriever for RAG tools, such as 'examine_files' and 'examine_web_content'; this feature is available in full version only")
 parser.add_argument('-b', '--backend', action='store', dest='backend', help="AI backend; optionally use it together with '-bc' to make a change persistant")
 parser.add_argument('-bc', '--backupconversation', action='store_true', dest='backupconversation', help="back up the current conversation in ToolMate AI user directory")
 parser.add_argument('-bs', '--backupsettings', action='store_true', dest='backupsettings', help="back up the current settings in ToolMate AI user directory")
@@ -42,7 +46,14 @@ parser.add_argument('-dt', '--defaulttool', action='store', dest='defaulttool', 
 parser.add_argument('-e', '--export', action='store', dest='export', help="export conversation; optionally used with -f option to specify a format for the export")
 parser.add_argument('-exec', '--execute', action='store_true', dest='execute', help="execute python code or system command; format a block of python code starting with '```python' or a block of system command starting with '```command'; ends the block with '```'")
 parser.add_argument('-f', '--format', action='store', dest='format', help="conversation output format; plain or list; useful for sharing or backup; only output the last assistant response if this option is not used")
+parser.add_argument('-gca', '--groupchatagents', action='store', dest='groupchatagents', type=int, help="group chat feature; maximum number of agents")
+parser.add_argument('-gcoaia', '--groupchatoaia', action='store_true', dest='groupchatoaia', help="group chat feature; use OpenAI Assistant API; applicable to backend 'openai' only")
+parser.add_argument('-gcr', '--groupchatrounds', action='store', dest='groupchatrounds', type=int, help="group chat feature; maximum number of rounds of discussion")
 parser.add_argument('-i', '--interactive', action='store_true', dest='interactive', help="interactive prompt, with auto-suggestions enabled, for writing instruction; do not use this option together with standard input or output")
+parser.add_argument('-imh', '--imageheight', action='store', dest='imageheight', type=int, help="image height; DALLE.3 supports 1024x1024 / 1024x1792 /1792x1024; Flux.1 natively supports any resolution up to 2 mp (1920x1088)")
+parser.add_argument('-imhd', '--imagehd', action='store_true', dest='imagehd', help="image quality in high definition")
+parser.add_argument('-ims', '--imagesteps', action='store', dest='imagesteps', type=int, help="image sampling steps")
+parser.add_argument('-imw', '--imagewidth', action='store', dest='imagewidth', type=int, help="image width; DALLE.3 supports 1024x1024 / 1024x1792 /1792x1024; Flux.1 natively supports any resolution up to 2 mp (1920x1088)")
 parser.add_argument('-info', '--information', action='store_true', dest='information', help="quick overview of server information")
 parser.add_argument('-k', '--key', action='store', dest='key', help="specify the API key for authenticating access to the ToolMate AI server")
 parser.add_argument('-m', '--model', action='store', dest='model', help="AI model; override backend option if the model's backend is different; optionally use it together with '-bc' to make a change persistant")
@@ -152,6 +163,15 @@ def reflection():
 
 def deepReflection():
     main(defaultTool="deep_reflection")
+
+def remember():
+    main(defaultTool="save_memory")
+
+def recall():
+    main(defaultTool="search_memory")
+
+def team():
+    main(defaultTool="create_agents")
 
 def tms1():
     main(chatSystem=config.tms1)
@@ -427,6 +447,14 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None):
             "toolagent": toolagent,
             "riskthreshold": args.riskthreshold,
             "execute": True if args.execute else False,
+            "autoretrieve": True if args.autoretrieve else False,
+            "groupchatoaia": True if args.groupchatoaia else False,
+            "groupchatagents": args.groupchatagents,
+            "groupchatrounds": args.groupchatrounds,
+            "imagehd": True if args.imagehd else False,
+            "imageheight": args.imageheight,
+            "imagewidth": args.imagewidth,
+            "imagesteps": args.imagesteps,
             "backupconversation": True if args.backupconversation else False,
             "backupsettings": True if args.backupsettings else False,
             "reloadsettings": True if args.reloadsettings else False,

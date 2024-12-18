@@ -219,6 +219,9 @@ defaultSettings = (
     ('translateToLanguage', 'English'),
     ('dynamicTokenCount', False),
     ('use_oai_assistant', False), # support OpenAI Assistants API in AutoGen Agent Builder
+    ('code_execution_use_docker', False),
+    ('code_execution_image', "python:3.12-slim"), # Execute code using the given docker image name.
+    ('code_execution_timeout', 300), # Timeout for each code execution in seconds.
     ('max_agents', 5), # maximum number of agents build manager can create.
     ('max_group_chat_round', 12), # AutoGen group chat maximum round
     ('env_QT_QPA_PLATFORM_PLUGIN_PATH', ''), # e.g. # deal with error: qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "~/apps/letmedoit/lib/python3.10/site-packages/cv2/qt/plugins" even though it was found.
@@ -250,7 +253,6 @@ defaultSettings = (
     ('chatGPTApiFunctionCall', "auto"),
     ('passFunctionCallReturnToChatGPT', True),
     ('llmTemperature', 0.3),
-    ('autogen_use_docker', False),
     ('max_consecutive_auto_reply', 10), # work with pyautogen
     ('memoryClosestMatches', 5),
     ('rag_useAutoRetriever', False),

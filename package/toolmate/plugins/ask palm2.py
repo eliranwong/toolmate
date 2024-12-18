@@ -16,7 +16,7 @@ if not config.isLite and config.online:
         from toolmate import config
         from vertexai.language_models import ChatModel, ChatMessage
 
-        def ask_palm2(function_args):
+        def palm2(function_args):
             config.stopSpinning()
             if function_args:
                 query = function_args.get("query") # required
@@ -61,7 +61,7 @@ if not config.isLite and config.online:
             "examples": [
                 "Ask PaLM",
             ],
-            "name": "ask_palm2",
+            "name": "palm2",
             "description": "Ask PaLM 2 to chat or provide information",
             "parameters": {
                 "type": "object",
@@ -75,7 +75,7 @@ if not config.isLite and config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=ask_palm2)
+        config.addFunctionCall(signature=functionSignature, method=palm2)
         config.inputSuggestions.append("Ask PaLM 2: ")
     else:
         print("Plugin `ask palm2` not enabled! Read setup at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Google%20Cloud%20Service%20Credential%20Setup.md")

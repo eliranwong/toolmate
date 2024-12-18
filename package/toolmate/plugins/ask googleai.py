@@ -16,7 +16,7 @@ if config.googleaiApi_key and config.online:
     try:
         CallGoogleAI.checkCompletion()
 
-        def ask_googleai(function_args):
+        def googleai(function_args):
             config.stopSpinning()
             if function_args:
                 query = function_args.get("query") # required
@@ -29,7 +29,7 @@ if config.googleaiApi_key and config.online:
 
         functionSignature = {
             "examples": [],
-            "name": "ask_googleai",
+            "name": "googleai",
             "description": "Ask GoogleAI Model to chat or provide information",
             "parameters": {
                 "type": "object",
@@ -43,7 +43,7 @@ if config.googleaiApi_key and config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=ask_googleai)
+        config.addFunctionCall(signature=functionSignature, method=googleai)
         config.inputSuggestions.append("Ask GoogleAI: ")
 
     except:

@@ -55,8 +55,11 @@ class Request(BaseModel):
     riskthreshold: int | None = None
     execute: bool | None = None
     autoretrieve: bool | None = None
-    groupchatagents: int | None = None
-    groupchatrounds: int | None = None
+    groupexecuteindocker: bool | None = None
+    groupexecutiontimeout: int | None = None
+    groupoaiassistant: bool | None = None
+    groupagents: int | None = None
+    grouprounds: int | None = None
     imagehd: bool | None = None
     imageheight: int | None = None
     imagewidth: int | None = None
@@ -89,9 +92,11 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
     riskthreshold = request.riskthreshold
     execute = request.execute
     autoretrieve = request.autoretrieve
-    groupchatoaia = request.groupchatoaia
-    groupchatagents = request.groupchatagents
-    groupchatrounds = request.groupchatrounds
+    groupexecuteindocker = request.groupexecuteindocker
+    groupexecutiontimeout = request.groupexecutiontimeout
+    groupoaiassistant = request.groupoaiassistant
+    groupagents = request.groupagents
+    grouprounds = request.grouprounds
     imagehd = request.imagehd
     imageheight = request.imageheight
     imagewidth = request.imagewidth
@@ -192,15 +197,21 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
     if autoretrieve:
         current_autoretrieve = config.rag_useAutoRetriever
         config.rag_useAutoRetriever = autoretrieve
-    if groupchatoaia:
-        current_groupchatoaia = config.use_oai_assistant
-        config.use_oai_assistant = groupchatoaia
-    if groupchatagents:
-        current_groupchatagents = config.max_agents
-        config.max_agents = groupchatagents
-    if groupchatrounds:
-        current_groupchatrounds = config.max_group_chat_round
-        config.max_group_chat_round = groupchatrounds
+    if groupexecuteindocker:
+        current_groupexecuteindocker = config.code_execution_use_docker
+        config.code_execution_use_docker = groupexecuteindocker
+    if groupoaiassistant:
+        current_groupoaiassistant = config.use_oai_assistant
+        config.use_oai_assistant = groupoaiassistant
+    if groupagents:
+        current_groupagents = config.max_agents
+        config.max_agents = groupagents
+    if groupexecutiontimeout:
+        current_groupexecutiontimeout = config.code_execution_timeout
+        config.code_execution_timeout = groupexecutiontimeout
+    if grouprounds:
+        current_grouprounds = config.max_group_chat_round
+        config.max_group_chat_round = grouprounds
 
     # override image parameters
     if imagehd:
@@ -246,15 +257,21 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
         if autoretrieve:
             config.rag_useAutoRetriever = current_autoretrieve
             print3(f"Auto-retriever option restored: {current_autoretrieve}")
-        if groupchatoaia:
-            config.use_oai_assistant = current_groupchatoaia
-            print3(f"OpenAI assistant option restored: {current_autoretrieve}")
-        if groupchatagents:
-            config.max_agents = current_groupchatagents
-            print3(f"Group chat maximum agents restored: {current_autoretrieve}")
-        if groupchatrounds:
-            config.max_group_chat_round = current_groupchatrounds
-            print3(f"Group chat maximum rounds restored: {current_autoretrieve}")
+        if groupexecuteindocker:
+            config.code_execution_use_docker = current_groupexecuteindocker
+            print3(f"Group chat code execution in docker restored: {current_groupexecuteindocker}")
+        if groupexecutiontimeout:
+            config.code_execution_timeout = current_groupexecutiontimeout
+            print3(f"Group chat timeout for each code execution restored: {current_groupexecutiontimeout}")
+        if groupoaiassistant:
+            config.use_oai_assistant = current_groupoaiassistant
+            print3(f"OpenAI assistant option restored: {current_groupoaiassistant}")
+        if groupagents:
+            config.max_agents = current_groupagents
+            print3(f"Group chat maximum agents restored: {current_groupagents}")
+        if grouprounds:
+            config.max_group_chat_round = current_grouprounds
+            print3(f"Group chat maximum rounds restored: {current_grouprounds}")
         if imagehd:
             config.imagehd = current_imagehd
         if imageheight and imageheight > 0:

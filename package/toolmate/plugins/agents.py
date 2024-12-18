@@ -14,11 +14,17 @@ if not config.isLite and config.online:
         from toolmate import print2, print3
         import re
 
-        def create_agents(function_args):
-            task = function_args.get("task") # required
-            title = function_args.get("title") # required
+        def agents(function_args):
+            config.stopSpinning()
+            if function_args:
+                task = function_args.get("task") # required
+                title = function_args.get("title", "") # optional
+            else:
+                task = config.currentMessages[-1]["content"]
+                title = ""
             print2("AutoGen Agent Builder launched!")
-            print3(f"Title: {title}")
+            if title:
+                print3(f"Title: {title}")
             print3(f"Description: {task}")
             messages = AutoGenBuilder().getResponse(task, title)
             # check last message
@@ -47,11 +53,11 @@ if not config.isLite and config.online:
                 "create a team of assistants",
                 "create a crew of agents",
             ],
-            "name": "create_agents",
-            "description": "build a group of AI agents to execute a complicated task that other functions cannot resolve",
+            "name": "agents",
+            "description": "create a group of AI agents to execute a complicated task that other functions cannot resolve",
             "parameters": {
                 "type": "object",
-                "properties": {
+                "properties": {} if not config.tool_selection_agent else {
                     "task": {
                         "type": "string",
                         "description": "Task description in as much detail as possible",
@@ -61,10 +67,10 @@ if not config.isLite and config.online:
                         "description": "A short title to describe the task",
                     },
                 },
-                "required": ["task", "title"],
+                "required": [] if not config.tool_selection_agent else ["task"],
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=create_agents)
+        config.addFunctionCall(signature=functionSignature, method=agents)
     except:
         print("Plugin `create agents` not enabled! Run `pip install autogen[autobuild]` first!")

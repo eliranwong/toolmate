@@ -34,7 +34,7 @@ if config.online:
 
     if isServerAlive(re.sub("http://|https://", "", config.perplexica_server), config.perplexica_backend_port):
 
-        def ask_perplexica_xai(function_args):
+        def perplexica_xai(function_args):
             config.stopSpinning()
             if function_args:
                 query = function_args.get("query")
@@ -115,7 +115,7 @@ if config.online:
             "examples": [
                 "Ask Perplexica",
             ],
-            "name": "ask_perplexica_xai",
+            "name": "perplexica_xai",
             "description": "Request Perplexica to conduct research or provide information through internet searches.",
             "parameters": {
                 "type": "object",
@@ -129,7 +129,7 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=ask_perplexica_xai)
+        config.addFunctionCall(signature=functionSignature, method=perplexica_xai)
         config.inputSuggestions.append("Ask Perplexica: ")
 
     else:

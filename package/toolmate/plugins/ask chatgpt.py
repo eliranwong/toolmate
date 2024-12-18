@@ -16,7 +16,7 @@ if config.online:
     try:
         CallChatGPT.checkCompletion()
 
-        def ask_chatgpt(function_args):
+        def chatgpt(function_args):
             config.stopSpinning()
             if function_args:
                 query = function_args.get("query") # required
@@ -31,7 +31,7 @@ if config.online:
             "examples": [
                 "Ask ChatGPT",
             ],
-            "name": "ask_chatgpt",
+            "name": "chatgpt",
             "description": "Ask ChatGPT to chat or provide information",
             "parameters": {
                 "type": "object",
@@ -45,7 +45,7 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=ask_chatgpt)
+        config.addFunctionCall(signature=functionSignature, method=chatgpt)
         config.inputSuggestions.append("Ask ChatGPT: ")
 
     except:

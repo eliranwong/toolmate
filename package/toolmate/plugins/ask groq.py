@@ -13,7 +13,7 @@ if config.online:
 
     from toolmate.utils.call_groq import CallGroq
 
-    def ask_groq(function_args):
+    def groq(function_args):
         config.stopSpinning()
         if function_args:
             query = function_args.get("query") # required
@@ -28,7 +28,7 @@ if config.online:
         "examples": [
             "Ask Groq",
         ],
-        "name": "ask_groq",
+        "name": "groq",
         "description": "Ask Groq to chat or provide information",
         "parameters": {
             "type": "object",
@@ -42,5 +42,5 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=ask_groq)
+    config.addFunctionCall(signature=functionSignature, method=groq)
     config.inputSuggestions.append("Ask Groq: ")

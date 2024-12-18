@@ -284,7 +284,6 @@ source ~/.bashrc
 
 Remarks:
 * Configure the `fabric` before installing running `ToolMate AI`.
-* `libsqlite3-dev` is required for python installing package `pysqlite3`.
 * Rust toolchain is required for installing package `lightrag-hku`
 
 ```

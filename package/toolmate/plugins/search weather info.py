@@ -18,7 +18,7 @@ if config.online:
         from toolmate.utils.python_utils import PythonUtil
         import json
 
-        def search_weather_info(function_args):
+        def search_weather(function_args):
             code = function_args.get("code") # required
             information = PythonUtil.showAndExecutePythonCode(code)
             if information == "[INVALID]":
@@ -34,7 +34,7 @@ if config.online:
                 "current weather",
                 "search weather",
             ],
-            "name": "search_weather_info",
+            "name": "search_weather",
             "description": f'''Answer a query about weather''',
             "parameters": {
                 "type": "object",
@@ -48,7 +48,7 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=search_weather_info)
+        config.addFunctionCall(signature=functionSignature, method=search_weather)
     else:
         print1("To use plugin 'search weather info', you need to set up an OpenWeatherMap API key first.")
         print3("Read: https://github.com/eliranwong/letmedoit/wiki/OpenWeatherMap-API-Setup")

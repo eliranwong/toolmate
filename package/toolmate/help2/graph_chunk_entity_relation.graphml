@@ -255,7 +255,7 @@
     </node>
     <node id="&quot;@ASK_INTERNET.&quot;">
       <data key="d0">"ALIAS"</data>
-      <data key="d1">"@ask_internet acts as an alias for @search_searxng."|&lt;SEP&gt;"@ask_internet acts as an alias for @search_searxng."|&lt;SEP&gt;"@ask_internet acts as an alias for @search_searxng."|&lt;SEP&gt;"@ask_internet is an alias for @search_searxng, offering similar functionalities."&lt;SEP&gt;"@ask_internet is an alias for @search_searxng, offering similar functionalities."&lt;SEP&gt;"@ask_internet is an alias for @search_searxng, offering similar functionalities."</data>
+      <data key="d1">"internet acts as an alias for @search_searxng."|&lt;SEP&gt;"internet acts as an alias for @search_searxng."|&lt;SEP&gt;"internet acts as an alias for @search_searxng."|&lt;SEP&gt;"internet is an alias for @search_searxng, offering similar functionalities."&lt;SEP&gt;"internet is an alias for @search_searxng, offering similar functionalities."&lt;SEP&gt;"internet is an alias for @search_searxng, offering similar functionalities."</data>
       <data key="d2">chunk-0972121b1b4cc2486add4c8c3e8b503b</data>
     </node>
     <node id="&quot;@SEARCH_TAVILY.&quot;">
@@ -265,7 +265,7 @@
     </node>
     <node id="&quot;@ASK_TAVILY.&quot;">
       <data key="d0">"ALIAS"</data>
-      <data key="d1">"@ask_tavily acts as an alias for @search_tavily, offering direct and short answers from the internet."&lt;SEP&gt;"@ask_tavily acts as an alias for @search_tavily, offering direct and short answers from the internet."&lt;SEP&gt;"@ask_tavily acts as an alias for @search_tavily, offering direct and short answers from the internet."&lt;SEP&gt;"@ask_tavily is an alias for @search_tavily, providing direct and short answers from the internet."&lt;SEP&gt;"@ask_tavily is an alias for @search_tavily, providing direct and short answers from the internet."&lt;SEP&gt;"@ask_tavily is an alias for @search_tavily, providing direct and short answers from the internet."</data>
+      <data key="d1">"tavily acts as an alias for @search_tavily, offering direct and short answers from the internet."&lt;SEP&gt;"tavily acts as an alias for @search_tavily, offering direct and short answers from the internet."&lt;SEP&gt;"tavily acts as an alias for @search_tavily, offering direct and short answers from the internet."&lt;SEP&gt;"tavily is an alias for @search_tavily, providing direct and short answers from the internet."&lt;SEP&gt;"tavily is an alias for @search_tavily, providing direct and short answers from the internet."&lt;SEP&gt;"tavily is an alias for @search_tavily, providing direct and short answers from the internet."</data>
       <data key="d2">chunk-0972121b1b4cc2486add4c8c3e8b503b</data>
     </node>
     <node id="&quot;LLMS&quot;">
@@ -600,7 +600,7 @@
     </node>
     <node id="&quot;SEARCH_WEATHER_INFO&quot;">
       <data key="d0">"EVENT"</data>
-      <data key="d1">"search_weather_info provides weather-related information based on a request with 'code' conditions."</data>
+      <data key="d1">"search_weather provides weather-related information based on a request with 'code' conditions."</data>
       <data key="d2">chunk-cacf86457977d1ebe0e01010f1a3ebdf</data>
     </node>
     <node id="&quot;SEND_GMAIL&quot;">
@@ -1956,13 +1956,13 @@
     </edge>
     <edge source="&quot;@ASK_O1_MINI&quot;" target="&quot;MESSAGE&quot;">
       <data key="d3">16.0</data>
-      <data key="d4">"The user command @ask_o1_mini requests information from reasoning model o1-mini, who then provides it."</data>
+      <data key="d4">"The user command o1_mini requests information from reasoning model o1-mini, who then provides it."</data>
       <data key="d5">"communication, request-response"</data>
       <data key="d6">chunk-995976c7c3b43e361fe960f032aa13c9</data>
     </edge>
     <edge source="&quot;@ASK_PALM2&quot;" target="&quot;CODE&quot;">
       <data key="d3">18.0</data>
-      <data key="d4">"The user command @ask_palm2 asks PaLM 2 for code execution, likely leading to a response that includes the requested functionality." &lt;|"interaction, information retrieval"</data>
+      <data key="d4">"The user command palm2 asks PaLM 2 for code execution, likely leading to a response that includes the requested functionality." &lt;|"interaction, information retrieval"</data>
       <data key="d5">9</data>
       <data key="d6">chunk-995976c7c3b43e361fe960f032aa13c9</data>
     </edge>

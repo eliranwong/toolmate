@@ -22,8 +22,8 @@ Assuming `fabric` is installed and the ToolMate AI tool plugin `fabric` is enabl
 @fabric -m gemini-1.5-pro -p write_essay "What is machine learning?"
 @append_fabric -m llama3.1:latest -p extract_wisdom
 @append_fabric -m mistral-large:123b -p summarize
-@ask_gemini Explain it to a five-year kid
-@ask_chatgpt Translate it into Chinese
+gemini Explain it to a five-year kid
+chatgpt Translate it into Chinese
 ```
 
 For using multiple tools in a single prompt, read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md

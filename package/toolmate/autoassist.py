@@ -3,15 +3,12 @@ from toolmate import config
 if not hasattr(config, "max_consecutive_auto_reply"):
     config.max_consecutive_auto_reply = 10
 import autogen, os, traceback
-from toolmate import getDeviceInfo, getAutogenConfigList
+from toolmate import getDeviceInfo, getAutogenConfigList, getAutogenCodeExecutionConfig
 from toolmate.utils.prompts import Prompts
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.styles import Style
 #from prompt_toolkit import PromptSession
 #from prompt_toolkit.history import FileHistory
-from autogen.coding import LocalCommandLineCodeExecutor
-from autogen.coding import DockerCommandLineCodeExecutor
-import tempfile
 
 class AutoGenAssistant:
 
@@ -26,7 +23,7 @@ class AutoGenAssistant:
         The options available are:
         - Make sure docker is running (advised approach for code execution)
         - Set "use_docker": False in code_execution_config
-        - Set AUTOGEN_USE_DOCKER to "0/False/no" in your environment variables
+        - Set code_execution_use_docker to "0/False/no" in your environment variables
         """
 
     def getResponse(self, message, auto=False):
@@ -39,16 +36,6 @@ Below is my message:
 
         filter_dict = {"tags": [config.llmInterface]}
         config_list = autogen.filter_config(getAutogenConfigList(), filter_dict)
-
-        temp_dir = tempfile.TemporaryDirectory()
-        executor =  DockerCommandLineCodeExecutor(
-            image="python:3.12-slim",  # Execute code using the given docker image name.
-            timeout=10,  # Timeout for each code execution in seconds.
-            work_dir=temp_dir.name,  # Use the temporary directory to store the code files.
-        ) if config.autogen_use_docker else LocalCommandLineCodeExecutor(
-            timeout=10,  # Timeout for each code execution in seconds.
-            work_dir=temp_dir.name,  # Use the temporary directory to store the code files.
-        )
 
         assistant = autogen.AssistantAgent(
             name="assistant",
@@ -65,9 +52,7 @@ Below is my message:
             human_input_mode="NEVER" if auto else "ALWAYS",
             max_consecutive_auto_reply=config.max_consecutive_auto_reply,
             is_termination_msg=lambda x: x.get("content", "").rstrip().endswith("TERMINATE"),
-            code_execution_config={
-                "executor": executor,
-            },
+            code_execution_config=getAutogenCodeExecutionConfig(),
         )
         # the assistant receives a message from the user_proxy, which contains the task description
         user_proxy.initiate_chat(

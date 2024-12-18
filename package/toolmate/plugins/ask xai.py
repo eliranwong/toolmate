@@ -16,7 +16,7 @@ if config.xaiApi_key and config.online:
     try:
         CallXAI.checkCompletion()
 
-        def ask_xai(function_args):
+        def xai(function_args):
             config.stopSpinning()
             if function_args:
                 query = function_args.get("query") # required
@@ -29,7 +29,7 @@ if config.xaiApi_key and config.online:
 
         functionSignature = {
             "examples": [],
-            "name": "ask_xai",
+            "name": "xai",
             "description": "Ask X AI Model to chat or provide information",
             "parameters": {
                 "type": "object",
@@ -43,7 +43,7 @@ if config.xaiApi_key and config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=ask_xai)
+        config.addFunctionCall(signature=functionSignature, method=xai)
         config.inputSuggestions.append("Ask X AI: ")
 
     except:

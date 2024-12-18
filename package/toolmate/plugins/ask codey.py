@@ -14,7 +14,7 @@ if not config.isLite and config.online:
 
         from vertexai.language_models import CodeChatModel, ChatMessage
 
-        def ask_codey(function_args):
+        def codey(function_args):
             config.stopSpinning()
             if function_args:
                 query = function_args.get("query") # required
@@ -61,7 +61,7 @@ if not config.isLite and config.online:
             "examples": [
                 "Ask Codey",
             ],
-            "name": "ask_codey",
+            "name": "codey",
             "description": "Ask Codey for information about coding",
             "parameters": {
                 "type": "object",
@@ -75,7 +75,7 @@ if not config.isLite and config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=ask_codey)
+        config.addFunctionCall(signature=functionSignature, method=codey)
         config.inputSuggestions.append("Ask Codey: ")
     else:
         print("Plugin `ask codey` not enabled! Read setup at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Google%20Cloud%20Service%20Credential%20Setup.md")

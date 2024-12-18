@@ -18,7 +18,7 @@ if not config.isLite and runnable:
 
     from toolmate import print1, loadLlamacppChatModel
 
-    def ask_llamacpp(function_args):
+    def llamacpppython(function_args):
         chatModel = None
         config.stopSpinning()
         if function_args:
@@ -44,7 +44,7 @@ if not config.isLite and runnable:
         "examples": [
             "Ask Llama.cpp",
         ],
-        "name": "ask_llamacpp",
+        "name": "llamacpppython",
         "description": "Ask Llama.cpp to chat or provide information",
         "parameters": {
             "type": "object",
@@ -58,5 +58,5 @@ if not config.isLite and runnable:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=ask_llamacpp)
+    config.addFunctionCall(signature=functionSignature, method=llamacpppython)
     config.inputSuggestions.append("Ask ChatGPT: ")

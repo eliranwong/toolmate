@@ -123,14 +123,15 @@ if isServerAlive(re.sub("http://|https://", "", config.searx_server), config.sea
     }
 
     config.addFunctionCall(signature=functionSignature, method=search_searxng)
-    config.aliases["@ask_internet "] = "@search_searxng "
+    config.aliases["@online "] = "@search_searxng "
+    config.builtinTools["online"] = "Perform online searches to obtain the latest and most up-to-date, real-time information"
     for i in config.searx_tabs:
         tool = i[1:-1]
         config.aliases[f'@{"qna" if tool=="q&a" else tool} '] = f"@search_searxng {i}"
         config.inputSuggestions.append(f'@{"qna" if tool=="q&a" else tool} ')
         config.builtinTools["qna" if tool=="q&a" else tool] = f"""Search the '{"questions_and_answers" if tool=="q&a" else tool}' category for online information."""
     tabsDict = {i: None for i in config.searx_tabs}
-    config.inputSuggestions += ["Search SearxNG: ", {"@search_searxng": tabsDict}, {"@ask_internet": tabsDict}]
+    config.inputSuggestions += ["Search SearxNG: ", {"@search_searxng": tabsDict}, {"@online": tabsDict}]
 
 else:
 

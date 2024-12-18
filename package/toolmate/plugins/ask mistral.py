@@ -12,7 +12,7 @@ from toolmate.utils.call_mistral import CallMistral
 
 if config.online:
 
-    def ask_mistral(function_args):
+    def mistral(function_args):
         config.stopSpinning()
         if function_args:
             query = function_args.get("query") # required
@@ -27,7 +27,7 @@ if config.online:
         "examples": [
             "Ask Mistral",
         ],
-        "name": "ask_mistral",
+        "name": "mistral",
         "description": "Ask Mistral to chat or provide information",
         "parameters": {
             "type": "object",
@@ -41,5 +41,5 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=ask_mistral)
+    config.addFunctionCall(signature=functionSignature, method=mistral)
     config.inputSuggestions.append("Ask Mistral: ")

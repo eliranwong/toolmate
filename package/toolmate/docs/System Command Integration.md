@@ -19,8 +19,8 @@ For an example, to integrate `fabric` with other ToolMate AI tools, you may do s
 @command /home/ubuntu/go/bin/fabric -m gemini-1.5-pro -p write_essay "What is machine learning?"
 @append_command /home/ubuntu/go/bin/fabric -m llama3.1:latest -p extract_wisdom
 @append_command /home/ubuntu/go/bin/fabric -m mistral-large:123b -p summarize
-@ask_gemini Explain it to a five-year kid
-@ask_chatgpt Translate it into Chinese
+gemini Explain it to a five-year kid
+chatgpt Translate it into Chinese
 ```
 
 # Difference from running system command on their own?

@@ -1,3 +1,19 @@
+# 0.5.82-0.5.84
+
+* changed tool name `create_agents` to `agents`
+
+* changed command name `tmteam` to `tmagents`
+
+* changed command name `tminternet` to `tmonline`
+
+* simplified some tool names
+
+* added code execution ability to tool "create_agents"
+
+* added config options for AutoGen parameters
+
+* fixed repetitive download of nltk modules on startup
+
 # 0.5.76-0.5.81
 
 * support use of image tools with api_client
@@ -114,7 +130,7 @@
 
 # 0.4.88
 
-* added support of using Grop cloud API keys for running tool `@ask_perplexica`
+* added support of using Grop cloud API keys for running tool `perplexica`
 
 # 0.4.81-0.4.87
 
@@ -232,7 +248,7 @@
 
 # 0.4.11
 
-* added tool `@ask_perplexica`
+* added tool `perplexica`
 
 # 0.4.09-0.4.10
 
@@ -250,7 +266,7 @@
 
 # 0.4.06
 
-* added two tools `@ask_o1` and `@ask_o1_mini` to use reasoning model o1-preview and o1-mini
+* added two tools `o1` and `o1_mini` to use reasoning model o1-preview and o1-mini
 
 # 0.4.04-0.4.05
 
@@ -380,7 +396,7 @@ Added tool aliases for `@search_searxng` categories:
 
 # Version 0.3.73
 
-* support SearXNG categories syntax for searching online with tool `@ask_internet` or `@search_searxng`. Read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Perplexica%20and%20SearXNG%20Integration.md#searxng-setup
+* support SearXNG categories syntax for searching online with tool `internet` or `@search_searxng`. Read https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Perplexica%20and%20SearXNG%20Integration.md#searxng-setup
 
 * fixed searching help store
 
@@ -388,7 +404,7 @@ Added tool aliases for `@search_searxng` categories:
 
 # Version 0.3.68-0.3.72
 
-* added an alias `@ask_internet` to point to `@search_searxng`
+* added an alias `internet` to point to `@search_searxng`
 
 * updated Ollama model list
 
@@ -764,8 +780,8 @@ For an example, to integrate `fabric` with other FreeGenius AI tools, you may do
 @command /home/ubuntu/go/bin/fabric -m gemini-1.5-pro -p write_essay "What is machine learning?"
 @append_command /home/ubuntu/go/bin/fabric -m llama3.1:latest -p extract_wisdom
 @append_command /home/ubuntu/go/bin/fabric -m mistral-large:123b -p summarize
-@ask_gemini Explain it to a five-year kid
-@ask_chatgpt Translate it into Chinese
+gemini Explain it to a five-year kid
+chatgpt Translate it into Chinese
 ```
 
 2. Created two aliases:
@@ -795,15 +811,15 @@ Fixed `improve input entry` feature.
 
 ```
 @chat What is the future of AI development?
-@ask_chatgpt What is your opinion?
-@ask_gemini What do you disagree?
+chatgpt What is your opinion?
+gemini What do you disagree?
 ```
 
 Or
 
 ```
-@ask_llama3_1 Write code to extract mp3 audio from YouTube video
-@ask_codey Review the code generated above
+llama3_1 Write code to extract mp3 audio from YouTube video
+codey Review the code generated above
 ```
 
 2. Suspended features in previous version resume:
@@ -914,7 +930,7 @@ Currently supported tools:
 @search_finance
 @search_news
 @search_sqlite
-@search_weather_info
+@search_weather
 @send_email
 @send_tweet
 

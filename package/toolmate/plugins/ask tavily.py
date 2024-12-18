@@ -12,7 +12,7 @@ if not config.isLite and config.online:
 
     from toolmate import getTavilyClient, print1
 
-    def ask_tavily(function_args):
+    def tavily(function_args):
         config.stopSpinning()
         if function_args:
             query = function_args.get("query")
@@ -27,7 +27,7 @@ if not config.isLite and config.online:
         "examples": [
             "Ask internet",
         ],
-        "name": "ask_tavily",
+        "name": "tavily",
         "description": "Ask internet for a short and direct answer",
         "parameters": {
             "type": "object",
@@ -41,5 +41,5 @@ if not config.isLite and config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=ask_tavily)
+    config.addFunctionCall(signature=functionSignature, method=tavily)
     config.inputSuggestions.append("Ask Tavily: ")

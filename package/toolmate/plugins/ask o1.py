@@ -18,7 +18,7 @@ if config.online:
     try:
         CallChatGPT.checkCompletion()
 
-        def ask_o1(function_args):
+        def o1(function_args):
             config.stopSpinning()
             if function_args:
                 query = function_args.get("query") # required
@@ -42,7 +42,7 @@ if config.online:
             "examples": [
                 "Ask o1",
             ],
-            "name": "ask_o1",
+            "name": "o1",
             "description": "Ask reasoning model o1 to chat or provide information",
             "parameters": {
                 "type": "object",
@@ -56,7 +56,7 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=ask_o1)
+        config.addFunctionCall(signature=functionSignature, method=o1)
         config.inputSuggestions.append("Ask o1: ")
 
     except:

@@ -15,7 +15,7 @@ if not config.isLite and config.online:
         from toolmate import config
         from toolmate.utils.call_vertexai import CallVertexAI
 
-        def ask_gemini(function_args):
+        def vertexai(function_args):
             config.stopSpinning()
             if function_args:
                 query = function_args.get("query") # required
@@ -30,7 +30,7 @@ if not config.isLite and config.online:
             "examples": [
                 "Ask Gemini",
             ],
-            "name": "ask_gemini",
+            "name": "vertexai",
             "description": "Ask Gemini to chat or provide information",
             "parameters": {
                 "type": "object",
@@ -44,7 +44,7 @@ if not config.isLite and config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=ask_gemini)
+        config.addFunctionCall(signature=functionSignature, method=vertexai)
         config.inputSuggestions.append("Ask Gemini: ")
     else:
         print("Plugin `ask gemini` not enabled! Read setup at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Google%20Cloud%20Service%20Credential%20Setup.md")

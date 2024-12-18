@@ -18,7 +18,7 @@ To install on Android, read https://github.com/eliranwong/toolmate/blob/main/pac
 
 # Perplexica Setup
 
-Tool `@ask_perplexica` is bult to integrate Perplexica capabilities with other ToolMate AI tools.  Simply ask a question following `@ask_perplexica` like the screenshot below.  You can make it more powerful, by [using it together with other tools in a ToolMate AI workflow](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md).
+Tool `perplexica` is bult to integrate Perplexica capabilities with other ToolMate AI tools.  Simply ask a question following `perplexica` like the screenshot below.  You can make it more powerful, by [using it together with other tools in a ToolMate AI workflow](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md).
 
 ![ask_perplexica](https://github.com/user-attachments/assets/95e60cfc-5649-42ae-afe1-665d9211ddc2)
 
@@ -46,9 +46,9 @@ For example, you may ask something like:
 
 > @search_searxng What is the current time in Hong Kong?
 
-`@ask_internet` is an alias to `@search_searxng`, therefore, it is the same as above to ask like:
+`internet` is an alias to `@search_searxng`, therefore, it is the same as above to ask like:
 
-> @ask_internet What is the current time in Hong Kong?
+> internet What is the current time in Hong Kong?
 
 The plugins assumes SearXNG is installed with Perplexica locally, with the following configurations:
 
@@ -61,11 +61,11 @@ You may customise these two values by manually editing the file `config.py`.
 
 You may specify categories for your searches: `!general` `!translate` `!web` `!wikimedia` `!images` `!web` `!videos` `!web` `!news` `!web` `!wikimedia` `!map` `!music` `!lyrics` `!radio` `!it` `!packages` `!q&a` `!repos` `!software_wikis` `!science` `!scientific_publications` `!wikimedia` `!files` `!apps` `!social_media`
 
-These categories are loaded for input suggestions when you enter `@search_searxng ` or `@ask_internet `.
+These categories are loaded for input suggestions when you enter `@search_searxng ` or `internet `.
 
 For example:
 
-> @ask_internet !news London today
+> internet !news London today
 
 Read supported categories at: https://docs.searxng.org/user/configured_engines.html
 

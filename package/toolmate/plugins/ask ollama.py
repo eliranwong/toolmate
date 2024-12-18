@@ -10,7 +10,7 @@ from toolmate import config
 #from toolmate.utils.ollama_models import ollama_models
 from toolmate.utils.call_ollama import CallOllama
 
-def ask_ollama(function_args):
+def ollama(function_args):
     config.stopSpinning()
     if function_args:
         query = function_args.get("query") # required
@@ -27,7 +27,7 @@ functionSignature = {
     "examples": [
         "Ask Ollama",
     ],
-    "name": "ask_ollama",
+    "name": "ollama",
     "description": "Ask an Ollama model to chat or provide information",
     "parameters": {
         "type": "object",
@@ -41,5 +41,5 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=ask_ollama)
+config.addFunctionCall(signature=functionSignature, method=ollama)
 config.inputSuggestions.append("Ask Ollama: ")

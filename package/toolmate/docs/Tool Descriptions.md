@@ -4,7 +4,7 @@ This page content is generated on 17Sept2024.  For the latest information, simpl
 
 # Available Tools
 
-@add_google_calendar_event @add_outlook_calendar_event @examine_audio_google @examine_audio_groq @examine_audio_openai @examine_audio_whisper @examine_files @examine_images_chatgpt @examine_images_gemini @examine_images_groq @examine_images_llamacpp @examine_images_ollama @examine_web_content @append_command @append_fabric @append_instruction @apps @ask_chatgpt @ask_codey @ask_gemini @ask_groq @ask_llama3_1 @ask_llamacpp @ask_llamacppserver @ask_o1 @ask_o1_mini @ask_ollama @ask_palm2 @ask_perplexica @ask_tavily @build_agents @chat @command @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_flux @create_image_imagen3 @create_image_sd @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @edit_text @execute_computing_task  @extract_python_code @fabric @files @general @help @images @improve_writing @install_python_package @it @list_current_directory_contents @load_conversations @lyrics @map @modify_images @music @news @open_browser @packages @paste_from_clipboard @qna @radio @read_aloud @recommend_tool @reflection @remove_image_background @repos @execute_python_code @save_memory @science @scientific_publications @search_conversations @search_finance @search_google @search_google_news @search_memory @search_searxng @search_sqlite @search_tavily @search_weather_info @send_gmail @send_outlook @send_tweet @social_media @software_wikis @translate @transcribe_audio_google @transcribe_audio_groq @transcribe_audio_openai @transcribe_audio_whisper @videos @web @wikimedia @workflow
+@add_google_calendar_event @add_outlook_calendar_event @agents @append_command @append_fabric @append_instruction @apps @chatgpt @codey @gemini @googleai @groq @llamacpp @llamacppserver @mistral @o1 @o1_mini @ollama @palm2 @perplexica_chatgpt @perplexica_googleai @perplexica_groq @perplexica_xai @tavily @xai @b @bapi @bible @bible_commentary @chat @command @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_imagen3 @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @edit_text @examine_audio_google @examine_audio_groq @examine_audio_openai @examine_audio_whisper @examine_files @examine_images_chatgpt @examine_images_googleai @examine_images_groq @examine_images_llamacpp @examine_images_ollama @examine_images_pixtral @examine_images_vertexai @examine_web_content @execute_computing_task @execute_python_code @extract_bible_references @extract_python_code @fabric @files @general @help @images @improve_writing @install_python_package @it @list_current_directory_contents @load_conversations @lyrics @map @modify_images @music @news @online @open_browser @packages @paste_from_clipboard @qna @radio @read_aloud @recommend_tool @reflection @remove_image_background @repos @science @scientific_publications @search_bible @search_bible_paragraphs @search_conversations @search_finance @search_google @search_google_news @search_searxng @search_sqlite @search_tavily @search_weather @send_gmail @send_outlook @send_tweet @social_media @software_wikis @task @transcribe_audio_google @transcribe_audio_groq @transcribe_audio_openai @transcribe_audio_whisper @translate @uniquebible @uniquebible_api @uniquebible_web @videos @web @wikimedia @workflow
 
 ## Android-only tools:
 
@@ -18,37 +18,21 @@ Additional bible tools, if you install optional `bible` module, by running `pip 
 
 # Tips
 
-Enter `@` to get the latest descriptions of all available tools.
+To get the latest descriptions of all available tools:
+
+Enter `@` in Toolmate AI interactive mode prompt.
+
+Alternately, run in terminal:
+
+> tm -st @ -sd
 
 # Descriptions
 
-`@add_google_calendar_event` Add a Google calendar event (Requirements: 'title', 'description', 'start_time', 'end_time')
+`@add_google_calendar_event` Add a Google calendar event (Requirements: 'title', 'description')
 
-`@add_outlook_calendar_event` Add an Outlook calendar event (Requirements: 'title', 'description', 'start_time', 'end_time')
+`@add_outlook_calendar_event` Add an Outlook calendar event (Requirements: 'title', 'description')
 
-`@examine_audio_google` Retrieve information from an audio with Google (Requirements: 'audio_filepath', 'language')
-
-`@examine_audio_groq` Retrieve information from an audio with Groq (Requirements: 'audio_filepath')
-
-`@examine_audio_openai` Retrieve information from an audio with OpenAI (Requirements: 'audio_filepath', 'language')
-
-`@examine_audio_whisper` Retrieve information from an audio with Whisper (Requirements: 'audio_filepath', 'language')
-
-`@examine_audio` Transcribe audio into text or retrieve information from an audio (Requirements: 'audio_filepath', 'language')
-
-`@examine_files` Retrieve information from files (Requirements: 'query', 'filepath')
-
-`@examine_images_chatgpt` Describe or compare images with ChatGPT (Requirements: 'query', 'image_filepath')
-
-`@examine_images_gemini` Describe or compare images with Gemini (Requirements: 'query', 'image_filepath')
-
-`@examine_images_groq` Describe or compare images with ChatGPT (Requirements: 'query', 'image_filepath')
-
-`@examine_images_llamacpp` Describe or compare images with Llama.cpp (Requirements: 'query', 'image_filepath')
-
-`@examine_images_ollama` Describe or compare images with Ollama (Requirements: 'query', 'image_filepath')
-
-`@examine_web_content` retrieve information from a webpage if an url is provided (Requirements: 'query', 'url')
+`@agents` build a group of AI agents to execute a complicated task that other functions cannot resolve (Requirements: 'task', 'title')
 
 `@append_command` Execute a system command with the previous text output appended to it
 
@@ -56,37 +40,51 @@ Enter `@` to get the latest descriptions of all available tools.
 
 `@append_instruction` Append the previous text output to a given instruction
 
-`@apps` Search for information online in the 'apps' category.
+`@apps` Search the 'apps' category for online information.
 
-`@ask_chatgpt` Ask ChatGPT to chat or provide information (Requirements: 'query')
+`@chatgpt` Ask ChatGPT to chat or provide information
 
-`@ask_codey` Ask Codey for information about coding (Requirements: 'query')
+`@codey` Ask Codey for information about coding
 
-`@ask_gemini` Ask Gemini to chat or provide information (Requirements: 'query')
+`@gemini` Ask Gemini to chat or provide information
 
-`@ask_groq` Ask Groq to chat or provide information (Requirements: 'query')
+`@googleai` Ask GoogleAI Model to chat or provide information
 
-`@ask_llama3_1` Ask Llama3.1 to chat or provide information (Requirements: 'query')
+`@groq` Ask Groq to chat or provide information
 
-`@ask_llamacpp` Ask Llama.cpp to chat or provide information (Requirements: 'query')
+`@llamacpp` Ask Llama.cpp to chat or provide information
 
-`@ask_llamacppserver` Ask Llama.cpp Server to chat or provide information (Requirements: 'query')
+`@llamacppserver` Ask Llama.cpp Server to chat or provide information
 
-`@ask_o1` Ask reasoning model o1 to chat or provide information (Requirements: 'query')
+`@mistral` Ask Mistral to chat or provide information
 
-`@ask_o1_mini` Ask reasoning model o1-mini to chat or provide information (Requirements: 'query')
+`@o1` Ask reasoning model o1 to chat or provide information
 
-`@ask_ollama` Ask an Ollama model to chat or provide information (Requirements: 'query')
+`@o1_mini` Ask reasoning model o1-mini to chat or provide information
 
-`@ask_palm2` Ask PaLM 2 to chat or provide information (Requirements: 'query')
+`@ollama` Ask an Ollama model to chat or provide information
 
-`@ask_tavily` Ask internet to provide information (Requirements: 'query')
+`@palm2` Ask PaLM 2 to chat or provide information
 
-`@bible` Show bible verses content
+`@perplexica_chatgpt` Request Perplexica to conduct research or provide information through internet searches.
+
+`@perplexica_googleai` Request Perplexica to conduct research or provide information through internet searches.
+
+`@perplexica_groq` Request Perplexica to conduct research or provide information through internet searches.
+
+`@perplexica_xai` Request Perplexica to conduct research or provide information through internet searches.
+
+`@tavily` Ask internet for a short and direct answer
+
+`@xai` Ask X AI Model to chat or provide information
+
+`@b` Retrieve bible data with UniqueBible App commands
+
+`@bapi` Retrieve bible data with UniqueBible API
+
+`@bible` Retrieve Bible verses based on given references or perform a plain text search
 
 `@bible_commentary` Retrieve bible commentary
-
-`@build_agents` build a group of AI assistants or agents to execute a complicated task that other functions cannot resolve (Requirements: 'task', 'title')
 
 `@chat` Provide information or answer a question (Requirements: 'message')
 
@@ -96,15 +94,11 @@ Enter `@` to get the latest descriptions of all available tools.
 
 `@copy_to_clipboard` Copy a given content to the system clipboard
 
-`@correct_python_code` Fix Python code if both the original code and the traceback error are provided (Requirements: 'code', 'missing_module', 'issue')
+`@correct_python_code` Fix Python code if both the original code and the traceback error are provided (Requirements: 'corrected_code', 'missing_module', 'issue')
 
 `@create_image_dalle3` Create an image with DALLE-3 (Requirements: 'prompt')
 
-`@create_image_flux` Create an image with Stable Diffusion Models (Requirements: 'prompt')
-
 `@create_image_imagen3` Create an image with Imagen 3 (Requirements: 'prompt')
-
-`@create_image_sd` Create an image with Stable Diffusion Models (Requirements: 'prompt')
 
 `@create_map` Create maps (Requirements: 'code')
 
@@ -124,7 +118,35 @@ Enter `@` to get the latest descriptions of all available tools.
 
 `@edit_text` Edit text files with extensions: '*.txt', '*.md', '*.py'. (Requirements: 'filename')
 
+`@examine_audio_google` Retrieve information from an audio with Google (Requirements: 'audio_filepath', 'language')
+
+`@examine_audio_groq` Retrieve information from an audio with Groq (Requirements: 'audio_filepath')
+
+`@examine_audio_openai` Retrieve information from an audio with OpenAI (Requirements: 'audio_filepath', 'language')
+
+`@examine_audio_whisper` Retrieve information from an audio with Whisper (Requirements: 'audio_filepath', 'language')
+
+`@examine_files` Retrieve information from files (Requirements: 'query', 'filepath')
+
+`@examine_images_chatgpt` Describe or compare images with ChatGPT (Requirements: 'query', 'image_filepath')
+
+`@examine_images_googleai` Describe or compare images with ChatGPT (Requirements: 'query', 'image_filepath')
+
+`@examine_images_groq` Describe or compare images with Llama 3.2 Vision (Requirements: 'query', 'image_filepath')
+
+`@examine_images_llamacpp` Describe or compare images with Llama.cpp (Requirements: 'query', 'image_filepath')
+
+`@examine_images_ollama` Describe or compare images with Ollama (Requirements: 'query', 'image_filepath')
+
+`@examine_images_pixtral` Describe or compare images with Pixtral (Requirements: 'query', 'image_filepath')
+
+`@examine_images_vertexai` Describe or compare images with Gemini (Requirements: 'query', 'image_filepath')
+
+`@examine_web_content` retrieve information from a webpage if an url is provided (Requirements: 'query', 'url')
+
 `@execute_computing_task` Execute computing task or gain access to device information (Requirements: 'code', 'title', 'risk')
+
+`@execute_python_code` Extract and run the python code in a given content
 
 `@extract_bible_references` Extract Bible references from a block of text
 
@@ -132,43 +154,45 @@ Enter `@` to get the latest descriptions of all available tools.
 
 `@fabric` Execute a fabric command
 
-`@files` Search for information online in the 'files' category.
+`@files` Search the 'files' category for online information.
 
-`@general` Search for information online in the 'general' category.
+`@general` Search the 'general' category for online information.
 
 `@help` Retrieve information from the documentation regarding how to use ToolMate AI (Requirements: 'query')
 
-`@images` Search for information online in the 'images' category.
+`@images` Search the 'images' category for online information.
 
 `@improve_writing` Improve the writing of a given content
 
-`@install_python_package` Install a python package (Requirements: 'package')
+`@install_python_package` Install a python package
 
-`@it` Search for information online in the 'it' category.
+`@it` Search the 'it' category for online information.
 
 `@list_current_directory_contents` List the contents in the current directory
 
 `@load_conversations` Load a saved conversations if chat ID / timestamp / file path is given (Requirements: 'id')
 
-`@lyrics` Search for information online in the 'lyrics' category.
+`@lyrics` Search the 'lyrics' category for online information.
 
-`@map` Search for information online in the 'map' category.
+`@map` Search the 'map' category for online information.
 
 `@modify_images` Modify images with ChatGPT and DALLE-3 (Requirements: 'image_fullpath', 'requested_changes_in_detail')
 
-`@music` Search for information online in the 'music' category.
+`@music` Search the 'music' category for online information.
 
-`@news` Search for information online in the 'news' category.
+`@news` Search the 'news' category for online information.
+
+`@online` Perform online searches to obtain the latest and most up-to-date, real-time information.
 
 `@open_browser` Open https:// url with web browser (Requirements: 'url')
 
-`@packages` Search for information online in the 'packages' category.
+`@packages` Search the 'packages' category for online information.
 
 `@paste_from_clipboard` Retrieve the text content from the system clipboard and paste
 
-`@qna` Search for information online in the 'questions_and_answers' category.
+`@qna` Search the 'questions_and_answers' category for online information.
 
-`@radio` Search for information online in the 'radio' category.
+`@radio` Search the 'radio' category for online information.
 
 `@read_aloud` Pronounce words or sentences with text-to-speech utility
 
@@ -178,15 +202,11 @@ Enter `@` to get the latest descriptions of all available tools.
 
 `@remove_image_background` Remove image background (Requirements: 'filepath')
 
-`@repos` Search for information online in the 'repos' category.
+`@repos` Search the 'repos' category for online information.
 
-`@execute_python_code` Extract and run the python code in a given content
+`@science` Search the 'science' category for online information.
 
-`@save_memory` Use this function if I mention something which you think would be useful in the future and should be saved as a memory. Saved memories will allow you to retrieve snippets of past conversations when needed. (Requirements: 'memory', 'title', 'type', 'tags')
-
-`@science` Search for information online in the 'science' category.
-
-`@scientific_publications` Search for information online in the 'scientific_publications' category.
+`@scientific_publications` Search the 'scientific_publications' category for online information.
 
 `@search_bible` Perform similarity search for verses in the bible
 
@@ -196,37 +216,29 @@ Enter `@` to get the latest descriptions of all available tools.
 
 `@search_finance` Search or analyze financial data. Use this function ONLY WHEN package yfinance is useful to resolve my request (Requirements: 'code')
 
-`@search_google` Search Google for real-time information or latest updates when LLM lacks information (Requirements: 'keywords')
+`@search_google` Search Google for real-time information or latest updates when LLM lacks information
 
-`@search_google_news` Search the latest news with given keywords (Requirements: 'keywords')
+`@search_google_news` Search Google the latest news with given keywords (Requirements: 'keywords')
 
-`@search_memory` Recall memories of important conversation snippets that we had in the past. (Requirements: 'query')
-
-`@search_searxng` Perform online searches to obtain the latest and most up-to-date, real-time information (Requirements: 'query')
+`@search_searxng` Perform online searches to obtain the latest and most up-to-date, real-time information
 
 `@search_sqlite` Search or manage SQLite file, e.g. fetch data, update records, etc. Remember, use this function ONLY IF I provide you with a sqlite file path. (Requirements: 'path', 'request')
 
-`@search_tavily` Search for online information with Tavily (Requirements: 'query')
+`@search_tavily` Search for online information with Tavily
 
-`@search_weather_info` Answer a query about weather (Requirements: 'code')
+`@search_weather` Answer a query about weather (Requirements: 'code')
 
 `@send_gmail` Send Gmail (Requirements: 'email', 'subject', 'body')
 
 `@send_outlook` Send Outlook email (Requirements: 'email', 'subject', 'body')
 
-`@send_tweet` Send a tweet to twitter (Requirements: 'message')
+`@send_tweet` Send a tweet to twitter
 
-`@social_media` Search for information online in the 'social_media' category.
+`@social_media` Search the 'social_media' category for online information.
 
-`@software_wikis` Search for information online in the 'software_wikis' category.
+`@software_wikis` Search the 'software_wikis' category for online information.
 
-`@translate` Search for information online in the 'translate' category.
-
-`@videos` Search for information online in the 'videos' category.
-
-`@web` Search for information online in the 'web' category.
-
-`@wikimedia` Search for information online in the 'wikimedia' category.
+`@task` Execute computing task or gain access to device information
 
 `@transcribe_audio_google` Transcribe audio into text with Google (Requirements: 'audio_filepath', 'language')
 
@@ -236,8 +248,18 @@ Enter `@` to get the latest descriptions of all available tools.
 
 `@transcribe_audio_whisper` Transcribe audio into text with Whisper (Requirements: 'audio_filepath', 'language')
 
-`@uba` Run UniqueBible App commands to retrieve bible data
+`@translate` Search the 'translate' category for online information.
 
-`@uniquebible` Run UniqueBible App commands to retrieve bible data
+`@uniquebible` Retrieve bible data with UniqueBible App commands
+
+`@uniquebible_api` Retrieve bible data with UniqueBible API
+
+`@uniquebible_web` Read bible-related content via UniqueBible web interface
+
+`@videos` Search the 'videos' category for online information.
+
+`@web` Search the 'web' category for online information.
+
+`@wikimedia` Search the 'wikimedia' category for online information.
 
 `@workflow` Execute a workflow

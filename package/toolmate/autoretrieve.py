@@ -28,7 +28,7 @@ class AutoGenRetriever:
         The options available are:
         - Make sure docker is running (advised approach for code execution)
         - Set "use_docker": False in code_execution_config
-        - Set AUTOGEN_USE_DOCKER to "0/False/no" in your environment variables
+        - Set code_execution_use_docker to "0/False/no" in your environment variables
         """
 
     def getResponse(self, docs_path, message, auto=False):

@@ -22,12 +22,12 @@ parser = argparse.ArgumentParser(description = """ToolMate AI API client `tm` cl
                                  `tmpython` -> `tm -dt execute_python_code`;
                                  `tmtask` -> `tm -dt execute_computing_task`;
                                  `tmgoogle` -> `tm -dt search_google` (internet connection required);
-                                 `tminternet` -> `tm -dt ask_internet` (internet connection and SearXNG required);
+                                 `tmonline` -> `tm -dt online` (internet connection and SearXNG required);
                                  `tmmp3` -> `tm -dt download_youtube_audio` (internet connection required);
                                  `tmmp4` -> `tm -dt download_youtube_video` (internet connection required);
                                  `tmr` -> `tm -dt reflection`;
                                  `tmdr` -> `tm -dt deep_reflection`;
-                                 `tmteam` -> `tm -dt create_agents` (full version only);
+                                 `tmagents` -> `tm -dt agents` (full version only);
                                  `tmremember` -> `tm -dt save_memory` (full version only);
                                  `tmrecall` -> `tm -dt search_memory` (full version only);
                                  `tmt1` ... `tmt20` -> `tm -dt <custom_tool>` (determined by `config.tmt1` ... `config.tmt20`);
@@ -46,9 +46,11 @@ parser.add_argument('-dt', '--defaulttool', action='store', dest='defaulttool', 
 parser.add_argument('-e', '--export', action='store', dest='export', help="export conversation; optionally used with -f option to specify a format for the export")
 parser.add_argument('-exec', '--execute', action='store_true', dest='execute', help="execute python code or system command; format a block of python code starting with '```python' or a block of system command starting with '```command'; ends the block with '```'")
 parser.add_argument('-f', '--format', action='store', dest='format', help="conversation output format; plain or list; useful for sharing or backup; only output the last assistant response if this option is not used")
-parser.add_argument('-gca', '--groupchatagents', action='store', dest='groupchatagents', type=int, help="group chat feature; maximum number of agents")
-parser.add_argument('-gcoaia', '--groupchatoaia', action='store_true', dest='groupchatoaia', help="group chat feature; use OpenAI Assistant API; applicable to backend 'openai' only")
-parser.add_argument('-gcr', '--groupchatrounds', action='store', dest='groupchatrounds', type=int, help="group chat feature; maximum number of rounds of discussion")
+parser.add_argument('-ga', '--groupagents', action='store', dest='groupagents', type=int, help="group chat feature; maximum number of agents")
+parser.add_argument('-ged', '--groupexecuteindocker', action='store_true', dest='groupexecuteindocker', help="group chat feature; execute code in docker")
+parser.add_argument('-get', '--groupexecutiontimeout', action='store', dest='groupexecutiontimeout', type=int, help="group chat feature; timeout for each code execution in seconds")
+parser.add_argument('-goaia', '--groupoaiassistant', action='store_true', dest='groupoaiassistant', help="group chat feature; use OpenAI Assistant API; applicable to backend 'openai' only")
+parser.add_argument('-gr', '--grouprounds', action='store', dest='grouprounds', type=int, help="group chat feature; maximum number of rounds of discussion")
 parser.add_argument('-i', '--interactive', action='store_true', dest='interactive', help="interactive prompt, with auto-suggestions enabled, for writing instruction; do not use this option together with standard input or output")
 parser.add_argument('-imh', '--imageheight', action='store', dest='imageheight', type=int, help="image height; DALLE.3 supports 1024x1024 / 1024x1792 /1792x1024; Flux.1 natively supports any resolution up to 2 mp (1920x1088)")
 parser.add_argument('-imhd', '--imagehd', action='store_true', dest='imagehd', help="image quality in high definition")
@@ -149,8 +151,8 @@ def python():
 def google():
     main(defaultTool="search_google")
 
-def internet():
-    main(defaultTool="ask_internet")
+def online():
+    main(defaultTool="online")
 
 def mp3():
     main(defaultTool="download_youtube_audio")
@@ -170,8 +172,8 @@ def remember():
 def recall():
     main(defaultTool="search_memory")
 
-def team():
-    main(defaultTool="create_agents")
+def agents():
+    main(defaultTool="agents")
 
 def tms1():
     main(chatSystem=config.tms1)
@@ -448,9 +450,11 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None):
             "riskthreshold": args.riskthreshold,
             "execute": True if args.execute else False,
             "autoretrieve": True if args.autoretrieve else False,
-            "groupchatoaia": True if args.groupchatoaia else False,
-            "groupchatagents": args.groupchatagents,
-            "groupchatrounds": args.groupchatrounds,
+            "groupexecuteindocker": True if args.groupexecuteindocker else False,
+            "groupexecutiontimeout": args.groupexecutiontimeout,
+            "groupoaiassistant": True if args.groupoaiassistant else False,
+            "groupagents": args.groupagents,
+            "grouprounds": args.grouprounds,
             "imagehd": True if args.imagehd else False,
             "imageheight": args.imageheight,
             "imagewidth": args.imagewidth,

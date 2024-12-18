@@ -42,8 +42,11 @@ if not config.isLite:
     from langchain_community.vectorstores import Chroma
     from langchain.text_splitter import RecursiveCharacterTextSplitter
     from langchain_unstructured import UnstructuredLoader
-    from autogen.retrieve_utils import TEXT_FORMATS
     from huggingface_hub import hf_hub_download
+    from autogen.retrieve_utils import TEXT_FORMATS
+    from autogen.coding import LocalCommandLineCodeExecutor
+    from autogen.coding import DockerCommandLineCodeExecutor
+    import tempfile
     import vosk
     import sounddevice, soundfile # it is important to import sounddevice on Linux, to resolve ALSA error display
 
@@ -617,8 +620,22 @@ def getAutogenConfigList():
             "tags": ["llamacppserver"],
         })
     os.environ["OAI_CONFIG_LIST"] = json.dumps(config_list)
-    os.environ["AUTOGEN_USE_DOCKER"] = str(config.autogen_use_docker)
+    os.environ["code_execution_use_docker"] = str(config.code_execution_use_docker)
     return config_list
+
+def getAutogenCodeExecutionConfig():
+    temp_dir = tempfile.TemporaryDirectory()
+    executor =  DockerCommandLineCodeExecutor(
+        image=config.code_execution_image,  # Execute code using the given docker image name.
+        timeout=config.code_execution_timeout,  # Timeout for each code execution in seconds.
+        work_dir=temp_dir.name,  # Use the temporary directory to store the code files.
+    ) if config.code_execution_use_docker else LocalCommandLineCodeExecutor(
+        timeout=10,  # Timeout for each code execution in seconds.
+        work_dir=temp_dir.name,  # Use the temporary directory to store the code files.
+    )
+    return {
+        "executor": executor,
+    }
 
 def downloadStableDiffusionFiles():
     # llm directory
@@ -1978,17 +1995,20 @@ def downloadNltkPackages():
         package_category="taggers",
         package_name="averaged_perceptron_tagger_eng",
     )
-    nltk.download("averaged_perceptron_tagger_eng")
+    if not tagger_available:
+        nltk.download("averaged_perceptron_tagger_eng")
     # punkt
     tokenizer_available = check_for_nltk_package(
         package_category="tokenizers", package_name="punkt"
     )
-    nltk.download("punkt")
+    if not tokenizer_available:
+        nltk.download("punkt")
     # punkt_tab
     tokenizer_available = check_for_nltk_package(
         package_category="tokenizers", package_name="punkt_tab"
     )
-    nltk.download("punkt_tab")
+    if not tokenizer_available:
+        nltk.download("punkt_tab")
     # extra
     #nltk.download("popular")
 

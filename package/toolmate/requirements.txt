@@ -1,5 +1,6 @@
 # common
 numpy==1.26.4
+pandas==2.2.3
 protobuf==4.25.3
 ollama==0.4.4
 groq==0.13.0
@@ -9,7 +10,6 @@ tiktoken==0.8.0
 anthropic==0.40.0
 # pyautogen,langchain,unstructured,litellm[proxy]
 autogen[gemini,mistral,groq,ollama,retrievechat,teachable,lmm,graph,long-context]==0.5.2
-#autogen[autobuild]==0.5.2
 autogenstudio==0.1.5
 langchain-unstructured[local]==0.1.6
 unstructured[all-docs]==0.15.14

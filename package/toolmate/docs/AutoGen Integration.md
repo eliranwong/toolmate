@@ -10,9 +10,11 @@
 
 `@captain` Use AutoGen captain agent and tool library to resolve a request
 
-`@examine_files` Use AutoGen retriever agent for examining file content, if config.rag_useAutoRetriever is set to True
+`@examine_files` Use AutoGen retrieve assistant agent for examining file content, if config.rag_useAutoRetriever is set to True
 
-`@examine_web_content` Use AutoGen retriever agent for examining web content, if config.rag_useAutoRetriever is set to True
+`@examine_web_content` Use AutoGen retrieve assistant agent for examining web content, if config.rag_useAutoRetriever is set to True
+
+Remarks: These tools are available in the full version of ToolMate AI.  The Lite version doesn't include these tools.
 
 ## Interactive Mode
 
@@ -48,7 +50,7 @@ To use AutoGen assistant agent:
 
 > autoassist
 
-To use AutoGen retriever agent:
+To use AutoGen retrieve assistant agent:
 
 > autoretrieve
 

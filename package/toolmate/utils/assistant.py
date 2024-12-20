@@ -2251,6 +2251,10 @@ class ToolMate:
             if showMessage:
                 print1("Visit https://console.mistral.ai/limits/ to read about tokens limits")
             currentMaxTokens = config.mistralApi_chat_model_max_tokens if feature == "chat" else config.mistralApi_tool_model_max_tokens
+        elif config.llmInterface in ("chatgpt", "letmedoit"):
+            if showMessage:
+                print1("Visit https://platform.openai.com/docs/models to read about tokens limits")
+            currentMaxTokens = config.chatGPTApiMaxTokens
         return currentMaxTokens
 
     def setMaxTokens_non_chatgpt(self, feature="default", customMaxtokens=None):

@@ -11,7 +11,7 @@ You can manually edit config.py to customise these settings.
 [TOOL_CALL]
 """
 
-from toolmate import config, isServerAlive, print1, print2, plainTextToUrl, convert_html_to_markdown
+from toolmate import config, isServerAlive, print1, print2, plainTextToUrl, convert_html_to_markdown, get_local_ip
 import re, requests
 
 persistentConfigs = (

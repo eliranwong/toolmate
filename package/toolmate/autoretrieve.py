@@ -75,7 +75,7 @@ class AutoGenRetriever:
                 #"cache_seed": 42,  # seed for caching and reproducibility
                 "config_list": config_list,
                 "temperature": config.llmTemperature,  # temperature for sampling
-                "timeout": config.llm_timeout,
+                "timeout": config.llm_timeout * 2, # more time for rag
             },  # configuration for autogen's enhanced inference API which is compatible with OpenAI API
         )
 

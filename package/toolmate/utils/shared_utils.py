@@ -1191,6 +1191,8 @@ def hostnameToIp(hostname):
         return None
 
 def isServerAlive(ip, port):
+    if ip.lower() == "localhost":
+        ip = "127.0.0.1"
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(2)  # Timeout in case of server not responding
     try:
@@ -1744,7 +1746,7 @@ def get_local_ip():
         return ip_address
     except Exception as e:
         print(f"Error getting local IP address: {e}")
-        return None
+        return "127.0.0.1"
 
 def runSystemCommand(command):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)

@@ -1,7 +1,7 @@
 import ollama, os, argparse, threading, shutil, json
 from ollama import Options, pull
 from toolmate.utils.download import Downloader
-from toolmate import config, is_valid_image_file, getOllamaServerClient
+from toolmate import config, is_valid_image_file, getOllamaServerClient, isServerAlive, get_local_ip
 from toolmate import print1, print2, print3, toggleinputaudio, toggleoutputaudio
 from toolmate.utils.ollama_models import ollama_models
 from toolmate.utils.streaming_word_wrapper import StreamingWordWrapper

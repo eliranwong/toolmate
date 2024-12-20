@@ -4,7 +4,7 @@ This page content is generated on 17Sept2024.  For the latest information, simpl
 
 # Available Tools
 
-@add_google_calendar_event @add_outlook_calendar_event @agents @append_command @append_fabric @append_instruction @apps @chatgpt @codey @gemini @googleai @groq @llamacpp @llamacppserver @mistral @o1 @o1_mini @ollama @palm2 @perplexica_chatgpt @perplexica_googleai @perplexica_groq @perplexica_xai @tavily @xai @b @bapi @bible @bible_commentary @chat @command @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_imagen3 @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @edit_text @examine_audio_google @examine_audio_groq @examine_audio_openai @examine_audio_whisper @examine_files @examine_images_chatgpt @examine_images_googleai @examine_images_groq @examine_images_llamacpp @examine_images_ollama @examine_images_pixtral @examine_images_vertexai @examine_web_content @execute_computing_task @execute_python_code @extract_bible_references @extract_python_code @fabric @files @general @help @images @improve_writing @install_python_package @it @list_current_directory_contents @load_conversations @lyrics @map @modify_images @music @news @online @open_browser @packages @paste_from_clipboard @qna @radio @read_aloud @recommend_tool @reflection @remove_image_background @repos @science @scientific_publications @search_bible @search_bible_paragraphs @search_conversations @search_finance @search_google @search_google_news @search_searxng @search_sqlite @search_tavily @search_weather @send_gmail @send_outlook @send_tweet @social_media @software_wikis @task @transcribe_audio_google @transcribe_audio_groq @transcribe_audio_openai @transcribe_audio_whisper @translate @uniquebible @uniquebible_api @uniquebible_web @videos @web @wikimedia @workflow
+@add_google_calendar_event @add_outlook_calendar_event @agents @append_command @append_fabric @append_instruction @apps @b @bapi @bible @bible_commentary @captain @chat @chatgpt @codey @command @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_imagen3 @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @edit_text @examine_audio_google @examine_audio_groq @examine_audio_openai @examine_audio_whisper @examine_files @examine_images_chatgpt @examine_images_googleai @examine_images_groq @examine_images_llamacpp @examine_images_ollama @examine_images_pixtral @examine_images_vertexai @examine_web_content @execute_computing_task @execute_python_code @extract_bible_references @extract_python_code @fabric @files @general @googleai @groq @group @help @images @improve_writing @install_python_package @it @list_current_directory_contents @llamacpppython @llamacppserver @load_conversations @lyrics @map @mistral @modify_images @music @news @o1 @o1_mini @ollama @online @open_browser @packages @palm2 @paste_from_clipboard @perplexica_chatgpt @perplexica_googleai @perplexica_groq @perplexica_xai @proxy @qna @radio @read_aloud @recommend_tool @reflection @remove_image_background @repos @save_memory @science @scientific_publications @search_bible @search_bible_paragraphs @search_conversations @search_finance @search_google @search_google_news @search_memory @search_searxng @search_sqlite @search_tavily @search_weather @send_gmail @send_outlook @send_tweet @social_media @software_wikis @task @tavily @transcribe_audio_google @transcribe_audio_groq @transcribe_audio_openai @transcribe_audio_whisper @translate @uniquebible @uniquebible_api @uniquebible_web @vertexai @videos @web @wikimedia @workflow @xai
 
 ## Android-only tools:
 
@@ -32,7 +32,7 @@ Alternately, run in terminal:
 
 `@add_outlook_calendar_event` Add an Outlook calendar event (Requirements: 'title', 'description')
 
-`@agents` build a group of AI agents to execute a complicated task that other functions cannot resolve (Requirements: 'task', 'title')
+`@agents` create a group of AI agents to execute a complicated task that other functions cannot resolve
 
 `@append_command` Execute a system command with the previous text output appended to it
 
@@ -42,42 +42,6 @@ Alternately, run in terminal:
 
 `@apps` Search the 'apps' category for online information.
 
-`@chatgpt` Ask ChatGPT to chat or provide information
-
-`@codey` Ask Codey for information about coding
-
-`@gemini` Ask Gemini to chat or provide information
-
-`@googleai` Ask GoogleAI Model to chat or provide information
-
-`@groq` Ask Groq to chat or provide information
-
-`@llamacpp` Ask Llama.cpp to chat or provide information
-
-`@llamacppserver` Ask Llama.cpp Server to chat or provide information
-
-`@mistral` Ask Mistral to chat or provide information
-
-`@o1` Ask reasoning model o1 to chat or provide information
-
-`@o1_mini` Ask reasoning model o1-mini to chat or provide information
-
-`@ollama` Ask an Ollama model to chat or provide information
-
-`@palm2` Ask PaLM 2 to chat or provide information
-
-`@perplexica_chatgpt` Request Perplexica to conduct research or provide information through internet searches.
-
-`@perplexica_googleai` Request Perplexica to conduct research or provide information through internet searches.
-
-`@perplexica_groq` Request Perplexica to conduct research or provide information through internet searches.
-
-`@perplexica_xai` Request Perplexica to conduct research or provide information through internet searches.
-
-`@tavily` Ask internet for a short and direct answer
-
-`@xai` Ask X AI Model to chat or provide information
-
 `@b` Retrieve bible data with UniqueBible App commands
 
 `@bapi` Retrieve bible data with UniqueBible API
@@ -86,7 +50,13 @@ Alternately, run in terminal:
 
 `@bible_commentary` Retrieve bible commentary
 
+`@captain` Use AutoGen Captain Agent and its tool libraries to resolve user's request
+
 `@chat` Provide information or answer a question (Requirements: 'message')
+
+`@chatgpt` Ask ChatGPT to chat or provide information
+
+`@codey` Ask Codey for information about coding
 
 `@command` Execute a system command
 
@@ -158,6 +128,12 @@ Alternately, run in terminal:
 
 `@general` Search the 'general' category for online information.
 
+`@googleai` Ask GoogleAI Model to chat or provide information
+
+`@groq` Ask Groq to chat or provide information
+
+`@group` create a group of AI agents to discuss and resolve a query
+
 `@help` Retrieve information from the documentation regarding how to use ToolMate AI (Requirements: 'query')
 
 `@images` Search the 'images' category for online information.
@@ -170,11 +146,17 @@ Alternately, run in terminal:
 
 `@list_current_directory_contents` List the contents in the current directory
 
+`@llamacpppython` Ask Llama.cpp to chat or provide information
+
+`@llamacppserver` Ask Llama.cpp Server to chat or provide information
+
 `@load_conversations` Load a saved conversations if chat ID / timestamp / file path is given (Requirements: 'id')
 
 `@lyrics` Search the 'lyrics' category for online information.
 
 `@map` Search the 'map' category for online information.
+
+`@mistral` Ask Mistral to chat or provide information
 
 `@modify_images` Modify images with ChatGPT and DALLE-3 (Requirements: 'image_fullpath', 'requested_changes_in_detail')
 
@@ -182,13 +164,31 @@ Alternately, run in terminal:
 
 `@news` Search the 'news' category for online information.
 
-`@online` Perform online searches to obtain the latest and most up-to-date, real-time information.
+`@o1` Ask reasoning model o1 to chat or provide information
+
+`@o1_mini` Ask reasoning model o1-mini to chat or provide information
+
+`@ollama` Ask an Ollama model to chat or provide information
+
+`@online` Perform online searches to obtain the latest and most up-to-date, real-time information
 
 `@open_browser` Open https:// url with web browser (Requirements: 'url')
 
 `@packages` Search the 'packages' category for online information.
 
+`@palm2` Ask PaLM 2 to chat or provide information
+
 `@paste_from_clipboard` Retrieve the text content from the system clipboard and paste
+
+`@perplexica_chatgpt` Request Perplexica to conduct research or provide information through internet searches.
+
+`@perplexica_googleai` Request Perplexica to conduct research or provide information through internet searches.
+
+`@perplexica_groq` Request Perplexica to conduct research or provide information through internet searches.
+
+`@perplexica_xai` Request Perplexica to conduct research or provide information through internet searches.
+
+`@proxy` use an AutoGen assistant and AutoGen code executor to fulfill a task
 
 `@qna` Search the 'questions_and_answers' category for online information.
 
@@ -203,6 +203,8 @@ Alternately, run in terminal:
 `@remove_image_background` Remove image background (Requirements: 'filepath')
 
 `@repos` Search the 'repos' category for online information.
+
+`@save_memory` Use this function if I mention something which you think would be useful in the future and should be saved as a memory. Saved memories will allow you to retrieve snippets of past conversations when needed. (Requirements: 'memory', 'title', 'type', 'tags')
 
 `@science` Search the 'science' category for online information.
 
@@ -219,6 +221,8 @@ Alternately, run in terminal:
 `@search_google` Search Google for real-time information or latest updates when LLM lacks information
 
 `@search_google_news` Search Google the latest news with given keywords (Requirements: 'keywords')
+
+`@search_memory` Recall memories of important conversation snippets that we had in the past. (Requirements: 'query')
 
 `@search_searxng` Perform online searches to obtain the latest and most up-to-date, real-time information
 
@@ -240,6 +244,8 @@ Alternately, run in terminal:
 
 `@task` Execute computing task or gain access to device information
 
+`@tavily` Ask internet for a short and direct answer
+
 `@transcribe_audio_google` Transcribe audio into text with Google (Requirements: 'audio_filepath', 'language')
 
 `@transcribe_audio_groq` Transcribe audio into text with Groq (Requirements: 'audio_filepath')
@@ -256,6 +262,8 @@ Alternately, run in terminal:
 
 `@uniquebible_web` Read bible-related content via UniqueBible web interface
 
+`@vertexai` Ask Gemini to chat or provide information
+
 `@videos` Search the 'videos' category for online information.
 
 `@web` Search the 'web' category for online information.
@@ -263,3 +271,5 @@ Alternately, run in terminal:
 `@wikimedia` Search the 'wikimedia' category for online information.
 
 `@workflow` Execute a workflow
+
+`@xai` Ask X AI Model to chat or provide information

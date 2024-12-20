@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import APIKeyHeader
-from toolmate import config, configFile, isServerAlive, print2, print3, getOllamaServerClient, getLlms, unloadLocalModels, changeModel, changeBackendAndModel, getCurrentModel
+from toolmate import config, configFile, isServerAlive, print2, print3, getOllamaServerClient, getLlms, unloadLocalModels, changeModel, changeBackendAndModel, getCurrentModel, get_wan_ip, get_local_ip
 from toolmate.utils.assistant import ToolMate
 from toolmate.utils.tool_plugins import Plugins
 from toolmate.utils.call_llm import CallLLM
@@ -312,11 +312,11 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
 @app.post("/api/status")
 async def process_status(query: str, api_key: str = Depends(get_api_key) if config.toolmate_api_server_key else ""):
     if query := query.strip():
-        try:
-            tmversion = lib_version("toolmate")
-        except:
-            tmversion = f"""{lib_version("toolmate_lite")} (lite)"""
         if query == "information":
+            try:
+                tmversion = lib_version("toolmate")
+            except:
+                tmversion = f"""{lib_version("toolmate_lite")} (lite)"""
             info = {
                 "Toolmate version": tmversion,
                 "Python version": sys.version,
@@ -324,6 +324,8 @@ async def process_status(query: str, api_key: str = Depends(get_api_key) if conf
                 "Path - configurations": configFile,
                 "Path - library": config.toolMateAIFolder,
                 "Path - user data": config.localStorage,
+                "IP address (wan)": get_wan_ip(),
+                "IP address (local)": get_local_ip(),
                 "Server host": config.this_api_server_host,
                 "Server port": config.this_api_server_port,
                 "AI Backend": config.llmInterface,

@@ -8,6 +8,8 @@
 
 * document about captain agent setup
 
+* fixed viewing server information when backend is set to chatgpt
+
 # 0.5.82-0.5.84
 
 * changed tool name `create_agents` to `agents`

@@ -162,6 +162,10 @@ class ToolMate:
             self.changeGroqApi()
         if not config.mistralApi_key:
             self.changeMistralApi()
+        if not config.bing_api_key:
+            self.changeBingApi()
+        if not config.rapid_api_key:
+            self.changeRapidApi()
         if not config.openweathermapApi:
             self.changeOpenweathermapApi()
         if not config.elevenlabsApi:
@@ -626,6 +630,8 @@ class ToolMate:
         self.changeChatGPTAPIkey()
         if not config.isLite:
             self.setAutoGenBuilderConfig()
+        self.changeBingApi()
+        self.changeRapidApi()
         self.changeOpenweathermapApi()
         self.changeElevenlabsApi()
         if not config.isLite:
@@ -727,6 +733,22 @@ class ToolMate:
             config.mistralApi_key = "toolmate"
         config.saveConfig()
         print2("Configurations updated!")
+
+    def changeBingApi(self):
+        print3("# Bing Search API Key")
+        print1("Enter Bing Search API key below:")
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.bing_api_key, is_password=True)
+        if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+            config.bing_api_key = apikey
+        config.saveConfig()
+
+    def changeRapidApi(self):
+        print3("# Rapid API Key")
+        print1("Enter Rapid API key below:")
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.rapid_api_key, is_password=True)
+        if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+            config.rapid_api_key = apikey
+        config.saveConfig()
 
     def changeOpenweathermapApi(self):
         print3("# OpenWeatherMap API Key: allows access to real-time weather information")

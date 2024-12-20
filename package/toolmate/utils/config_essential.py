@@ -221,7 +221,8 @@ defaultSettings = (
     ('use_oai_assistant', False), # support OpenAI Assistants API in AutoGen Agent Builder
     ('code_execution_use_docker', False),
     ('code_execution_image', "python:3.12-slim"), # Execute code using the given docker image name.
-    ('code_execution_timeout', 300), # Timeout for each code execution in seconds.
+    ('code_execution_timeout', 60), # Timeout for each code execution in seconds.
+    ('llm_timeout', 300),
     ('max_agents', 5), # maximum number of agents build manager can create.
     ('max_group_chat_round', 12), # AutoGen group chat maximum round
     ('env_QT_QPA_PLATFORM_PLUGIN_PATH', ''), # e.g. # deal with error: qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "~/apps/letmedoit/lib/python3.10/site-packages/cv2/qt/plugins" even though it was found.
@@ -347,6 +348,8 @@ defaultSettings = (
     ("ttsLanguages", ["en", "en-gb", "en-us", "zh", "yue", "el"]), # users can edit this item in config.py to support more or less languages
     ("ttsLanguagesCommandMap", {"en": "", "en-gb": "", "en-us": "", "zh": "", "yue": "", "el": "",}), # advanced users need to edit this item manually to support different voices with customised tts command, e.g. ttsCommand set to "say -r 200 -v Daniel" and ttsLanguagesCommandMap set to {"en": "Daniel", "en-gb": "Daniel", "en-us": "", "zh": "", "yue": "", "el": "",}
     ("openweathermapApi", ""),
+    ("bing_api_key", ""),
+    ("rapid_api_key", ""),
     ("elevenlabsApi", ""),
     ("elevenlabsVoice", "21m00Tcm4TlvDq8ikWAM"),
     ("pyaudioInstalled", False),

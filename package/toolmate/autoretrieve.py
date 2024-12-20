@@ -4,7 +4,8 @@ if not hasattr(config, "max_consecutive_auto_reply"):
     config.max_consecutive_auto_reply = 10
 from toolmate import print2, print3, getCurrentModel
 from toolmate import getEmbeddingFunction, refinePath, getAutogenConfigList
-import autogen, os, traceback, chromadb, re, zipfile, datetime, traceback
+from autogen import filter_config
+import os, traceback, chromadb, re, zipfile, datetime, traceback
 from chromadb.config import Settings
 from pathlib import Path
 from toolmate.utils.prompts import Prompts
@@ -64,7 +65,7 @@ class AutoGenRetriever:
                 return None
 
         filter_dict = {"tags": [config.llmInterface]}
-        config_list = autogen.filter_config(getAutogenConfigList(), filter_dict)
+        config_list = filter_config(getAutogenConfigList(), filter_dict)
 
         # https://microsoft.github.io/autogen/docs/reference/agentchat/contrib/retrieve_assistant_agent
         assistant = RetrieveAssistantAgent(
@@ -74,7 +75,7 @@ class AutoGenRetriever:
                 #"cache_seed": 42,  # seed for caching and reproducibility
                 "config_list": config_list,
                 "temperature": config.llmTemperature,  # temperature for sampling
-                "timeout": 600,
+                "timeout": config.llm_timeout,
             },  # configuration for autogen's enhanced inference API which is compatible with OpenAI API
         )
 

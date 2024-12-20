@@ -1,7 +1,8 @@
 """
-ToolMate AI Plugin - agents
+ToolMate AI Plugin - group
 
-build a group of agents, with integrated "AutoGen Agent Builder", to execute a task
+build a group of agents, with integrated "AutoGen Agent Builder", to discuss and resolve a query
+For task execution or coding purpose, use tool 'agents' instead.
 
 [TOOL_CALL]
 """
@@ -13,10 +14,10 @@ if not config.isLite and config.online:
     from toolmate import print2, print3
     import re
 
-    def agents(function_args):
+    def group(function_args):
         config.stopSpinning()
         if function_args:
-            task = function_args.get("task") # required
+            task = function_args.get("query") # required
             title = function_args.get("title", "") # optional
         else:
             task = config.currentMessages[-1]["content"]
@@ -25,7 +26,7 @@ if not config.isLite and config.online:
         if title:
             print3(f"Title: {title}")
         print3(f"Description: {task}")
-        messages = AutoGenBuilder().getResponse(task, title, coding=True)
+        messages = AutoGenBuilder().getResponse(task, title)
         # check last message
         theLastMessage = messages[-1].get("content", "").strip()
         if not theLastMessage or theLastMessage == "TERMINATE":
@@ -50,25 +51,24 @@ if not config.isLite and config.online:
 
     functionSignature = {
         "examples": [
-            "create a team of assistants",
-            "create a crew of agents",
+            "group chat",
         ],
-        "name": "agents",
-        "description": "create a group of AI agents to execute a complicated task that other functions cannot resolve",
+        "name": "group",
+        "description": "create a group of AI agents to discuss and resolve a query",
         "parameters": {
             "type": "object",
             "properties": {} if not config.tool_selection_agent else {
-                "task": {
+                "query": {
                     "type": "string",
-                    "description": "Task description in as much detail as possible",
+                    "description": "Query description in as much detail as possible",
                 },
                 "title": {
                     "type": "string",
-                    "description": "A short title to describe the task",
+                    "description": "A short title to describe the query",
                 },
             },
-            "required": [] if not config.tool_selection_agent else ["task"],
+            "required": [] if not config.tool_selection_agent else ["query"],
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=agents)
+    config.addFunctionCall(signature=functionSignature, method=group)

@@ -172,8 +172,17 @@ def remember():
 def recall():
     main(defaultTool="search_memory")
 
+def proxy():
+    main(defaultTool="proxy")
+
+def group():
+    main(defaultTool="group")
+
 def agents():
     main(defaultTool="agents")
+
+def captain():
+    main(defaultTool="captain")
 
 def tms1():
     main(chatSystem=config.tms1)

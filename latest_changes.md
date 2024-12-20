@@ -1,3 +1,13 @@
+# 0.5.85-0.5.89
+
+* enhanced integration of AutoGen agents in tools: proxy, group, agents, captain, examine_files, examine_web_content
+
+* fixed saving autobuilder configs
+
+* support use of bing api key and rapid api key for use with AutoGen captain agent
+
+* document about captain agent setup
+
 # 0.5.82-0.5.84
 
 * changed tool name `create_agents` to `agents`

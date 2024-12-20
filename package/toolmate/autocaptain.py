@@ -9,8 +9,9 @@ if not hasattr(config, "use_oai_assistant"):
 
 from toolmate import print2, getCurrentModel
 
-from autogen.agentchat.contrib.agent_builder import AgentBuilder
-from autogen import filter_config, GroupChat, GroupChatManager
+from autogen.agentchat.contrib.captainagent import CaptainAgent
+from autogen import UserProxyAgent
+from autogen import filter_config
 import os, traceback, re, datetime, argparse
 from pathlib import Path
 from urllib.parse import quote
@@ -21,17 +22,13 @@ from prompt_toolkit.styles import Style
 #from prompt_toolkit.history import FileHistory
 
 # Reference: https://microsoft.github.io/autogen/docs/reference/agentchat/contrib/agent_builder
-class AutoGenBuilder:
+class AutoCaptainAgent:
 
     def __init__(self):
+        os.environ["BING_API_KEY"] = config.bing_api_key
+        os.environ["RAPID_API_KEY"] = config.rapid_api_key
+
         self.llm = getCurrentModel()
-        """
-        Code execution is set to be run in docker (default behaviour) but docker is not running.
-        The options available are:
-        - Make sure docker is running (advised approach for code execution)
-        - Set "use_docker": False in code_execution_config
-        - Set code_execution_use_docker to "0/False/no" in your environment variables
-        """
 
         # prompt style
         self.promptStyle = Style.from_dict({
@@ -50,7 +47,7 @@ class AutoGenBuilder:
             folder = config.storagedirectory
         else:
             folder = os.path.join(packageFolder, "files")
-        folder = os.path.join(folder, "autogen", "builder")
+        folder = os.path.join(folder, "autogen", "captain")
         if not os.path.isdir(folder):
             Path(folder).mkdir(parents=True, exist_ok=True)
         if title:
@@ -58,9 +55,8 @@ class AutoGenBuilder:
         currentTime = re.sub(r"[\. :]", "_", str(datetime.datetime.now()))
         return os.path.join(folder, f"{currentTime}{title}.json")
 
-    def getResponse(self, task, title="", load_path="", coding=False):
-
-        building_task = execution_task = task
+    def getResponse(self, query):
+        # https://ag2ai.github.io/ag2/blog/2024/11/15/CaptainAgent
 
         filter_dict = {"tags": [config.llmInterface]}
         config_list = filter_config(getAutogenConfigList(), filter_dict)
@@ -72,39 +68,44 @@ class AutoGenBuilder:
             "timeout":  config.llm_timeout,
         }  # configuration for autogen's enhanced inference API which is compatible with OpenAI API
 
-        builder = AgentBuilder(
-            #config_path=config_path, # use default
-            builder_model=self.llm,
-            agent_model=self.llm,
-            #max_tokens=4096,
-            max_agents=config.max_agents,
+        # https://ag2ai.github.io/ag2/docs/topics/captainagent/configurations
+        nested_config = {
+            "autobuild_init_config": {
+                "config_file_or_env": "OAI_CONFIG_LIST",
+                "builder_model": self.llm,
+                "agent_model": self.llm,
+            },
+            "autobuild_build_config": {
+                "default_llm_config": llm_config,
+                "code_execution_config": getAutogenCodeExecutionConfig(),
+                "coding": True,
+                "use_oai_assistant": config.use_oai_assistant,
+                "library_path_or_json": os.path.join(packageFolder, "captainagent_expert_library.json"),
+            },
+            "autobuild_tool_config": {
+                "tool_root": "default",  # this will use the tool library we provide
+                "retriever": "paraphrase-multilingual-mpnet-base-v2",
+            },
+            "group_chat_config": {"max_round": config.max_group_chat_round},
+            "group_chat_llm_config": llm_config.copy(),
+        }
+
+        ## build agents
+        captain_agent = CaptainAgent(
+            name="captain_agent",
+            llm_config=llm_config,
+            nested_config=nested_config,
+            #agent_lib=os.path.join(packageFolder, "captainagent_expert_library.json"), # duplicate
+            #tool_lib="default", # duplicate
+            code_execution_config=getAutogenCodeExecutionConfig(),
+            agent_config_save_path=None if config.code_execution_use_docker else self.getSavePath(),
         )
-
-        # e.g.
-        #building_task = "Find a paper on arxiv by programming, and analysis its application in some domain. For example, find a latest paper about gpt-4 on arxiv and find its potential applications in software."
-        #execution_task="Find a recent paper about gpt-4 on arxiv and find its potential applications in software."
-        #agent_list, agent_configs = builder.build(building_task, llm_config, coding=True)
-        
-        if load_path:
-            agent_list, _ = builder.load(load_path, use_oai_assistant=config.use_oai_assistant)
-        else:
-            agent_list, _ = builder.build(building_task, llm_config, code_execution_config=getAutogenCodeExecutionConfig() if coding else None, use_oai_assistant=config.use_oai_assistant, coding=coding) # coding: use to identify if the user proxy (a code interpreter) should be added.
-
-        group_chat = GroupChat(agents=agent_list, messages=[], max_round=config.max_group_chat_round)
-        manager = GroupChatManager(
-            groupchat=group_chat,
-            llm_config={"config_list": config_list, **llm_config},
+        user_proxy = UserProxyAgent(
+            name="user_proxy",
+            human_input_mode="NEVER"
         )
-        agent_list[0].initiate_chat(manager, message=execution_task)
-
-        # save building config # TODO: raise TypeError(f'Object of type {o.__class__.__name__} ' TypeError: Object of type LocalCommandLineCodeExecutor is not JSON serializable
-        if not load_path and not config.code_execution_use_docker:
-            builder.save(self.getSavePath(title))
-
-        #clear all agents
-        builder.clear_all_agents(recycle_endpoint=True)
-
-        return group_chat.messages
+        chatResult = user_proxy.initiate_chat(captain_agent, message=query)
+        return chatResult.chat_history
 
     def promptTask(self):
         self.print(f"<{config.terminalCommandEntryColor1}>Please specify a task below:</{config.terminalCommandEntryColor1}>")
@@ -137,17 +138,12 @@ class AutoGenBuilder:
         code_execution_timeout = self.prompts.simplePrompt(numberOnly=True, style=self.promptStyle, default=str(config.code_execution_timeout),)
         if code_execution_timeout and int(code_execution_timeout) > 1:
             config.code_execution_timeout = int(code_execution_timeout)
-        # code interpreter
-        self.print("Do you want to use a code interpreter (y/yes/N/NO)?")
-        userInput = self.prompts.simplePrompt(style=self.promptStyle, default="y")
-        if userInput:
-            self.interpreter = True if userInput.strip().lower() in ("y", "yes") else False
         config.saveConfig()
 
     def run(self):
         self.promptConfig()
 
-        self.print(f"<{config.terminalCommandEntryColor1}>AutoGen Agent Builder launched!</{config.terminalCommandEntryColor1}>")
+        self.print(f"<{config.terminalCommandEntryColor1}>AutoGen Captain Agent launched!</{config.terminalCommandEntryColor1}>")
         self.print(f"""[press '{str(config.hotkey_exit).replace("'", "")[1:-1]}' to exit]""")
         while True:
             self.print(f"<{config.terminalCommandEntryColor1}>Hi! I am ready for a new task.</{config.terminalCommandEntryColor1}>")
@@ -155,12 +151,12 @@ class AutoGenBuilder:
             if task == config.exit_entry:
                 break
             try:
-                self.getResponse(task, coding=self.interpreter)
+                self.getResponse(task)
             except:
                 self.print(traceback.format_exc())
                 break
 
-        print2("\n\nAutoGen Agent Builder closed!")
+        print2("\n\nAutoGen Captain Agent closed!")
 
 
 
@@ -169,20 +165,18 @@ class AutoGenBuilder:
         print_formatted_text(HTML(message))
 
 def main():
-    parser = argparse.ArgumentParser(description="AutoGen Agent Builder cli options")
+    parser = argparse.ArgumentParser(description="AutoGen Captain Agent cli options")
     # Add arguments
     parser.add_argument("default", nargs="?", default=None, help="execution task")
     parser.add_argument('-a', '--agents', action='store', dest='agents', type=int, help="maximum number of agents")
-    parser.add_argument('-c', '--config', action='store', dest='config', help="load building config file")
     parser.add_argument('-ed', '--executeindocker', action='store_true', dest='executeindocker', help="execute code in docker")
     parser.add_argument('-et', '--executiontimeout', action='store', dest='executiontimeout', type=int, help="timeout for each code execution in seconds")
-    parser.add_argument('-i', '--interpreter', action='store_true', dest='interpreter', help="use a code interpreter")
     parser.add_argument('-oaia', '--oaiassistant', action='store_true', dest='oaiassistant', help="use OpenAI Assistant API")
     parser.add_argument('-r', '--rounds', action='store', dest='rounds', type=int, help="maximum round of group chat")
     # Parse arguments
     args = parser.parse_args()
 
-    builder = AutoGenBuilder()
+    builder = AutoCaptainAgent()
 
     if args.agents and args.agents > 0:
         config.max_agents = args.agents
@@ -196,21 +190,8 @@ def main():
     config.code_execution_use_docker = True if args.executeindocker else False
     config.use_oai_assistant = True if args.oaiassistant else False
 
-    if args.config and not os.path.isfile(args.config):
-        print2(f"'{args.config}' does not exist!")
-
-    coding = True if args.interpreter else False
-
-    if args.config and os.path.isfile(args.config):
-        task = args.default if args.default else ""
-        if not task:
-            task = builder.promptTask()
-        if task.strip():
-            builder.getResponse(task=task.strip(), load_path=args.config, coding=coding)
-        else:
-            print2("Task not specified!")
-    elif args.default:
-        builder.getResponse(task=args.default, coding=coding)
+    if args.default:
+        builder.getResponse(task=args.default)
     else:
         builder.run()
 

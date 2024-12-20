@@ -33,6 +33,8 @@ Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/d
 
 # New Additions
 
+[NEW! AutoGen Agents Integration](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/AutoGen%20Integration.md)
+
 [NEW! Support Ollama v0.5.0+ latest structured output feature](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Configure%20Ollama%20Server.md)
 
 [NEW! Support Llama.cpp server running on Android](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Android%20Versions.md)
@@ -116,7 +118,13 @@ Read more at: https://github.com/eliranwong/toolmate/blob/main/package/toolmate/
 
 ![plugins](https://github.com/eliranwong/toolmate/assets/25262722/6bb4b2f6-5684-42c1-95e3-7b12c3a38db6)
 
+## AutoGen Agents Integration
+
+https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/AutoGen%20Integration.md
+
 ## System Command and Fabric Integration
+
+CLI Options: https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/CLI%20Options.md
 
 System Command Integration: https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/System%20Command%20Integration.md
 

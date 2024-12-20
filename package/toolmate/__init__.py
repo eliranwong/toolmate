@@ -85,7 +85,8 @@ elif thisPlatform == "Linux":
     checkPath()
     config.open = "xdg-open"
     try:
-        config.thisDistro = subprocess.check_output('lsb_release -i -s', shell=True).decode('utf-8')
+        #config.thisDistro = subprocess.check_output('lsb_release -i -s', shell=True).decode('utf-8')
+        config.thisDistro = get_linux_distro().get("name", "")
     except:
         config.thisDistro = ""
 elif thisPlatform == "Darwin":

@@ -1,8 +1,8 @@
-import os
 from toolmate import config
 if not hasattr(config, "max_consecutive_auto_reply"):
     config.max_consecutive_auto_reply = 10
-import autogen, os, traceback
+from autogen import AssistantAgent, ConversableAgent, filter_config
+import traceback
 from toolmate import getDeviceInfo, getAutogenConfigList, getAutogenCodeExecutionConfig
 from toolmate.utils.prompts import Prompts
 from prompt_toolkit import print_formatted_text, HTML
@@ -11,20 +11,6 @@ from prompt_toolkit.styles import Style
 #from prompt_toolkit.history import FileHistory
 
 class AutoGenAssistant:
-
-    def __init__(self):
-        #config_list = autogen.get_config_list(
-        #    [config.openaiApiKey], # assume openaiApiKey is in place in config.py
-        #    api_type="openai",
-        #    api_version=None,
-        #)
-        """
-        Code execution is set to be run in docker (default behaviour) but docker is not running.
-        The options available are:
-        - Make sure docker is running (advised approach for code execution)
-        - Set "use_docker": False in code_execution_config
-        - Set code_execution_use_docker to "0/False/no" in your environment variables
-        """
 
     def getResponse(self, message, auto=False):
 
@@ -35,30 +21,33 @@ Below is my message:
 {message}"""
 
         filter_dict = {"tags": [config.llmInterface]}
-        config_list = autogen.filter_config(getAutogenConfigList(), filter_dict)
+        config_list = filter_config(getAutogenConfigList(), filter_dict)
 
-        assistant = autogen.AssistantAgent(
+        assistant = AssistantAgent(
             name="assistant",
             llm_config={
                 #"cache_seed": 42,  # seed for caching and reproducibility
                 "config_list": config_list,
                 "temperature": config.llmTemperature,  # temperature for sampling
-                "timeout": 300,
+                "timeout":  config.llm_timeout,
             },  # configuration for autogen's enhanced inference API which is compatible with OpenAI API
         )
-        # create a UserProxyAgent instance named "user_proxy"
-        user_proxy = autogen.UserProxyAgent(
-            name="user_proxy",
-            human_input_mode="NEVER" if auto else "ALWAYS",
+
+        # Create an agent with code executor configuration.
+        code_executor_agent = ConversableAgent(
+            name="code_executor_agent",
+            llm_config=False,  # Turn off LLM for this agent.
+            code_execution_config=getAutogenCodeExecutionConfig(),  # Use the local command line code executor.
+            human_input_mode="NEVER" if auto else "ALWAYS",  # Always take human input for this agent for safety.
             max_consecutive_auto_reply=config.max_consecutive_auto_reply,
-            is_termination_msg=lambda x: x.get("content", "").rstrip().endswith("TERMINATE"),
-            code_execution_config=getAutogenCodeExecutionConfig(),
+            is_termination_msg=lambda msg: msg.get("content", "").rstrip().endswith("TERMINATE") and not "```" in msg.get("content", ""), # Check here if chat is terminated before code is executed
         )
-        # the assistant receives a message from the user_proxy, which contains the task description
-        user_proxy.initiate_chat(
+
+        chatResult = code_executor_agent.initiate_chat(
             assistant,
             message=message,
         )
+        return chatResult.chat_history
 
     def print(self, message):
         #print(message)
@@ -83,7 +72,7 @@ Below is my message:
             if max_consecutive_auto_reply and int(max_consecutive_auto_reply) > 1:
                 config.max_consecutive_auto_reply = int(max_consecutive_auto_reply)
 
-        self.print(f"<{config.terminalCommandEntryColor1}>AutoGen Assistant launched!</{config.terminalCommandEntryColor1}>")
+        self.print(f"<{config.terminalCommandEntryColor1}>AutoGen Assistant Agent launched!</{config.terminalCommandEntryColor1}>")
         self.print(f"""[press '{str(config.hotkey_exit).replace("'", "")[1:-1]}' to exit]""")
         while True:
             self.print(f"<{config.terminalCommandEntryColor1}>New chat started!</{config.terminalCommandEntryColor1}>")
@@ -96,7 +85,7 @@ Below is my message:
             except:
                 self.print(traceback.format_exc())
                 break
-        self.print(f"<{config.terminalCommandEntryColor1}>\n\nAutoGen Assistant closed!</{config.terminalCommandEntryColor1}>")
+        self.print(f"<{config.terminalCommandEntryColor1}>\n\nAutoGen Assistant Agent closed!</{config.terminalCommandEntryColor1}>")
 
 def main():
     config.includeIpInDeviceInfoTemp = config.includeIpInDeviceInfo

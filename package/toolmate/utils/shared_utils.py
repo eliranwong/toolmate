@@ -5,10 +5,7 @@ import traceback, uuid, re, textwrap, signal, wcwidth, shutil, threading, time, 
 from importlib_metadata import version as lib_version
 from packaging import version
 import importlib.resources
-import pygments
-from pygments.lexers.python import PythonLexer
 from pygments.styles import get_style_by_name
-from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit.styles.pygments import style_from_pygments_cls
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit import prompt
@@ -624,17 +621,36 @@ def getAutogenConfigList():
     return config_list
 
 def getAutogenCodeExecutionConfig():
-    temp_dir = tempfile.TemporaryDirectory()
-    executor =  DockerCommandLineCodeExecutor(
-        image=config.code_execution_image,  # Execute code using the given docker image name.
-        timeout=config.code_execution_timeout,  # Timeout for each code execution in seconds.
-        work_dir=temp_dir.name,  # Use the temporary directory to store the code files.
-    ) if config.code_execution_use_docker else LocalCommandLineCodeExecutor(
-        timeout=10,  # Timeout for each code execution in seconds.
-        work_dir=temp_dir.name,  # Use the temporary directory to store the code files.
-    )
+    if config.code_execution_use_docker:
+        temp_dir = tempfile.TemporaryDirectory()
+        coding_directory = temp_dir.name
+        executor = DockerCommandLineCodeExecutor(
+            image=config.code_execution_image,  # Execute code using the given docker image name.
+            timeout=config.code_execution_timeout,  # Timeout for each code execution in seconds.
+            work_dir=coding_directory,  # Use the temporary directory to store the code files.
+        )
+    else:
+        if hasattr(config, "api_server_id"):
+            coding_directory = os.getcwd()
+        else:
+            coding_directory = os.path.join(config.localStorage, "autogen", "coding")
+            if not os.path.isdir(coding_directory):
+                Path(coding_directory).mkdir(parents=True, exist_ok=True)
+        """executor = LocalCommandLineCodeExecutor(
+            timeout=config.code_execution_timeout,  # Timeout for each code execution in seconds.
+            work_dir=coding_directory,  # Use the current directory to store the code files.
+        )""" # raise TypeError(f'Object of type {o.__class__.__name__} ' TypeError: Object of type LocalCommandLineCodeExecutor is not JSON serializable
+        executor = "commandline-local"
     return {
         "executor": executor,
+        #"last_n_messages": "auto",
+        #"timeout": config.code_execution_timeout,
+        #"use_docker": config.code_execution_use_docker,
+        #"work_dir": coding_directory,
+        "commandline-local": {
+            "timeout": config.code_execution_timeout,
+            "work_dir": coding_directory,
+        },
     }
 
 def downloadStableDiffusionFiles():
@@ -2415,3 +2431,119 @@ def buildHelpStore():
     splits = ragGetSplits(docs_path)
     for i in splits:
         add_vector(collection, i.page_content, metadata={"source": i.metadata.get("source")[0]})
+
+def get_linux_distro():
+    """
+    Detects the Linux distribution using various methods.
+
+    Returns:
+    A dictionary containing information about the distribution, or None if 
+    the distribution could not be determined.
+    """
+
+    # Method 1: Check /etc/os-release (most reliable)
+    try:
+        with open("/etc/os-release", "r") as f:
+            os_release_content = f.readlines()
+            distro_info = {}
+            for line in os_release_content:
+                if "=" in line:
+                    key, value = line.strip().split("=", 1)
+                    distro_info[key.lower()] = value.strip('"')
+        
+        # Prioritize 'pretty_name' or 'name' if available.
+        if distro_info.get("pretty_name"):
+            distro_info["name"] = distro_info["pretty_name"]
+        else:
+            distro_info["name"] = "Unknown"
+
+        return distro_info
+    except FileNotFoundError:
+        pass
+
+    # Method 2: Check for distro-specific files in /etc
+    distro_files = {
+        "redhat": "/etc/redhat-release",
+        "fedora": "/etc/fedora-release",
+        "centos": "/etc/centos-release",
+        "oracle": "/etc/oracle-release",
+        "debian": "/etc/debian_version",
+        "ubuntu": "/etc/lsb-release",
+        "linuxmint": "/etc/lsb-release",
+        "gentoo": "/etc/gentoo-release",
+        "alpine": "/etc/alpine-release",
+        "arch": "/etc/arch-release",
+        "manjaro": "/etc/lsb-release",
+        "opensuse": "/etc/SuSE-release", 
+        "suse": "/etc/SuSE-release" # older SUSE
+    }
+
+    for distro_name, file_path in distro_files.items():
+        try:
+            with open(file_path, "r") as f:
+                content = f.read().strip()
+                
+                if distro_name == "ubuntu" or distro_name == "linuxmint" or distro_name == "manjaro":
+                    # Parse lsb-release for Ubuntu, Mint and Manjaro
+                    distro_info = {}
+                    for line in content.splitlines():
+                        key, value = line.split("=")
+                        distro_info[key.lower()] = value.strip()
+                    if distro_info.get("distrib_description"):
+                        return {"name": distro_info["distrib_description"], "version": distro_info.get("distrib_release"), "codename": distro_info.get("distrib_codename")}
+                    else:
+                        return {"name": distro_info.get("distrib_id"), "version": distro_info.get("distrib_release"), "codename": distro_info.get("distrib_codename")}
+
+                elif distro_name == "debian":
+                    # Debian only has a version number 
+                    return {"name": "Debian", "version": content}
+
+                elif distro_name == "arch":
+                    # Arch Linux typically has an empty /etc/arch-release
+                    return {"name": "Arch Linux"}
+                    
+                else:
+                    # Extract name and version for other distributions
+                    # This regex tries to handle different formats
+                    match = re.search(r"([\w\s]+)[\s|-]*release\s*([\d.abrc]+)?", content, re.IGNORECASE)
+
+                    if match:
+                        name = match.group(1).strip()
+                        version = match.group(2).strip() if match.group(2) else None
+                        
+                        # Special case handling for CentOS to differentiate from RHEL
+                        if name.lower().startswith("centos"):
+                            return {"name": "CentOS", "version": version}
+                        else:
+                            return {"name": name, "version": version}
+                    else:
+                        return {"name": distro_name, "version": content}
+
+        except FileNotFoundError:
+            pass
+
+    # Method 3: Use platform.linux_distribution() (deprecated)
+    # try:
+    #   # This is deprecated in Python 3.8+ and removed in Python 3.10
+    #   distro_name, version, codename = platform.linux_distribution()
+    #   if distro_name:
+    #     return {"name": distro_name, "version": version, "codename": codename}
+    # except AttributeError:
+    #   pass
+        
+    # Method 4: Use lsb_release command (if available)
+    try:
+        # Check if lsb_release command exists
+        if os.system("which lsb_release > /dev/null 2>&1") == 0:
+            distro_info = {}
+            output = os.popen("lsb_release -a").read()
+            for line in output.splitlines():
+                if ":" in line:
+                    key, value = line.split(":", 1)
+                    distro_info[key.strip().lower().replace(" ", "_")] = value.strip()
+            if distro_info.get("distributor_id"):
+                return {"name": distro_info["distributor_id"], "version": distro_info.get("release"), "codename": distro_info.get("codename"), "description": distro_info.get("description")}
+    except Exception:
+        pass
+
+    return None  # Could not determine distro

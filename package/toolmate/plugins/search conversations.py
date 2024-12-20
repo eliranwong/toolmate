@@ -10,7 +10,7 @@ from toolmate import config
 
 if not config.isLite:
 
-    get_or_create_collection, add_vector, query_vectors, showErrors, displayLoadedMessages
+    from toolmate import get_or_create_collection, add_vector, query_vectors, showErrors, displayLoadedMessages
     from toolmate import print1, print2, print3
     from pathlib import Path
     from chromadb.config import Settings

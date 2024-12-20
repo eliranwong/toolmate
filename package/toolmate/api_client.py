@@ -1,5 +1,5 @@
 import requests, argparse, json, sys, os, pprint, re, shutil
-from toolmate import config, configFile, convertOutputText, wrapText, startSpinning, stopSpinning, readTextFile, writeTextFile, print2, print3, getPygmentsStyle, showErrors, isServerAlive, getLlms
+from toolmate import config, configFile, convertOutputText, wrapText, startSpinning, stopSpinning, readTextFile, writeTextFile, print2, print3, getPygmentsStyle, showErrors, isServerAlive, getLlms, searchFolder
 from toolmate.utils.tts_utils import TTSUtil
 from toolmate.utils.single_prompt import SinglePrompt
 
@@ -41,6 +41,7 @@ parser.add_argument('-bc', '--backupconversation', action='store_true', dest='ba
 parser.add_argument('-bs', '--backupsettings', action='store_true', dest='backupsettings', help="back up the current settings in ToolMate AI user directory")
 parser.add_argument('-c', '--chat', action='store_true', dest='chat', help="enable to chat as an on-going conversation")
 parser.add_argument('-cf', '--chatfile', action='store', dest='chatfile', help="a chat file containing a saved conversation")
+parser.add_argument('-cp', '--chatpattern', action='store', dest='chatpattern', help=f"override chat system message for a single request, with a fabric pattern, in {config.fabricPatterns}; configure config.fabricPatterns to customise the path; use AI model assigned in ToolMate AI instead of in Fabric; this option cannot be used together with option 'chatsystem'; fabric is required to install separately")
 parser.add_argument('-cs', '--chatsystem', action='store', dest='chatsystem', help="override chat system message for a single request; optionally use it together with '-bc' to make a change persistant")
 parser.add_argument('-dt', '--defaulttool', action='store', dest='defaulttool', help="override default tool for a single request; optionally use it together with '-bc' to make a change persistant; applied when 'Tool Selection Agent' is disabled and no tool is specified in the request")
 parser.add_argument('-e', '--export', action='store', dest='export', help="export conversation; optionally used with -f option to specify a format for the export")
@@ -70,6 +71,7 @@ parser.add_argument('-rt', '--riskthreshold', action='store', dest='riskthreshol
 parser.add_argument('-s', '--server', action='store', dest='server', help="server address; 'http://localhost' by default")
 parser.add_argument('-sd', '--showdescription', action='store_true', dest='showdescription', help="show description of the found items in search results; used together with 'sc', 'ss' and 'st'")
 parser.add_argument('-sc', '--searchcontexts', action='store', dest='searchcontexts', help="search predefined contexts; use '@' to display all; use regex pattern to filter")
+parser.add_argument('-sp', '--searchpatterns', action='store', dest='searchpatterns', help=f"search fabric patterns in {config.fabricPatterns}; configure config.fabricPatterns to customise the search path; fabric is required to install separately")
 parser.add_argument('-ss', '--searchsystems', action='store', dest='searchsystems', help="search predefined system messages; use '@' to display all; use regex pattern to filter")
 parser.add_argument('-st', '--searchtools', action='store', dest='searchtools', help="search enabled tools; use '@' to display all; use regex pattern to filter")
 parser.add_argument('-t', '--temperature', action='store', dest='temperature', type=float, help="override inference temperature for a single request; optionally use it together with '-bc' to make a change persistant; accepted range: 0.0-2.0; unaccepted values will be ignored without notification")
@@ -267,6 +269,9 @@ def tmt20():
     main(chatSystem=config.tmt20)
 
 def main(chat: bool = False, defaultTool=None, chatSystem=None):
+    if args.searchpatterns:
+        searchFolder(os.path.expanduser(config.fabricPatterns), args.searchpatterns, filter="system.md")
+        return None
     host = args.server if args.server else config.toolmate_api_client_host
     port = args.port if args.port else config.toolmate_api_client_port
     if not isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
@@ -450,6 +455,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None):
             "instruction": instruction,
             "chat": chat,
             "chatfile": chatfile,
+            "chatpattern": args.chatpattern,
             "chatsystem": chatSystem if chatSystem is not None else args.chatsystem,
             "windowsize": args.windowsize,
             "maximumoutput": args.maximumoutput,

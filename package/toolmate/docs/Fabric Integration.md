@@ -34,9 +34,21 @@ Enter `@fabric_pattern`, `@append_fabric_pattern`, `@fabric -p` or `@append_fabr
 
 ![fabric_pattern](https://github.com/user-attachments/assets/604f4d51-7573-4209-bd9b-3df408581997)
 
+# CLI Options
+
+To use ToolMate AI assigned model and fabric pattern to resolve a query, run:
+
+> tm --chatpattern [pattern]
+
+To search for a pattern, run:
+
+> tm --searchpatterns [query]
+
 # Difference from Running Fabric Alone
 
 Fabric integration in ToolMate AI brings `fabric` to interact with other AI tools, supported by ToolMate AI. Fabric output is directly integrated into the main ToolMate AI message chain.
+
+In addition, by using CLI option `tm --chatpattern`, users can run fabric patterns with AI backends supported in ToolMate AI, but not available in Fabric.
 
 # Requirement
 

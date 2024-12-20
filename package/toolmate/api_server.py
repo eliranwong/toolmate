@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import APIKeyHeader
-from toolmate import config, configFile, isServerAlive, print2, print3, getOllamaServerClient, getLlms, unloadLocalModels, changeModel, changeBackendAndModel, getCurrentModel, get_wan_ip, get_local_ip
+from toolmate import config, configFile, isServerAlive, print2, print3, getOllamaServerClient, getLlms, unloadLocalModels, changeModel, changeBackendAndModel, getCurrentModel, get_wan_ip, get_local_ip, readTextFile
 from toolmate.utils.assistant import ToolMate
 from toolmate.utils.tool_plugins import Plugins
 from toolmate.utils.call_llm import CallLLM
@@ -46,6 +46,7 @@ class Request(BaseModel):
     instruction: str | None = "."
     chat: bool | None = False
     chatfile: str | None = None
+    chatpattern: str | None = None
     chatsystem: str | None = None
     windowsize: int | None = None
     maximumoutput: int | None = None
@@ -77,11 +78,17 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
     instruction = request.instruction
     chat = request.chat
     chatfile = request.chatfile
+    chatpattern = request.chatpattern
     chatsystem = request.chatsystem
     if chatsystem is not None:
         check = re.sub("^`([^`]+?)`$", r"\1", chatsystem)
         if check in config.predefinedChatSystemMessages:
             chatsystem = config.predefinedChatSystemMessages.get(check)
+    elif chatpattern:
+        fabricPattern = os.path.join(os.path.expanduser(config.fabricPatterns), chatpattern, "system.md")
+        if os.path.isfile(fabricPattern):
+            chatsystem = readTextFile(fabricPattern)
+            chatsystem = re.sub(r'# INPUT.*', '', chatsystem, flags=re.DOTALL).rstrip()
     windowsize = request.windowsize
     maximumoutput = request.maximumoutput
     temperature = request.temperature

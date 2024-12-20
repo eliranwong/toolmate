@@ -1226,6 +1226,15 @@ def is_valid_url(url: str) -> bool:
 import glob
 import os
 
+def searchFolder(folder, query, filter="*.txt"):
+    # Linux/macOS: find chats/ -name "*.txt" -type f -exec grep -rin --color=auto "your_string" {} +
+    # Windows: findstr /s "your_string" *.txt /path/to/your/folder
+    if config.thisPlatform == "Windows":
+        cli = '''findstr /s "{2}" "{1}" "{0}"'''.format(folder, filter, query)
+    else:
+        cli = '''find "{0}" -iname "{1}" -type f -exec grep -Erin --color=auto "{2}" {3}{4} +'''.format(folder, filter, query, "{", "}")
+    os.system(cli)
+
 def find_last_added_file(folder_path, ext=".mp3"):
     """
     Finds the filename of the last added .mp3 file in a folder.

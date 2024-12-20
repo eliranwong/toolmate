@@ -1,4 +1,8 @@
-# 0.5.85-0.5.89
+# 0.5.91-0.5.92
+
+* Enhanced fabric integration.  Added CLI options `--chatpattern` and `--searchpatterns` for ToolMate AI to use fabric pattern as chat system message. https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Fabric%20Integration.md This feature uses AI model assigned in ToolMate AI backend, rather than the default model set up in fabric.
+
+# 0.5.85-0.5.90
 
 * enhanced integration of AutoGen agents in tools: proxy, group, agents, captain, examine_files, examine_web_content
 

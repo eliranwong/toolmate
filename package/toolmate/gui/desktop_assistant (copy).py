@@ -1,11 +1,15 @@
 from toolmate import config
+from toolmate.api_client import main as getApiResponse
 from toolmate.utils.call_llm import CallLLM
+from toolmate.utils.tool_plugins import Plugins
 from toolmate.gui.worker import QtApiResponseStreamer
-import getpass, requests, json
+#from toolmate.gui.worker import Worker
+import getpass
 
-from PySide6.QtCore import Qt, QThreadPool
-from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QCompleter, QMainWindow, QWidget, QMessageBox, QPlainTextEdit, QProgressBar, QHBoxLayout, QVBoxLayout, QLineEdit, QSplitter, QComboBox
+from PySide6.QtPrintSupport import QPrinter, QPrintDialog
+from PySide6.QtCore import Qt, QThread, QRegularExpression, QRunnable, Slot, Signal, QObject, QThreadPool
+from PySide6.QtGui import QStandardItemModel, QStandardItem, QGuiApplication, QAction, QIcon, QFontMetrics, QTextDocument
+from PySide6.QtWidgets import QCompleter, QMenu, QSystemTrayIcon, QApplication, QMainWindow, QWidget, QDialog, QFileDialog, QDialogButtonBox, QFormLayout, QLabel, QMessageBox, QCheckBox, QPlainTextEdit, QProgressBar, QPushButton, QListView, QHBoxLayout, QVBoxLayout, QLineEdit, QSplitter, QComboBox
 
 class CentralWidget(QWidget):
 
@@ -54,7 +58,7 @@ class CentralWidget(QWidget):
         # widgets
         # user input
         self.userInput = QLineEdit()
-        completer = QCompleter([f"@{i}" for i in self.getAllTools()])
+        completer = QCompleter(config.inputSuggestions)
         completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
         completer.setCompletionMode(QCompleter.PopupCompletion)
         completer.setFilterMode(Qt.MatchContains)
@@ -65,7 +69,6 @@ class CentralWidget(QWidget):
         # content view
         self.contentView = QPlainTextEdit()
         self.contentView.setReadOnly(True)
-        self.setFontSize()
         # progress bar
         self.progressBar = QProgressBar()
         self.progressBar.setRange(0, 0) # Set the progress bar to use an indeterminate progress indicator
@@ -78,33 +81,6 @@ class CentralWidget(QWidget):
 
         # Connections
         self.userInput.returnPressed.connect(self.submit)
-
-    def getAllTools(self):
-        query = "@"
-        endpoint = f"{config.toolmate_api_client_host}:{config.toolmate_api_client_port}/api/tools"
-
-        url = f"""{endpoint}?query={query}"""
-        headers = {
-            "Content-Type": "application/json",
-            "X-API-Key": config.toolmate_api_client_key,
-        }
-        try:
-            response = requests.post(url, headers=headers)
-            results = json.loads(response.json())["results"]
-            return list(results.keys())
-        except Exception as e:
-            #response = f"Error: {e}"
-            pass
-        return []
-
-    def setFontSize(self, index=None):
-        if index is not None:
-            config.desktopAssistantFontSize = index + 1
-        # content view
-        font = self.contentView.font()
-        font.setPointSize(config.desktopAssistantFontSize)
-        self.contentView.setFont(font)
-        config.saveConfig()
 
     def submit(self):
         if request := self.userInput.text().strip():
@@ -123,24 +99,6 @@ class CentralWidget(QWidget):
         self.userInput.setEnabled(True)
         self.progressBar.hide()
         self.userInput.setFocus()
-        # handle user confirmation
-        if "Run `tm -exec` or `tmc -exec` to confirm!" in self.lastResponse and self.confirmCodeExecution():
-            self.userInput.setText("tm -exec")
-            self.submit()
-
-    def confirmCodeExecution(self):
-        msgBox = QMessageBox(QMessageBox.Warning,
-                             "User confirmation required!",
-                             "Do you want to execute the task?",
-                             QMessageBox.NoButton, self)
-        msgBox.addButton("No", QMessageBox.RejectRole)
-        msgBox.addButton("Yes", QMessageBox.AcceptRole)
-        answer = msgBox.exec_()
-        if answer and not answer == 2:
-            return True
-        else:
-            # Continue
-            return False
 
     def streamResponse(self, content):
         self.contentView.insertPlainText(content)
@@ -163,12 +121,15 @@ class DesktopAssistant(QMainWindow):
         self.standalone = standalone
         # set title
         self.setWindowTitle(config.toolMateAIName)
+        # set variables
+        #self.setupVariables()
+        # run plugins
+        Plugins.runPlugins()
         # gui
         self.initUI()
         # shortcuts
         self.processResponse = self.centralWidget.processResponse
         self.streamResponse = self.centralWidget.streamResponse
-        self.setFontSize = self.centralWidget.setFontSize
 
     def closeEvent(self, event):
         if self.standalone:
@@ -195,15 +156,6 @@ class DesktopAssistant(QMainWindow):
     def printTextOutput(self, output):
         self.centralWidget.addContent(output, False)
 
-    def showFontSizeComboBox(self):
-        self.fontSizeComboBox = QComboBox()
-        self.fontSizeComboBox.setWindowTitle("Select Font Size")
-        self.fontSizeComboBox.setFixedWidth(400)
-        self.fontSizeComboBox.addItems([str(i) for i in range(1, 51)])
-        self.fontSizeComboBox.setCurrentIndex((config.desktopAssistantFontSize - 1))
-        self.fontSizeComboBox.currentIndexChanged.connect(self.setFontSize)
-        self.fontSizeComboBox.show()
-
     def createMenubar(self):
         # Create a menu bar
         menubar = self.menuBar()
@@ -214,18 +166,6 @@ class DesktopAssistant(QMainWindow):
         new_action = QAction("New Session", self)
         new_action.setShortcut("Ctrl+N")
         new_action.triggered.connect(self.newConversation)
-        file_menu.addAction(new_action)
-
-        file_menu.addSeparator()
-
-        new_action = QAction("Change Font Size", self)
-        new_action.triggered.connect(self.showFontSizeComboBox)
-        file_menu.addAction(new_action)
-
-        file_menu.addSeparator()
-
-        new_action = QAction("Close", self)
-        new_action.triggered.connect(self.hide)
         file_menu.addAction(new_action)
 
         """new_action = QAction("Open", self)
@@ -250,4 +190,4 @@ class DesktopAssistant(QMainWindow):
 
     def newConversation(self):
         self.centralWidget.contentView.setPlainText("")
-        self.centralWidget.newSession = True
+        self.newSession = True

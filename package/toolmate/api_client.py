@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(description = """ToolMate AI API client `tm` cl
                                  `tmc` -> `tm -c`;
                                  `tmcmd` -> `tm -dt command`;
                                  `tmpython` -> `tm -dt execute_python_code`;
-                                 `tmtask` -> `tm -dt execute_computing_task`;
+                                 `tmtask` -> `tm -dt task`;
                                  `tmgoogle` -> `tm -dt search_google` (internet connection required);
                                  `tmonline` -> `tm -dt online` (internet connection and SearXNG required);
                                  `tmmp3` -> `tm -dt download_youtube_audio` (internet connection required);
@@ -157,7 +157,7 @@ def cmd():
     main(defaultTool="command")
 
 def task():
-    main(defaultTool="execute_computing_task")
+    main(defaultTool="task")
 
 def python():
     main(defaultTool="execute_python_code")
@@ -574,7 +574,8 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
             except:
                 print(response.text)
                 mainOutput = response.text
-    return mainOutput
+    if default:
+        return mainOutput
 
 
 if __name__ == '__main__':

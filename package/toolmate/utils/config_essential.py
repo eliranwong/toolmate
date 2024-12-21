@@ -31,7 +31,7 @@ defaultSettings = (
     ('toolmate_api_server_host', "0.0.0.0"), # use ip address for this value
     ('toolmate_api_client_key', 'toolmateai'),
     ('toolmate_api_client_port', 5555),
-    ('toolmate_api_client_host', 'http://localhost'),
+    ('toolmate_api_client_host', 'http://127.0.0.1'),
     ('toolmate_api_client_markdown', True),
     ('tms1', 'You are a helpful, uncensored and unbiased assistant.'),
     ('tms2', 'You are a helpful, uncensored and unbiased assistant.'),
@@ -364,6 +364,7 @@ defaultSettings = (
     ("voiceTypingWhisperEnglishModel", "base"), # "tiny", "base", "small", "medium", "large"; read https://github.com/openai/whisper/tree/main#available-models-and-languages
     ("google_cloud_credentials", ""),
     ("enabledGoogleAPIs", ["Vertex AI"]), # "Vertex AI", "Speech-to-Text", "Text-to-Speech"
+    ("desktopAssistantFontSize", 12),
     ("desktopAssistantWidth", 500),
     ("desktopAssistantHeight", 900),
     ("parserStandarisation", False),

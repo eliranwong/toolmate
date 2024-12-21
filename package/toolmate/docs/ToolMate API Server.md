@@ -137,7 +137,7 @@ To check CLI options:
 Remarks: Both `tm` and `tmc` are aliases to toolmateclient, with a different that `tm` set `-c CHAT` to `false` by default whereas `tmc` set `-c CHAT` to `true` by default
 
 ```
-ToolMate AI API client `tm` cli options; available shortcuts: `tmc` -> `tm -c`; `tmcmd` -> `tm -dt command`; `tmpython` -> `tm -dt execute_python_code`; `tmtask` -> `tm -dt execute_computing_task`;
+ToolMate AI API client `tm` cli options; available shortcuts: `tmc` -> `tm -c`; `tmcmd` -> `tm -dt command`; `tmpython` -> `tm -dt execute_python_code`; `tmtask` -> `tm -dt task`;
 `tmgoogle` -> `tm -dt search_google` (internet connection required); `tmonline` -> `tm -dt online` (internet connection and SearXNG required); `tmmp3` -> `tm -dt download_youtube_audio` (internet
 connection required); `tmmp4` -> `tm -dt download_youtube_video` (internet connection required); `tmr` -> `tm -dt reflection`; `tmdr` -> `tm -dt deep_reflection`; `tmagents` -> `tm -dt agents` (full
 version only); `tmremember` -> `tm -dt save_memory` (full version only); `tmrecall` -> `tm -dt search_memory` (full version only); `tmt1` ... `tmt20` -> `tm -dt <custom_tool>` (determined by
@@ -299,7 +299,7 @@ options:
 
 * Specify the default tool for a request that does not specify a tool:
 
-> tm -dt execute_computing_task "Create a text file 'hello.txt' and write 'Hello World!' in it."
+> tm -dt task "Create a text file 'hello.txt' and write 'Hello World!' in it."
 
 > tm -dt deep_reflection "What countries are the best for young people?"
 

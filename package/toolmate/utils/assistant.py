@@ -750,6 +750,8 @@ class ToolMate:
         apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.bing_api_key, is_password=True)
         if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
             config.bing_api_key = apikey
+        elif not config.bing_api_key:
+            config.bing_api_key = "toolmate"
         config.saveConfig()
 
     def changeRapidApi(self):
@@ -758,6 +760,8 @@ class ToolMate:
         apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.rapid_api_key, is_password=True)
         if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
             config.rapid_api_key = apikey
+        elif not config.rapid_api_key:
+            config.rapid_api_key = "toolmate"
         config.saveConfig()
 
     def changeOpenweathermapApi(self):

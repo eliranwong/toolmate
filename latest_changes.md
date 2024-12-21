@@ -1,4 +1,8 @@
-# 0.5.91-0.5.93
+# 0.5.91-0.5.95
+
+* added Desktop Assistant GUI in full version
+
+* changed tool name `execute_computing_task` to `task`
 
 * added setup menu `tmsetup -m`
 
@@ -874,7 +878,7 @@ For example, download two more songs from YouTube and play all downloaded mp3 fi
 ```
 @download_youtube_audio https://youtu.be/KBD18rsVJHk?si=PhfzNCOBIj7o_Bdy 
 @download_youtube_audio https://www.youtube.com/watch?v=gCGs6t3tOCU
-@execute_computing_task Play all the mp3 files in folder `/home/ubuntu/freegenius/audio` with command `vlc`
+@task Play all the mp3 files in folder `/home/ubuntu/freegenius/audio` with command `vlc`
 ```
 
 ## Tool and Chat Feature Integration
@@ -935,7 +939,7 @@ Currently supported tools:
 @datetimes
 @download_web_content
 @edit_text
-@execute_computing_task
+@task
 @install_python_package
 @save_memory
 @search_memory

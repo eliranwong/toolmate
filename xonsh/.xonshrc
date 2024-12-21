@@ -68,7 +68,7 @@ toolmate_tools = [
  'examine_images_pixtral',
  'examine_images_vertexai',
  'examine_web_content',
- 'execute_computing_task',
+ 'task',
  'execute_python_code',
  'extract_bible_references',
  'extract_python_code',

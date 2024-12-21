@@ -1,4 +1,4 @@
-import os, re
+import os, re, subprocess
 from toolmate import config
 localStorage = config.localStorage
 if os.getcwd() != localStorage:
@@ -35,12 +35,34 @@ class ToolMateHub(QSystemTrayIcon):
         config.desktopAssistant.hide()
         config.desktopAssistant.show()
 
+    def startApiServer(self):
+        host = config.toolmate_api_client_host
+        port = config.toolmate_api_client_port
+        if not isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
+            configFile = os.path.join(config.toolMateAIFolder, "config.py")
+            if (os.path.getsize(configFile) == 0 or not hasattr(config, "llmInterface") or not config.llmInterface) and shutil.which("tmsetup"):
+                os.system("tmsetup")
+            if shutil.which("toolmateserver"):
+                print("Loading ToolMate AI ...")
+                if shutil.which("nohup"):
+                    cli = f'''{shutil.which("nohup")} "{shutil.which("toolmateserver")}" > ~/toolmate/nohup-api-server.out 2>&1 &'''
+                    os.system(cli)
+                else:
+                    cli = f'''"{shutil.which("toolmateserver")}" &'''
+                    subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                # wait until the server is up
+                while not isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
+                    pass
+                print("ToolMate AI server is now running ...")
+            else:
+                #print("Failed to connect ToolMate AI! Run `toolmateserver` first!")
+                QMessageBox.information(self, "ToolMate AI", "Failed to connect ToolMate AI! Run `toolmateserver` first!")
+
     def __init__(self, icon, parent=None):
         super().__init__(icon, parent)
 
-        # initial completion check at startup
-        #config.initialCompletionCheck = False
-        #config.toolmate = ToolMate()
+        # start API server if it is not running
+        self.startApiServer()
 
         # pre-load desktop assistant gui
         config.desktopAssistant = DesktopAssistant()
@@ -208,6 +230,11 @@ class ToolMateHub(QSystemTrayIcon):
         menuAction.setMenu(submenu)
         self.menu.addAction(menuAction)"""
 
+        self.menu.addSeparator()
+
+        action = QAction("Edit Configurations", self)
+        action.triggered.connect(partial(runToolMateCommand, "tmsetup -m"))
+        self.menu.addAction(action)
         self.menu.addSeparator()
 
         helpAction = QAction("Wiki", self)

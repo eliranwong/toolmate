@@ -42,7 +42,7 @@ open(os.path.join(package, "config.py"), "w").close()
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name="toolmate_lite",
-    version="0.5.92",
+    version="0.5.95",
     python_requires=">=3.8, <3.13",
     description=f"ToolMate AI, developed by Eliran Wong, is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. Supports custom workflow and plugins to automate multi-step actions.",
     long_description='''# ToolMate AI Lite
@@ -95,7 +95,7 @@ This `Lite` version supports running on Android Termux as well as on Windows / m
             f"tm={package}.api_client:main", # essentially `tmclient`
             f"tmc={package}.api_client:chat", # practically equal to `tmclient -c` or `tm -c`
             f"tmcmd={package}.api_client:cmd", # practically equal to `tmclient -dt command` or `tm -dt command`
-            f"tmtask={package}.api_client:task", # practically equal to `tmclient -dt execute_computing_task` or `tm -dt execute_computing_task`
+            f"tmtask={package}.api_client:task", # practically equal to `tmclient -dt task` or `tm -dt task`
             f"tmpython={package}.api_client:python",
             f"tminternet={package}.api_client:internet",
             f"tmgoogle={package}.api_client:google",

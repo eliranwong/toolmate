@@ -16,7 +16,7 @@ from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit import print_formatted_text
 from prompt_toolkit.styles import Style
 
-def execute_computing_task(function_args):
+def task(function_args):
     # retrieve argument values from a dictionary
     risk = function_args.get("risk") # required
     title = function_args.get("title") # required
@@ -78,7 +78,7 @@ functionSignature = {
         "open folder",
         "open directory",
     ],
-    "name": "execute_computing_task",
+    "name": "task",
     "description": "Execute computing task or gain access to device information",
     "parameters": {
         "type": "object",
@@ -101,6 +101,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=execute_computing_task)
-config.aliases["@task "] = "@execute_computing_task "
-config.builtinTools["task"] = "Execute computing task or gain access to device information"
+config.addFunctionCall(signature=functionSignature, method=task)

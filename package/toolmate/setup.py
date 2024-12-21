@@ -1,9 +1,9 @@
-from toolmate import config, print2
+from toolmate import config, print2, showErrors
 
-import os, shutil, argparse, pyperclip, subprocess
+import os, shutil, argparse, re, requests
 from pathlib import Path
 
-from toolmate import updateApp, configFile, getOllamaServerClient, exportOllamaModels
+from toolmate import configFile, getOllamaServerClient, exportOllamaModels, isServerAlive
 from toolmate.utils.assistant import ToolMate
 from prompt_toolkit.shortcuts import set_title, clear_title
 
@@ -145,6 +145,27 @@ def main():
     config.saveConfig()
     if os.path.isdir(config.localStorage):
         shutil.copy(configFile, os.path.join(config.localStorage, "config_lite_backup.py" if config.isLite else "config_backup.py"))
+
+    host = config.toolmate_api_client_host
+    port = config.toolmate_api_client_port
+    if isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
+        print("Reloading configurations ...")
+
+        endpoint = f"{host}:{port}/api/toolmate"
+        headers = {
+            "Content-Type": "application/json",
+            "X-API-Key": config.toolmate_api_client_key,
+        }
+        data = {
+            "wd": os.getcwd(),
+            "reloadsettings": True,
+        }
+        try:
+            requests.post(endpoint, headers=headers, json=data)
+        except Exception as e:
+            showErrors(e=e)
+
+        print("Reloaded!")
 
     # clear title
     clear_title()

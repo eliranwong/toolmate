@@ -1,5 +1,5 @@
 import requests, argparse, json, sys, os, pprint, re, shutil, pydoc, pyperclip
-from toolmate import config, configFile, convertOutputText, wrapText, startSpinning, stopSpinning, readTextFile, writeTextFile, print2, print3, getPygmentsStyle, showErrors, isServerAlive, getLlms, searchFolder, getCliOutput
+from toolmate import config, convertOutputText, wrapText, startSpinning, stopSpinning, readTextFile, writeTextFile, print2, print3, getPygmentsStyle, showErrors, isServerAlive, getLlms, searchFolder, getCliOutput
 from toolmate.utils.tts_utils import TTSUtil
 from toolmate.utils.single_prompt import SinglePrompt
 
@@ -14,79 +14,6 @@ from prompt_toolkit.history import FileHistory
 from prompt_toolkit.completion import WordCompleter, FuzzyCompleter
 from pathlib import Path
 
-# Create the parser
-parser = argparse.ArgumentParser(description = """ToolMate AI API client `tm` cli options;
-                                 available shortcuts:
-                                 `tmc` -> `tm -c`;
-                                 `tmcmd` -> `tm -dt command`;
-                                 `tmpython` -> `tm -dt execute_python_code`;
-                                 `tmtask` -> `tm -dt task`;
-                                 `tmgoogle` -> `tm -dt search_google` (internet connection required);
-                                 `tmonline` -> `tm -dt online` (internet connection and SearXNG required);
-                                 `tmmp3` -> `tm -dt download_youtube_audio` (internet connection required);
-                                 `tmmp4` -> `tm -dt download_youtube_video` (internet connection required);
-                                 `tmr` -> `tm -dt reflection`;
-                                 `tmdr` -> `tm -dt deep_reflection`;
-                                 `tmproxy` -> `tm -dt proxy` (full version only);
-                                 `tmgroup` -> `tm -dt group` (full version only);
-                                 `tmagents` -> `tm -dt agents` (full version only);
-                                 `tmcaptain` -> `tm -dt captain` (full version only);
-                                 `tmremember` -> `tm -dt save_memory` (full version only);
-                                 `tmrecall` -> `tm -dt search_memory` (full version only);
-                                 `tmt1` ... `tmt20` -> `tm -dt <custom_tool>` (determined by `config.tmt1` ... `config.tmt20`);
-                                 `tms1` ... `tms20` -> `tm -cs <custom_chat_system_message>` (determined by `config.tms1` ... `config.tms20`, support pre-defined system messages or fabric patterns or custom entry);
-                                 You may create your own aliases to make the shortcuts more memorable.""")
-# Add arguments
-parser.add_argument("default", nargs="?", default=None, help="instruction sent to ToolMate API server; work on previous conversation if not given.")
-parser.add_argument('-ar', '--autoretrieve', action='store_true', dest='autoretrieve', help="use AutoGen retriever for RAG tools, such as 'examine_files' and 'examine_web_content'; this feature is available in full version only")
-parser.add_argument('-b', '--backend', action='store', dest='backend', help="AI backend; optionally use it together with '-bc' to make a change persistant")
-parser.add_argument('-bc', '--backupconversation', action='store_true', dest='backupconversation', help="back up the current conversation in ToolMate AI user directory")
-parser.add_argument('-bs', '--backupsettings', action='store_true', dest='backupsettings', help="back up the current settings in ToolMate AI user directory")
-parser.add_argument('-c', '--chat', action='store_true', dest='chat', help="enable to chat as an on-going conversation")
-parser.add_argument('-cf', '--chatfile', action='store', dest='chatfile', help="a chat file containing a saved conversation")
-parser.add_argument('-cp', '--chatpattern', action='store', dest='chatpattern', help=f"override chat system message for a single request, with a fabric pattern, in {config.fabricPatterns}; configure config.fabricPatterns to customise the path; use AI model assigned in ToolMate AI instead of in Fabric; this option cannot be used together with option 'chatsystem'; fabric is required to install separately")
-parser.add_argument('-cs', '--chatsystem', action='store', dest='chatsystem', help="override chat system message for a single request; optionally use it together with '-bc' to make a change persistant")
-parser.add_argument('-dt', '--defaulttool', action='store', dest='defaulttool', help="override default tool for a single request; optionally use it together with '-bc' to make a change persistant; applied when 'Tool Selection Agent' is disabled and no tool is specified in the request")
-parser.add_argument('-e', '--export', action='store', dest='export', help="export conversation; optionally used with -f option to specify a format for the export")
-parser.add_argument('-exec', '--execute', action='store_true', dest='execute', help="execute python code or system command; format a block of python code starting with '```python' or a block of system command starting with '```command'; ends the block with '```'")
-parser.add_argument('-f', '--format', action='store', dest='format', help="conversation output format; plain or list; useful for sharing or backup; only output the last assistant response if this option is not used")
-parser.add_argument('-ga', '--groupagents', action='store', dest='groupagents', type=int, help="group chat feature; maximum number of agents")
-parser.add_argument('-ged', '--groupexecuteindocker', action='store_true', dest='groupexecuteindocker', help="group chat feature; execute code in docker")
-parser.add_argument('-get', '--groupexecutiontimeout', action='store', dest='groupexecutiontimeout', type=int, help="group chat feature; timeout for each code execution in seconds")
-parser.add_argument('-goaia', '--groupoaiassistant', action='store_true', dest='groupoaiassistant', help="group chat feature; use OpenAI Assistant API; applicable to backend 'openai' only")
-parser.add_argument('-gr', '--grouprounds', action='store', dest='grouprounds', type=int, help="group chat feature; maximum number of rounds of discussion")
-parser.add_argument('-i', '--interactive', action='store_true', dest='interactive', help="interactive prompt, with auto-suggestions enabled, for writing instruction; do not use this option together with standard input or output")
-parser.add_argument('-imh', '--imageheight', action='store', dest='imageheight', type=int, help="image height; DALLE.3 supports 1024x1024 / 1024x1792 /1792x1024; Flux.1 natively supports any resolution up to 2 mp (1920x1088)")
-parser.add_argument('-imhd', '--imagehd', action='store_true', dest='imagehd', help="image quality in high definition")
-parser.add_argument('-ims', '--imagesteps', action='store', dest='imagesteps', type=int, help="image sampling steps")
-parser.add_argument('-imw', '--imagewidth', action='store', dest='imagewidth', type=int, help="image width; DALLE.3 supports 1024x1024 / 1024x1792 /1792x1024; Flux.1 natively supports any resolution up to 2 mp (1920x1088)")
-parser.add_argument('-info', '--information', action='store_true', dest='information', help="quick overview of server information")
-parser.add_argument('-k', '--key', action='store', dest='key', help="specify the API key for authenticating access to the ToolMate AI server")
-parser.add_argument('-m', '--model', action='store', dest='model', help="AI model; override backend option if the model's backend is different; optionally use it together with '-bc' to make a change persistant")
-parser.add_argument('-ms', '--models', action='store_true', dest='models', help="show available AI backends and models")
-parser.add_argument('-md', '--markdown', action='store', dest='markdown', help="highlight assistant response in markdown format; true / false")
-parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', type=int, help="override maximum output tokens for a single request; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
-parser.add_argument('-p', '--port', action='store', dest='port', type=int, help="server port")
-parser.add_argument('-pa', '--paste', action='store_true', dest='paste', help="paste the clipboard text as a suffix to the instruction")
-parser.add_argument('-pd', '--powerdown', action='store_true', dest='powerdown', help="power down server")
-parser.add_argument('-py', '--copy', action='store_true', dest='copy', help="copy text output to the clipboard")
-parser.add_argument('-r', '--read', action='store_true', dest='read', help="read text output aloud")
-parser.add_argument('-rs', '--reloadsettings', action='store_true', dest='reloadsettings', help=f"Reload: 1. configurations in {configFile} 2. plugins")
-parser.add_argument('-rt', '--riskthreshold', action='store', dest='riskthreshold', type=int, help="risk threshold for user confirmation before code execution; 0 - always require confirmation; 1 - require confirmation only when risk level is medium or higher; 2 - require confirmation only when risk level is high or higher; 3 or higher - no confirmation required")
-parser.add_argument('-s', '--server', action='store', dest='server', help="server address; 'http://localhost' by default")
-parser.add_argument('-sd', '--showdescription', action='store_true', dest='showdescription', help="show description of the found items in search results; used together with option 'sc' or 'ss' or 'st'; show a fabric pattern content if used with option 'sp'")
-parser.add_argument('-sc', '--searchcontexts', action='store', dest='searchcontexts', help="search predefined contexts; use '@' to display all; use regex pattern to filter")
-parser.add_argument('-sp', '--searchpatterns', action='store', dest='searchpatterns', help=f"search fabric patterns in {config.fabricPatterns}; configure config.fabricPatterns to customise the search path; fabric is required to install separately")
-parser.add_argument('-ss', '--searchsystems', action='store', dest='searchsystems', help="search predefined system messages; use '@' to display all; use regex pattern to filter")
-parser.add_argument('-st', '--searchtools', action='store', dest='searchtools', help="search enabled tools; use '@' to display all; use regex pattern to filter")
-parser.add_argument('-t', '--temperature', action='store', dest='temperature', type=float, help="override inference temperature for a single request; optionally use it together with '-bc' to make a change persistant; accepted range: 0.0-2.0; unaccepted values will be ignored without notification")
-parser.add_argument('-ta', '--toolagent', action='store', dest='toolagent', help="override tool selection agent for a single request; optionally use it together with '-bc' to make a change persistant; true / false; unaccepted values will be ignored without notification")
-parser.add_argument('-vc', '--viewconfigs', action='store_true', dest='viewconfigs', help="view current server configurations")
-parser.add_argument('-wd', '--workingdirectory', action='store', dest='workingdirectory', help="working directory; current location by default")
-parser.add_argument('-ws', '--windowsize', action='store', dest='windowsize', type=int, help="override context window size for a single request; applicable to backends `llama.cpp` amd `ollama` only; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
-parser.add_argument('-ww', '--wordwrap', action='store', dest='wordwrap', help="word wrap; true / false; determined by 'config.wrapWords' if not given")
-# Parse arguments
-args = parser.parse_args()
 
 def highlightMarkdownSyntax(content):
     try:
@@ -116,39 +43,6 @@ def configs():
     print2("```path")
     print(configFile)
     print2("```")
-
-def getPrefix(host, port):
-    stopSpinning()
-
-    endpoint = f"{host}:{port}/api/tools"
-    url = f"""{endpoint}?query=@"""
-    headers = {
-        "Content-Type": "application/json",
-        "X-API-Key": args.key if args.key else config.toolmate_api_client_key,
-    }
-    try:
-        response = requests.post(url, headers=headers)
-        availableTools = json.loads(response.json())["results"].keys()
-    except Exception as e:
-        showErrors(e=e)
-        return ""
-
-    promptStyle = Style.from_dict({
-        # User input (default text).
-        "": config.terminalCommandEntryColor2,
-        # Prompt.
-        "indicator": config.terminalPromptIndicatorColor2,
-    })
-    historyFolder = os.path.join(config.localStorage, "history")
-    Path(historyFolder).mkdir(parents=True, exist_ok=True)
-    instruction_history = os.path.join(historyFolder, "api_client")
-    instruction_session = PromptSession(history=FileHistory(instruction_history))
-    completer = FuzzyCompleter(WordCompleter(sorted([f"@{i}" for i in availableTools]), ignore_case=True))
-    bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
-    instruction = SinglePrompt.run(style=promptStyle, promptSession=instruction_session, bottom_toolbar=bottom_toolbar, completer=completer)
-    if instruction and not instruction.lower() == config.exit_entry:
-        return instruction
-    return ""
 
 def chat():
     main(chat=True)
@@ -281,6 +175,114 @@ def tmt20():
     main(chatSystem=config.tmt20)
 
 def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
+    configFile = os.path.join(config.toolMateAIFolder, "config.py")
+    # Create the parser
+    parser = argparse.ArgumentParser(description = """ToolMate AI API client `tm` cli options;
+                                    available shortcuts:
+                                    `tmc` -> `tm -c`;
+                                    `tmcmd` -> `tm -dt command`;
+                                    `tmpython` -> `tm -dt execute_python_code`;
+                                    `tmtask` -> `tm -dt task`;
+                                    `tmgoogle` -> `tm -dt search_google` (internet connection required);
+                                    `tmonline` -> `tm -dt online` (internet connection and SearXNG required);
+                                    `tmmp3` -> `tm -dt download_youtube_audio` (internet connection required);
+                                    `tmmp4` -> `tm -dt download_youtube_video` (internet connection required);
+                                    `tmr` -> `tm -dt reflection`;
+                                    `tmdr` -> `tm -dt deep_reflection`;
+                                    `tmproxy` -> `tm -dt proxy` (full version only);
+                                    `tmgroup` -> `tm -dt group` (full version only);
+                                    `tmagents` -> `tm -dt agents` (full version only);
+                                    `tmcaptain` -> `tm -dt captain` (full version only);
+                                    `tmremember` -> `tm -dt save_memory` (full version only);
+                                    `tmrecall` -> `tm -dt search_memory` (full version only);
+                                    `tmt1` ... `tmt20` -> `tm -dt <custom_tool>` (determined by `config.tmt1` ... `config.tmt20`);
+                                    `tms1` ... `tms20` -> `tm -cs <custom_chat_system_message>` (determined by `config.tms1` ... `config.tms20`, support pre-defined system messages or fabric patterns or custom entry);
+                                    You may create your own aliases to make the shortcuts more memorable.""")
+    # Add arguments
+    parser.add_argument("default", nargs="?", default=None, help="instruction sent to ToolMate API server; work on previous conversation if not given.")
+    parser.add_argument('-ar', '--autoretrieve', action='store_true', dest='autoretrieve', help="use AutoGen retriever for RAG tools, such as 'examine_files' and 'examine_web_content'; this feature is available in full version only")
+    parser.add_argument('-b', '--backend', action='store', dest='backend', help="AI backend; optionally use it together with '-bc' to make a change persistant")
+    parser.add_argument('-bc', '--backupconversation', action='store_true', dest='backupconversation', help="back up the current conversation in ToolMate AI user directory")
+    parser.add_argument('-bs', '--backupsettings', action='store_true', dest='backupsettings', help="back up the current settings in ToolMate AI user directory")
+    parser.add_argument('-c', '--chat', action='store_true', dest='chat', help="enable to chat as an on-going conversation")
+    parser.add_argument('-cf', '--chatfile', action='store', dest='chatfile', help="a chat file containing a saved conversation")
+    parser.add_argument('-cp', '--chatpattern', action='store', dest='chatpattern', help=f"override chat system message for a single request, with a fabric pattern, in {config.fabricPatterns}; configure config.fabricPatterns to customise the path; use AI model assigned in ToolMate AI instead of in Fabric; this option cannot be used together with option 'chatsystem'; fabric is required to install separately")
+    parser.add_argument('-cs', '--chatsystem', action='store', dest='chatsystem', help="override chat system message for a single request; optionally use it together with '-bc' to make a change persistant")
+    parser.add_argument('-dt', '--defaulttool', action='store', dest='defaulttool', help="override default tool for a single request; optionally use it together with '-bc' to make a change persistant; applied when 'Tool Selection Agent' is disabled and no tool is specified in the request")
+    parser.add_argument('-e', '--export', action='store', dest='export', help="export conversation; optionally used with -f option to specify a format for the export")
+    parser.add_argument('-exec', '--execute', action='store_true', dest='execute', help="execute python code or system command; format a block of python code starting with '```python' or a block of system command starting with '```command'; ends the block with '```'")
+    parser.add_argument('-f', '--format', action='store', dest='format', help="conversation output format; plain or list; useful for sharing or backup; only output the last assistant response if this option is not used")
+    parser.add_argument('-ga', '--groupagents', action='store', dest='groupagents', type=int, help="group chat feature; maximum number of agents")
+    parser.add_argument('-ged', '--groupexecuteindocker', action='store_true', dest='groupexecuteindocker', help="group chat feature; execute code in docker")
+    parser.add_argument('-get', '--groupexecutiontimeout', action='store', dest='groupexecutiontimeout', type=int, help="group chat feature; timeout for each code execution in seconds")
+    parser.add_argument('-goaia', '--groupoaiassistant', action='store_true', dest='groupoaiassistant', help="group chat feature; use OpenAI Assistant API; applicable to backend 'openai' only")
+    parser.add_argument('-gr', '--grouprounds', action='store', dest='grouprounds', type=int, help="group chat feature; maximum number of rounds of discussion")
+    parser.add_argument('-i', '--interactive', action='store_true', dest='interactive', help="interactive prompt, with auto-suggestions enabled, for writing instruction; do not use this option together with standard input or output")
+    parser.add_argument('-imh', '--imageheight', action='store', dest='imageheight', type=int, help="image height; DALLE.3 supports 1024x1024 / 1024x1792 /1792x1024; Flux.1 natively supports any resolution up to 2 mp (1920x1088)")
+    parser.add_argument('-imhd', '--imagehd', action='store_true', dest='imagehd', help="image quality in high definition")
+    parser.add_argument('-ims', '--imagesteps', action='store', dest='imagesteps', type=int, help="image sampling steps")
+    parser.add_argument('-imw', '--imagewidth', action='store', dest='imagewidth', type=int, help="image width; DALLE.3 supports 1024x1024 / 1024x1792 /1792x1024; Flux.1 natively supports any resolution up to 2 mp (1920x1088)")
+    parser.add_argument('-info', '--information', action='store_true', dest='information', help="quick overview of server information")
+    parser.add_argument('-k', '--key', action='store', dest='key', help="specify the API key for authenticating access to the ToolMate AI server")
+    parser.add_argument('-m', '--model', action='store', dest='model', help="AI model; override backend option if the model's backend is different; optionally use it together with '-bc' to make a change persistant")
+    parser.add_argument('-ms', '--models', action='store_true', dest='models', help="show available AI backends and models")
+    parser.add_argument('-md', '--markdown', action='store', dest='markdown', help="highlight assistant response in markdown format; true / false")
+    parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', type=int, help="override maximum output tokens for a single request; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
+    parser.add_argument('-p', '--port', action='store', dest='port', type=int, help="server port")
+    parser.add_argument('-pa', '--paste', action='store_true', dest='paste', help="paste the clipboard text as a suffix to the instruction")
+    parser.add_argument('-pd', '--powerdown', action='store_true', dest='powerdown', help="power down server")
+    parser.add_argument('-py', '--copy', action='store_true', dest='copy', help="copy text output to the clipboard")
+    parser.add_argument('-r', '--read', action='store_true', dest='read', help="read text output aloud")
+    parser.add_argument('-rs', '--reloadsettings', action='store_true', dest='reloadsettings', help=f"Reload: 1. configurations in {configFile} 2. plugins")
+    parser.add_argument('-rt', '--riskthreshold', action='store', dest='riskthreshold', type=int, help="risk threshold for user confirmation before code execution; 0 - always require confirmation; 1 - require confirmation only when risk level is medium or higher; 2 - require confirmation only when risk level is high or higher; 3 or higher - no confirmation required")
+    parser.add_argument('-s', '--server', action='store', dest='server', help="server address; 'http://localhost' by default")
+    parser.add_argument('-sd', '--showdescription', action='store_true', dest='showdescription', help="show description of the found items in search results; used together with option 'sc' or 'ss' or 'st'; show a fabric pattern content if used with option 'sp'")
+    parser.add_argument('-sc', '--searchcontexts', action='store', dest='searchcontexts', help="search predefined contexts; use '@' to display all; use regex pattern to filter")
+    parser.add_argument('-sp', '--searchpatterns', action='store', dest='searchpatterns', help=f"search fabric patterns in {config.fabricPatterns}; configure config.fabricPatterns to customise the search path; fabric is required to install separately")
+    parser.add_argument('-ss', '--searchsystems', action='store', dest='searchsystems', help="search predefined system messages; use '@' to display all; use regex pattern to filter")
+    parser.add_argument('-st', '--searchtools', action='store', dest='searchtools', help="search enabled tools; use '@' to display all; use regex pattern to filter")
+    parser.add_argument('-t', '--temperature', action='store', dest='temperature', type=float, help="override inference temperature for a single request; optionally use it together with '-bc' to make a change persistant; accepted range: 0.0-2.0; unaccepted values will be ignored without notification")
+    parser.add_argument('-ta', '--toolagent', action='store', dest='toolagent', help="override tool selection agent for a single request; optionally use it together with '-bc' to make a change persistant; true / false; unaccepted values will be ignored without notification")
+    parser.add_argument('-vc', '--viewconfigs', action='store_true', dest='viewconfigs', help="view current server configurations")
+    parser.add_argument('-wd', '--workingdirectory', action='store', dest='workingdirectory', help="working directory; current location by default")
+    parser.add_argument('-ws', '--windowsize', action='store', dest='windowsize', type=int, help="override context window size for a single request; applicable to backends `llama.cpp` amd `ollama` only; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
+    parser.add_argument('-ww', '--wordwrap', action='store', dest='wordwrap', help="word wrap; true / false; determined by 'config.wrapWords' if not given")
+    # Parse arguments
+    args = parser.parse_args()
+
+    def getPrefix(host, port):
+        stopSpinning()
+
+        endpoint = f"{host}:{port}/api/tools"
+        url = f"""{endpoint}?query=@"""
+        headers = {
+            "Content-Type": "application/json",
+            "X-API-Key": args.key if args.key else config.toolmate_api_client_key,
+        }
+        try:
+            response = requests.post(url, headers=headers)
+            availableTools = json.loads(response.json())["results"].keys()
+        except Exception as e:
+            showErrors(e=e)
+            return ""
+
+        promptStyle = Style.from_dict({
+            # User input (default text).
+            "": config.terminalCommandEntryColor2,
+            # Prompt.
+            "indicator": config.terminalPromptIndicatorColor2,
+        })
+        historyFolder = os.path.join(config.localStorage, "history")
+        Path(historyFolder).mkdir(parents=True, exist_ok=True)
+        instruction_history = os.path.join(historyFolder, "api_client")
+        instruction_session = PromptSession(history=FileHistory(instruction_history))
+        completer = FuzzyCompleter(WordCompleter(sorted([f"@{i}" for i in availableTools]), ignore_case=True))
+        bottom_toolbar = f""" {str(config.hotkey_exit).replace("'", "")} {config.exit_entry}"""
+        instruction = SinglePrompt.run(style=promptStyle, promptSession=instruction_session, bottom_toolbar=bottom_toolbar, completer=completer)
+        if instruction and not instruction.lower() == config.exit_entry:
+            return instruction
+        return ""
+
     mainOutput = ""
     if args.searchpatterns:
         if args.showdescription:
@@ -298,7 +300,6 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
     host = args.server if args.server else config.toolmate_api_client_host
     port = args.port if args.port else config.toolmate_api_client_port
     if not isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
-        configFile = os.path.join(config.toolMateAIFolder, "config.py")
         if (os.path.getsize(configFile) == 0 or not hasattr(config, "llmInterface") or not config.llmInterface) and shutil.which("tmsetup"):
             os.system("tmsetup")
         if shutil.which("nohup") and shutil.which("toolmateserver"):

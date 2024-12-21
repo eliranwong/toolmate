@@ -21,8 +21,7 @@ or
 ```
 usage: tmserver [-h] [-b BACKEND] [-k KEY] [-m MODEL] [-mo MAXIMUMOUTPUT] [-p PORT] [-rt RISKTHRESHOLD] [-s SERVER] [-t TEMPERATURE] [-ws WINDOWSIZE]
 
-ToolMate AI API server `tmserver` cli options; run `tmconfigs` to view configurations; run `tmsetup` to edit configurations; run `tmsetup -h` to check for setup options; configurations are stored in
-`/home/eliran/apps/tm/lib/python3.10/site-packages/toolmate/config.py`
+ToolMate AI API server `tmserver` cli options; run `tmconfigs` to view configurations; run `tmsetup` to edit configurations; run `tmsetup -h` to check for setup options; configurations are stored in `config.py`
 
 options:
   -h, --help            show this help message and exit
@@ -47,16 +46,25 @@ options:
 
 ## Change Server Settings
 
-You may use cli setup tool `tmsetup` to configure certain settings. Run `tmsetup -h` for options:
+You may use cli setup tool `tmsetup` to configure certain settings.
+
+Run for options:
+
+> tmsetup -h
+
+To open a setup dialog menu:
+
+> tmsetup -m
 
 ```
-usage: tmsetup [-h] [-ag] [-b] [-cs] [-d DEVELOPER] [-ed] [-ec] [-em EXPORTMODELS] [-k] [-mo] [-p] [-rt] [-sg] [-so] [-sr] [-t] [-tms] [-tmt] [-ta] [-ws] [-ww WORDWRAP]
+Setting up ToolMate AI ...
+usage: tmsetup [-h] [-ag] [-b] [-cs] [-d DEVELOPER] [-ed] [-ec] [-em EXPORTMODELS] [-fb] [-k] [-m] [-mo] [-p] [-rt] [-sg] [-so] [-sr] [-t] [-tms] [-tmt] [-ta] [-ws] [-ww WORDWRAP]
 
 ToolMate AI setup options
 
 options:
   -h, --help            show this help message and exit
-  -ag, --autogen        configure AutoGen parameters; applicable to plugin 'create_agents'.
+  -ag, --autogen        configure AutoGen integration; applicable to AutoGen integrated tools
   -b, --backend         configure AI backend and models
   -cs, --chatsystem     configure chat system message
   -d DEVELOPER, --developer DEVELOPER
@@ -66,7 +74,9 @@ options:
   -em EXPORTMODELS, --exportmodels EXPORTMODELS
                         export models, downloaded with ollama, to ~/toolmate/LLMs/gguf/; pass a list of models for the export, e.g. "['llama3.2:1b','llama3.2:3b']"; pass an empty list "[]" to export all
                         downloaded models
+  -fb, --fabric         configure Fabric integration; applicable to Fabric integrated tools
   -k, --apikeys         configure API keys
+  -m, --menu            setup menu
   -mo, --maximumoutput  configure maximum output tokens
   -p, --plugins         configure plugins
   -rt, --riskthreshold  configure the risk threshold for user confirmation before code execution
@@ -137,12 +147,19 @@ To check CLI options:
 Remarks: Both `tm` and `tmc` are aliases to toolmateclient, with a different that `tm` set `-c CHAT` to `false` by default whereas `tmc` set `-c CHAT` to `true` by default
 
 ```
-ToolMate AI API client `tm` cli options; available shortcuts: `tmc` -> `tm -c`; `tmcmd` -> `tm -dt command`; `tmpython` -> `tm -dt execute_python_code`; `tmtask` -> `tm -dt task`;
-`tmgoogle` -> `tm -dt search_google` (internet connection required); `tmonline` -> `tm -dt online` (internet connection and SearXNG required); `tmmp3` -> `tm -dt download_youtube_audio` (internet
-connection required); `tmmp4` -> `tm -dt download_youtube_video` (internet connection required); `tmr` -> `tm -dt reflection`; `tmdr` -> `tm -dt deep_reflection`; `tmagents` -> `tm -dt agents` (full
-version only); `tmremember` -> `tm -dt save_memory` (full version only); `tmrecall` -> `tm -dt search_memory` (full version only); `tmt1` ... `tmt20` -> `tm -dt <custom_tool>` (determined by
-`config.tmt1` ... `config.tmt20`); `tms1` ... `tms20` -> `tm -cs <custom_chat_system_message>` (determined by `config.tms1` ... `config.tms20`); You may create your own aliases to make the shortcuts
-more memorable.
+usage: tm [-h] [-ar] [-b BACKEND] [-bc] [-bs] [-c] [-cf CHATFILE] [-cp CHATPATTERN] [-cs CHATSYSTEM] [-dt DEFAULTTOOL] [-e EXPORT] [-exec] [-f FORMAT] [-ga GROUPAGENTS] [-ged]
+          [-get GROUPEXECUTIONTIMEOUT] [-goaia] [-gr GROUPROUNDS] [-i] [-imh IMAGEHEIGHT] [-imhd] [-ims IMAGESTEPS] [-imw IMAGEWIDTH] [-info] [-k KEY] [-m MODEL] [-ms] [-md MARKDOWN] [-mo MAXIMUMOUTPUT]
+          [-p PORT] [-pa] [-pd] [-py] [-r] [-rs] [-rt RISKTHRESHOLD] [-s SERVER] [-sd] [-sc SEARCHCONTEXTS] [-sp SEARCHPATTERNS] [-ss SEARCHSYSTEMS] [-st SEARCHTOOLS] [-t TEMPERATURE] [-ta TOOLAGENT]
+          [-vc] [-wd WORKINGDIRECTORY] [-ws WINDOWSIZE] [-ww WORDWRAP]
+          [default]
+
+ToolMate AI API client `tm` cli options; available shortcuts: `tmc` -> `tm -c`; `tmcmd` -> `tm -dt command`; `tmpython` -> `tm -dt execute_python_code`; `tmtask` -> `tm -dt task`; `tmgoogle` -> `tm -dt
+search_google` (internet connection required); `tmonline` -> `tm -dt online` (internet connection and SearXNG required); `tmmp3` -> `tm -dt download_youtube_audio` (internet connection required);
+`tmmp4` -> `tm -dt download_youtube_video` (internet connection required); `tmr` -> `tm -dt reflection`; `tmdr` -> `tm -dt deep_reflection`; `tmproxy` -> `tm -dt proxy` (full version only); `tmgroup` ->
+`tm -dt group` (full version only); `tmagents` -> `tm -dt agents` (full version only); `tmcaptain` -> `tm -dt captain` (full version only); `tmremember` -> `tm -dt save_memory` (full version only);
+`tmrecall` -> `tm -dt search_memory` (full version only); `tmt1` ... `tmt20` -> `tm -dt <custom_tool>` (determined by `config.tmt1` ... `config.tmt20`); `tms1` ... `tms20` -> `tm -cs
+<custom_chat_system_message>` (determined by `config.tms1` ... `config.tms20`, support pre-defined system messages or fabric patterns or custom entry); You may create your own aliases to make the
+shortcuts more memorable.
 
 positional arguments:
   default               instruction sent to ToolMate API server; work on previous conversation if not given.
@@ -159,6 +176,9 @@ options:
   -c, --chat            enable to chat as an on-going conversation
   -cf CHATFILE, --chatfile CHATFILE
                         a chat file containing a saved conversation
+  -cp CHATPATTERN, --chatpattern CHATPATTERN
+                        override chat system message for a single request, with a fabric pattern, in /home/eliran/.config/fabric/patterns; configure config.fabricPatterns to customise the path; use AI
+                        model assigned in ToolMate AI instead of in Fabric; this option cannot be used together with option 'chatsystem'; fabric is required to install separately
   -cs CHATSYSTEM, --chatsystem CHATSYSTEM
                         override chat system message for a single request; optionally use it together with '-bc' to make a change persistant
   -dt DEFAULTTOOL, --defaulttool DEFAULTTOOL
@@ -198,19 +218,23 @@ options:
                         override maximum output tokens for a single request; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be
                         ignored without notification
   -p PORT, --port PORT  server port
+  -pa, --paste          paste the clipboard text as a suffix to the instruction
   -pd, --powerdown      power down server
-  -r, --read            read text output
+  -py, --copy           copy text output to the clipboard
+  -r, --read            read text output aloud
   -rs, --reloadsettings
-                        Reload: 1. configurations in /home/eliran/apps/tm/lib/python3.10/site-packages/toolmate/config.py 2. plugins
+                        Reload: 1. configurations in config.py 2. plugins
   -rt RISKTHRESHOLD, --riskthreshold RISKTHRESHOLD
                         risk threshold for user confirmation before code execution; 0 - always require confirmation; 1 - require confirmation only when risk level is medium or higher; 2 - require
                         confirmation only when risk level is high or higher; 3 or higher - no confirmation required
   -s SERVER, --server SERVER
                         server address; 'http://localhost' by default
   -sd, --showdescription
-                        show description of the found items in search results; used together with 'sc', 'ss' and 'st'
+                        show description of the found items in search results; used together with option 'sc' or 'ss' or 'st'; show a fabric pattern content if used with option 'sp'
   -sc SEARCHCONTEXTS, --searchcontexts SEARCHCONTEXTS
                         search predefined contexts; use '@' to display all; use regex pattern to filter
+  -sp SEARCHPATTERNS, --searchpatterns SEARCHPATTERNS
+                        search fabric patterns in /home/eliran/.config/fabric/patterns; configure config.fabricPatterns to customise the search path; fabric is required to install separately
   -ss SEARCHSYSTEMS, --searchsystems SEARCHSYSTEMS
                         search predefined system messages; use '@' to display all; use regex pattern to filter
   -st SEARCHTOOLS, --searchtools SEARCHTOOLS

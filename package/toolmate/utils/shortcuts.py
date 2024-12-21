@@ -11,11 +11,11 @@ def createShortcuts():
     appName = "ToolMate"
     # Windows icon
     if thisOS == "Windows":
-        myappid = "letmedoit.ai"
+        myappid = "toolmate.ai"
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
         windowsIconPath = os.path.abspath(os.path.join(sys.path[0], "icons", f"{appName}.ico"))
         if not os.path.isfile(windowsIconPath):
-            windowsIconPath = os.path.abspath(os.path.join(sys.path[0], "icons", "LetMeDoIt.ico"))
+            windowsIconPath = os.path.abspath(os.path.join(sys.path[0], "icons", "ToolMate.ico"))
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(windowsIconPath)
 
     # Desktop shortcut
@@ -89,7 +89,7 @@ def createShortcuts():
         def desktopFileContent():
             iconPath = os.path.join(config.toolMateAIFolder, "icons", f"{appName}.png")
             if not os.path.isfile(iconPath):
-                iconPath = os.path.join(config.toolMateAIFolder, "icons", "LetMeDoIt.png")
+                iconPath = os.path.join(config.toolMateAIFolder, "icons", "ToolMate.png")
             return f"""#!/usr/bin/env xdg-open
 
 [Desktop Entry]
@@ -127,7 +127,7 @@ Name={config.toolMateAIName}
         def desktopSystemTrayFileContent():
             iconPath = os.path.join(config.toolMateAIFolder, "icons", f"ai.png")
             if not os.path.isfile(iconPath):
-                iconPath = os.path.join(config.toolMateAIFolder, "icons", "LetMeDoIt.png")
+                iconPath = os.path.join(config.toolMateAIFolder, "icons", "ToolMate.png")
             return f"""#!/usr/bin/env xdg-open
 
 [Desktop Entry]
@@ -136,7 +136,7 @@ Type=Application
 Path={config.toolMateAIFolder}
 Exec={prefix}{sys.executable} {systemtrayFile}
 Icon={iconPath}
-Name={config.toolMateAIName} AI
+Name={config.toolMateAIName}
 """
         linuxDesktopFile = os.path.join(config.toolMateAIFolder, f"{appName}AI.desktop")
         if not os.path.exists(linuxDesktopFile):
@@ -246,7 +246,7 @@ selected_text=$(echo "$(xsel -o)" | sed 's/"/\"/g')
         work_with_translation_script_path = os.path.join(storage, f"{first_name}_Translation")
         with open(work_with_translation_script_path, "w", encoding="utf-8") as fileObj:
             fileObj.write(work_with_text_script)
-        # work with files or folders selection via NAUTILUS; right-click > scripts > LetMeDoIt
+        # work with files or folders selection via NAUTILUS; right-click > scripts > ToolMate
         if not config.isLite:
             work_with_files_script = f'''#!/usr/bin/env bash
 mkdir -p {storage}

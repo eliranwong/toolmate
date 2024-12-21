@@ -4,17 +4,23 @@ ToolMate AI, formerly known as FreeGenius AI, is a cutting-edge AI companion tha
 
 # Three Inteface Options
 
-1. Graphical User Interface
+1. [Graphical User Interface](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/GUI.md)
+
+> toolmateai
 
 ![desktop_assistant](https://github.com/user-attachments/assets/0b29e38f-e3bb-4deb-b07e-589dc4519626)
 
-2. Terminal Interactive Mode
+2. [Terminal Interactive Mode](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Quick%20Guide.md#prompt-interface), run:
+
+> toolmate
 
 ![ToolMateAI](https://github.com/user-attachments/assets/64525e6c-0e01-4316-bd3e-06c1f06ec5dd)
 
-3. Command Line Interface
+3. [Command Line Interface](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/ToolMate%20API%20Server.md), for options, run:
 
-![cli](https://github.com/user-attachments/assets/a2df4faa-0e61-4ca9-b9a3-53affcc08a62)
+> tm -h
+
+![cli_tm](https://github.com/user-attachments/assets/fe8669e7-f2d9-4234-9225-c2b1453698f9)
 
 # Background
 

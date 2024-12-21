@@ -566,8 +566,8 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
                 else:
                     print(outputContent)
                 if args.copy:
-                    pydoc.pipepager(content, cmd="termux-clipboard-set") if config.terminalEnableTermuxAPI else pyperclip.copy(content)
-                    print2(f"\n{config.divider}Copied!")
+                    pydoc.pipepager(output, cmd="termux-clipboard-set") if config.terminalEnableTermuxAPI else pyperclip.copy(output)
+                    print2(f"{config.divider}\nCopied!")
                 if args.read:
                     TTSUtil.play(output)
                 mainOutput = output
@@ -577,6 +577,21 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
     if default:
         return mainOutput
 
+def getToolmate(data: dict):
+    if not "wd" in data:
+        data["wd"] = os.getcwd()
+    host = config.toolmate_api_client_host
+    port = config.toolmate_api_client_port
+    endpoint = f"{host}:{port}/api/toolmate"
+    headers = {
+        "Content-Type": "application/json",
+        "X-API-Key": config.toolmate_api_client_key,
+    }
+    try:
+        return requests.post(endpoint, headers=headers, json=data)
+    except Exception as e:
+        showErrors(e=e)
+        return f"Error: {e}"
 
 if __name__ == '__main__':
     main()

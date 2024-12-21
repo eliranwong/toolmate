@@ -48,8 +48,7 @@ class ToolMateHub(QSystemTrayIcon):
                     cli = f'''{shutil.which("nohup")} "{shutil.which("toolmateserver")}" > ~/toolmate/nohup-api-server.out 2>&1 &'''
                     os.system(cli)
                 else:
-                    cli = f'''"{shutil.which("toolmateserver")}" &'''
-                    subprocess.Popen(cli, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    subprocess.Popen(shutil.which("toolmateserver"), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 # wait until the server is up
                 while not isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
                     pass

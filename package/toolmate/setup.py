@@ -1,12 +1,10 @@
-from toolmate import config, print2, showErrors
-
-import os, shutil, argparse, re, requests
-from pathlib import Path
-
+from toolmate import config, print2
+from toolmate.api_client import getToolmate
 from toolmate import configFile, getOllamaServerClient, exportOllamaModels, isServerAlive
 from toolmate.utils.assistant import ToolMate
 from prompt_toolkit.shortcuts import set_title, clear_title
-
+from pathlib import Path
+import os, shutil, argparse, re
 
 def main():
     print(f"Setting up {config.toolMateAIName} ...")
@@ -150,21 +148,7 @@ def main():
     port = config.toolmate_api_client_port
     if isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
         print("Reloading configurations ...")
-
-        endpoint = f"{host}:{port}/api/toolmate"
-        headers = {
-            "Content-Type": "application/json",
-            "X-API-Key": config.toolmate_api_client_key,
-        }
-        data = {
-            "wd": os.getcwd(),
-            "reloadsettings": True,
-        }
-        try:
-            requests.post(endpoint, headers=headers, json=data)
-        except Exception as e:
-            showErrors(e=e)
-
+        getToolmate({"reloadsettings": True})
         print("Reloaded!")
 
     # clear title

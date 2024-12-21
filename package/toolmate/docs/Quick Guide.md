@@ -20,15 +20,29 @@ When virtual environment is applied, e.g.
 
 # Prompt Interface
 
+> toolmate
+
 Simply enter your request in the prompt interface.
 
 <img width="857" alt="prompt" src="https://github.com/eliranwong/letmedoit/assets/25262722/cbf63cf3-29ec-4c75-9c6f-b08f5ea4f5b1">
 
 [Examples](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Examples.md)
 
+# Graphical User Interface
+
+> toolmateai
+
+https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/GUI.md
+
 # CLI Options
 
-> toolmate -h
+> tm -h
+
+Read more at:
+
+https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/ToolMate%20API%20Server.md
+
+https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/CLI%20Options.md
 
 # Quick Actions
 

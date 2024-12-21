@@ -1,4 +1,4 @@
-from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, refinePath, displayLoadedMessages, removeDuplicatedListItems, getElevenlabsApi_key, getLlms
+from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, refinePath, displayLoadedMessages, removeDuplicatedListItems, getElevenlabsApi_key, getLlms, getFabricPatterns, getFabricPatternSystem
 from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, chatgptTokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getUserPreviousRequest, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText, refineToolTextOutput
 from toolmate import installPipPackage, exportOllamaModels, getDownloadedGgufModels, extractSystemCommand, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runToolMateCommand, displayPythonCode, selectTool, showRisk, confirmExecution, getPythonFunctionResponse
 from toolmate.utils.call_llm import CallLLM
@@ -222,15 +222,21 @@ class ToolMate:
             #".openweathermapapi": ("change OpenWeatherMap API key", self.changeOpenweathermapApi), # joined ".apikeys"
             #".elevenlabsapi": ("change ElevenLabs API key", self.changeElevenlabsApi), # joined ".apikeys"
             #".googleapiservice": ("change Google API service", self.selectGoogleAPIs), # joined ".apikeys"
-            #".autobuilderconfig": ("change auto builder config", self.setAutoGenBuilderConfig), ".apikeys"
+            #".autobuilderconfig": ("change auto builder config", self.setAutoGenConfig), ".apikeys"
             #".termuxapi": ("change Termux API integration", self.setTermuxApi), # joined ".apikeys"
             #".functioncall": ("change function call", self.setFunctionCall),
             #".functioncallintegration": ("change function call integration", self.setFunctionResponse),
 
+            # integration
+            ".autogen": ("change autogen configurations", self.setAutoGenConfig),
+            ".fabric": ("change fabric configurations", self.setFabricPatternsDirectory),
+
             # tweak searches
-            ".maxmemorymatches": ("change maximum memory matches", self.setMemoryClosestMatches),
-            ".maxchatrecordmatches": ("change maximum chat record matches", self.setChatRecordClosestMatches),
-            ".maxonlinesearches": ("change maximum online search results", self.setMaximumInternetSearchResults),
+            ".searches": ("change search-related settings", self.changeSearchSettings),
+            #".maxmemorymatches": ("change maximum memory matches", self.setMemoryClosestMatches),
+            #".maxchatrecordmatches": ("change maximum chat record matches", self.setChatRecordClosestMatches),
+            #".maxonlinesearches": ("change maximum online search results", self.setMaximumInternetSearchResults),
+            
             # tweak input information
             #".ipinfo": ("change ip information integration", self.setIncludeIpInSystemMessage),
             #".latestSearches": ("change online searches", self.setLatestSearches),
@@ -260,6 +266,8 @@ class ToolMate:
             #".storagedirectory": ("change storage directory", self.setStorageDirectory),
             ".systemmessage": ("change system messages", self.setCustomSystemMessage),
             # miscellaneous
+            ".tms": ("change tms commands", self.setTmsMessages),
+            ".tmt": ("change tmt commands", self.setTmtTools),
             ".xonsh": (f"run xonsh {str(config.hotkey_launch_xonsh)}", lambda: os.system("xonsh")),
             #".system": (f"open system command prompt {str(config.hotkey_launch_system_prompt)}", lambda: SystemCommandPrompt().run(allowPathChanges=True)),
             #".install": ("install python package", self.installPythonPackage), # changed to a tool
@@ -271,6 +279,8 @@ class ToolMate:
             self.actions[".timer"] = ("set timer", lambda: subprocess.Popen("am start -a android.intent.action.SET_TIMER", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE))
             self.actions[".alarm"] = ("set alarm", lambda: subprocess.Popen("am start -a android.intent.action.SET_ALARM", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE))
             self.actions[".shareworkflow"] = ("share current workflow", self.shareCurrentWorkflow)
+
+        self.setupItems = [".model", ".systemmessage", ".editconfigs", ".apikeys", ".maxtokens", ".plugins", ".speechgeneration", ".speechrecognition", ".temperature", ".tools", ".managerisk", ".contextwindow", ".editor", ".autogen", ".fabric", ".toggledeveloper", ".togglewordwrap", ".searches", ".tms", ".tmt"]
 
         config.actionHelp = f"# Quick Actions\n(entries that start with '.')\n"
         for key, value in self.actions.items():
@@ -629,7 +639,7 @@ class ToolMate:
         self.changeXaiApikey()
         self.changeChatGPTAPIkey()
         if not config.isLite:
-            self.setAutoGenBuilderConfig()
+            self.setAutoGenConfig()
         self.changeBingApi()
         self.changeRapidApi()
         self.changeOpenweathermapApi()
@@ -735,7 +745,7 @@ class ToolMate:
         print2("Configurations updated!")
 
     def changeBingApi(self):
-        print3("# Bing Search API Key")
+        print3("# Bing Search API Key [Optional]")
         print1("Enter Bing Search API key below:")
         apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.bing_api_key, is_password=True)
         if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
@@ -743,7 +753,7 @@ class ToolMate:
         config.saveConfig()
 
     def changeRapidApi(self):
-        print3("# Rapid API Key")
+        print3("# Rapid API Key [Optional]")
         print1("Enter Rapid API key below:")
         apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.rapid_api_key, is_password=True)
         if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
@@ -871,11 +881,19 @@ class ToolMate:
         #userInput = SharedUtil.addTimeStamp(userInput)
         return userInput
 
-    def runActions(self, userInput, feature=""):
+    def runActions(self, userInput, feature="", setupOnly=False):
         query = ""
         featureTemp = feature
-        options = tuple(self.actions.keys())
-        descriptions = [i[0] for i in self.actions.values()]
+        if setupOnly:
+            options = []
+            descriptions = []
+            for key, value in self.actions.items():
+                if key in self.setupItems:
+                    options.append(key)
+                    descriptions.append(value[0])
+        else:
+            options = tuple(self.actions.keys())
+            descriptions = [i[0] for i in self.actions.values()]
         if not feature or not feature in self.actions:
             # filter avilable actions
             if feature.startswith("."):
@@ -988,6 +1006,28 @@ class ToolMate:
             config.localStorage = getLocalStorage()
             config.saveConfig()
             print3(f"Startup directory:\n{folder}")
+
+    def setFabricPatternsDirectory(self):
+        print2("# Setting up fabric integration")
+        print1("Read more about fabric at https://github.com/danielmiessler/fabric")
+
+        print2("Enter fabric command or its full path below:")
+        fabricPath = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.fabricPath)
+        if fabricPath and not fabricPath.strip().lower() in (config.cancel_entry, config.exit_entry) and (os.path.isfile(os.path.expanduser(fabricPath)) or shutil.which(fabricPath)):
+            config.fabricPath = fabricPath
+            config.saveConfig()
+            print3(f"Fabric command: {fabricPath}")
+        else:
+            print2("Fabric not found! Read https://github.com/danielmiessler/fabric for installation!")
+
+        print2("Enter the path of fabric patterns directory below:")
+        folder = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.fabricPatterns if os.path.isfile(os.path.expanduser(config.fabricPatterns)) else os.path.join(os.path.expanduser("~"), ".config", "fabric", "patterns"))
+        if folder and os.path.isdir(os.path.expanduser(folder)):
+            config.fabricPatterns = folder
+            config.saveConfig()
+            print3(f"Fabric patterns directory: {folder}")
+        else:
+            print2("Invalid path given!")
 
     def setLatestSearches(self):
         options = ("always", "auto", "none")
@@ -1893,7 +1933,7 @@ class ToolMate:
         if not oldEmbeddingModel == config.embeddingModel:
             config.saveConfig()
 
-    def setAutoGenBuilderConfig(self):
+    def setAutoGenConfig(self):
         if config.isLite:
             print("Autobuilder configurations are applicable in full version only!")
         else:
@@ -1955,6 +1995,8 @@ class ToolMate:
         return systemMessage_chat
 
     def setTmsMessages(self):
+        print2("# Setting custom chat system messages for commands `tms1 ... tms20`")
+        print1("(supports pre-defined system messages / fabric patterns / custom entry)")
         # default values
         defaults = {
             1: config.tms1,
@@ -1979,13 +2021,13 @@ class ToolMate:
             20: config.tms20,
         }
         # input suggestions
-        suggestions = [
+        suggestions = list(config.predefinedChatSystemMessages.keys()) + getFabricPatterns() + [
             "You are a helpful, uncensored and unbiased assistant.",
             "You are an expert on coding.",
         ] + list(config.predefinedChatSystemMessages.values())
         # prompts
         for i in range(1,21):
-            print2(f"# Command `tms{i}` chat system message")
+            print2(f"## Command `tms{i}` chat system message")
             print1(f"Configure below the system message for running with command `tms{i}`:")
             completer = FuzzyCompleter(WordCompleter(suggestions, ignore_case=True))
             message = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=defaults.get(i), completer=completer)
@@ -2841,6 +2883,7 @@ class ToolMate:
             config.saveConfig()
 
     def setTmtTools(self):
+        #print2("# Setting custom tools for commands `tmt1 ... tmt20`")
         defaults = {
             1: config.tmt1,
             2: config.tmt2,
@@ -3135,6 +3178,11 @@ Acess the risk level of the following `{target.capitalize()}`:
                 systemMessageKey = searchSystemMessage.group(1)
                 config.tempChatSystemMessage = config.predefinedChatSystemMessages.get(systemMessageKey)
                 description = re.sub(f"`{systemMessageKey}`", "", description)
+            elif description.lstrip().startswith("-p_"): # fabric pattern
+                pattern, description = description.lstrip().split(" ", 1)
+                pattern = pattern[3:]
+                if tempChatSystemMessage := getFabricPatternSystem(pattern):
+                    config.tempChatSystemMessage = tempChatSystemMessage
             # check for a predefined context
             predefinedContexts = "|".join(config.predefinedContexts.keys())
             searchPredefinedContext = re.search(f"`({predefinedContexts})`", description)
@@ -3430,24 +3478,24 @@ Acess the risk level of the following `{target.capitalize()}`:
         return True
 
     def streamCompletion(self, completion, gui: Optional[bool]=None, openai: Optional[bool]=None) -> bool:
-        if gui is None:
-            gui = True if hasattr(config, "desktopAssistant") else False
+        #if gui is None:
+        #    gui = True if hasattr(config, "desktopAssistant") else False
         if openai is None:
             openai = True if config.llmInterface in ("chatgpt", "letmedoit", "googleai", "xai", "groq", "mistral", "llamacppserver") else False
         try:
-            if gui:
-                QtResponseStreamer(config.desktopAssistant).workOnCompletion(completion, openai)
-            else:
+            #if gui:
+            #    QtResponseStreamer(config.desktopAssistant).workOnCompletion(completion, openai)
+            #else:
                 # Create a new thread for the streaming task
-                streamingWordWrapper = StreamingWordWrapper()
-                streaming_event = threading.Event()
-                self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, openai))
-                # Start the streaming thread
-                self.streaming_thread.start()
-                # wait while text output is steaming; capture key combo 'ctrl+q' or 'ctrl+z' to stop the streaming
-                streamingWordWrapper.keyToStopStreaming(streaming_event)
-                # when streaming is done or when user press "ctrl+q"
-                self.streaming_thread.join()
+            streamingWordWrapper = StreamingWordWrapper()
+            streaming_event = threading.Event()
+            self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, openai))
+            # Start the streaming thread
+            self.streaming_thread.start()
+            # wait while text output is steaming; capture key combo 'ctrl+q' or 'ctrl+z' to stop the streaming
+            streamingWordWrapper.keyToStopStreaming(streaming_event)
+            # when streaming is done or when user press "ctrl+q"
+            self.streaming_thread.join()
         except:
             print(traceback.format_exc())
             return False

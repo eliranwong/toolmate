@@ -14,14 +14,16 @@ def main():
     # Create the parser
     parser = argparse.ArgumentParser(description="ToolMate AI setup options")
     # Add arguments
-    parser.add_argument('-ag', '--autogen', action='store_true', dest='autogen', help="configure AutoGen parameters; applicable to plugin 'create_agents'.")
+    parser.add_argument('-ag', '--autogen', action='store_true', dest='autogen', help="configure AutoGen integration; applicable to AutoGen integrated tools")
     parser.add_argument('-b', '--backend', action='store_true', dest='backend', help="configure AI backend and models")
     parser.add_argument('-cs', '--chatsystem', action='store_true', dest='chatsystem', help="configure chat system message")
     parser.add_argument('-d', '--developer', action='store', dest='developer', help="configure developer mode; true / false")
     parser.add_argument('-ed', '--editor', action='store_true', dest='editor', help="configure custom editor")
     parser.add_argument('-ec', '--editconfigs', action='store_true', dest='editconfigs', help="configure config.py")
     parser.add_argument('-em', '--exportmodels', action='store', dest='exportmodels', help="""export models, downloaded with ollama, to ~/toolmate/LLMs/gguf/; pass a list of models for the export, e.g. "['llama3.2:1b','llama3.2:3b']"; pass an empty list "[]" to export all downloaded models""")
+    parser.add_argument('-fb', '--fabric', action='store_true', dest='fabric', help="configure Fabric integration; applicable to Fabric integrated tools")
     parser.add_argument('-k', '--apikeys', action='store_true', dest='apikeys', help="configure API keys")
+    parser.add_argument('-m', '--menu', action='store_true', dest='menu', help="setup menu")
     parser.add_argument('-mo', '--maximumoutput', action='store_true', dest='maximumoutput', help="configure maximum output tokens")
     parser.add_argument('-p', '--plugins', action='store_true', dest='plugins', help="configure plugins")
     parser.add_argument('-rt', '--riskthreshold', action='store_true', dest='riskthreshold', help="configure the risk threshold for user confirmation before code execution")
@@ -49,7 +51,7 @@ def main():
     # set window title
     set_title(config.toolMateAIName)
 
-    config.toolmate = ToolMate(plugins=True if args.tmsystems or args.tmtools else False)
+    toolmate = ToolMate(plugins=True if args.tmsystems or args.tmtools or args.menu else False)
 
     if args.exportmodels:
         exportmodels = eval(args.exportmodels)
@@ -62,10 +64,12 @@ def main():
 * pass a list of models for the export, e.g. "['llama3.2:1b','llama3.2:3b']"
 * pass an empty list "[]" to export all downloaded models""")
 
+    if args.menu:
+        toolmate.runActions("...", setupOnly=True)
     if args.backend:
-        config.toolmate.setLlmModel()
+        toolmate.setLlmModel()
     if args.chatsystem:
-        config.toolmate.setCustomSystemMessage()
+        toolmate.setCustomSystemMessage()
     if args.developer:
         if args.developer.lower() == "true":
             config.developer = True
@@ -76,29 +80,29 @@ def main():
         else:
             print2("Developer mode unchanged! Accept 'True' or 'False' only!")
     if args.editconfigs:
-        config.toolmate.editConfigs()
+        toolmate.editConfigs()
     if args.apikeys:
-        config.toolmate.changeAPIkeys()
+        toolmate.changeAPIkeys()
     if args.maximumoutput:
-        config.toolmate.setMaxTokens()
+        toolmate.setMaxTokens()
     if args.plugins:
-        config.toolmate.selectPlugins()
+        toolmate.selectPlugins()
     if args.tmsystems:
-        config.toolmate.setTmsMessages()
+        toolmate.setTmsMessages()
     if args.tmtools:
-        config.toolmate.setTmtTools()
+        toolmate.setTmtTools()
     if args.speechgeneration:
-        config.toolmate.setTextToSpeechConfig()
+        toolmate.setTextToSpeechConfig()
     if args.speechrecognition:
-        config.toolmate.setSpeechToTextConfig()
+        toolmate.setSpeechToTextConfig()
     if args.temperature:
-        config.toolmate.setTemperature()
+        toolmate.setTemperature()
     if args.toolagent:
-        config.toolmate.setToolSelectionConfigs()
+        toolmate.setToolSelectionConfigs()
     if args.riskthreshold:
-        config.toolmate.manageCodeExecutionRisk()
+        toolmate.manageCodeExecutionRisk()
     if args.windowsize:
-        config.toolmate.setContextWindowSize()
+        toolmate.setContextWindowSize()
     if args.wordwrap:
         if args.wordwrap.lower() == "true":
             config.wrapWords = True
@@ -109,11 +113,13 @@ def main():
         else:
             print2("Word wrap unchanged! Accept 'True' or 'False' only!")
     if args.searchoptions:
-        config.toolmate.changeSearchSettings()
+        toolmate.changeSearchSettings()
     if args.editor:
-        config.toolmate.setCustomTextEditor()
+        toolmate.setCustomTextEditor()
     if args.autogen:
-        config.toolmate.setAutoGenBuilderConfig()
+        toolmate.setAutoGenConfig()
+    if args.fabric:
+        toolmate.setFabricPatternsDirectory()
 
     # unload llama.cpp model to free VRAM
     try:

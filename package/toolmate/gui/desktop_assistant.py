@@ -1,8 +1,10 @@
 from toolmate import config
+from toolmate.api_client import main as getApiResponse
 from toolmate.utils.call_llm import CallLLM
 from toolmate.utils.tool_plugins import Plugins
-from toolmate.gui.worker import Worker
-import json, getpass
+from toolmate.gui.worker import QtApiResponseStreamer
+#from toolmate.gui.worker import Worker
+import getpass
 
 from PySide6.QtPrintSupport import QPrinter, QPrintDialog
 from PySide6.QtCore import Qt, QThread, QRegularExpression, QRunnable, Slot, Signal, QObject, QThreadPool
@@ -29,6 +31,9 @@ class CentralWidget(QWidget):
         self.threadpool = QThreadPool()
         # scroll bar
         self.contentScrollBar = self.contentView.verticalScrollBar()
+        # operations
+        self.newSession = True
+        self.lastResponse = ""
 
     def setupUI(self):
         # a layout with left and right columns and a splitter placed between them
@@ -69,8 +74,8 @@ class CentralWidget(QWidget):
         self.progressBar.setRange(0, 0) # Set the progress bar to use an indeterminate progress indicator
         
         # update layout
-        layout000Rt.addWidget(self.userInput)
         layout000Rt.addWidget(self.contentView)
+        layout000Rt.addWidget(self.userInput)
         layout000Rt.addWidget(self.progressBar)
         self.progressBar.hide()
 
@@ -82,8 +87,12 @@ class CentralWidget(QWidget):
             self.userInput.setDisabled(True)
             self.addContent(request)
 
-        self.progressBar.show()
-        config.toolmate.runMultipleActions(request, True)
+            if request in ("tm -exec", "tmc -exec"):
+                request = "@command" if "```command" in self.lastResponse else "@execute_python_code"
+
+            self.progressBar.show()
+            QtApiResponseStreamer(self).workOnRequest(request, chat=False if self.newSession else True)
+            self.newSession = False
 
     def processResponse(self):
         self.userInput.setText("")
@@ -94,6 +103,7 @@ class CentralWidget(QWidget):
     def streamResponse(self, content):
         self.contentView.insertPlainText(content)
         self.contentScrollBar.setValue(self.contentScrollBar.maximum())
+        self.lastResponse = content
 
     def addContent(self, newContent, user=True) -> None:
         content = self.contentView.toPlainText()
@@ -151,9 +161,9 @@ class DesktopAssistant(QMainWindow):
         menubar = self.menuBar()
 
         # Create a File menu and add it to the menu bar
-        file_menu = menubar.addMenu("Chat")
+        file_menu = menubar.addMenu("ToolMate AI")
 
-        new_action = QAction("New", self)
+        new_action = QAction("New Session", self)
         new_action.setShortcut("Ctrl+N")
         new_action.triggered.connect(self.newConversation)
         file_menu.addAction(new_action)
@@ -179,9 +189,5 @@ class DesktopAssistant(QMainWindow):
         file_menu.addSeparator()"""
 
     def newConversation(self):
-        config.toolmate.saveChat(config.currentMessages)
-        config.currentMessages = CallLLM.resetMessages()
         self.centralWidget.contentView.setPlainText("")
-
-    def openConversation(self):
-        ...
+        self.newSession = True

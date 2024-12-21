@@ -62,6 +62,16 @@ To use AutoGen captain agent:
 
 > autocaptain
 
+# AutoGen Integration Setup
+
+Interactive propmt
+
+> toolmate .autogen
+
+CLI:
+
+> tmsetup -ag
+
 # Captain Agent Setup
 
 AutoGen Agent requires setup of Bing search and Rapid API keys.  Free plans are available.  You may follow the steps below:

@@ -1,5 +1,5 @@
 from toolmate import config
-import shutil, os, pprint
+import os, pprint
 
 pluginExcludeList = [
     "awesome prompts",
@@ -347,7 +347,8 @@ defaultSettings = (
     ('ttsCommandSuffix', ""), # try on Windows; ttsComand = '''Add-Type -TypeDefinition 'using System.Speech.Synthesis; class TTS { static void Main(string[] args) { using (SpeechSynthesizer synth = new SpeechSynthesizer()) { synth.Speak(args[0]); } } }'; [TTS]::Main('''; ttsCommandSuffix = ")"; a full example is Add-Type -TypeDefinition 'using System.Speech.Synthesis; class TTS { static void Main(string[] args) { using (SpeechSynthesizer synth = new SpeechSynthesizer()) { synth.Speak(args[0]); } } }'; [TTS]::Main("Text to be read")
     ("ttsLanguages", ["en", "en-gb", "en-us", "zh", "yue", "el"]), # users can edit this item in config.py to support more or less languages
     ("ttsLanguagesCommandMap", {"en": "", "en-gb": "", "en-us": "", "zh": "", "yue": "", "el": "",}), # advanced users need to edit this item manually to support different voices with customised tts command, e.g. ttsCommand set to "say -r 200 -v Daniel" and ttsLanguagesCommandMap set to {"en": "Daniel", "en-gb": "Daniel", "en-us": "", "zh": "", "yue": "", "el": "",}
-    ("fabricPatterns", "~/.config/fabric/patterns"),
+    ("fabricPath", "fabric"),
+    ("fabricPatterns", os.path.isdir(os.path.join(os.path.expanduser("~"), ".config", "fabric", "patterns"))),
     ("openweathermapApi", ""),
     ("bing_api_key", ""),
     ("rapid_api_key", ""),

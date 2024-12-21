@@ -2,6 +2,7 @@ import sys, traceback, openai, os, json, traceback, re, textwrap
 from PySide6.QtCore import QRunnable, Slot, Signal, QObject, QThreadPool
 from toolmate import config
 from toolmate.utils.tts_utils import TTSUtil
+from toolmate.api_client import main as getApiResponse
 
 class WorkerSignals(QObject):
     '''
@@ -174,6 +175,30 @@ class QtResponseStreamer:
     def workOnCompletion(self, completion, openai: bool):
         # Pass the function to execute
         worker = Worker(self.processCompletion, completion, openai=openai) # Any other args, kwargs are passed to the run function
+        worker.signals.result.connect(self.parent.processResponse) # process the output return by self.parent.getResponse
+        worker.signals.progress.connect(self.parent.streamResponse)
+        # Connection
+        #worker.signals.finished.connect(None)
+        # Execute
+        self.threadpool.start(worker)
+
+class QtApiResponseStreamer:
+
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+        self.threadpool = QThreadPool()
+
+    def processRequest(self, request, chat, progress_callback):
+        apiResponse = getApiResponse(chat=chat, default=request)
+        progress_callback.emit(apiResponse)
+        
+        if config.ttsOutput:
+            TTSUtil.play(apiResponse)
+
+    def workOnRequest(self, request, chat=True):
+        # Pass the function to execute
+        worker = Worker(self.processRequest, request, chat) # Any other args, kwargs are passed to the run function
         worker.signals.result.connect(self.parent.processResponse) # process the output return by self.parent.getResponse
         worker.signals.progress.connect(self.parent.streamResponse)
         # Connection

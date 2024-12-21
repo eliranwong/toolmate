@@ -1,4 +1,6 @@
-# 0.5.91-0.5.92
+# 0.5.91-0.5.93
+
+* added setup menu `tmsetup -m`
 
 * Enhanced fabric integration.  Added CLI options `--chatpattern` and `--searchpatterns` for ToolMate AI to use fabric pattern as chat system message. https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Fabric%20Integration.md This feature uses AI model assigned in ToolMate AI backend, rather than the default model set up in fabric.
 

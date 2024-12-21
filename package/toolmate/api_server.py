@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import APIKeyHeader
-from toolmate import config, configFile, isServerAlive, print2, print3, getOllamaServerClient, getLlms, unloadLocalModels, changeModel, changeBackendAndModel, getCurrentModel, get_wan_ip, get_local_ip, readTextFile
+from toolmate import config, configFile, isServerAlive, print2, print3, getOllamaServerClient, getLlms, unloadLocalModels, changeModel, changeBackendAndModel, getCurrentModel, get_wan_ip, get_local_ip, getFabricPatternSystem
 from toolmate.utils.assistant import ToolMate
 from toolmate.utils.tool_plugins import Plugins
 from toolmate.utils.call_llm import CallLLM
@@ -84,11 +84,10 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
         check = re.sub("^`([^`]+?)`$", r"\1", chatsystem)
         if check in config.predefinedChatSystemMessages:
             chatsystem = config.predefinedChatSystemMessages.get(check)
+        elif system := getFabricPatternSystem(check):
+            chatsystem = system
     elif chatpattern:
-        fabricPattern = os.path.join(os.path.expanduser(config.fabricPatterns), chatpattern, "system.md")
-        if os.path.isfile(fabricPattern):
-            chatsystem = readTextFile(fabricPattern)
-            chatsystem = re.sub(r'# INPUT.*', '', chatsystem, flags=re.DOTALL).rstrip()
+        chatsystem = getFabricPatternSystem(chatpattern)
     windowsize = request.windowsize
     maximumoutput = request.maximumoutput
     temperature = request.temperature

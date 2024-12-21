@@ -1,5 +1,5 @@
-import requests, argparse, json, sys, os, pprint, re, shutil
-from toolmate import config, configFile, convertOutputText, wrapText, startSpinning, stopSpinning, readTextFile, writeTextFile, print2, print3, getPygmentsStyle, showErrors, isServerAlive, getLlms, searchFolder
+import requests, argparse, json, sys, os, pprint, re, shutil, pydoc, pyperclip
+from toolmate import config, configFile, convertOutputText, wrapText, startSpinning, stopSpinning, readTextFile, writeTextFile, print2, print3, getPygmentsStyle, showErrors, isServerAlive, getLlms, searchFolder, getCliOutput
 from toolmate.utils.tts_utils import TTSUtil
 from toolmate.utils.single_prompt import SinglePrompt
 
@@ -27,11 +27,14 @@ parser = argparse.ArgumentParser(description = """ToolMate AI API client `tm` cl
                                  `tmmp4` -> `tm -dt download_youtube_video` (internet connection required);
                                  `tmr` -> `tm -dt reflection`;
                                  `tmdr` -> `tm -dt deep_reflection`;
+                                 `tmproxy` -> `tm -dt proxy` (full version only);
+                                 `tmgroup` -> `tm -dt group` (full version only);
                                  `tmagents` -> `tm -dt agents` (full version only);
+                                 `tmcaptain` -> `tm -dt captain` (full version only);
                                  `tmremember` -> `tm -dt save_memory` (full version only);
                                  `tmrecall` -> `tm -dt search_memory` (full version only);
                                  `tmt1` ... `tmt20` -> `tm -dt <custom_tool>` (determined by `config.tmt1` ... `config.tmt20`);
-                                 `tms1` ... `tms20` -> `tm -cs <custom_chat_system_message>` (determined by `config.tms1` ... `config.tms20`);
+                                 `tms1` ... `tms20` -> `tm -cs <custom_chat_system_message>` (determined by `config.tms1` ... `config.tms20`, support pre-defined system messages or fabric patterns or custom entry);
                                  You may create your own aliases to make the shortcuts more memorable.""")
 # Add arguments
 parser.add_argument("default", nargs="?", default=None, help="instruction sent to ToolMate API server; work on previous conversation if not given.")
@@ -64,12 +67,14 @@ parser.add_argument('-ms', '--models', action='store_true', dest='models', help=
 parser.add_argument('-md', '--markdown', action='store', dest='markdown', help="highlight assistant response in markdown format; true / false")
 parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', type=int, help="override maximum output tokens for a single request; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
 parser.add_argument('-p', '--port', action='store', dest='port', type=int, help="server port")
+parser.add_argument('-pa', '--paste', action='store_true', dest='paste', help="paste the clipboard text as a suffix to the instruction")
 parser.add_argument('-pd', '--powerdown', action='store_true', dest='powerdown', help="power down server")
-parser.add_argument('-r', '--read', action='store_true', dest='read', help="read text output")
+parser.add_argument('-py', '--copy', action='store_true', dest='copy', help="copy text output to the clipboard")
+parser.add_argument('-r', '--read', action='store_true', dest='read', help="read text output aloud")
 parser.add_argument('-rs', '--reloadsettings', action='store_true', dest='reloadsettings', help=f"Reload: 1. configurations in {configFile} 2. plugins")
 parser.add_argument('-rt', '--riskthreshold', action='store', dest='riskthreshold', type=int, help="risk threshold for user confirmation before code execution; 0 - always require confirmation; 1 - require confirmation only when risk level is medium or higher; 2 - require confirmation only when risk level is high or higher; 3 or higher - no confirmation required")
 parser.add_argument('-s', '--server', action='store', dest='server', help="server address; 'http://localhost' by default")
-parser.add_argument('-sd', '--showdescription', action='store_true', dest='showdescription', help="show description of the found items in search results; used together with 'sc', 'ss' and 'st'")
+parser.add_argument('-sd', '--showdescription', action='store_true', dest='showdescription', help="show description of the found items in search results; used together with option 'sc' or 'ss' or 'st'; show a fabric pattern content if used with option 'sp'")
 parser.add_argument('-sc', '--searchcontexts', action='store', dest='searchcontexts', help="search predefined contexts; use '@' to display all; use regex pattern to filter")
 parser.add_argument('-sp', '--searchpatterns', action='store', dest='searchpatterns', help=f"search fabric patterns in {config.fabricPatterns}; configure config.fabricPatterns to customise the search path; fabric is required to install separately")
 parser.add_argument('-ss', '--searchsystems', action='store', dest='searchsystems', help="search predefined system messages; use '@' to display all; use regex pattern to filter")
@@ -82,6 +87,13 @@ parser.add_argument('-ws', '--windowsize', action='store', dest='windowsize', ty
 parser.add_argument('-ww', '--wordwrap', action='store', dest='wordwrap', help="word wrap; true / false; determined by 'config.wrapWords' if not given")
 # Parse arguments
 args = parser.parse_args()
+
+def highlightMarkdownSyntax(content):
+    try:
+        tokens = list(pygments.lex(content, lexer=MarkdownLexer()))
+        print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
+    except:
+        print(content)
 
 def highlightPythonSyntax(content, pformat=True):
     if pformat:
@@ -268,9 +280,20 @@ def tmt19():
 def tmt20():
     main(chatSystem=config.tmt20)
 
-def main(chat: bool = False, defaultTool=None, chatSystem=None):
+def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
+    mainOutput = ""
     if args.searchpatterns:
-        searchFolder(os.path.expanduser(config.fabricPatterns), args.searchpatterns, filter="system.md")
+        if args.showdescription:
+            # show content of a single pattern
+            fabricPattern = os.path.join(os.path.expanduser(config.fabricPatterns), args.searchpatterns, "system.md")
+            if os.path.isfile(fabricPattern):
+                content = readTextFile(fabricPattern)
+                highlightMarkdownSyntax(content)
+            else:
+                print3(f"File not found: {fabricPattern}")
+        else:
+            # search for a string in fabric pattern folder
+            searchFolder(os.path.expanduser(config.fabricPatterns), args.searchpatterns, filter="system.md")
         return None
     host = args.server if args.server else config.toolmate_api_client_host
     port = args.port if args.port else config.toolmate_api_client_port
@@ -289,9 +312,6 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None):
             stopSpinning()
         else:
             print2("Failed to connect ToolMate AI! Run `toolmateserver` first!")
-
-    cliDefault = args.default.strip() if args.default is not None and args.default.strip() else ""
-    stdin_text = sys.stdin.read() if not sys.stdin.isatty() else ""
 
     if args.information or args.models or args.viewconfigs:
 
@@ -419,10 +439,20 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None):
         startSpinning()
 
         endpoint = f"{host}:{port}/api/toolmate"
+
+        # formulate an instruction
         prefix = getPrefix(host, port) if args.interactive else ""
-        instruction = prefix + cliDefault + stdin_text
+        cliDefault = args.default.strip() if args.default is not None and args.default.strip() else ""
+        stdin_text = sys.stdin.read() if not sys.stdin.isatty() else ""
+        if args.paste:
+            clipboardText = getCliOutput("termux-clipboard-get") if config.terminalEnableTermuxAPI else pyperclip.paste()
+        else:
+            clipboardText = ""
+        instruction = prefix + cliDefault + stdin_text + clipboardText + default
         if not instruction:
+            # It simply uses the previously generated messages
             instruction = "."
+
         chatfile = args.chatfile if args.chatfile is not None and os.path.isfile(args.chatfile) else ""
         if chatfile or args.chat:
             chat = True
@@ -532,17 +562,19 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None):
                 wordwrap = True if (args.wordwrap is not None and args.wordwrap.lower() == "true") or config.wrapWords else False
                 outputContent = wrapText(output) if wordwrap else output
                 if (args.markdown and args.markdown.lower() == "true") or (config.toolmate_api_client_markdown and not (args.markdown and args.markdown.lower() == "false")):
-                    try:
-                        tokens = list(pygments.lex(outputContent, lexer=MarkdownLexer()))
-                        print_formatted_text(PygmentsTokens(tokens), style=getPygmentsStyle())
-                    except:
-                        print(outputContent)
+                    highlightMarkdownSyntax(outputContent)
                 else:
                     print(outputContent)
+                if args.copy:
+                    pydoc.pipepager(content, cmd="termux-clipboard-set") if config.terminalEnableTermuxAPI else pyperclip.copy(content)
+                    print2(f"\n{config.divider}Copied!")
                 if args.read:
                     TTSUtil.play(output)
+                mainOutput = output
             except:
                 print(response.text)
+                mainOutput = response.text
+    return mainOutput
 
 
 if __name__ == '__main__':

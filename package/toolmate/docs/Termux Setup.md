@@ -283,7 +283,6 @@ source ~/.bashrc
 ```
 
 Remarks:
-* Configure the `fabric` before installing running `ToolMate AI`.
 * Rust toolchain is required for installing package `lightrag-hku`
 
 ```

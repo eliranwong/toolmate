@@ -4,7 +4,7 @@ This page content is generated on 17Sept2024.  For the latest information, simpl
 
 # Available Tools
 
-@add_google_calendar_event @add_outlook_calendar_event @agents @append_command @append_fabric @append_instruction @apps @b @bapi @bible @bible_commentary @captain @chat @chatgpt @codey @command @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_imagen3 @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @edit_text @examine_audio_google @examine_audio_groq @examine_audio_openai @examine_audio_whisper @examine_files @examine_images_chatgpt @examine_images_googleai @examine_images_groq @examine_images_llamacpp @examine_images_ollama @examine_images_pixtral @examine_images_vertexai @examine_web_content @execute_computing_task @execute_python_code @extract_bible_references @extract_python_code @fabric @files @general @googleai @groq @group @help @images @improve_writing @install_python_package @it @list_current_directory_contents @llamacpppython @llamacppserver @load_conversations @lyrics @map @mistral @modify_images @music @news @o1 @o1_mini @ollama @online @open_browser @packages @palm2 @paste_from_clipboard @perplexica_chatgpt @perplexica_googleai @perplexica_groq @perplexica_xai @proxy @qna @radio @read_aloud @recommend_tool @reflection @remove_image_background @repos @save_memory @science @scientific_publications @search_bible @search_bible_paragraphs @search_conversations @search_finance @search_google @search_google_news @search_memory @search_searxng @search_sqlite @search_tavily @search_weather @send_gmail @send_outlook @send_tweet @social_media @software_wikis @task @tavily @transcribe_audio_google @transcribe_audio_groq @transcribe_audio_openai @transcribe_audio_whisper @translate @uniquebible @uniquebible_api @uniquebible_web @vertexai @videos @web @wikimedia @workflow @xai
+@add_google_calendar_event @add_outlook_calendar_event @agents @append_command @append_fabric @append_fabric_pattern @append_instruction @apps @b @bapi @bible @bible_commentary @captain @chat @chatgpt @codey @command @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_imagen3 @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @edit_text @examine_audio_google @examine_audio_groq @examine_audio_openai @examine_audio_whisper @examine_files @examine_images_chatgpt @examine_images_googleai @examine_images_groq @examine_images_llamacpp @examine_images_ollama @examine_images_pixtral @examine_images_vertexai @examine_web_content @execute_computing_task @execute_python_code @extract_bible_references @extract_python_code @fabric @fabric_pattern @files @general @googleai @groq @group @help @images @improve_writing @install_python_package @it @list_current_directory_contents @llamacpppython @llamacppserver @load_conversations @lyrics @map @mistral @modify_images @music @news @o1 @o1_mini @ollama @online @open_browser @packages @palm2 @paste_from_clipboard @perplexica_chatgpt @perplexica_googleai @perplexica_groq @perplexica_xai @proxy @qna @radio @read_aloud @recommend_tool @reflection @remove_image_background @repos @save_memory @science @scientific_publications @search_bible @search_bible_paragraphs @search_conversations @search_finance @search_google @search_google_news @search_memory @search_searxng @search_sqlite @search_tavily @search_weather @send_gmail @send_outlook @send_tweet @social_media @software_wikis @task @tavily @transcribe_audio_google @transcribe_audio_groq @transcribe_audio_openai @transcribe_audio_whisper @translate @uniquebible @uniquebible_api @uniquebible_web @vertexai @videos @web @wikimedia @workflow @xai
 
 ## Android-only tools:
 
@@ -37,6 +37,8 @@ Alternately, run in terminal:
 `@append_command` Execute a system command with the previous text output appended to it
 
 `@append_fabric` Execute a fabric command with the previous text output appended to it
+
+`@append_fabric_pattern` Use a fabric pattern as chat system message with the previous text output appended to it
 
 `@append_instruction` Append the previous text output to a given instruction
 
@@ -123,6 +125,8 @@ Alternately, run in terminal:
 `@extract_python_code` Extract the python code in a given content
 
 `@fabric` Execute a fabric command
+
+`@fabric_pattern` Use a fabric pattern as chat system message
 
 `@files` Search the 'files' category for online information.
 

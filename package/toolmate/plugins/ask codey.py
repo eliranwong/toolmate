@@ -51,10 +51,7 @@ if not config.isLite and config.online:
 
             response = chat.send_message(query, **parameters)
             config.toolTextOutput = response.text.strip()
-            if hasattr(config, "desktopAssistant"):
-                config.desktopAssistant.printTextOutput(config.toolTextOutput)
-            else:
-                print(config.toolTextOutput)
+            print(config.toolTextOutput)
             return ""
 
         functionSignature = {

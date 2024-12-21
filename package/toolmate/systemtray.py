@@ -1,18 +1,8 @@
 import os, re
-thisFile = os.path.realpath(__file__)
-packageFolder = os.path.dirname(thisFile)
-package = os.path.basename(packageFolder)
-if os.getcwd() != packageFolder:
-    os.chdir(packageFolder)
-
 from toolmate import config
-config.isLite = package.endswith("_lite")
-config.isTermux = True if os.path.isdir("/data/data/com.termux/files/home") else False
-config.toolMateAIFolder = packageFolder
-if not hasattr(config, "toolMateAIName") or not config.toolMateAIName:
-    config.toolMateAIName = "ToolMate AI"
-config.divider = "--------------------"
-os.environ["TOKENIZERS_PARALLELISM"] = config.tokenizers_parallelism
+localStorage = config.localStorage
+if os.getcwd() != localStorage:
+    os.chdir(localStorage)
 
 try:
     from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication, QMessageBox
@@ -49,8 +39,8 @@ class ToolMateHub(QSystemTrayIcon):
         super().__init__(icon, parent)
 
         # initial completion check at startup
-        config.initialCompletionCheck = False
-        config.toolmate = ToolMate()
+        #config.initialCompletionCheck = False
+        #config.toolmate = ToolMate()
 
         # pre-load desktop assistant gui
         config.desktopAssistant = DesktopAssistant()
@@ -58,13 +48,18 @@ class ToolMateHub(QSystemTrayIcon):
         self.clipboard = PyperclipClipboard()
         self.menu = QMenu(parent)
 
-        if config.developer:
-            chatgui = QAction("Desktop Assistant [experimental]", self)
-            chatgui.triggered.connect(self.showDesktopAssistant)
-            self.menu.addAction(chatgui)
-            self.menu.addSeparator()
+        #if config.developer:
+        chatgui = QAction("Desktop Assistant", self)
+        chatgui.triggered.connect(self.showDesktopAssistant)
+        self.menu.addAction(chatgui)
+        self.menu.addSeparator()
 
-        for i in ("toolmate", "letmedoit"):
+        action = QAction("Terminal Mode", self)
+        action.triggered.connect(partial(runToolMateCommand, "toolmate"))
+        self.menu.addAction(action)
+        self.menu.addSeparator()
+
+        """for i in ("toolmate", "letmedoit"):
             action = QAction(i, self)
             action.triggered.connect(partial(runToolMateCommand, i))
             self.menu.addAction(action)
@@ -111,11 +106,11 @@ class ToolMateHub(QSystemTrayIcon):
 
         menuAction = QAction("Chatbots", self)
         menuAction.setMenu(submenu)
-        self.menu.addAction(menuAction)
+        self.menu.addAction(menuAction)"""
 
         # submenu - autogen agents
         submenu = QMenu()
-        for i in ("autoassist", "autoretriever", "autobuilder"):
+        for i in ("autoassist", "autoretrieve", "autobuild", "autocaptain"):
             action = QAction(i, self)
             action.triggered.connect(partial(runToolMateCommand, i))
             submenu.addAction(action)
@@ -143,7 +138,7 @@ class ToolMateHub(QSystemTrayIcon):
         '''
 
         # submenu - clipboard
-        submenu = QMenu()
+        """submenu = QMenu()
 
         action = QAction("read", self)
         action.triggered.connect(self.readClipboard)
@@ -211,7 +206,7 @@ class ToolMateHub(QSystemTrayIcon):
 
         menuAction = QAction("Custom", self)
         menuAction.setMenu(submenu)
-        self.menu.addAction(menuAction)
+        self.menu.addAction(menuAction)"""
 
         self.menu.addSeparator()
 
@@ -226,6 +221,9 @@ class ToolMateHub(QSystemTrayIcon):
         self.menu.addAction(exitAction)
 
         self.setContextMenu(self.menu)
+
+        # show desktop assistant on startup
+        config.desktopAssistant.show()
 
     def exit(self):
         self.setVisible(False)

@@ -2278,6 +2278,26 @@ def query_vectors(collection, query, n=1):
         n_results = n,
     )
 
+# fabric
+
+def getFabricPatternSystem(pattern):
+    system = None
+    fabricPattern = os.path.join(os.path.expanduser(config.fabricPatterns), pattern, "system.md")
+    if os.path.isfile(fabricPattern):
+        system = readTextFile(fabricPattern)
+        system = re.sub(r'# INPUT.*', '', system, flags=re.DOTALL).rstrip()
+    return system
+
+def getFabricPatterns():
+    patterns = []
+    fabricPatterns = os.path.expanduser(config.fabricPatterns)
+    if os.path.isdir(fabricPatterns):
+        for pattern in os.listdir(fabricPatterns):
+            system_path = os.path.join(fabricPatterns, pattern, "system.md")
+            if os.path.isfile(system_path):
+                patterns.append(pattern)
+    return patterns
+
 # rag
 # references:
 # https://python.langchain.com/docs/integrations/providers/unstructured/

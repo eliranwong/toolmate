@@ -99,7 +99,6 @@ class QtResponseStreamer:
             config.llmTextChunk += answer
 
     def processCompletion(self, completion, progress_callback, openai: bool):
-        #openai = True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False
         config.new_chat_response = ""
 
         def finishOutputs(chat_response):

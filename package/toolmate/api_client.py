@@ -201,14 +201,14 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
     # Add arguments
     parser.add_argument("default", nargs="?", default=None, help="instruction sent to ToolMate API server; work on previous conversation if not given.")
     parser.add_argument('-ar', '--autoretrieve', action='store_true', dest='autoretrieve', help="use AutoGen retriever for RAG tools, such as 'examine_files' and 'examine_web_content'; this feature is available in full version only")
-    parser.add_argument('-b', '--backend', action='store', dest='backend', help="AI backend; optionally use it together with '-bc' to make a change persistant")
+    parser.add_argument('-b', '--backend', action='store', dest='backend', help="specify AI backend")
     parser.add_argument('-bc', '--backupconversation', action='store_true', dest='backupconversation', help="back up the current conversation in ToolMate AI user directory")
     parser.add_argument('-bs', '--backupsettings', action='store_true', dest='backupsettings', help="back up the current settings in ToolMate AI user directory")
     parser.add_argument('-c', '--chat', action='store_true', dest='chat', help="enable to chat as an on-going conversation")
     parser.add_argument('-cf', '--chatfile', action='store', dest='chatfile', help="a chat file containing a saved conversation")
     parser.add_argument('-cp', '--chatpattern', action='store', dest='chatpattern', help=f"override chat system message for a single request, with a fabric pattern, in {config.fabricPatterns}; configure config.fabricPatterns to customise the path; use AI model assigned in ToolMate AI instead of in Fabric; this option cannot be used together with option 'chatsystem'; fabric is required to install separately")
-    parser.add_argument('-cs', '--chatsystem', action='store', dest='chatsystem', help="override chat system message for a single request; optionally use it together with '-bc' to make a change persistant")
-    parser.add_argument('-dt', '--defaulttool', action='store', dest='defaulttool', help="override default tool for a single request; optionally use it together with '-bc' to make a change persistant; applied when 'Tool Selection Agent' is disabled and no tool is specified in the request")
+    parser.add_argument('-cs', '--chatsystem', action='store', dest='chatsystem', help="override chat system message for a single request")
+    parser.add_argument('-dt', '--defaulttool', action='store', dest='defaulttool', help="override default tool for a single request; applied when 'Tool Selection Agent' is disabled and no tool is specified in the request")
     parser.add_argument('-e', '--export', action='store', dest='export', help="export conversation; optionally used with -f option to specify a format for the export")
     parser.add_argument('-exec', '--execute', action='store_true', dest='execute', help="execute python code or system command; format a block of python code starting with '```python' or a block of system command starting with '```command'; ends the block with '```'")
     parser.add_argument('-f', '--format', action='store', dest='format', help="conversation output format; plain or list; useful for sharing or backup; only output the last assistant response if this option is not used")
@@ -223,11 +223,12 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
     parser.add_argument('-ims', '--imagesteps', action='store', dest='imagesteps', type=int, help="image sampling steps")
     parser.add_argument('-imw', '--imagewidth', action='store', dest='imagewidth', type=int, help="image width; DALLE.3 supports 1024x1024 / 1024x1792 /1792x1024; Flux.1 natively supports any resolution up to 2 mp (1920x1088)")
     parser.add_argument('-info', '--information', action='store_true', dest='information', help="quick overview of server information")
+    parser.add_argument('-ip', '--improveprompt', action='store_true', dest='improveprompt', help="toggle user prompt improvement for a single request")
     parser.add_argument('-k', '--key', action='store', dest='key', help="specify the API key for authenticating access to the ToolMate AI server")
-    parser.add_argument('-m', '--model', action='store', dest='model', help="AI model; override backend option if the model's backend is different; optionally use it together with '-bc' to make a change persistant")
+    parser.add_argument('-m', '--model', action='store', dest='model', help="AI model; override backend option if the model's backend is different")
     parser.add_argument('-ms', '--models', action='store_true', dest='models', help="show available AI backends and models")
-    parser.add_argument('-md', '--markdown', action='store', dest='markdown', help="highlight assistant response in markdown format; true / false")
-    parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', type=int, help="override maximum output tokens for a single request; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
+    parser.add_argument('-md', '--markdown', action='store_true', dest='markdown', help="toggle markdown highlights of assistant response a single request")
+    parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', type=int, help="override maximum output tokens for a single request; accepts non-negative integers; unaccepted values will be ignored")
     parser.add_argument('-p', '--port', action='store', dest='port', type=int, help="server port")
     parser.add_argument('-pa', '--paste', action='store_true', dest='paste', help="paste the clipboard text as a suffix to the instruction")
     parser.add_argument('-pd', '--powerdown', action='store_true', dest='powerdown', help="power down server")
@@ -241,12 +242,12 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
     parser.add_argument('-sp', '--searchpatterns', action='store', dest='searchpatterns', help=f"search fabric patterns in {config.fabricPatterns}; configure config.fabricPatterns to customise the search path; fabric is required to install separately")
     parser.add_argument('-ss', '--searchsystems', action='store', dest='searchsystems', help="search predefined system messages; use '@' to display all; use regex pattern to filter")
     parser.add_argument('-st', '--searchtools', action='store', dest='searchtools', help="search enabled tools; use '@' to display all; use regex pattern to filter")
-    parser.add_argument('-t', '--temperature', action='store', dest='temperature', type=float, help="override inference temperature for a single request; optionally use it together with '-bc' to make a change persistant; accepted range: 0.0-2.0; unaccepted values will be ignored without notification")
-    parser.add_argument('-ta', '--toolagent', action='store', dest='toolagent', help="override tool selection agent for a single request; optionally use it together with '-bc' to make a change persistant; true / false; unaccepted values will be ignored without notification")
+    parser.add_argument('-t', '--temperature', action='store', dest='temperature', type=float, help="override inference temperature for a single request; accepted range: 0.0-2.0; unaccepted values will be ignored")
+    parser.add_argument('-ta', '--toolagent', action='store_true', dest='toolagent', help="toggle tool selection agent for a single request")
     parser.add_argument('-vc', '--viewconfigs', action='store_true', dest='viewconfigs', help="view current server configurations")
     parser.add_argument('-wd', '--workingdirectory', action='store', dest='workingdirectory', help="working directory; current location by default")
-    parser.add_argument('-ws', '--windowsize', action='store', dest='windowsize', type=int, help="override context window size for a single request; applicable to backends `llama.cpp` amd `ollama` only; optionally use it together with '-bc' to make a change persistant; accepts non-negative integers; unaccepted values will be ignored without notification")
-    parser.add_argument('-ww', '--wordwrap', action='store', dest='wordwrap', help="word wrap; true / false; determined by 'config.wrapWords' if not given")
+    parser.add_argument('-ws', '--windowsize', action='store', dest='windowsize', type=int, help="override context window size for a single request; applicable to backends `llama.cpp` amd `ollama` only; accepts non-negative integers; unaccepted values will be ignored")
+    parser.add_argument('-ww', '--wordwrap', action='store_true', dest='wordwrap', help="toggle word wrap of assistant response a single request")
     # Parse arguments
     args = parser.parse_args()
 
@@ -398,7 +399,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
         
         try:
             results = json.loads(response.json())["results"]
-            if args.showdescription and args.showdescription.lower() == "true":
+            if args.showdescription:
                 for key, value in results.items():
                     print3(f"`{key}`: {value}")
             else:
@@ -428,7 +429,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
         
         try:
             results = json.loads(response.json())["results"]
-            if args.showdescription and args.showdescription.lower() == "true":
+            if args.showdescription:
                 for key, value in results.items():
                     print3(f"`{key}`: {value}")
             else:
@@ -457,10 +458,6 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
         chatfile = args.chatfile if args.chatfile is not None and os.path.isfile(args.chatfile) else ""
         if chatfile or args.chat:
             chat = True
-        if args.toolagent is not None and args.toolagent.strip().lower() in ("true", "false"):
-            toolagent = True if args.toolagent.strip().lower() == "true" else False
-        else:
-            toolagent = None
         
         # backend and model
         if args.backend and args.backend.lower() in getLlms().keys():
@@ -492,23 +489,26 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
             "maximumoutput": args.maximumoutput,
             "temperature": args.temperature,
             "defaulttool": defaultTool if defaultTool is not None else args.defaulttool,
-            "toolagent": toolagent,
+            "toolagent": args.toolagent,
             "riskthreshold": args.riskthreshold,
-            "execute": True if args.execute else False,
-            "autoretrieve": True if args.autoretrieve else False,
-            "groupexecuteindocker": True if args.groupexecuteindocker else False,
+            "execute": args.execute,
+            "improveprompt": args.improveprompt,
+            "autoretrieve": args.autoretrieve,
+            "groupexecuteindocker": args.groupexecuteindocker,
             "groupexecutiontimeout": args.groupexecutiontimeout,
-            "groupoaiassistant": True if args.groupoaiassistant else False,
+            "groupoaiassistant": args.groupoaiassistant,
             "groupagents": args.groupagents,
             "grouprounds": args.grouprounds,
-            "imagehd": True if args.imagehd else False,
+            "imagehd": args.imagehd,
             "imageheight": args.imageheight,
             "imagewidth": args.imagewidth,
             "imagesteps": args.imagesteps,
-            "backupconversation": True if args.backupconversation else False,
-            "backupsettings": True if args.backupsettings else False,
-            "reloadsettings": True if args.reloadsettings else False,
-            "powerdown": True if args.powerdown else False,
+            "markdown": args.markdown,
+            "wordwrap": args.wordwrap,
+            "backupconversation": args.backupconversation,
+            "backupsettings": args.backupsettings,
+            "reloadsettings": args.reloadsettings,
+            "powerdown": args.powerdown,
         }
         try:
             response = requests.post(endpoint, headers=headers, json=data)
@@ -560,15 +560,23 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
                     except Exception as e:
                         showErrors(e=e)
                     return None
-                wordwrap = True if (args.wordwrap is not None and args.wordwrap.lower() == "true") or config.wrapWords else False
-                outputContent = wrapText(output) if wordwrap else output
-                if (args.markdown and args.markdown.lower() == "true") or (config.toolmate_api_client_markdown and not (args.markdown and args.markdown.lower() == "false")):
-                    highlightMarkdownSyntax(outputContent)
-                else:
-                    print(outputContent)
+                if args.wordwrap:
+                    current_wordwrap = config.wrapWords
+                    config.wrapWords = not config.wrapWords
+                if args.markdown:
+                    current_toolmate_api_client_markdown = config.toolmate_api_client_markdown
+                    config.toolmate_api_client_markdown = not config.toolmate_api_client_markdown
+                outputContent = wrapText(output) if config.wrapWords else output
+                highlightMarkdownSyntax(outputContent) if config.toolmate_api_client_markdown else print(outputContent)
+                # restore configurations
+                if not args.backupsettings:
+                    config.wrapWords = current_wordwrap
+                    config.toolmate_api_client_markdown = current_toolmate_api_client_markdown
+                # copy response to clipboard
                 if args.copy:
                     pydoc.pipepager(output, cmd="termux-clipboard-set") if config.terminalEnableTermuxAPI else pyperclip.copy(output)
                     print2(f"{config.divider}\nCopied!")
+                # read aloud response
                 if args.read:
                     TTSUtil.play(output)
                 mainOutput = output

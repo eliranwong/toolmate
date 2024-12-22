@@ -73,7 +73,7 @@ class RAG:
             completion = CallLLM.regularCall(messages)
             # Create a new thread for the streaming task
             streaming_event = threading.Event()
-            self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") else False))
+            self.streaming_thread = threading.Thread(target=streamingWordWrapper.streamOutputs, args=(streaming_event, completion, True if config.llmInterface in ("openai", "letmedoit", "github", "azure", "groq", "llamacppserver") else False))
             # Start the streaming thread
             self.streaming_thread.start()
             # wait while text output is steaming; capture key combo 'ctrl+q' or 'ctrl+z' to stop the streaming

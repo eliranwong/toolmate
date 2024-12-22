@@ -5,7 +5,9 @@ from toolmate.utils.call_groq import CallGroq
 from toolmate.utils.call_mistral import CallMistral
 from toolmate.utils.call_googleai import CallGoogleAI
 from toolmate.utils.call_xai import CallXAI
-from toolmate.utils.call_chatgpt import CallChatGPT, CallLetMeDoIt
+from toolmate.utils.call_openai_azure import CallOpenAIAzure
+from toolmate.utils.call_openai_github import CallOpenAIGithub
+from toolmate.utils.call_openai import CallOpenAI, CallLetMeDoIt
 from toolmate.utils.call_llamacppserver import CallLlamaCppServer
 import copy
 if not config.isLite:
@@ -30,7 +32,7 @@ class CallLLM:
             # Custom Tool System Message
             config.systemMessage_tool_current = config.systemMessage_tool
         
-        elif config.llmInterface in ("chatgpt", "letmedoit"):
+        elif config.llmInterface in ("openai", "letmedoit", "azure", "github"):
 
             config.systemMessage_tool_current = f'''You’re {config.toolMateAIName}, an advanced AI assistant, capable of both engaging in conversations and executing codes on my device.
 I am providing the basic information of my device below in case you need it:
@@ -86,8 +88,12 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallGoogleAI.checkCompletion()
         elif llmInterface == "xai":
             return CallXAI.checkCompletion()
-        elif llmInterface == "chatgpt":
-            return CallChatGPT.checkCompletion()
+        elif llmInterface == "openai":
+            return CallOpenAI.checkCompletion()
+        elif llmInterface == "azure":
+            return CallOpenAIAzure.checkCompletion()
+        elif llmInterface == "github":
+            return CallOpenAIGithub.checkCompletion()
         # letmedoit
         return CallLetMeDoIt.checkCompletion()
 
@@ -110,8 +116,12 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallGoogleAI.autoCorrectPythonCode(code, trace)
         elif llmInterface == "xai":
             return CallXAI.autoCorrectPythonCode(code, trace)
-        elif llmInterface == "chatgpt":
-            return CallChatGPT.autoCorrectPythonCode(code, trace)
+        elif llmInterface == "openai":
+            return CallOpenAI.autoCorrectPythonCode(code, trace)
+        elif llmInterface == "azure":
+            return CallOpenAIAzure.autoCorrectPythonCode(code, trace)
+        elif llmInterface == "github":
+            return CallOpenAIGithub.autoCorrectPythonCode(code, trace)
         # letmedoit
         return CallLetMeDoIt.autoCorrectPythonCode(code, trace)
 
@@ -133,8 +143,12 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallGoogleAI.runSingleFunctionCall(messages, function_name)
         elif config.llmInterface == "xai":
             return CallXAI.runSingleFunctionCall(messages, function_name)
-        elif config.llmInterface == "chatgpt":
-            return CallChatGPT.runSingleFunctionCall(messages, function_name)
+        elif config.llmInterface == "openai":
+            return CallOpenAI.runSingleFunctionCall(messages, function_name)
+        elif config.llmInterface == "azure":
+            return CallOpenAIAzure.runSingleFunctionCall(messages, function_name)
+        elif config.llmInterface == "github":
+            return CallOpenAIGithub.runSingleFunctionCall(messages, function_name)
         # letmedoit
         return CallLetMeDoIt.runSingleFunctionCall(messages, function_name)
 
@@ -157,7 +171,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallGoogleAI.regularCall(chatMessages)
         elif config.llmInterface == "xai":
             return CallXAI.regularCall(chatMessages)
-        return CallChatGPT.regularCall(chatMessages)
+        return CallOpenAI.regularCall(chatMessages)
 
     @staticmethod
     def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=[], keepSystemMessage: bool=False):
@@ -182,7 +196,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
         elif config.llmInterface == "vertexai":
             history, systemMessage, lastUserMessage = toGeminiMessages(messages=chatMessages)
             if userInput.strip() and systemMessage:
-                userInput = f"""# Your role\n\n{systemMessage}\n\n# My Inquiry\n\n{userMessage}"""
+                userInput = f"""# Your role\n\n{systemMessage}\n\n# My Inquiry\n\n{userInput}"""
             elif not userInput.strip() and lastUserMessage.strip() and systemMessage:
                 userInput = f"""# Your role\n\n{systemMessage}\n\n# My Inquiry\n\n{lastUserMessage}"""
             elif not userInput.strip() and lastUserMessage.strip():
@@ -190,8 +204,12 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallVertexAI.getSingleChatResponse(userInput, history=history)
             #history, *_ = toGeminiMessages(messages=chatMessages)
             #return CallVertexAI.getSingleChatResponse(userInput, history=history)
-        elif config.llmInterface == "chatgpt":
-            return CallChatGPT.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
+        elif config.llmInterface == "openai":
+            return CallOpenAI.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
+        elif config.llmInterface == "azure":
+            return CallOpenAIAzure.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
+        elif config.llmInterface == "github":
+            return CallOpenAIGithub.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         # letmedoit
         return CallLetMeDoIt.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
 
@@ -215,8 +233,12 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallGoogleAI.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmInterface == "xai":
             return CallXAI.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
-        elif config.llmInterface == "chatgpt":
-            return CallChatGPT.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
+        elif config.llmInterface == "openai":
+            return CallOpenAI.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
+        elif config.llmInterface == "azure":
+            return CallOpenAIAzure.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
+        elif config.llmInterface == "github":
+            return CallOpenAIGithub.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         # letmedoit
         return CallLetMeDoIt.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
 
@@ -238,7 +260,11 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallGoogleAI.runToolCall(messages)
         elif config.llmInterface == "xai":
             return CallXAI.runToolCall(messages)
-        elif config.llmInterface == "chatgpt":
-            return CallChatGPT.runToolCall(messages)
+        elif config.llmInterface == "openai":
+            return CallOpenAI.runToolCall(messages)
+        elif config.llmInterface == "azure":
+            return CallOpenAIAzure.runToolCall(messages)
+        elif config.llmInterface == "github":
+            return CallOpenAIGithub.runToolCall(messages)
         # letmedoit
         return CallLetMeDoIt.runToolCall(messages)

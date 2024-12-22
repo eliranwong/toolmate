@@ -100,7 +100,7 @@ def autoCorrectPythonCode(code, trace):
         userInput = f"Original python code:\n```\n{code}\n```\n\nTraceback:\n```\n{trace}\n```"
         messages = [{"role": "user", "content" : userInput}]
         print3(f"Auto-correction attempt: {(i + 1)}")
-        function_call_message, function_call_response = CallChatGPT.getSingleFunctionCallResponse(messages, "correct_python_code") if config.llmInterface == "chatgpt" or config.autoCorrectionInterface == "chatgpt" else CallLetMeDoIt.getSingleFunctionCallResponse(messages, "correct_python_code")
+        function_call_message, function_call_response = CallOpenAI.getSingleFunctionCallResponse(messages, "correct_python_code") if config.llmInterface == "openai" or config.autoCorrectionInterface == "openai" else CallLetMeDoIt.getSingleFunctionCallResponse(messages, "correct_python_code")
         code = json.loads(function_call_message["function_call"]["arguments"]).get("code")
         # display response
         print1(config.divider)
@@ -223,7 +223,7 @@ def getSingleFunctionCallResponse(messages: list[dict], function_name: str, temp
             "arguments": func_arguments,
         }
     }
-    function_call_response = CallChatGPT.finetuneSingleFunctionCallResponse(func_arguments, function_name)
+    function_call_response = CallOpenAI.finetuneSingleFunctionCallResponse(func_arguments, function_name)
     return function_call_message_mini, function_call_response
 
 def finetuneSingleFunctionCallResponse(func_arguments, function_name):
@@ -296,7 +296,7 @@ def finetuneSingleFunctionCallResponse(func_arguments, function_name):
     return function_response
 
 
-class CallChatGPT:
+class CallOpenAI:
 
     @staticmethod
     @check_openai_errors
@@ -362,7 +362,7 @@ class CallChatGPT:
     @staticmethod
     def runToolCall(messages: dict):
         if not config.selectedTool:
-            return CallChatGPT.regularCall(messages)
+            return CallOpenAI.regularCall(messages)
         else:
             # 2. Tool Selection
             if config.selectedTool and not config.selectedTool == "chat" and config.selectedTool in config.toolFunctionSchemas:
@@ -370,7 +370,7 @@ class CallChatGPT:
                 tool_schema = config.toolFunctionSchemas[tool_name]
                 config.selectedTool = ""
             else:
-                return CallChatGPT.regularCall(messages)
+                return CallOpenAI.regularCall(messages)
             # 3. Parameter Extraction
             if config.developer:
                 print1("extracting parameters ...")
@@ -380,9 +380,9 @@ class CallChatGPT:
                     tool_parameters = {}
                     tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
                 else:
-                    tool_parameters = CallChatGPT.getDictionaryOutput(messages=messages, schema=tool_schema)
+                    tool_parameters = CallOpenAI.getDictionaryOutput(messages=messages, schema=tool_schema)
                     if not validParameters(tool_parameters, tool_schema["parameters"]["required"]):
-                        return CallChatGPT.regularCall(messages)
+                        return CallOpenAI.regularCall(messages)
                     # 4. Function Execution
                     tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
             except:
@@ -391,7 +391,7 @@ class CallChatGPT:
             # 5. Chat Extension
             if tool_response == "[INVALID]":
                 # invalid tool call; return a regular call instead
-                return CallChatGPT.regularCall(messages)
+                return CallOpenAI.regularCall(messages)
             else:
                 # record tool selection
                 #config.currentMessages[-1]["tool"] = tool_name
@@ -421,7 +421,7 @@ class CallChatGPT:
                     )
                     config.toolTextOutput = ""
 
-                    return CallChatGPT.regularCall(messages)
+                    return CallOpenAI.regularCall(messages)
                 elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
                     # tool function executed without chat extension
                     if config.toolTextOutput:
@@ -436,7 +436,7 @@ class CallChatGPT:
         """
         Extract action parameters
         """
-        parameters = CallChatGPT.getDictionaryOutput(messages=ongoingMessages, schema=schema, **kwargs)
+        parameters = CallOpenAI.getDictionaryOutput(messages=ongoingMessages, schema=schema, **kwargs)
         if config.developer:
             print2("```parameters")
             pprint.pprint(parameters)

@@ -34,6 +34,7 @@ class ToolMateHub(QSystemTrayIcon):
         # to work with mutliple virtual desktops
         config.desktopAssistant.hide()
         config.desktopAssistant.show()
+        config.desktopAssistant.centralWidget.userInput.setFocus()
 
     def startApiServer(self):
         host = config.toolmate_api_client_host
@@ -115,7 +116,7 @@ class ToolMateHub(QSystemTrayIcon):
             "llamacppserver",
             "ollamachat",
             "groqchat",
-            "chatgpt",
+            "openai",
             "geminipro",
             "geminiprovision",
             "palm2",
@@ -250,6 +251,7 @@ class ToolMateHub(QSystemTrayIcon):
 
         # show desktop assistant on startup
         config.desktopAssistant.show()
+        config.desktopAssistant.centralWidget.userInput.setFocus()
 
     def exit(self):
         self.setVisible(False)

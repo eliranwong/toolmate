@@ -13,7 +13,7 @@ from toolmate import config
 
 if config.online:
 
-    from toolmate import print1, print2, is_valid_image_file, is_valid_image_url, getGroqClient, is_valid_url, encode_image
+    from toolmate import print1, print2, is_valid_image_file, is_valid_image_url, getGroqClient, is_valid_url, encode_image, getFileSizeInMB
     import os
 
     def examine_images_groq(function_args):

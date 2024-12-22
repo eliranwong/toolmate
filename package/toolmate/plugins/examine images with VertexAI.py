@@ -25,7 +25,7 @@ from toolmate import config
 
 if not config.isLite and config.online:
 
-    from toolmate.utils.call_chatgpt import check_openai_errors
+    from toolmate.utils.call_openai import check_openai_errors
     from toolmate.geminiprovision import GeminiProVision
 
     @check_openai_errors

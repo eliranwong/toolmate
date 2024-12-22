@@ -30,7 +30,7 @@ if not config.isTermux:
         language = function_args.get("language") # required
 
         if audio_file and os.path.isfile(audio_file):
-            if config.llmInterface in ("chatgpt", "letmedoit"):
+            if config.llmInterface in ("openai", "letmedoit"):
                 if not check_file_format(audio_file):
                     print3("This feature supports the following input file types only: '.mp3', '.mp4', '.mpeg', '.mpga', '.m4a', '.wav', '.webm'!")
                     return ""

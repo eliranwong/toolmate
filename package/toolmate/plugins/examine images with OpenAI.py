@@ -27,18 +27,13 @@ from toolmate import config
 if config.online:
 
     from toolmate import print1, print2, is_valid_image_file, is_valid_image_url, is_valid_url, encode_image
-    from toolmate.utils.call_chatgpt import check_openai_errors
+    from toolmate.utils.call_openai import check_openai_errors
     import os
     from openai import OpenAI
 
     @check_openai_errors
-    def examine_images_chatgpt(function_args):
+    def examine_images_openai(function_args):
         from toolmate import config
-
-        llmInterface = "chatgpt"
-
-        if llmInterface in ("chatgpt", "letmedoit") and not config.openaiApiKey:
-            return "OpenAI API key not found!"
 
         query = function_args.get("query") # required
         files = function_args.get("image_filepath") # required
@@ -99,7 +94,7 @@ if config.online:
             "compare images",
             "analyze image",
         ],
-        "name": "examine_images_chatgpt",
+        "name": "examine_images_openai",
         "description": "Describe or compare images with ChatGPT",
         "parameters": {
             "type": "object",
@@ -117,4 +112,4 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=examine_images_chatgpt)
+    config.addFunctionCall(signature=functionSignature, method=examine_images_openai)

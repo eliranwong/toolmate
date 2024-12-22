@@ -12,7 +12,7 @@ Major differences are listed below:
 
 1. Configurations are different even both are powered 
 
-ChatGPT Mode: "config.llmBackend" set to "chatgpt"
+ChatGPT Mode: "config.llmBackend" set to "openai"
 
 LetMeDoIt Mode: "config.llmBackend" set to "letmedoit"
 

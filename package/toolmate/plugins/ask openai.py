@@ -11,19 +11,19 @@ from toolmate import config
 
 if config.online:
 
-    from toolmate.utils.call_chatgpt import CallChatGPT
+    from toolmate.utils.call_openai import CallOpenAI
 
     try:
-        CallChatGPT.checkCompletion()
+        CallOpenAI.checkCompletion()
 
-        def chatgpt(function_args):
+        def openai(function_args):
             config.stopSpinning()
             if function_args:
                 query = function_args.get("query") # required
                 config.currentMessages[-1] = {"role": "user", "content": query}
             else:
                 query = config.currentMessages[-1]["content"]
-            completion = CallChatGPT.regularCall(config.currentMessages)
+            completion = CallOpenAI.regularCall(config.currentMessages)
             config.toolmate.streamCompletion(completion, openai=True)
             return ""
 
@@ -31,7 +31,7 @@ if config.online:
             "examples": [
                 "Ask ChatGPT",
             ],
-            "name": "chatgpt",
+            "name": "openai",
             "description": "Ask ChatGPT to chat or provide information",
             "parameters": {
                 "type": "object",
@@ -45,7 +45,7 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=chatgpt)
+        config.addFunctionCall(signature=functionSignature, method=openai)
         config.inputSuggestions.append("Ask ChatGPT: ")
 
     except:

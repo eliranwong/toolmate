@@ -55,6 +55,7 @@ class Request(BaseModel):
     toolagent: bool | None = None
     riskthreshold: int | None = None
     execute: bool | None = None
+    improveprompt: bool | None = None
     autoretrieve: bool | None = None
     groupexecuteindocker: bool | None = None
     groupexecutiontimeout: int | None = None
@@ -65,6 +66,8 @@ class Request(BaseModel):
     imageheight: int | None = None
     imagewidth: int | None = None
     imagesteps: int | None = None
+    markdown: bool | None = None
+    wordwrap: bool | None = None
     backupconversation: bool | None = None
     backupsettings: bool | None = None
     reloadsettings: bool | None = None
@@ -96,6 +99,7 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
         defaulttool = re.sub("^@", "", defaulttool)
     toolagent = request.toolagent
     riskthreshold = request.riskthreshold
+    improveprompt = request.improveprompt
     execute = request.execute
     autoretrieve = request.autoretrieve
     groupexecuteindocker = request.groupexecuteindocker
@@ -107,6 +111,8 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
     imageheight = request.imageheight
     imagewidth = request.imagewidth
     imagesteps = request.imagesteps
+    markdown = request.markdown
+    wordwrap = request.wordwrap
     backupconversation = request.backupconversation
     backupsettings = request.backupsettings
     reloadsettings = request.reloadsettings
@@ -157,11 +163,17 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
         config.toolmate.setCustomSystemMessage(customChatMessage=chatsystem)
         print3(f"Chat system message changed for this request: {chatsystem}")
 
-    # override tool selection agent once
-    if toolagent is not None:
+    # toggle tool selection agent once
+    if toolagent:
         current_toolagent = config.tool_selection_agent
-        config.tool_selection_agent = toolagent
-        print3(f"Tool selection agent changed for this request: {toolagent}")
+        config.tool_selection_agent = not config.tool_selection_agent
+        print3(f"Tool selection agent changed for this request: {config.tool_selection_agent}")
+
+    # toggle user prompt improvement once
+    if improveprompt:
+        current_improveInputEntry = config.improveInputEntry
+        config.improveInputEntry = not config.improveInputEntry
+        print3(f"Tool selection agent changed for this request: {config.improveInputEntry}")
 
     # override default tool once
     if defaulttool and defaulttool in config.allEnabledTools:
@@ -256,9 +268,11 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
     
     # persist changes or restore server configurations
     if backupsettings:
+        if markdown:
+            config.toolmate_api_client_markdown = not config.toolmate_api_client_markdown
+        if wordwrap:
+            config.wrapWords = not config.wrapWords
         config.saveConfig()
-        if os.path.isdir(config.localStorage):
-            shutil.copy(configFile, os.path.join(config.localStorage, "config_lite_backup.py" if config.isLite else "config_backup.py"))
     else:
         if autoretrieve:
             config.rag_useAutoRetriever = current_autoretrieve
@@ -289,9 +303,12 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
         if chatsystem:
             config.toolmate.setCustomSystemMessage(customChatMessage=current_chatsystem)
             print3(f"Chat system message restored: {current_chatsystem}")
-        if toolagent is not None:
+        if toolagent:
             config.tool_selection_agent = current_toolagent
             print3(f"Tool selection agent restored: {current_toolagent}")
+        if improveprompt:
+            config.improveInputEntry = current_improveInputEntry
+            print3(f"Tool selection agent restored: {current_improveInputEntry}")
         if defaulttool and defaulttool in config.allEnabledTools:
             config.defaultTool = current_defaulttool
             print3(f"Default tool restored: {current_defaulttool}")

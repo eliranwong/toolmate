@@ -14,7 +14,7 @@ if config.online:
     from toolmate import print3, getCurrentDateTime, getCliOutput
     import os, shutil, subprocess
     from base64 import b64decode
-    from toolmate.utils.call_chatgpt import check_openai_errors
+    from toolmate.utils.call_openai import check_openai_errors
     from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
     from openai import OpenAI
     from pathlib import Path

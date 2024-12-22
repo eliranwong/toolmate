@@ -57,7 +57,7 @@ def main(tempInterface=""):
 
     # update to the latest version
     config.tempInterface = tempInterface
-    backends = ("llamacpppython", "llamacppserver", "ollama", "groq", "xai", "googleai", "vertexai", "chatgpt", "letmedoit")
+    backends = ("llamacpppython", "llamacppserver", "ollama", "groq", "xai", "googleai", "vertexai", "openai", "letmedoit", "github", "azure")
     if args.backend:
         config.llmInterface = args.backend.lower()
     elif args.temp and args.temp.lower() in backends:
@@ -147,8 +147,6 @@ def main(tempInterface=""):
     # Do the following tasks before exit
     # backup configurations
     config.saveConfig()
-    if os.path.isdir(config.localStorage):
-        shutil.copy(configFile, os.path.join(config.localStorage, "config_lite_backup.py" if config.isLite else "config_backup.py"))
     # unload llama.cpp model to free VRAM
     unloadLocalModels()
 

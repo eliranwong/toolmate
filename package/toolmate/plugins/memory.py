@@ -8,7 +8,7 @@ modified from source: https://medium.com/@simon_attard/building-a-memory-layer-f
 [TOOL_CALL]
 """
 
-from toolmate import config
+from toolmate import config, isServerAlive
 #import numpy as np
 #from numpy.linalg import norm
 #def cosine_similarity(A, B):

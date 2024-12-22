@@ -17,7 +17,7 @@ if not config.isLite and isSDcppInstalled:
     from toolmate import config, print1, print2, print3, getCurrentDateTime, getCliOutput, getCpuThreads, downloadStableDiffusionFiles
     import os, shutil, subprocess
     from base64 import b64decode
-    from toolmate.utils.call_chatgpt import check_openai_errors
+    from toolmate.utils.call_openai import check_openai_errors
     from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
     from openai import OpenAI
     from pathlib import Path

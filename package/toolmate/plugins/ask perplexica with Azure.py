@@ -16,7 +16,7 @@ from toolmate import config
 
 if config.online:
 
-    from toolmate import isServerAlive, print1, print2, get_local_ip
+    from toolmate import isServerAlive, print1, print2, get_local_ip, getGithubApi_key
     import requests, json, re
 
     persistentConfigs = (
@@ -34,7 +34,7 @@ if config.online:
 
     if isServerAlive(re.sub("http://|https://", "", config.perplexica_server), config.perplexica_backend_port):
 
-        def perplexica_chatgpt(function_args):
+        def perplexica_azure(function_args):
             config.stopSpinning()
             if function_args:
                 query = function_args.get("query")
@@ -58,14 +58,17 @@ if config.online:
             # https://github.com/ItzCrazyKns/Perplexica/blob/master/docs/API/SEARCH.md
             # https://github.com/ItzCrazyKns/Perplexica/tree/master/src/lib/providers
 
+            # groq
             data = {
                 "chatModel": {
-                    "provider": "openai",
+                    "provider": "custom_openai",
                     "model": config.chatGPTApiModel,
+                    "customOpenAIBaseURL": config.azureBaseUrl,
+                    "customOpenAIKey": config.azureApi_key,
                 },
                 "embeddingModel": {
-                    "provider": "openai",
-                    "model": "text-embedding-3-large",
+                    "provider": "local",
+                    "model": config.perplexica_local_embedding_model,
                 },
                 "optimizationMode": "speed",
                 "focusMode": "webSearch",
@@ -112,7 +115,7 @@ if config.online:
             "examples": [
                 "Ask Perplexica",
             ],
-            "name": "perplexica_chatgpt",
+            "name": "perplexica_azure",
             "description": "Request Perplexica to conduct research or provide information through internet searches.",
             "parameters": {
                 "type": "object",
@@ -126,7 +129,7 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=perplexica_chatgpt)
+        config.addFunctionCall(signature=functionSignature, method=perplexica_azure)
         config.inputSuggestions.append("Ask Perplexica: ")
 
     else:

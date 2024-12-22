@@ -51,7 +51,7 @@ if os.path.isdir(storageDir):
         # check if config backup is available
         backupFile = os.path.join(storageDir, "config_lite_backup.py" if config.isLite else "config_backup.py")
         if os.path.isfile(backupFile):
-            if hasattr(config, "api_server_id"):
+            if hasattr(config, "api_server_id") or (hasattr(config, "autoRestoreConfigs") and config.autoRestoreConfigs):
                 loadConfig(backupFile)
                 shutil.copy(backupFile, configFile)
                 print("Configuration backup restored!")

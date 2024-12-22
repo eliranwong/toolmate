@@ -1,6 +1,6 @@
 from toolmate import config, print2
 from toolmate.api_client import getToolmate
-from toolmate import configFile, getOllamaServerClient, exportOllamaModels, isServerAlive
+from toolmate import getOllamaServerClient, exportOllamaModels, isServerAlive
 from toolmate.utils.assistant import ToolMate
 from prompt_toolkit.shortcuts import set_title, clear_title
 from pathlib import Path
@@ -141,8 +141,6 @@ def main():
 
     # backup configurations
     config.saveConfig()
-    if os.path.isdir(config.localStorage):
-        shutil.copy(configFile, os.path.join(config.localStorage, "config_lite_backup.py" if config.isLite else "config_backup.py"))
 
     host = config.toolmate_api_client_host
     port = config.toolmate_api_client_port

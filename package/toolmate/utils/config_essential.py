@@ -1,5 +1,5 @@
 from toolmate import config
-import os, pprint
+import os, pprint, shutil
 
 pluginExcludeList = [
     "awesome prompts",
@@ -82,7 +82,7 @@ defaultSettings = (
     ('appName', ''),
     ('text2art_font1', 'cybermedum'),
     ('text2art_font2', 'white_bubble'),
-    ('llmInterface', ""), # "llamacpppython", "llamacppserver", "ollama", "chatgpt", "letmedoit", "groq", "mistral", "xai", "googleai", "vertexai"
+    ('llmInterface', ""), # "llamacpppython", "llamacppserver", "ollama", "openai", "letmedoit", "github", "azure", "groq", "mistral", "xai", "googleai", "vertexai"
     ('tool_selection_agent', False), # automatically screens user request and recommend tools, can also be manually triggered by tool `@recommend_tool`
     ('tool_selection_requirements', False), # convey each tool's requirements to the tool selection agent for the tool selection process.
     ('auto_tool_selection', False), # apply only if tool_selection_agent is set to True
@@ -245,8 +245,11 @@ defaultSettings = (
     ('wrapWords', True),
     ('mouseSupport', False),
     ('autoUpgrade', True),
-    #('chatbot', 'chatgpt'),
     ('customTrayCommands', ['mistral', 'llama3']),
+    ('azureApi_key', ''),
+    ('azureBaseUrl', ''),
+    ('githubApi_key', ''),
+    ('githubBaseUrl', "https://models.inference.ai.azure.com"),
     ('chatGPTApiModel', 'gpt-4o'),
     ('chatGPTApiMaxTokens', 4000),
     ('chatGPTApiMinTokens', 256),
@@ -368,6 +371,7 @@ defaultSettings = (
     ("desktopAssistantWidth", 500),
     ("desktopAssistantHeight", 900),
     ("parserStandarisation", False),
+    ("autoRestoreConfigs", True),
     ("hotkey_exit", ["c-q"]),
     ("hotkey_cancel", ["c-z"]),
     ("hotkey_new", ["c-n"]),
@@ -517,4 +521,6 @@ def saveConfig():
                             fileObj.write("{0} = {1}\n".format(name, pprint.pformat(value)))
                     except:
                         pass
+    if os.path.isdir(config.localStorage):
+        shutil.copy(configFile, os.path.join(config.localStorage, "config_lite_backup.py" if config.isLite else "config_backup.py"))
 config.saveConfig = saveConfig

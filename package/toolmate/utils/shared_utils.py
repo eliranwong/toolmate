@@ -334,7 +334,9 @@ def getLlms() -> dict:
             "gemini-1.5-flash",
             "gemini-1.5-pro",
         ],
-        "chatgpt": list(chatgptTokenLimits.keys()),
+        "azure": list(chatgptTokenLimits.keys()),
+        "github": list(chatgptTokenLimits.keys()),
+        "openai": list(chatgptTokenLimits.keys()),
         "letmedoit": list(chatgptTokenLimits.keys()),
     }
     # check if llama-cpp-python is installed
@@ -364,12 +366,12 @@ def changeBackendAndModel(backend, model):
         config.googleaiApi_tool_model = model
     elif backend == "vertexai":
         config.vertexai_model = model
-    elif backend in ("chatgpt", "letmedoit"):
+    elif backend in ("openai", "letmedoit", "github", "azure"):
         config.chatGPTApiModel = model
     print3(f"Model configured: {model}")
 
 def changeModel(model):
-    for backend, models in llms.items():
+    for backend, models in getLlms().items():
         if model in models:
             changeBackendAndModel(backend, model)
             break
@@ -388,7 +390,7 @@ def getCurrentModel():
         return config.googleaiApi_tool_model
     elif config.llmInterface == "vertexai":
         return config.vertexai_model
-    elif config.llmInterface in ("chatgpt", "letmedoit"):
+    elif config.llmInterface in ("openai", "letmedoit", "github", "azure"):
         return config.chatGPTApiModel
     elif config.llmInterface == "llamacpppython":
         return config.llamacppToolModel_model_path if config.llamacppToolModel_model_path else config.llamacppToolModel_filename
@@ -473,6 +475,36 @@ def getXAIClient():
     return OpenAI(
         api_key=config.xaiApi_key,
         base_url="https://api.x.ai/v1",
+    )
+
+def getGithubApi_key():
+    '''
+    support multiple github api keys
+    User can manually edit config to change the value of config.githubApi_key to a list of multiple api keys instead of a string of a single api key
+    '''
+    if config.githubApi_key:
+        if isinstance(config.githubApi_key, str):
+            return config.githubApi_key
+        elif isinstance(config.githubApi_key, list):
+            if len(config.githubApi_key) > 1:
+                # rotate multiple api keys
+                config.githubApi_key = config.githubApi_key[1:] + [config.githubApi_key[0]]
+            return config.githubApi_key[0]
+        else:
+            return ""
+    else:
+        return ""
+
+def getGithubClient():
+    return OpenAI(
+        api_key=getGithubApi_key(),
+        base_url=config.githubBaseUrl,
+    )
+
+def getAzureClient():
+    return OpenAI(
+        api_key=config.azureApi_key,
+        base_url=config.azureBaseUrl,
     )
 
 def getGroqApi_key():
@@ -578,7 +610,35 @@ def getAutogenConfigList():
             "api_type": "open_ai",
             "model": config.chatGPTApiModel,
             "api_key": config.openaiApiKey,
-            "tags": ["chatgpt", "letmedoit"],
+            "tags": ["openai", "letmedoit"],
+        })
+    # github
+    if config.githubApi_key:
+        if isinstance(config.githubApi_key, str):
+            config_list.append({
+                "api_type": "open_ai",
+                "model": config.chatGPTApiModel,
+                "base_url": config.githubBaseUrl,
+                "api_key": config.githubApi_key,
+                "tags": ["github"],
+            })
+        elif isinstance(config.githubApi_key, list):
+            for key in config.groqApi_key:
+                config_list.append({
+                    "api_type": "open_ai",
+                    "model": config.chatGPTApiModel,
+                    "base_url": config.githubBaseUrl,
+                    "api_key": key,
+                    "tags": ["github"],
+                })
+    # azure
+    if config.azureApi_key:
+        config_list.append({
+            "api_type": "open_ai",
+            "model": config.chatGPTApiModel,
+            "base_url": config.azureBaseUrl,
+            "api_key": config.azureApi_key,
+            "tags": ["azure"],
         })
     # googleai
     if config.googleaiApi_key:
@@ -1432,7 +1492,7 @@ def useChatSystemMessage(messages: dict, mergeSystemIntoUserMessage=False, thisS
                 messages[originalIndex]["content"] = config.systemMessage_xai
             elif config.llmInterface == "vertexai":
                 messages[originalIndex]["content"] = config.systemMessage_vertexai
-            elif config.llmInterface in ("chatgpt", "letmedoit"):
+            elif config.llmInterface in ("openai", "letmedoit", "github", "azure"):
                 messages[originalIndex]["content"] = config.systemMessage_chatgpt
             # merge system message
             if mergeSystemIntoUserMessage and messages[-1].get("role", "") == "user":

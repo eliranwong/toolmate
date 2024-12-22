@@ -57,6 +57,9 @@ config.localStorage = getLocalStorage()
 from toolmate.utils.config_tools import *
 config.loadConfig = loadConfig
 config.setConfig = setConfig
+# old configs
+if config.llmInterface == "chatgpt":
+    config.llmInterface = "openai"
 
 from toolmate.utils.tool_plugins import Plugins
 config.addFunctionCall = Plugins.addFunctionCall

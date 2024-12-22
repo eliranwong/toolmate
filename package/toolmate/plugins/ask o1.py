@@ -12,11 +12,11 @@ from toolmate import config
 if config.online:
 
     from toolmate import print1, useChatSystemMessage
-    from toolmate.utils.call_chatgpt import CallChatGPT
+    from toolmate.utils.call_openai import CallOpenAI
     import copy
 
     try:
-        CallChatGPT.checkCompletion()
+        CallOpenAI.checkCompletion()
 
         def o1(function_args):
             config.stopSpinning()

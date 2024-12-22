@@ -53,7 +53,7 @@ if not config.isLite:
 config.inputSuggestions += [
     "!etextedit",
     "!chatgpt",
-    "chatgpt",
+    "openai",
 ]
 
 # Example to set an alias to open-interpreter

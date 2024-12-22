@@ -1,3 +1,9 @@
+# 0.6.0-0.6.4
+
+* added support of backend OpenAI models via Github API keys or Azure API keys
+
+* improved cli options
+
 # 0.5.91-0.5.99
 
 * added Desktop Assistant GUI in full version

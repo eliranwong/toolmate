@@ -7,6 +7,7 @@ add a calendar event on Android
 """
 
 from toolmate import config
+import subprocess
 
 if config.isTermux and config.online:
 

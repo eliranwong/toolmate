@@ -13,7 +13,7 @@ if config.online:
     from toolmate import is_valid_image_file, is_valid_image_url, print1, print3, print2, encode_image, getCliOutput
     import os, shutil, subprocess
     from openai import OpenAI
-    from toolmate.utils.call_chatgpt import check_openai_errors
+    from toolmate.utils.call_openai import check_openai_errors
     from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
     from base64 import b64decode
     from urllib.parse import quote

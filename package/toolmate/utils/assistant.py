@@ -1,5 +1,5 @@
 from toolmate import config, showErrors, getDayOfWeek, getFilenamesWithoutExtension, getStringWidth, stopSpinning, spinning_animation, getLocalStorage, getWebText, getWeather, getCliOutput, refinePath, displayLoadedMessages, removeDuplicatedListItems, getElevenlabsApi_key, getLlms, getFabricPatterns, getFabricPatternSystem
-from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, chatgptTokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getUserPreviousRequest, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText, refineToolTextOutput
+from toolmate import print1, print2, print3, isCommandInstalled, setChatGPTAPIkey, count_tokens_from_functions, chatgptTokenLimits, toggleinputaudio, toggleoutputaudio, downloadFile, getUserPreviousRequest, getAssistantPreviousResponse, readTextFile, writeTextFile, wrapText, refineToolTextOutput, getPromptExecutionMessage
 from toolmate import installPipPackage, exportOllamaModels, getDownloadedGgufModels, extractSystemCommand, extractPythonCode, is_valid_url, getCurrentDateTime, openURL, isExistingPath, is_CJK, exportOllamaModels, runToolMateCommand, displayPythonCode, selectTool, showRisk, confirmExecution, getPythonFunctionResponse
 from toolmate.utils.call_llm import CallLLM
 import threading, os, traceback, re, subprocess, json, pydoc, shutil, datetime, pprint, copy
@@ -154,6 +154,10 @@ class ToolMate:
         # check availability of api keys
         if not config.openaiApiKey:
             self.changeChatGPTAPIkey()
+        if not config.githubApi_key:
+            self.changeGithubAPIkey()
+        if not config.azureApi_key:
+            self.changeAzureAPIkey()
         if not config.googleaiApi_key:
             self.changeGoogleaiApikey()
         if not config.xaiApi_key:
@@ -200,7 +204,6 @@ class ToolMate:
             ".apikeys": ("change API keys", self.changeAPIkeys),
             ".model": ("change AI backends and models", self.setLlmModel),
             #".embedding": ("change embedding model", self.setEmbeddingModel), # joined ".model"
-            #".chatmodel": ("change chat-only model", self.setChatbot),
             # inference
             ".contextwindow": ("change context window size", self.setContextWindowSize),
             ".maxtokens": ("change maximum output tokens", self.setMaxTokens),
@@ -638,6 +641,8 @@ class ToolMate:
         self.changeGoogleaiApikey()
         self.changeXaiApikey()
         self.changeChatGPTAPIkey()
+        self.changeGithubAPIkey()
+        self.changeAzureAPIkey()
         if not config.isLite:
             self.setAutoGenConfig()
         self.changeBingApi()
@@ -675,18 +680,60 @@ class ToolMate:
         print2("Configurations updated!")
 
     def changeChatGPTAPIkey(self):
-        print3("# ChatGPT API Key: allows access to ChatGPT models")
+        print3("# ChatGPT API Key: allows access to OpenAI models")
         print1("To set up ChatGPT API Key, read:\nhttps://github.com/eliranwong/letmedoit/wiki/ChatGPT-API-Key#how-to-obtain\n")
         print1("Enter your OpenAI API Key [optional]:")
         apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.openaiApiKey, is_password=True)
         if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
             config.openaiApiKey = apikey
-            CallLLM.checkCompletion("chatgpt")
+            CallLLM.checkCompletion("openai")
         else:
             config.openaiApiKey = "toolmate"
         config.saveConfig()
         print2("Configurations updated!")
         setChatGPTAPIkey()
+
+    def changeGithubAPIkey(self):
+        print3("# Github API Key: allows access to OpenAI models via Github service")
+        print1("To set up Github API Key, read:\nhttps://github.com/marketplace/models\n")
+        print1("Enter a single or a list of multiple Github API Key(s) [optional]:")
+        print1("(To enter multiple keys, use the following format: ['api_key_1', 'api_key_2', 'api_key_3'])")
+        print()
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=str(config.githubApi_key), is_password=True)
+        if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+            try:
+                if isinstance(eval(apikey), list):
+                    config.githubApi_key = eval(apikey)
+            except:
+                config.githubApi_key = apikey
+            CallLLM.checkCompletion("github")
+        else:
+            config.githubApi_key = "toolmate"
+        config.saveConfig()
+        print2("Configurations updated!")
+
+    def changeAzureAPIkey(self):
+        print3("# Azure API Key: allows access to OpenAI models via Azure service")
+        print1("To set up Azure API Key, read:\nhttps://github.com/marketplace/models\n")
+        print1("Enter your Azure API Key [optional]:")
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.azureApi_key, is_password=True)
+        if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+            config.azureApi_key = apikey
+        else:
+            config.azureApi_key = "toolmate"
+        # endpoint
+        if config.azureApi_key and not config.azureApi_key == "toolmate":
+            print3("# Azure endpoint url [Optional]")
+            print1("Enter Azure endpoint url below:")
+            endpoint = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.azureBaseUrl)
+            if endpoint and not endpoint.strip().lower() in (config.cancel_entry, config.exit_entry):
+                config.azureBaseUrl = endpoint
+            try:
+                CallLLM.checkCompletion("azure")
+                config.saveConfig()
+                print2("Configurations updated!")
+            except:
+                print2("Failed to connect!")
 
     def changeTavilyApi(self):
         print3("# Tavily API Key: allows access to Tavily hosted LLMs")
@@ -949,7 +996,7 @@ class ToolMate:
             config.dynamicTokenCount = (option == "enable")
             config.saveConfig()
             print3(f"Dynamic token count: {option}d!")
-            print3("Note: Changes applicable to 'chatgpt' and 'letmedoit' interfaces only.")
+            print3("Note: Changes applicable to 'openai', 'github', 'azure' and 'letmedoit' interfaces only.")
 
     def setIncludeIpInSystemMessage(self):
         options = ("enable", "disable")
@@ -1370,16 +1417,18 @@ class ToolMate:
         instruction = "Select an AI platform:"
         print1(instruction)
         options = {
-            "llamacppserver": "Llama.cpp",
-            "llamacpppython": "Llama-cpp-python",
-            "ollama": "Ollama",
-            "groq": "Groq Cloud API",
-            "mistral": "Mistral AI API",
-            "xai": "X AI API [Paid online service]",
-            "googleai": "Google AI Studio API [Paid online service]",
-            "vertexai": "Google Vertex AI [Paid online service]",
-            "chatgpt": "OpenAI ChatGPT [Paid online service]",
-            "letmedoit": "LetMeDoIt Mode (powered by ChatGPT)",
+            "llamacppserver": "Llama.cpp [FREE]",
+            "llamacpppython": "Llama-cpp-python [FREE]",
+            "ollama": "Ollama [FREE]",
+            "groq": "Groq Cloud API [FREE/PAID]",
+            "mistral": "Mistral AI API [FREE/PAID]",
+            "xai": "X AI API [Paid]",
+            "googleai": "Google AI Studio API [Paid]",
+            "vertexai": "Google Vertex AI [Paid]",
+            "openai": "OpenAI ChatGPT [Paid]",
+            "github": "OpenAI ChatGPT - Github [FREE]",
+            "azure": "OpenAI ChatGPT - Azure [Paid]",
+            "letmedoit": "LetMeDoIt Mode [via PAID ChatGPT models]",
         }
         try:
             from llama_cpp import Llama
@@ -1497,7 +1546,12 @@ class ToolMate:
         else:
             # chatgpt / letmedoit
             #if not config.openaiApiKey or config.openaiApiKey == "toolmate":
-            self.changeChatGPTAPIkey()
+            if config.llmInterface == "github":
+                self.changeGithubAPIkey()
+            elif config.llmInterface == "azure":
+                self.changeAzureAPIkey()
+            else:
+                self.changeChatGPTAPIkey()
             self.setLlmModel_chatgpt()
             self.setMaxTokens(feature="default")
         config.saveConfig()
@@ -1856,7 +1910,7 @@ class ToolMate:
             print3(f"Maximum output tokens: {config.vertexai_max_output_tokens}")
 
     def setLlmModel_chatgpt(self):
-        models = list(chatgptTokenLimits.keys())
+        models = ["gpt-4o", "gpt-4o-mini"] if config.llmInterface == "github" else list(chatgptTokenLimits.keys())
         model = self.dialogs.getValidOptions(
             options=models,
             title="ChatGPT Model",
@@ -1869,17 +1923,6 @@ class ToolMate:
             # set max tokens
             config.chatGPTApiMaxTokens = self.getMaxTokens()[-1]
             print3(f"Maximum output tokens: {config.chatGPTApiMaxTokens}")
-
-    def setChatbot(self):
-        model = self.dialogs.getValidOptions(
-            options=("chatgpt", "geminipro", "palm2", "codey"),
-            title="Chat-only model",
-            default=config.chatbot,
-            text="Select default chat-only model:\n(Default model is loaded when you include '@chat' in your input)",
-        )
-        if model:
-            config.chatbot = model
-            print3(f"Chat-only model: {model}")
 
     def setEmbeddingModel(self):
         def askChangingEmbedding():
@@ -1994,7 +2037,7 @@ class ToolMate:
             systemMessage_chat = config.systemMessage_googleai
         elif config.llmInterface == "xai":
             systemMessage_chat = config.systemMessage_xai
-        elif config.llmInterface in ("chatgpt", "letmedoit"):
+        elif config.llmInterface in ("openai", "letmedoit", "github", "azure"):
             systemMessage_chat = config.systemMessage_chatgpt
         return systemMessage_chat
 
@@ -2112,7 +2155,7 @@ class ToolMate:
                 config.systemMessage_googleai = message
             elif config.llmInterface == "xai":
                 config.systemMessage_xai = message
-            elif config.llmInterface in ("chatgpt", "letmedoit"):
+            elif config.llmInterface in ("openai", "letmedoit", "github", "azure"):
                 config.systemMessage_chatgpt = message
             if customChatMessage is None:
                 config.saveConfig()
@@ -2182,7 +2225,7 @@ class ToolMate:
 
     def setMinTokens(self):
         print1("Please specify minimum output tokens below:")
-        print1("(applicable to 'chatgpt' and 'letmedoit' interfaces only)")
+        print1("(applicable to 'openai', 'github', 'azure' and 'letmedoit' interfaces only)")
         mintokens = self.prompts.simplePrompt(style=self.prompts.promptStyle2, numberOnly=True, default=str(config.chatGPTApiMinTokens))
         if mintokens and not mintokens.strip().lower() == config.exit_entry and int(mintokens) > 0:
             config.chatGPTApiMinTokens = int(mintokens)
@@ -2297,7 +2340,7 @@ class ToolMate:
             if showMessage:
                 print1("Visit https://console.mistral.ai/limits/ to read about tokens limits")
             currentMaxTokens = config.mistralApi_chat_model_max_tokens if feature == "chat" else config.mistralApi_tool_model_max_tokens
-        elif config.llmInterface in ("chatgpt", "letmedoit"):
+        elif config.llmInterface in ("openai", "letmedoit", "github", "azure"):
             if showMessage:
                 print1("Visit https://platform.openai.com/docs/models to read about tokens limits")
             currentMaxTokens = config.chatGPTApiMaxTokens
@@ -2344,7 +2387,7 @@ class ToolMate:
 
     def setMaxTokens(self, feature="default", customMaxtokens=None):
         # non-chatgpt settings
-        if not config.llmInterface in ("chatgpt", "letmedoit"):
+        if not config.llmInterface in ("openai", "letmedoit", "github", "azure"):
             self.setMaxTokens_non_chatgpt(feature=feature, customMaxtokens=customMaxtokens)
             return None
         # chatgpt settings
@@ -2779,11 +2822,9 @@ class ToolMate:
 
             if hasattr(config, "save_chat_record"):
                 # when plugin "save chat records" is enabled
-                messageLength = len(messagesCopy)
+                #messageLength = len(messagesCopy)
                 for order, i in enumerate(messagesCopy):
-                    isLastItem = (order == (messageLength - 1))
-                    #if config.llmInterface in ("chatgpt", "letmedoit", "groq", "llamacppserver") and not isLastItem and i.get("role", "") == "user" and "function_call" in messagesCopy[order+1]:
-                    #    i["tool"] = messagesCopy[order+1]["function_call"].get("name", "")
+                    #isLastItem = (order == (messageLength - 1))
                     config.save_chat_record(timestamp, order, i)
 
             try:
@@ -3485,7 +3526,7 @@ Acess the risk level of the following `{target.capitalize()}`:
         #if gui is None:
         #    gui = True if hasattr(config, "desktopAssistant") else False
         if openai is None:
-            openai = True if config.llmInterface in ("chatgpt", "letmedoit", "googleai", "xai", "groq", "mistral", "llamacppserver") else False
+            openai = True if config.llmInterface in ("openai", "letmedoit", "github", "azure", "googleai", "xai", "groq", "mistral", "llamacppserver") else False
         try:
             #if gui:
             #    QtResponseStreamer(config.desktopAssistant).workOnCompletion(completion, openai)
@@ -3811,25 +3852,6 @@ Acess the risk level of the following `{target.capitalize()}`:
                 complete = self.runMultipleActions(userInput)
                 if not complete:
                     _, config.currentMessages = startChat()
-
-    def launchChatbot(self, chatbot, userInput):
-        if not chatbot:
-            chatbot = config.llmInterface
-        chatbots = {
-            "llamacpppython": lambda: LlamacppChat(model=None if config.useAdditionalChatModel else config.llamacppToolModel).run(userInput),
-            "llamacppserver": lambda: LlamacppServerChat().run(userInput),
-            "ollama": lambda: OllamaChat().run(userInput, model=config.ollamaChatModel if config.useAdditionalChatModel else config.ollamaToolModel),
-            "groq": lambda: GroqChatbot().run(userInput),
-            "mistral": lambda: MistralChatbot().run(userInput),
-            "chatgpt": lambda: ChatGPT().run(userInput),
-            "letmedoit": lambda: ChatGPT().run(userInput),
-            "vertexai": lambda: GeminiPro(temperature=config.llmTemperature).run(userInput),
-            "geminipro": lambda: GeminiPro(temperature=config.llmTemperature).run(userInput),
-            "palm2": lambda: Palm2().run(userInput, temperature=config.llmTemperature),
-            "codey": lambda: Codey().run(userInput, temperature=config.llmTemperature),
-        }
-        if chatbot in chatbots:
-            chatbots[chatbot]()
 
     def launchPager(self, pagerContent=None):
         if pagerContent is None:

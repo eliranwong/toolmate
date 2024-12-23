@@ -1,3 +1,7 @@
+# 0.6.6
+
+* fixed API client error message
+
 # 0.6.5
 
 * fixed AutoGen tools using GitHub API Keys

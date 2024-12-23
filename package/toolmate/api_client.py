@@ -569,8 +569,9 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
                 outputContent = wrapText(output) if config.wrapWords else output
                 highlightMarkdownSyntax(outputContent) if config.toolmate_api_client_markdown else print(outputContent)
                 # restore configurations
-                if not args.backupsettings:
+                if args.wordwrap and not args.backupsettings:
                     config.wrapWords = current_wordwrap
+                if args.markdown and not args.backupsettings:
                     config.toolmate_api_client_markdown = current_toolmate_api_client_markdown
                 # copy response to clipboard
                 if args.copy:
@@ -580,7 +581,8 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
                 if args.read:
                     TTSUtil.play(output)
                 mainOutput = output
-            except:
+            except Exception as e:
+                showErrors(e=e)
                 print(response.text)
                 mainOutput = response.text
     if default:

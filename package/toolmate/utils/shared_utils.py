@@ -21,7 +21,7 @@ from ollama import Client
 from ollama import list as ollama_ls
 import speech_recognition as sr
 import zipfile
-from openai import OpenAI
+from openai import OpenAI, AzureOpenAI
 import tiktoken
 if not config.isLite:
     try:
@@ -47,6 +47,8 @@ if not config.isLite:
     import vosk
     import sounddevice, soundfile # it is important to import sounddevice on Linux, to resolve ALSA error display
 
+# check latest version at https://learn.microsoft.com/en-us/azure/ai-services/openai/reference
+azure_api_version = "2024-10-21"
 
 # voice typing
 
@@ -304,7 +306,6 @@ def getLlms() -> dict:
             "llama-3.2-11b-vision-preview",
             "llama-3.2-3b-preview",
             "llama-3.2-1b-preview",
-            "llama-3.1-70b-versatile",
             "llama-3.1-8b-instant",
             "llama3-70b-8192",
             "llama3-8b-8192",
@@ -336,9 +337,9 @@ def getLlms() -> dict:
             "gemini-1.5-pro",
         ],
         # The following order matters for changing models if user selects an OpenAI model but not specifying the backend
-        "github": list(chatgptTokenLimits.keys()),
+        "github": ["gpt-4o", "gpt-4o-mini"],
+        "azure": ["gpt-4o", "gpt-4o-mini"],
         "openai": list(chatgptTokenLimits.keys()),
-        "azure": list(chatgptTokenLimits.keys()),
         "letmedoit": list(chatgptTokenLimits.keys()),
     }
     # check if llama-cpp-python is installed
@@ -504,10 +505,9 @@ def getGithubClient():
     )
 
 def getAzureClient():
-    return OpenAI(
-        api_key=config.azureApi_key,
-        base_url=config.azureBaseUrl,
-    )
+    # azure_endpoint should be something like https://<your-resource-name>.openai.azure.com without "/models" at the end
+    endpoint = re.sub("/models[/]*$", "", config.azureBaseUrl)
+    return AzureOpenAI(azure_endpoint=endpoint,api_version=azure_api_version,api_key=config.azureApi_key)
 
 def getGroqApi_key():
     '''
@@ -636,10 +636,11 @@ def getAutogenConfigList():
     # azure
     if config.azureApi_key:
         config_list.append({
-            "api_type": "open_ai",
+            "api_type": "azure",
             "model": config.chatGPTApiModel,
-            "base_url": config.azureBaseUrl,
+            "base_url": re.sub("/models[/]*$", "", config.azureBaseUrl),
             "api_key": config.azureApi_key,
+            "api_version": azure_api_version,
             "tags": ["azure"],
         })
     # googleai

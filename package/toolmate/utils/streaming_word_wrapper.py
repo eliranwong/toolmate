@@ -120,6 +120,8 @@ class StreamingWordWrapper:
                         answer = event
                     elif hasattr(event, "data"): # mistralai
                         answer = event.data.choices[0].delta.content
+                    elif not event.choices: # in case of azure
+                        continue
                     else: # openai, groq
                         answer = event.choices[0].delta.content
                 elif hasattr(event, "message"): # newer ollama python package

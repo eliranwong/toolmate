@@ -81,6 +81,7 @@ class Plugins:
         for folder in pluginFolders:
             for plugin in getFilenamesWithoutExtension(folder, "py"):
                 if not plugin in config.pluginExcludeList:
+                    print3(f"Loading plugin: {plugin}")
                     script = os.path.join(folder, "{0}.py".format(plugin))
                     run = execPythonFile(script)
                     if not run:

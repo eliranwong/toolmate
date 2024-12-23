@@ -123,7 +123,7 @@ class CallOpenAIGithub:
     @check_openai_errors
     def checkCompletion():
         getGithubClient().chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=[{"role": "user", "content" : "hello"}],
             n=1,
             max_tokens=10,

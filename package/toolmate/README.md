@@ -40,7 +40,9 @@ Windows, macOS, Linux, ChromeOS, Android
 
 # AI Backends and Models
 
-ToolMate AI supports a wide range of AI backends and models, including [Ollama, Llama.cpp, Llama-cpp-python, Groq Cloud API, Mistral AI API, X AI API, OpenAI API, Google AI Studio API and Google Vertex AI](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Supported%20Backends%20and%20Models.md). Llama-cpp-python is selected as the default backend because it is completely free and requires no additional setup. However, users can switch backends at any time.
+![aibackends](https://github.com/user-attachments/assets/14edeb31-d3a4-4c41-8540-f6eb7381659b)
+
+ToolMate AI supports a wide range of AI backends and models, including [Ollama, Llama.cpp, Llama-cpp-python, Groq Cloud API, Mistral AI API, X AI API, OpenAI API, Github API, Azure API, Google AI Studio API and Google Vertex AI](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Supported%20Backends%20and%20Models.md). Llama-cpp-python is selected as the default backend because it is completely free and requires no additional setup. However, users can switch backends at any time.
 
 Our recommendations:
 * For backend selection, we consider [Ollama](https://ollama.com/) as the best friendly free `offline` option and [Groq Cloud API](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Groq%20API%20Setup.md) as the best freiendly and free `online` option.
@@ -51,7 +53,9 @@ Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/d
 
 # New Additions
 
-[NEW! Free Github and Paid Azure API Keys](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Github%20API%20Setup.md)
+[NEW! Support Paid Azure API Keys](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Azure%20API%20Setup.md)
+
+[NEW! Support Free Github API Keys](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Github%20API%20Setup.md)
 
 [NEW! Graphical User Interface](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/GUI.md)
 

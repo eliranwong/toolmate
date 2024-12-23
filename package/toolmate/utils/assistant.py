@@ -1414,7 +1414,7 @@ class ToolMate:
             Plugins.runPlugins()
 
     def selectLlmPlatform(self):
-        instruction = "Select an AI platform:"
+        instruction = "Select an AI Backend:"
         print1(instruction)
         options = {
             "llamacppserver": "Llama.cpp [FREE]",
@@ -1422,12 +1422,12 @@ class ToolMate:
             "ollama": "Ollama [FREE]",
             "groq": "Groq Cloud API [FREE/PAID]",
             "mistral": "Mistral AI API [FREE/PAID]",
-            "xai": "X AI API [Paid]",
-            "googleai": "Google AI Studio API [Paid]",
-            "vertexai": "Google Vertex AI [Paid]",
-            "openai": "OpenAI ChatGPT [Paid]",
+            "xai": "X AI API [PAID]",
+            "googleai": "Google AI Studio API [PAID]",
+            "vertexai": "Google Vertex AI [PAID]",
+            "openai": "OpenAI ChatGPT [PAID]",
             "github": "OpenAI ChatGPT - Github [FREE]",
-            "azure": "OpenAI ChatGPT - Azure [Paid]",
+            "azure": "OpenAI ChatGPT - Azure [PAID]",
             "letmedoit": "LetMeDoIt Mode [via PAID ChatGPT models]",
         }
         try:
@@ -1441,7 +1441,7 @@ class ToolMate:
         llmInterface = self.dialogs.getValidOptions(
             options=options.keys(),
             descriptions=list(options.values()),
-            title="LLM Interface",
+            title="AI Backends",
             default=config.llmInterface if config.llmInterface else "llamacpppython",
             text=instruction,
         )
@@ -1910,7 +1910,7 @@ class ToolMate:
             print3(f"Maximum output tokens: {config.vertexai_max_output_tokens}")
 
     def setLlmModel_chatgpt(self):
-        models = ["gpt-4o", "gpt-4o-mini"] if config.llmInterface == "github" else list(chatgptTokenLimits.keys())
+        models = list(chatgptTokenLimits.keys()) if config.llmInterface == "openai" else ["gpt-4o", "gpt-4o-mini"]
         model = self.dialogs.getValidOptions(
             options=models,
             title="ChatGPT Model",

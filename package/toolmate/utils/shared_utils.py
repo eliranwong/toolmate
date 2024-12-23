@@ -325,6 +325,7 @@ def getLlms() -> dict:
         "xai": [
             "grok-beta",
         ],
+        # The following order matters for changing models if user selects an Gemini model but not specifying the backend
         "googleai": [
             "gemini-1.5-flash",
             "gemini-1.5-flash-8b",
@@ -334,9 +335,10 @@ def getLlms() -> dict:
             "gemini-1.5-flash",
             "gemini-1.5-pro",
         ],
-        "azure": list(chatgptTokenLimits.keys()),
+        # The following order matters for changing models if user selects an OpenAI model but not specifying the backend
         "github": list(chatgptTokenLimits.keys()),
         "openai": list(chatgptTokenLimits.keys()),
+        "azure": list(chatgptTokenLimits.keys()),
         "letmedoit": list(chatgptTokenLimits.keys()),
     }
     # check if llama-cpp-python is installed
@@ -623,7 +625,7 @@ def getAutogenConfigList():
                 "tags": ["github"],
             })
         elif isinstance(config.githubApi_key, list):
-            for key in config.groqApi_key:
+            for key in config.githubApi_key:
                 config_list.append({
                     "api_type": "open_ai",
                     "model": config.chatGPTApiModel,

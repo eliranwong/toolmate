@@ -16,7 +16,7 @@ from toolmate import config
 
 if config.online:
 
-    from toolmate import isServerAlive, print1, print2, get_local_ip, getGithubApi_key
+    from toolmate import isServerAlive, print1, print2, get_local_ip
     import requests, json, re
 
     persistentConfigs = (

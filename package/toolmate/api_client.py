@@ -201,7 +201,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
     # Add arguments
     parser.add_argument("default", nargs="?", default=None, help="instruction sent to ToolMate API server; work on previous conversation if not given.")
     parser.add_argument('-ar', '--autoretrieve', action='store_true', dest='autoretrieve', help="use AutoGen retriever for RAG tools, such as 'examine_files' and 'examine_web_content'; this feature is available in full version only")
-    parser.add_argument('-b', '--backend', action='store', dest='backend', help="specify AI backend")
+    parser.add_argument('-b', '--backend', action='store', dest='backend', help="change AI backend if the model's backend is different")
     parser.add_argument('-bc', '--backupconversation', action='store_true', dest='backupconversation', help="back up the current conversation in ToolMate AI user directory")
     parser.add_argument('-bs', '--backupsettings', action='store_true', dest='backupsettings', help="back up the current settings in ToolMate AI user directory")
     parser.add_argument('-c', '--chat', action='store_true', dest='chat', help="enable to chat as an on-going conversation")
@@ -225,7 +225,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
     parser.add_argument('-info', '--information', action='store_true', dest='information', help="quick overview of server information")
     parser.add_argument('-ip', '--improveprompt', action='store_true', dest='improveprompt', help="toggle user prompt improvement for a single request")
     parser.add_argument('-k', '--key', action='store', dest='key', help="specify the API key for authenticating access to the ToolMate AI server")
-    parser.add_argument('-m', '--model', action='store', dest='model', help="AI model; override backend option if the model's backend is different")
+    parser.add_argument('-m', '--model', action='store', dest='model', help="change AI model if the model is different")
     parser.add_argument('-ms', '--models', action='store_true', dest='models', help="show available AI backends and models")
     parser.add_argument('-md', '--markdown', action='store_true', dest='markdown', help="toggle markdown highlights of assistant response a single request")
     parser.add_argument('-mo', '--maximumoutput', action='store', dest='maximumoutput', type=int, help="override maximum output tokens for a single request; accepts non-negative integers; unaccepted values will be ignored")

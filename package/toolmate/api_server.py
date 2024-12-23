@@ -7,7 +7,7 @@ from toolmate.utils.call_llm import CallLLM
 from toolmate.utils.config_essential import temporaryConfigs
 from importlib_metadata import version as lib_version
 from pydantic import BaseModel
-import argparse, json, uvicorn, re, os, signal, shutil, sys, pprint
+import argparse, json, uvicorn, re, os, signal, sys, pprint
 
 
 # Create the parser

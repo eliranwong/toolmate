@@ -1,3 +1,7 @@
+# 0.6.5
+
+* fixed AutoGen tools using GitHub API Keys
+
 # 0.6.0-0.6.4
 
 * added support of backend OpenAI models via Github API keys or Azure API keys

@@ -2342,7 +2342,8 @@ class ToolMate:
             currentMaxTokens = config.mistralApi_chat_model_max_tokens if feature == "chat" else config.mistralApi_tool_model_max_tokens
         elif config.llmInterface in ("openai", "letmedoit", "github", "azure"):
             if showMessage:
-                print1("Visit https://platform.openai.com/docs/models to read about tokens limits")
+                url = "https://docs.github.com/en/github-models/prototyping-with-ai-models#rate-limits" if config.llmInterface == "github" else "https://platform.openai.com/docs/models"
+                print1(f"Visit {url} to read about tokens limits")
             currentMaxTokens = config.chatGPTApiMaxTokens
         return currentMaxTokens
 

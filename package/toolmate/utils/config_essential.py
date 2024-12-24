@@ -207,10 +207,6 @@ defaultSettings = (
     ('llamacppChatModel_max_tokens', 2048), # llama.cpp chat model maximum tokens
     ('llamacppChatModel_n_gpu_layers', 0), # change to -1 to use GPU acceleration
     ('llamacppChatModel_n_batch', 512), # The batch size to use per eval
-    ('vertexai_project_id', ""),
-    ('vertexai_service_location', "us-central1"),
-    ('vertexai_model', "gemini-1.5-flash"), # "gemini-1.5-flash", "gemini-1.5-pro"; https://cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versions; read models that support function calling https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling
-    ('vertexai_max_output_tokens', 8192), # check supported value at https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
     ('whispercpp_main', ''), # whisper.cpp main command file path
     ('whispercpp_model', ''), # whisper.cpp model file path
     ('whispercpp_additional_options', ''), # whisper.cpp additional options. See https://github.com/ggerganov/whisper.cpp/tree/master/examples/main for all options.
@@ -236,6 +232,7 @@ defaultSettings = (
     ('systemMessage_llamacppserver', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone llamacppserver chatbot
     ('systemMessage_chatgpt', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone chatgpt chatbot
     ('systemMessage_vertexai', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone geminipro chatbot
+    ('systemMessage_genai', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone geminipro chatbot
     ('systemMessage_palm2', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone palm2 chatbot
     ('systemMessage_codey', 'You are an expert on coding.'), # system message for standalone codey chatbot
     ('embeddingModel', 'paraphrase-multilingual-mpnet-base-v2'), # reference: https://www.sbert.net/docs/pretrained_models.html
@@ -301,6 +298,15 @@ defaultSettings = (
     ('googleaiApi_chat_model_additional_chat_options', {}),
     ('googleaiApi_tool_model_max_tokens', 2048),
     ('googleaiApi_chat_model_max_tokens', 2048),
+    ('vertexai_project_id', ""),
+    ('vertexai_service_location', "us-central1"),
+    ('vertexai_model', "gemini-1.5-flash"), # "gemini-1.5-flash", "gemini-1.5-pro"; https://cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versions; read models that support function calling https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling
+    ('vertexai_max_output_tokens', 8192), # check supported value at https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
+    ('genaiApi_key', config.googleaiApi_key if hasattr(config, "googleaiApi_key") else ""),
+    ('genai_project_id', config.vertexai_project_id if hasattr(config, "vertexai_project_id") else ""),
+    ('genai_service_location', config.vertexai_service_location if hasattr(config, "vertexai_service_location") else "us-central1"),
+    ('genai_model', config.vertexai_model if hasattr(config, "vertexai_model") else "gemini-2.0-flash-exp"), # "gemini-2.0-flash-exp", "gemini-1.5-flash", "gemini-1.5-pro"; https://cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versions; read models that support function calling https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling
+    ('genai_max_output_tokens', config.vertexai_max_output_tokens if hasattr(config, "vertexai_max_output_tokens") else 8192), # check supported value at https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
     ('openaiApiKey', ''),
     ('openaiApiOrganization', ''),
     ('loadingInternetSearches', "auto"),

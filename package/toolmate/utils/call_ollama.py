@@ -322,13 +322,7 @@ Find required code below:
         properties = schemaCopy["properties"]
         template = {property: "" if properties[property]['type'] == "string" else [] for property in properties}
         
-        messages = ongoingMessages[:-2] + [
-            {
-                "role": "system",
-                "content": f"""You are a JSON builder expert. You response to my input according to the following schema:
-
-{properties}""",
-            },
+        messages = ongoingMessages[:-1] + [
             {
                 "role": "user",
                 "content": f"""Use the following template in your response:
@@ -346,6 +340,10 @@ Generate content to fill up the value of each required key in the JSON, if infor
 Remember, response in JSON with the filled template ONLY.""",
             },
         ]
+        thisSystemMessage = f"""You are a JSON builder expert. You response to my input according to the following schema:
+
+{properties}"""
+        messages = useChatSystemMessage(messages, thisSystemMessage=thisSystemMessage)
 
         parameters = CallOllama.getDictionaryOutput(messages, temperature=temperature, num_ctx=num_ctx, num_batch=num_batch, num_predict=num_predict, schema=schemaCopy)
         if code:

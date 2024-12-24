@@ -53,6 +53,8 @@ Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/d
 
 # New Additions
 
+[NEW! Support Gemini 2.0 Models](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Gemini.md)
+
 [NEW! Support Paid Azure API Keys](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Azure%20API%20Setup.md)
 
 [NEW! Support Free Github API Keys](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Github%20API%20Setup.md)

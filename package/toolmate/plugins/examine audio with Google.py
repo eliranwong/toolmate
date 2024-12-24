@@ -32,7 +32,7 @@ if not config.isLite and config.online:
         llmInterface = "vertexai"
 
         if audio_file and os.path.isfile(audio_file):
-            if llmInterface == "vertexai":
+            if llmInterface in ("vertexai", "genai"):
 
                 # create a speech recognition object
                 r = sr.Recognizer()

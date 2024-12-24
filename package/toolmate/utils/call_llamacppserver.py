@@ -367,11 +367,7 @@ Remember, response with the required python code ONLY, WITHOUT extra notes or ex
 Find required code below:
 {code}""" if code else ""
 
-        messages = ongoingMessages[:-2] + [
-            {
-                "role": "system",
-                "content": f"""You are a JSON builder expert that outputs in JSON.""",
-            },
+        messages = ongoingMessages[:-1] + [
             {
                 "role": "user",
                 "content": f"""Response in JSON based on the following content:
@@ -385,6 +381,7 @@ Generate content to fill up the value of each required key in the JSON, if infor
 Remember, output in JSON.""",
             },
         ]
+        messages = useChatSystemMessage(messages, thisSystemMessage="""You are a JSON builder expert that outputs in JSON.""")
 
         fullSchema = {
             "name": name,

@@ -549,6 +549,15 @@ class ToolMate:
             print3(f"Google Cloud Text-to-Speech playback speed: {gcttsSpeed}")
 
     def setGoogleCredentialsPath(self) -> bool:
+        print2("# Google Vertex AI configurations ...")
+        print1("Enter your project id below:")
+        project_id = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.vertexai_project_id)
+        if project_id and not project_id.strip().lower() == config.exit_entry:
+            config.genai_project_id = config.vertexai_project_id = project_id
+        print1("Enter your service location below:")
+        service_location = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.vertexai_service_location)
+        if service_location and not service_location.strip().lower() == config.exit_entry:
+            config.genai_service_location = config.vertexai_service_location = service_location
         filePath = self.getPath.getFilePath(
             empty_to_cancel=True,
             list_content_on_directory_change=True,
@@ -659,10 +668,10 @@ class ToolMate:
         print1("Enter your Google AI API Key [optional]:")
         apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.googleaiApi_key, is_password=True)
         if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
-            config.googleaiApi_key = apikey
+            config.googleaiApi_key = config.genaiApi_key = apikey
             CallLLM.checkCompletion("googleai")
         else:
-            config.googleaiApi_key = "toolmate"
+            config.googleaiApi_key = config.genaiApi_key = "toolmate"
         config.saveConfig()
         print2("Configurations updated!")
 
@@ -1425,6 +1434,7 @@ class ToolMate:
             "xai": "X AI API [PAID]",
             "googleai": "Google AI Studio API [PAID]",
             "vertexai": "Google Vertex AI [PAID]",
+            "genai": "Google GenAI API [PAID]",
             "openai": "OpenAI ChatGPT [PAID]",
             "github": "OpenAI ChatGPT - Github [FREE]",
             "azure": "OpenAI ChatGPT - Azure [PAID]",
@@ -1438,6 +1448,10 @@ class ToolMate:
             from vertexai.generative_models import GenerativeModel
         except:
             del options["vertexai"]
+        try:
+            from google import genai as googlegenai
+        except:
+            del options["genai"]
         llmInterface = self.dialogs.getValidOptions(
             options=options.keys(),
             descriptions=list(options.values()),
@@ -1531,6 +1545,15 @@ class ToolMate:
             self.changeXaiApikey()
             self.setLlmModel_xai()
             self.setMaxTokens(feature="default")
+        elif config.llmInterface == "genai":
+            print2("# GenAI Configurations ...")
+            print1("GenAI SDK supports running Gemini 2.0 models. Configure either Google Vertex AI credentials or Google AI API Key. You will be prompted to enter Google AI API key only if you do not provide vertex AI credentials.")
+            if not "Vertex AI" in config.enabledGoogleAPIs:
+                config.enabledGoogleAPIs.append("Vertex AI")
+            if not self.setGoogleCredentialsPath():
+                self.changeGoogleaiApikey()
+            self.setLlmModel_genai()
+            self.setMaxTokens(feature="default")
         elif config.llmInterface == "vertexai":
             if not "Vertex AI" in config.enabledGoogleAPIs:
                 config.enabledGoogleAPIs.append("Vertex AI")
@@ -1539,13 +1562,11 @@ class ToolMate:
             self.setLlmModel_vertexai()
             self.setMaxTokens(feature="default")
         elif config.llmInterface == "googleai":
-            #if not config.googleaiApi_key or config.googleaiApi_key == "toolmate":
             self.changeGoogleaiApikey()
             self.setLlmModel_googleai()
             self.setMaxTokens(feature="default")
         else:
             # chatgpt / letmedoit
-            #if not config.openaiApiKey or config.openaiApiKey == "toolmate":
             if config.llmInterface == "github":
                 self.changeGithubAPIkey()
             elif config.llmInterface == "azure":
@@ -1878,8 +1899,6 @@ class ToolMate:
         if model:
             config.googleaiApi_tool_model = model
             print3(f"Gemini model: {model}")
-            # set max tokens
-            print3(f"Maximum output tokens: {config.googleaiApi_tool_model_max_tokens}")
 
     def setLlmModel_xai(self):
         models = getLlms()["xai"]
@@ -1906,8 +1925,18 @@ class ToolMate:
         if model:
             config.vertexai_model = model
             print3(f"Gemini model: {model}")
-            # set max tokens
-            print3(f"Maximum output tokens: {config.vertexai_max_output_tokens}")
+
+    def setLlmModel_genai(self):
+        models = getLlms()["genai"]
+        model = self.dialogs.getValidOptions(
+            options=models,
+            title="Google GenAI Models",
+            default=config.genai_model if config.genai_model in models else models[0],
+            text="Select a tool call model:\n(for both chat and task execution)",
+        )
+        if model:
+            config.vertexai_model = model
+            print3(f"Gemini model: {model}")
 
     def setLlmModel_chatgpt(self):
         models = list(chatgptTokenLimits.keys()) if config.llmInterface == "openai" else ["gpt-4o", "gpt-4o-mini"]
@@ -2031,6 +2060,8 @@ class ToolMate:
             systemMessage_chat = config.systemMessage_llamacppserver
         elif config.llmInterface == "llamacpppython":
             systemMessage_chat = config.systemMessage_llamacpp
+        elif config.llmInterface == "genai":
+            systemMessage_chat = config.systemMessage_genai
         elif config.llmInterface == "vertexai":
             systemMessage_chat = config.systemMessage_vertexai
         elif config.llmInterface == "googleai":
@@ -2149,6 +2180,8 @@ class ToolMate:
                 config.systemMessage_llamacppserver = message
             elif config.llmInterface == "llamacpppython":
                 config.systemMessage_llamacpp = message
+            elif config.llmInterface == "genai":
+                config.systemMessage_genai = message
             elif config.llmInterface == "vertexai":
                 config.systemMessage_vertexai = message
             elif config.llmInterface == "googleai":
@@ -2316,7 +2349,11 @@ class ToolMate:
                 print3(f"Context Window Size: {contextWindowSize}")
 
     def getCurrentMaxTokens(self, feature="default", showMessage=True):
-        if config.llmInterface == "vertexai":
+        if config.llmInterface == "genai":
+            if showMessage:
+                print1("Visit https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models to read about tokens limits")
+            currentMaxTokens = config.genai_max_output_tokens
+        elif config.llmInterface == "vertexai":
             if showMessage:
                 print1("Visit https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models to read about tokens limits")
             currentMaxTokens = config.vertexai_max_output_tokens
@@ -2356,7 +2393,9 @@ class ToolMate:
             maxtokens = str(customMaxtokens)
         if maxtokens and not maxtokens.strip().lower() == config.exit_entry and int(maxtokens) >= -1:
             maxtokens = int(maxtokens)
-            if config.llmInterface == "vertexai":
+            if config.llmInterface == "genai":
+                config.genai_max_output_tokens = maxtokens
+            elif config.llmInterface == "vertexai":
                 config.vertexai_max_output_tokens = maxtokens
             elif config.llmInterface == "googleai":
                 config.googleaiApi_tool_model_max_tokens = maxtokens
@@ -3286,6 +3325,7 @@ Acess the risk level of the following `{target.capitalize()}`:
                     selectedTool = selectTool(recommended_tools)
                 if selectedTool:
                     action = selectedTool
+                    # remove the tool selection message
                     config.currentMessages = config.currentMessages[:-2]
                     self.runSingleAction(action, description, gui)
             return None

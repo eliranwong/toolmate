@@ -138,7 +138,7 @@ if config.online:
             )
             if not quality:
                 return "[INVALID]"
-            config.config.imagehd = True if quality == "hd" else False
+            config.imagehd = True if quality == "hd" else False
 
         # get responses
         #https://platform.openai.com/docs/guides/images/introduction

@@ -8,6 +8,7 @@ mistralai==1.2.5
 openai==1.57.2
 tiktoken==0.8.0
 anthropic==0.40.0
+google-genai==0.3.0
 # pyautogen,langchain,unstructured,litellm[proxy]
 autogen[gemini,mistral,groq,ollama,retrievechat,teachable,lmm,graph,long-context]==0.5.3
 autogenstudio==0.1.5
@@ -154,6 +155,7 @@ lightrag-hku
 fastapi
 uvicorn
 xonsh[full]
+markitdown
 # Captain Agent requirements
 # those are commented are duplicates
 #markdownify

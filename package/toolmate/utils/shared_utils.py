@@ -28,6 +28,8 @@ if not config.isLite:
         from llama_cpp import Llama
     except:
         pass
+    from google import genai as googlegenai
+    from google.genai import types
     from vertexai.generative_models import Content, Part
     from tavily import TavilyClient
     import chromadb, pendulum
@@ -327,6 +329,12 @@ def getLlms() -> dict:
             "grok-beta",
         ],
         # The following order matters for changing models if user selects an Gemini model but not specifying the backend
+        "genai": [
+            "gemini-2.0-flash-exp",
+            "gemini-1.5-flash",
+            "gemini-1.5-flash-8b",
+            "gemini-1.5-pro"
+        ],
         "googleai": [
             "gemini-1.5-flash",
             "gemini-1.5-flash-8b",
@@ -352,6 +360,10 @@ def getLlms() -> dict:
         from vertexai.generative_models import GenerativeModel
     except:
         del llms["vertexai"]
+    try:
+        from google import genai as googlegenai
+    except:
+        del llms["genai"]
     return llms
 
 def changeBackendAndModel(backend, model):
@@ -369,6 +381,8 @@ def changeBackendAndModel(backend, model):
         config.googleaiApi_tool_model = model
     elif backend == "vertexai":
         config.vertexai_model = model
+    elif backend == "genai":
+        config.genai_model = model
     elif backend in ("openai", "letmedoit", "github", "azure"):
         config.chatGPTApiModel = model
     print3(f"Model configured: {model}")
@@ -393,6 +407,8 @@ def getCurrentModel():
         return config.googleaiApi_tool_model
     elif config.llmInterface == "vertexai":
         return config.vertexai_model
+    elif config.llmInterface == "genai":
+        return config.genai_model
     elif config.llmInterface in ("openai", "letmedoit", "github", "azure"):
         return config.chatGPTApiModel
     elif config.llmInterface == "llamacpppython":
@@ -504,6 +520,81 @@ def getGithubClient():
         base_url=config.githubBaseUrl,
     )
 
+def toGenAIMessages(messages: dict=[]) -> Optional[list]:
+    systemMessage = ""
+    lastUserMessage = ""
+    if messages:
+        history = []
+        for i in messages:
+            role = i.get("role", "")
+            content = i.get("content", "")
+            if role in ("user", "assistant"):
+                history.append(Content(role="user" if role == "user" else "model", parts=[Part.from_text(content)]))
+                if role == "user":
+                    lastUserMessage = content
+            elif role == "system":
+                systemMessage = content
+        # remove the last user message
+        if history and history[-1].role == "user":
+            history = history[:-1]
+        else:
+            lastUserMessage = ""
+        if not history:
+            history = None
+    else:
+        history = None
+    return history, systemMessage, lastUserMessage
+
+def getGenAIConfig(system: Optional[str]=None, temperature: Optional[float]=None, max_output_tokens: Optional[int]=None, tools: Optional[list]=None):
+    return types.GenerateContentConfig(
+        system_instruction=config.systemMessage_genai if system is None else system,
+        temperature=config.llmTemperature if temperature is None else temperature,
+        #top_p=0.95,
+        #top_k=20,
+        candidate_count=1,
+        #seed=5,
+        max_output_tokens=config.genai_max_output_tokens if max_output_tokens is None else max_output_tokens,
+        stop_sequences=["STOP!"],
+        #presence_penalty=0.0,
+        #frequency_penalty=0.0,
+        safety_settings= [
+            types.SafetySetting(
+                category='HARM_CATEGORY_CIVIC_INTEGRITY',
+                threshold='BLOCK_ONLY_HIGH',
+            ),
+            types.SafetySetting(
+                category='HARM_CATEGORY_DANGEROUS_CONTENT',
+                threshold='BLOCK_ONLY_HIGH',
+            ),
+            types.SafetySetting(
+                category='HARM_CATEGORY_HATE_SPEECH',
+                threshold='BLOCK_ONLY_HIGH',
+            ),
+            types.SafetySetting(
+                category='HARM_CATEGORY_HARASSMENT',
+                threshold='BLOCK_ONLY_HIGH',
+            ),
+            types.SafetySetting(
+                category='HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                threshold='BLOCK_ONLY_HIGH',
+            ),
+        ],
+        tools=tools,
+    )
+
+def getGenAIClient():
+    if os.environ["GOOGLE_APPLICATION_CREDENTIALS"] and config.genai_project_id and config.genai_service_location:
+        # Only run this block for Vertex AI API
+        return googlegenai.Client(
+            vertexai=True,
+            project=config.genai_project_id,
+            location=config.genai_service_location,
+        )
+    elif config.genaiApi_key:
+        # Only run this block for Google AI API
+        return googlegenai.Client(api_key=config.genaiApi_key)
+    return None
+
 def getAzureClient():
     # azure_endpoint should be something like https://<your-resource-name>.openai.azure.com without "/models" at the end
     endpoint = re.sub("/models[/]*$", "", config.azureBaseUrl)
@@ -596,7 +687,7 @@ def getAutogenConfigList():
             "project_id": config.vertexai_project_id,
             "location": config.vertexai_service_location,
             "google_application_credentials": os.environ["GOOGLE_APPLICATION_CREDENTIALS"],
-            "tags": ["vertexai"],
+            "tags": ["vertexai", "genai"],
         })
     # ollama
     if config.ollamaToolModel in getLlms()["ollama"]:
@@ -1495,6 +1586,8 @@ def useChatSystemMessage(messages: dict, mergeSystemIntoUserMessage=False, thisS
                 messages[originalIndex]["content"] = config.systemMessage_xai
             elif config.llmInterface == "vertexai":
                 messages[originalIndex]["content"] = config.systemMessage_vertexai
+            elif config.llmInterface == "genai":
+                messages[originalIndex]["content"] = config.systemMessage_genai
             elif config.llmInterface in ("openai", "letmedoit", "github", "azure"):
                 messages[originalIndex]["content"] = config.systemMessage_chatgpt
             # merge system message

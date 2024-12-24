@@ -16,6 +16,7 @@ if not config.isLite:
     except:
         pass
     from toolmate.utils.call_vertexai import CallVertexAI
+    from toolmate.utils.call_genai import CallGenAI
 
 class CallLLM:
 
@@ -86,6 +87,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallVertexAI.checkCompletion()
         elif llmInterface == "googleai":
             return CallGoogleAI.checkCompletion()
+        elif llmInterface == "genai":
+            return CallGenAI.checkCompletion()
         elif llmInterface == "xai":
             return CallXAI.checkCompletion()
         elif llmInterface == "openai":
@@ -114,6 +117,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallVertexAI.autoCorrectPythonCode(code, trace)
         elif llmInterface == "googleai":
             return CallGoogleAI.autoCorrectPythonCode(code, trace)
+        elif llmInterface == "genai":
+            return CallGenAI.autoCorrectPythonCode(code, trace)
         elif llmInterface == "xai":
             return CallXAI.autoCorrectPythonCode(code, trace)
         elif llmInterface == "openai":
@@ -141,6 +146,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallVertexAI.runSingleFunctionCall(messages, function_name)
         elif config.llmInterface == "googleai":
             return CallGoogleAI.runSingleFunctionCall(messages, function_name)
+        elif config.llmInterface == "genai":
+            return CallGenAI.runSingleFunctionCall(messages, function_name)
         elif config.llmInterface == "xai":
             return CallXAI.runSingleFunctionCall(messages, function_name)
         elif config.llmInterface == "openai":
@@ -169,6 +176,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallVertexAI.regularCall(chatMessages)
         elif config.llmInterface == "googleai":
             return CallGoogleAI.regularCall(chatMessages)
+        elif config.llmInterface == "genai":
+            return CallGenAI.regularCall(chatMessages)
         elif config.llmInterface == "xai":
             return CallXAI.regularCall(chatMessages)
         return CallOpenAI.regularCall(chatMessages)
@@ -187,6 +196,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallMistral.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "googleai":
             return CallGoogleAI.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
+        elif config.llmInterface == "genai":
+            return CallGenAI.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "xai":
             return CallXAI.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "llamacppserver":
@@ -231,6 +242,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallVertexAI.getSingleFunctionCallResponse(messages, function_name)
         elif config.llmInterface == "googleai":
             return CallGoogleAI.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
+        elif config.llmInterface == "genai":
+            return CallGenAI.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmInterface == "xai":
             return CallXAI.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmInterface == "openai":
@@ -258,6 +271,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallVertexAI.runToolCall(messages)
         elif config.llmInterface == "googleai":
             return CallGoogleAI.runToolCall(messages)
+        elif config.llmInterface == "genai":
+            return CallGenAI.runToolCall(messages)
         elif config.llmInterface == "xai":
             return CallXAI.runToolCall(messages)
         elif config.llmInterface == "openai":

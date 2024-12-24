@@ -1,3 +1,13 @@
+# 0.6.9-0.6.10
+
+* support Gemini 2.0 models via GenAI SDK
+
+# 0.6.7-0.6.8
+
+* fixed using Azure AI as backends
+
+* fixed image creation tools
+
 # 0.6.6
 
 * fixed API client error message

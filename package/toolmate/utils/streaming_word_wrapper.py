@@ -120,7 +120,7 @@ class StreamingWordWrapper:
                         answer = event
                     elif hasattr(event, "data"): # mistralai
                         answer = event.data.choices[0].delta.content
-                    elif not event.choices: # in case of azure
+                    elif not event.choices: # in case of the 1st event of azure's completion
                         continue
                     else: # openai, groq
                         answer = event.choices[0].delta.content
@@ -134,7 +134,7 @@ class StreamingWordWrapper:
                         # llama.cpp chat
                         answer = event["choices"][0]["delta"].get("content", "")
                 else:
-                    # vertex ai
+                    # vertex ai, genai
                     answer = event.text
                 # transform
                 if hasattr(config, "outputTextConverters"):

@@ -38,9 +38,8 @@ config.aliases["!chatgpt"] = f"!{sys.executable} {os.path.join(config.toolMateAI
 if not config.isLite:
     config.inputSuggestions += [
         "!autoassist",
-        "!autobuilder",
-        "!automath",
-        "!autoretriever",
+        "!autobuild",
+        "!autoretrieve",
         "!geminipro",
         "geminipro",
         "!geminiprovision",
@@ -52,8 +51,6 @@ if not config.isLite:
     ]
 config.inputSuggestions += [
     "!etextedit",
-    "!chatgpt",
-    "openai",
 ]
 
 # Example to set an alias to open-interpreter

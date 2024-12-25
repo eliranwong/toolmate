@@ -598,7 +598,10 @@ def getGenAIClient():
 def getAzureClient():
     # azure_endpoint should be something like https://<your-resource-name>.openai.azure.com without "/models" at the end
     endpoint = re.sub("/models[/]*$", "", config.azureBaseUrl)
-    return AzureOpenAI(azure_endpoint=endpoint,api_version=azure_api_version,api_key=config.azureApi_key)
+    return AzureOpenAI(
+        azure_endpoint=endpoint,
+        api_version=azure_api_version,
+        api_key=config.azureApi_key)
 
 def getGroqApi_key():
     '''

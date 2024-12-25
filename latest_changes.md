@@ -1,3 +1,9 @@
+# 0.6.11
+
+* improved GUI functionalities
+
+* fixed setting max tokens of chatgpt models via api client
+
 # 0.6.9-0.6.10
 
 * support Gemini 2.0 models via GenAI SDK

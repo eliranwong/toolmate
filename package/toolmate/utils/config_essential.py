@@ -26,6 +26,7 @@ if config.isLite:
 
 defaultSettings = (
     # unique configs in ToolMate AI
+    ('pasteTextOnWindowActivation', True),
     ('toolmate_api_server_key', 'toolmateai'),
     ('toolmate_api_server_port', 5555),
     ('toolmate_api_server_host', "0.0.0.0"), # use ip address for this value

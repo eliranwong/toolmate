@@ -201,7 +201,7 @@ setup(
             f"tms19={package}.api_client:tms19",
             f"tms20={package}.api_client:tms20",
             f"tmconfigs={package}.api_client:configs",
-            f"{package}ai={package}.systemtray:main",
+            f"{package}ai={package}.ToolMateAI:main",
             f"toolserver={package}.servers:main",
             f"chatserver={package}.servers:chat",
             f"visionserver={package}.servers:vision",

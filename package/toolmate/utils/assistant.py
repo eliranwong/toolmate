@@ -2431,8 +2431,8 @@ class ToolMate:
             self.setMaxTokens_non_chatgpt(feature=feature, customMaxtokens=customMaxtokens)
             return None
         # chatgpt settings
+        contextWindowLimit, functionTokens, tokenLimit = self.getMaxTokens()
         if customMaxtokens is None:
-            contextWindowLimit, functionTokens, tokenLimit = self.getMaxTokens()
             if tokenLimit < config.chatGPTApiMinTokens:
                 print2(f"Function tokens [{functionTokens}] exceed {config.chatGPTApiModel} output token limit.")
                 print1("Either change to a model with higher token limit or disable unused function-call plguins.")

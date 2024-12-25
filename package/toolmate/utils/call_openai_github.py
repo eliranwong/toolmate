@@ -11,6 +11,7 @@ from typing import Optional
 def check_openai_errors(func):
     def wrapper(*args, **kwargs):
         def finishError():
+            print(f"Failed API Key: {config.githubApi_key[0] if isinstance(config.githubApi_key, list) else config.githubApi_key}")
             config.stopSpinning()
             return "[INVALID]"
         try:
@@ -294,8 +295,22 @@ class CallOpenAIGithub:
         return getSingleFunctionCallResponse(messages, function_name, temperature, **kwargs)
 
     @staticmethod
-    @check_openai_errors
+    #@check_openai_errors
     def regularCall(messages: dict, **kwargs):
+        if isinstance(config.githubApi_key, str):
+            return CallOpenAIGithub.regularCall_run(messages, **kwargs)
+        elif isinstance(config.githubApi_key, list):
+            for _ in range(len(config.githubApi_key)):
+                try:
+                    completion = CallOpenAIGithub.regularCall_run(messages, **kwargs)
+                    break
+                except:
+                    print(f"Failed API Key: {config.githubApi_key[0] if isinstance(config.githubApi_key, list) else config.githubApi_key}")
+            return completion
+
+    @staticmethod
+    @check_openai_errors
+    def regularCall_run(messages: dict, **kwargs):
         chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         return getGithubClient().chat.completions.create(
             model=config.chatGPTApiModel,

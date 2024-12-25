@@ -56,7 +56,7 @@ class Request(BaseModel):
     riskthreshold: int | None = None
     execute: bool | None = None
     improveprompt: bool | None = None
-    autoretrieve: bool | None = None
+    autorag: bool | None = None
     groupexecuteindocker: bool | None = None
     groupexecutiontimeout: int | None = None
     groupoaiassistant: bool | None = None
@@ -101,7 +101,7 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
     riskthreshold = request.riskthreshold
     improveprompt = request.improveprompt
     execute = request.execute
-    autoretrieve = request.autoretrieve
+    autorag = request.autorag
     groupexecuteindocker = request.groupexecuteindocker
     groupexecutiontimeout = request.groupexecutiontimeout
     groupoaiassistant = request.groupoaiassistant
@@ -212,9 +212,9 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
             print3(f"Temperature changed for this request: {temperature}")
 
     # override AutoGen utilities configurations
-    if autoretrieve:
-        current_autoretrieve = config.rag_useAutoRetriever
-        config.rag_useAutoRetriever = autoretrieve
+    if autorag:
+        current_autorag = config.rag_useAutoRetriever
+        config.rag_useAutoRetriever = autorag
     if groupexecuteindocker:
         current_groupexecuteindocker = config.code_execution_use_docker
         config.code_execution_use_docker = groupexecuteindocker
@@ -274,9 +274,9 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
             config.wrapWords = not config.wrapWords
         config.saveConfig()
     else:
-        if autoretrieve:
-            config.rag_useAutoRetriever = current_autoretrieve
-            print3(f"Auto-retriever option restored: {current_autoretrieve}")
+        if autorag:
+            config.rag_useAutoRetriever = current_autorag
+            print3(f"Auto-retriever option restored: {current_autorag}")
         if groupexecuteindocker:
             config.code_execution_use_docker = current_groupexecuteindocker
             print3(f"Group chat code execution in docker restored: {current_groupexecuteindocker}")

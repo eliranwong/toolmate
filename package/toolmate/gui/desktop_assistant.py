@@ -5,7 +5,7 @@ import getpass, requests, json
 
 from PySide6.QtCore import Qt, QThreadPool
 from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QCompleter, QMainWindow, QWidget, QMessageBox, QPlainTextEdit, QProgressBar, QHBoxLayout, QVBoxLayout, QLineEdit, QSplitter, QComboBox
+from PySide6.QtWidgets import QCompleter, QMainWindow, QWidget, QMessageBox, QPlainTextEdit, QProgressBar, QHBoxLayout, QVBoxLayout, QLineEdit, QSplitter, QComboBox, QPushButton
 
 class CentralWidget(QWidget):
 
@@ -39,8 +39,20 @@ class CentralWidget(QWidget):
         widgetLt = QWidget()
         layout000Lt = QVBoxLayout()
         widgetLt.setLayout(layout000Lt)
+
         widgetRt = QWidget()
         layout000Rt = QVBoxLayout()
+        rtTop = QWidget()
+        rtTopLayout = QVBoxLayout()
+        rtTop.setLayout(rtTopLayout)
+        rtBottom = QWidget()
+        rtBottomLayout = QVBoxLayout()
+        rtBottom.setLayout(rtBottomLayout)
+        rtSplitter = QSplitter(Qt.Vertical, self)
+        rtSplitter.addWidget(rtTop)
+        rtSplitter.addWidget(rtBottom)
+        layout000Rt.addWidget(rtSplitter)
+
         widgetRt.setLayout(layout000Rt)
         
         splitter = QSplitter(Qt.Horizontal, self)
@@ -54,14 +66,18 @@ class CentralWidget(QWidget):
         # widgets
         # user input
         self.userInput = QLineEdit()
-        completer = QCompleter([f"@{i}" for i in self.getAllTools()])
+        self.userInputMultiline = QPlainTextEdit()
+        self.userInputMultiline.setPlaceholderText("Enter your request here ...")
+        completer = QCompleter([f"@{i}" for i in self.getAllTools()]+["tm -exec", "tmc -exec"])
         completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
         completer.setCompletionMode(QCompleter.PopupCompletion)
         completer.setFilterMode(Qt.MatchContains)
         self.userInput.setCompleter(completer)
-        self.userInput.setPlaceholderText("Enter your request here ...")
+        self.userInput.setPlaceholderText("Find a tool here ...")
         self.userInput.mousePressEvent = lambda _ : self.userInput.selectAll()
         self.userInput.setClearButtonEnabled(True)
+        self.sendButton = QPushButton("Send")
+        self.sendButton.clicked.connect(self.submit)
         # content view
         self.contentView = QPlainTextEdit()
         self.contentView.setReadOnly(True)
@@ -71,13 +87,15 @@ class CentralWidget(QWidget):
         self.progressBar.setRange(0, 0) # Set the progress bar to use an indeterminate progress indicator
         
         # update layout
-        layout000Rt.addWidget(self.contentView)
-        layout000Rt.addWidget(self.userInput)
-        layout000Rt.addWidget(self.progressBar)
+        rtTopLayout.addWidget(self.contentView)
+        rtBottomLayout.addWidget(self.userInput)
+        rtBottomLayout.addWidget(self.userInputMultiline)
+        rtBottomLayout.addWidget(self.sendButton)
+        rtBottomLayout.addWidget(self.progressBar)
         self.progressBar.hide()
 
         # Connections
-        self.userInput.returnPressed.connect(self.submit)
+        self.userInput.returnPressed.connect(self.addTool)
 
     def getAllTools(self):
         query = "@"
@@ -106,23 +124,41 @@ class CentralWidget(QWidget):
         self.contentView.setFont(font)
         config.saveConfig()
 
+    def addTool(self):
+        toolText = self.userInput.text().strip()
+        if toolText:
+            self.userInputMultiline.insertPlainText(f" {toolText} ")
+            self.userInput.setText("")
+
     def submit(self):
-        if request := self.userInput.text().strip():
+        toolText = self.userInput.text().strip()
+        execute = (toolText in ("tm -exec", "tmc -exec"))
+        if execute:
+            request = toolText
+        else:
+            requestText = self.userInputMultiline.toPlainText().strip()
+            request = f"{toolText} {requestText}".strip()
+        if request:
             self.userInput.setDisabled(True)
             self.addContent(request)
 
             if request in ("tm -exec", "tmc -exec"):
                 request = "@command" if "```command" in self.lastResponse else "@execute_python_code"
 
+            self.sendButton.hide()
             self.progressBar.show()
             QtApiResponseStreamer(self).workOnRequest(request, chat=False if self.newSession else True)
             self.newSession = False
+
+            if not execute:
+                self.userInputMultiline.setPlainText("")
 
     def processResponse(self):
         self.userInput.setText("")
         self.userInput.setEnabled(True)
         self.progressBar.hide()
-        self.userInput.setFocus()
+        self.sendButton.show()
+        self.userInputMultiline.setFocus()
         # handle user confirmation
         if "Run `tm -exec` or `tmc -exec` to confirm!" in self.lastResponse and self.confirmCodeExecution():
             self.userInput.setText("tm -exec")
@@ -204,6 +240,9 @@ class DesktopAssistant(QMainWindow):
         self.fontSizeComboBox.currentIndexChanged.connect(self.setFontSize)
         self.fontSizeComboBox.show()
 
+    def toggleAutoPaste(self):
+        config.pasteTextOnWindowActivation = not config.pasteTextOnWindowActivation
+
     def createMenubar(self):
         # Create a menu bar
         menubar = self.menuBar()
@@ -218,8 +257,21 @@ class DesktopAssistant(QMainWindow):
 
         file_menu.addSeparator()
 
+        new_action = QAction("Send", self)
+        new_action.setShortcut("Ctrl+S")
+        new_action.triggered.connect(self.centralWidget.submit)
+        file_menu.addAction(new_action)
+
+        file_menu.addSeparator()
+
         new_action = QAction("Change Font Size", self)
         new_action.triggered.connect(self.showFontSizeComboBox)
+        file_menu.addAction(new_action)
+
+        file_menu.addSeparator()
+
+        new_action = QAction("Toggle Auto Paste", self)
+        new_action.triggered.connect(self.toggleAutoPaste)
         file_menu.addAction(new_action)
 
         file_menu.addSeparator()

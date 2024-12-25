@@ -8,6 +8,9 @@ from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit import prompt
 from typing import Optional
 
+# OpenAI Azure API
+# reference: https://learn.microsoft.com/en-us/azure/ai-services/openai/supported-languages?tabs=dotnet-secure%2Csecure%2Cpython-key%2Ccommand&pivots=programming-language-python
+
 def check_openai_errors(func):
     def wrapper(*args, **kwargs):
         def finishError():

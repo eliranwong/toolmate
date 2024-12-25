@@ -7,18 +7,18 @@ if os.getcwd() != localStorage:
 try:
     from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication, QMessageBox
     from PySide6.QtGui import QIcon, QAction, QGuiApplication
+    from PySide6.QtCore import QEvent
 except:
     print("Module 'gui' not found! Run 'pip install toolmate[gui]' first!")
     exit()
 
-import sys, platform, webbrowser, shutil
+import sys, platform, webbrowser, shutil, pyperclip
 from toolmate import startAutogenstudioServer, runToolMateCommand, isServerAlive, print2, getCliOutput
 from toolmate.gui.desktop_assistant import DesktopAssistant
 from pathlib import Path
 from functools import partial
 from prompt_toolkit.clipboard.pyperclip import PyperclipClipboard
 from toolmate.utils.tts_utils import TTSUtil
-from toolmate.utils.assistant import ToolMate
 
 toolMateAIFile = os.path.realpath(__file__)
 toolMateAIFolder = os.path.dirname(toolMateAIFile)
@@ -34,7 +34,7 @@ class ToolMateHub(QSystemTrayIcon):
         # to work with mutliple virtual desktops
         config.desktopAssistant.hide()
         config.desktopAssistant.show()
-        config.desktopAssistant.centralWidget.userInput.setFocus()
+        config.desktopAssistant.centralWidget.userInputMultiline.setFocus()
 
     def startApiServer(self):
         host = config.toolmate_api_client_host
@@ -251,7 +251,7 @@ class ToolMateHub(QSystemTrayIcon):
 
         # show desktop assistant on startup
         config.desktopAssistant.show()
-        config.desktopAssistant.centralWidget.userInput.setFocus()
+        config.desktopAssistant.centralWidget.userInputMultiline.setFocus()
 
     def exit(self):
         self.setVisible(False)
@@ -297,8 +297,49 @@ class ToolMateHub(QSystemTrayIcon):
             QMessageBox.information(self.menu, "ToolMate AI", "Perplexica not found!")
         os.chdir(current_dir)
 
+
+class TM(QApplication):
+    
+    def __init__(self, argv):
+        super().__init__(argv)
+        config.mainWindowHidden = False
+
+    # Open Desktop Assistant on application activate
+    def event(self, event):
+        if event.type() == QEvent.ApplicationActivate and hasattr(config, "desktopAssistant") and (not config.desktopAssistant.isVisible() or not config.desktopAssistant.isActiveWindow()):
+            config.desktopAssistant.show()
+            clipboardText = pyperclip.paste()
+            insertedText = f"# Context\n\n{clipboardText}" if clipboardText else ""
+            if insertedText and not config.desktopAssistant.centralWidget.userInputMultiline.toPlainText().endswith(insertedText) and config.pasteTextOnWindowActivation:
+                config.desktopAssistant.centralWidget.userInputMultiline.insertPlainText(insertedText)
+        """
+#!/usr/bin/env bash
+
+# work with text selection
+# Install `xsel` and `xdotool`
+# > apt install xsel xdotool
+# To use this script, users need to:
+# 1. Launch "Settings"
+# 2. Go to "Keyboard" > "Keyboard Shortcuts" > "View and Customise Shortcuts" > "Custom Shortcuts"
+# 3. Select "+" to add a custom shortcut and enter the following information, e.g.:
+
+# Name: ToolMate AI
+# Command: /home/username/toolmate/ToolMate
+# Shortcut: Ctrl + Alt + L
+
+selected_text=$(echo "$(xsel -o)" | sed 's/"/\"/g')
+echo $selected_text | xsel --clipboard
+toolmate=$(xdotool search --name "ToolMate AI")
+xdotool windowmap $toolmate
+xdotool windowactivate $toolmate
+#xdotool type --window $toolmate $selected_text
+        """
+        return super().event(event)
+
+
 def main():
-    app = QApplication(sys.argv)
+    #app = QApplication(sys.argv)
+    app = TM(sys.argv)
     app.setQuitOnLastWindowClosed(False)
 
     icon = QIcon(iconFile)

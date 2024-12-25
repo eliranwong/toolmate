@@ -199,8 +199,8 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
                                     `tms1` ... `tms20` -> `tm -cs <custom_chat_system_message>` (determined by `config.tms1` ... `config.tms20`, support pre-defined system messages or fabric patterns or custom entry);
                                     You may create your own aliases to make the shortcuts more memorable.""")
     # Add arguments
-    parser.add_argument("default", nargs="?", default=None, help="instruction sent to ToolMate API server; work on previous conversation if not given.")
-    parser.add_argument('-ar', '--autoretrieve', action='store_true', dest='autoretrieve', help="use AutoGen retriever for RAG tools, such as 'examine_files' and 'examine_web_content'; this feature is available in full version only")
+    parser.add_argument("default", nargs="*", default=None, help="instruction sent to ToolMate API server; work on previous conversation if not given.")
+    parser.add_argument('-ar', '--autorag', action='store_true', dest='autorag', help="use AutoGen retriever for RAG tools, such as 'examine_files' and 'examine_web_content'; this feature is available in full version only")
     parser.add_argument('-b', '--backend', action='store', dest='backend', help="change AI backend if the model's backend is different")
     parser.add_argument('-bc', '--backupconversation', action='store_true', dest='backupconversation', help="back up the current conversation in ToolMate AI user directory")
     parser.add_argument('-bs', '--backupsettings', action='store_true', dest='backupsettings', help="back up the current settings in ToolMate AI user directory")
@@ -211,7 +211,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
     parser.add_argument('-dt', '--defaulttool', action='store', dest='defaulttool', help="override default tool for a single request; applied when 'Tool Selection Agent' is disabled and no tool is specified in the request")
     parser.add_argument('-e', '--export', action='store', dest='export', help="export conversation; optionally used with -f option to specify a format for the export")
     parser.add_argument('-exec', '--execute', action='store_true', dest='execute', help="execute python code or system command; format a block of python code starting with '```python' or a block of system command starting with '```command'; ends the block with '```'")
-    parser.add_argument('-f', '--format', action='store', dest='format', help="conversation output format; plain or list; useful for sharing or backup; only output the last assistant response if this option is not used")
+    parser.add_argument('-f', '--format', action='store', dest='format', help="conversation output format; plain or chat; plain - readable format designed for sharing; chat - format for saving a conversation when used together with -e option; a saved chat file can be opened with -cf option; when this option is omitted, only the last assistant response is displayed by default")
     parser.add_argument('-ga', '--groupagents', action='store', dest='groupagents', type=int, help="group chat feature; maximum number of agents")
     parser.add_argument('-ged', '--groupexecuteindocker', action='store_true', dest='groupexecuteindocker', help="group chat feature; execute code in docker")
     parser.add_argument('-get', '--groupexecutiontimeout', action='store', dest='groupexecutiontimeout', type=int, help="group chat feature; timeout for each code execution in seconds")
@@ -444,7 +444,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
 
         # formulate an instruction
         prefix = getPrefix(host, port) if args.interactive else ""
-        cliDefault = args.default.strip() if args.default is not None and args.default.strip() else ""
+        cliDefault = " ".join(args.default) if args.default is not None else ""
         stdin_text = sys.stdin.read() if not sys.stdin.isatty() else ""
         if args.paste:
             clipboardText = getCliOutput("termux-clipboard-get") if config.terminalEnableTermuxAPI else pyperclip.paste()
@@ -493,7 +493,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
             "riskthreshold": args.riskthreshold,
             "execute": args.execute,
             "improveprompt": args.improveprompt,
-            "autoretrieve": args.autoretrieve,
+            "autorag": args.autorag,
             "groupexecuteindocker": args.groupexecuteindocker,
             "groupexecutiontimeout": args.groupexecutiontimeout,
             "groupoaiassistant": args.groupoaiassistant,
@@ -519,7 +519,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
 
         stopSpinning()
 
-        if args.format and args.format.lower() in ("plain", "list"):
+        if args.format and args.format.lower() in ("plain", "chat"):
             outputText = []
             if args.format.lower() == "plain":
                 for i in json.loads(response.json()):
@@ -533,7 +533,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
                             outputText.append(content)
                         else:
                             print(content)
-            elif args.format.lower() == "list":
+            elif args.format.lower() == "chat":
                 try:
                     output = json.loads(response.json())
                     if args.export:

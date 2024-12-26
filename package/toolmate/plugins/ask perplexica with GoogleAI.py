@@ -3,7 +3,7 @@ ToolMate AI Plugin - Ask Perplexica
 
 Default Configurations
 (assuming Perplexica is installed locally)
-perplexica_server = "localhost"
+perplexica_server = "127.0.0.1"
 perplexica_frontend_port = 3000
 perplexica_backend_port = 3001
 
@@ -20,14 +20,14 @@ if config.online:
     import requests, json, re
 
     persistentConfigs = (
-        ("perplexica_server", "http://localhost"),
+        ("perplexica_server", "http://127.0.0.1"),
         ("perplexica_frontend_port", 3000),
         ("perplexica_backend_port", 3001),
         ("perplexica_local_embedding_model", "xenova-bge-small-en-v1.5"), # local options "xenova-bge-small-en-v1.5", "xenova-gte-small", "xenova-bert-base-multilingual-uncased"
     )
     config.setConfig(persistentConfigs)
-    if config.perplexica_server == "localhost":
-        config.perplexica_server = "http://localhost"
+    if config.perplexica_server in ("localhost", "127.0.0.1"):
+        config.perplexica_server = "http://127.0.0.1"
 
     if not isServerAlive(re.sub("http://|https://", "", config.perplexica_server), config.perplexica_backend_port):
         config.perplexica_server = f"http://{get_local_ip()}" # access to the server running outside a container

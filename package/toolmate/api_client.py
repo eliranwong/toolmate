@@ -458,6 +458,8 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
         chatfile = args.chatfile if args.chatfile is not None and os.path.isfile(args.chatfile) else ""
         if chatfile or args.chat:
             chat = True
+        if chatSystem is None and args.chatsystem:
+            chatSystem = args.chatsystem
         
         # backend and model
         if args.backend and args.backend.lower() in getLlms().keys():
@@ -484,7 +486,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
             "chat": chat,
             "chatfile": chatfile,
             "chatpattern": args.chatpattern,
-            "chatsystem": chatSystem if chatSystem is not None else args.chatsystem,
+            "chatsystem": chatSystem,
             "windowsize": args.windowsize,
             "maximumoutput": args.maximumoutput,
             "temperature": args.temperature,

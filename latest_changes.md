@@ -1,6 +1,12 @@
-# 0.6.11
+# 0.6.11-0.6.13
+
+* added "Researches" submenu to system tray
+
+* improved CLI options
 
 * improved GUI functionalities
+
+* improved handling of multiple keys in the same backend
 
 * fixed setting max tokens of chatgpt models via api client
 

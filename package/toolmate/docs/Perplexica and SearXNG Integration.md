@@ -52,7 +52,7 @@ For example, you may ask something like:
 
 The plugins assumes SearXNG is installed with Perplexica locally, with the following configurations:
 
-searx_server = "localhost"
+searx_server = "127.0.0.1"
 searx_port = 4000
 
 You may customise these two values by manually editing the file `config.py`.

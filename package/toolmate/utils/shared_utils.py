@@ -43,7 +43,7 @@ if not config.isLite:
     from langchain_unstructured import UnstructuredLoader
     from huggingface_hub import hf_hub_download
     from autogen.retrieve_utils import TEXT_FORMATS
-    from autogen.coding import LocalCommandLineCodeExecutor
+    #from autogen.coding import LocalCommandLineCodeExecutor
     from autogen.coding import DockerCommandLineCodeExecutor
     import tempfile
     import vosk

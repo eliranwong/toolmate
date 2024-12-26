@@ -26,7 +26,7 @@ if config.isLite:
 
 defaultSettings = (
     # unique configs in ToolMate AI
-    ('pasteTextOnWindowActivation', True),
+    ('pasteTextOnWindowActivation', False),
     ('toolmate_api_server_key', 'toolmateai'),
     ('toolmate_api_server_port', 5555),
     ('toolmate_api_server_host', "0.0.0.0"), # use ip address for this value
@@ -118,9 +118,10 @@ defaultSettings = (
     ('imagesteps', None),
     ('imagehd', False),
     ('autogenstudio_server_port', 8081),
-    ('perplexica_directory', ""),
-    ('perplexica_ip', "127.0.0.1"),
-    ('perplexica_port', 3000),
+    #('perplexica_directory', ""),
+    #('perplexica_ip', "127.0.0.1"),
+    #('perplexica_port', 3000),
+    ('customUrls', {"Perplexica":"http://localhost:3000", "SearXNG":"http://localhost:4000",}),
     #('ollamaToolServer', "http://127.0.0.1"),
     #('ollamaChatServer', "http://127.0.0.1"),
     ('ollamaToolServer_protocol', "http://"),

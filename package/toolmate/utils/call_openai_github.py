@@ -8,6 +8,20 @@ from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit import prompt
 from typing import Optional
 
+def check_api_keys(func):
+    def wrapper(*args, **kwargs):
+        if isinstance(config.githubApi_key, str):
+            return func(*args, **kwargs)
+        elif isinstance(config.githubApi_key, list):
+            for _ in range(len(config.githubApi_key)):
+                try:
+                    output = func(*args, **kwargs)
+                    break
+                except:
+                    print(f"Failed API Key: {config.githubApi_key[0]}")
+            return output
+    return wrapper
+
 def check_openai_errors(func):
     def wrapper(*args, **kwargs):
         def finishError():
@@ -89,6 +103,7 @@ Acess the risk level of this Python code:
 def convertFunctionSignaturesIntoTools(functionSignatures):
     return [{"type": "function", "function": functionSignature} for functionSignature in functionSignatures]
 
+@check_api_keys
 @check_openai_errors
 def getSingleFunctionCallResponse(messages: list[dict], function_name: str, temperature=None, **kwargs):
     functionSignatures = [config.toolFunctionSchemas[function_name]]
@@ -121,6 +136,7 @@ def getSingleFunctionCallResponse(messages: list[dict], function_name: str, temp
 class CallOpenAIGithub:
 
     @staticmethod
+    @check_api_keys
     @check_openai_errors
     def checkCompletion():
         getGithubClient().chat.completions.create(
@@ -172,6 +188,7 @@ class CallOpenAIGithub:
             return "[INVALID]"
 
     @staticmethod
+    @check_api_keys
     @check_openai_errors
     def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
         """
@@ -295,22 +312,9 @@ class CallOpenAIGithub:
         return getSingleFunctionCallResponse(messages, function_name, temperature, **kwargs)
 
     @staticmethod
-    #@check_openai_errors
-    def regularCall(messages: dict, **kwargs):
-        if isinstance(config.githubApi_key, str):
-            return CallOpenAIGithub.regularCall_run(messages, **kwargs)
-        elif isinstance(config.githubApi_key, list):
-            for _ in range(len(config.githubApi_key)):
-                try:
-                    completion = CallOpenAIGithub.regularCall_run(messages, **kwargs)
-                    break
-                except:
-                    print(f"Failed API Key: {config.githubApi_key[0] if isinstance(config.githubApi_key, list) else config.githubApi_key}")
-            return completion
-
-    @staticmethod
+    @check_api_keys
     @check_openai_errors
-    def regularCall_run(messages: dict, **kwargs):
+    def regularCall(messages: dict, **kwargs):
         chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         return getGithubClient().chat.completions.create(
             model=config.chatGPTApiModel,
@@ -323,6 +327,7 @@ class CallOpenAIGithub:
         )
 
     @staticmethod
+    @check_api_keys
     @check_openai_errors
     def getDictionaryOutput(messages: list, schema: dict, **kwargs) -> dict:
         completion = getGithubClient().chat.completions.create(

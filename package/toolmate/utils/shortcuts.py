@@ -4,7 +4,7 @@ import platform, os, sys, ctypes, subprocess, re
 import shutil
 
 def createShortcuts():
-    systemtrayFile = os.path.join(config.toolMateAIFolder, "systemtray.py")
+    systemtrayFile = os.path.join(config.toolMateAIFolder, "ToolMateAI.py")
 
     thisOS = platform.system()
     #appName = config.toolMateAIName.split()[0]
@@ -27,7 +27,7 @@ def createShortcuts():
         sendToShortcut1 = os.path.join(os.path.expanduser('~'), os.environ["APPDATA"], 'Microsoft\Windows\SendTo', f"{appName}.bat")
         shortcutCommand1 = f'''powershell.exe -NoExit -Command "{sys.executable} '{config.toolMateAIFile}' \\"%1\\""'''
         # Create .bat for application shortcuts
-        if not os.path.exists(shortcutBat1):
+        if not os.path.isfile(shortcutBat1):
             for i in (shortcutBat1, desktopShortcut1a, desktopShortcut1b, sendToShortcut1):
                 try:
                     print("creating shortcuts ...")
@@ -42,7 +42,7 @@ def createShortcuts():
         desktopShortcut1b = os.path.join(os.path.expanduser('~'), 'OneDrive', 'Desktop', f"{appName}AI.bat")
         shortcutCommand1 = f'''powershell.exe -NoExit -Command "{sys.executable} '{systemtrayFile}'"'''
         # Create .bat for application shortcuts
-        if not os.path.exists(shortcutBat1):
+        if not os.path.isfile(shortcutBat1):
             for i in (shortcutBat1, desktopShortcut1a, desktopShortcut1b):
                 try:
                     print("creating system tray shortcuts ...")
@@ -102,7 +102,7 @@ Icon={iconPath}
 Name={config.toolMateAIName}
 """
         linuxDesktopFile = os.path.join(config.toolMateAIFolder, f"{appName}.desktop")
-        if not os.path.exists(linuxDesktopFile):
+        if not os.path.isfile(linuxDesktopFile):
             print("creating shortcut ...")
             # Create .desktop shortcut
             with open(linuxDesktopFile, "w") as fileObj:
@@ -139,7 +139,7 @@ Icon={iconPath}
 Name={config.toolMateAIName}
 """
         linuxDesktopFile = os.path.join(config.toolMateAIFolder, f"{appName}AI.desktop")
-        if not os.path.exists(linuxDesktopFile):
+        if not os.path.isfile(linuxDesktopFile):
             print("creating system tray shortcut ...")
             # Create .desktop shortcut
             with open(linuxDesktopFile, "w") as fileObj:

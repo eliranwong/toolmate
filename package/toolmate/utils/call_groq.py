@@ -9,6 +9,20 @@ from prompt_toolkit import prompt
 from typing import Optional
 from pydantic import BaseModel
 
+def check_api_keys(func):
+    def wrapper(*args, **kwargs):
+        if isinstance(config.groqApi_key, str):
+            return func(*args, **kwargs)
+        elif isinstance(config.groqApi_key, list):
+            for _ in range(len(config.groqApi_key)):
+                try:
+                    output = func(*args, **kwargs)
+                    break
+                except:
+                    print(f"Failed API Key: {config.groqApi_key[0]}")
+            return output
+    return wrapper
+
 class Screening(BaseModel):
     answer: str
 
@@ -40,6 +54,7 @@ Acess the risk level of this Python code:
         return [{"type": "function", "function": functionSignature} for functionSignature in functionSignatures]
 
     @staticmethod
+    @check_api_keys
     @check_llm_errors
     def checkCompletion():
         getGroqClient().chat.completions.create(
@@ -90,6 +105,7 @@ Acess the risk level of this Python code:
             return "[INVALID]"
 
     @staticmethod
+    @check_api_keys
     @check_llm_errors
     def getSingleChatResponse(userInput, messages=[], temperature: Optional[float]=None, max_tokens: Optional[int]=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
         """
@@ -209,6 +225,7 @@ Acess the risk level of this Python code:
         return messages
 
     @staticmethod
+    @check_api_keys
     @check_llm_errors
     def getSingleFunctionCallResponse(messages: list[dict], function_name: str, temperature: Optional[float]=None, max_tokens: Optional[int]=None):
         functionSignatures = [config.toolFunctionSchemas[function_name]]
@@ -238,6 +255,7 @@ Acess the risk level of this Python code:
         return function_call_message_mini, function_call_response
 
     @staticmethod
+    @check_api_keys
     @check_llm_errors
     def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None, chat_model: Optional[str]=None):
         chatMessages = useChatSystemMessage(copy.deepcopy(messages))
@@ -252,6 +270,7 @@ Acess the risk level of this Python code:
         )
 
     @staticmethod
+    @check_api_keys
     @check_llm_errors
     def getDictionaryOutput(messages: list, schema: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None) -> dict:
         completion = getGroqClient().chat.completions.create(

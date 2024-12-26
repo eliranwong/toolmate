@@ -76,7 +76,7 @@ class ToolMateHub(QSystemTrayIcon):
         self.menu.addAction(chatgui)
         self.menu.addSeparator()
 
-        action = QAction("Terminal Mode", self)
+        action = QAction("ToolMate Terminal", self)
         action.triggered.connect(partial(runToolMateCommand, "toolmate"))
         self.menu.addAction(action)
         self.menu.addSeparator()
@@ -130,6 +130,22 @@ class ToolMateHub(QSystemTrayIcon):
         menuAction.setMenu(submenu)
         self.menu.addAction(menuAction)"""
 
+        # submenu - researches
+        submenu = QMenu()
+
+        action = QAction("NotebookLM", self)
+        action.triggered.connect(lambda: webbrowser.open("https://notebooklm.google.com/"))
+        submenu.addAction(action)
+
+        for key, value in config.customUrls.items():
+            action = QAction(key, self)
+            action.triggered.connect(partial(webbrowser.open, value))
+            submenu.addAction(action)
+
+        menuAction = QAction("Researches", self)
+        menuAction.setMenu(submenu)
+        self.menu.addAction(menuAction)
+
         # submenu - autogen agents
         submenu = QMenu()
         for i in ("autoassist", "autoretrieve", "autobuild", "autocaptain"):
@@ -145,19 +161,6 @@ class ToolMateHub(QSystemTrayIcon):
         menuAction = QAction("AutoGen Agents", self)
         menuAction.setMenu(submenu)
         self.menu.addAction(menuAction)
-
-        # submenu - researches
-        '''
-        submenu = QMenu()
-
-        action = QAction("perplexica", self)
-        action.triggered.connect(self.launchPerplexica)
-        submenu.addAction(action)
-
-        menuAction = QAction("Researches", self)
-        menuAction.setMenu(submenu)
-        self.menu.addAction(menuAction)
-        '''
 
         # submenu - clipboard
         """submenu = QMenu()
@@ -303,6 +306,7 @@ class TM(QApplication):
     def __init__(self, argv):
         super().__init__(argv)
         config.mainWindowHidden = False
+        self.lastInsertedText = ""
 
     # Open Desktop Assistant on application activate
     def event(self, event):
@@ -310,8 +314,9 @@ class TM(QApplication):
             config.desktopAssistant.show()
             clipboardText = pyperclip.paste()
             insertedText = f"# Context\n\n{clipboardText}" if clipboardText else ""
-            if insertedText and not config.desktopAssistant.centralWidget.userInputMultiline.toPlainText().endswith(insertedText) and config.pasteTextOnWindowActivation:
+            if config.pasteTextOnWindowActivation and insertedText and not (insertedText == self.lastInsertedText) and not config.desktopAssistant.centralWidget.userInputMultiline.toPlainText().endswith(insertedText):
                 config.desktopAssistant.centralWidget.userInputMultiline.insertPlainText(insertedText)
+                self.lastInsertedText = insertedText
         """
 #!/usr/bin/env bash
 

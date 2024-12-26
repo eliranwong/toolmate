@@ -1,8 +1,8 @@
-import sys, traceback, openai, os, json, traceback, re, textwrap
+import sys, traceback, os, traceback, re
 from PySide6.QtCore import QRunnable, Slot, Signal, QObject, QThreadPool
 from toolmate import config
 from toolmate.utils.tts_utils import TTSUtil
-from toolmate.api_client import main as getApiResponse
+from toolmate.api_client import getToolmate
 
 class WorkerSignals(QObject):
     '''
@@ -189,11 +189,15 @@ class QtApiResponseStreamer:
         self.threadpool = QThreadPool()
 
     def processRequest(self, request, chat, progress_callback):
-        apiResponse = getApiResponse(chat=chat, default=request)
-        progress_callback.emit(apiResponse)
-        
-        if config.ttsOutput:
-            TTSUtil.play(apiResponse)
+        try:
+            apiResponse = getToolmate({
+                "instruction": request,
+                "chat": chat,
+            })
+            conversation = apiResponse.json()
+        except Exception as e:
+            conversation = f"Error: {str(e)}"
+        progress_callback.emit(conversation) # stream a text response in json format
 
     def workOnRequest(self, request, chat=True):
         # Pass the function to execute

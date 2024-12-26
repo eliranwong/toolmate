@@ -1,6 +1,7 @@
-from toolmate import config
+from toolmate import config, convertOutputText
 from toolmate.utils.call_llm import CallLLM
 from toolmate.gui.worker import QtApiResponseStreamer
+from toolmate.utils.tts_utils import TTSUtil
 import getpass, requests, json
 
 from PySide6.QtCore import Qt, QThreadPool
@@ -178,10 +179,25 @@ class CentralWidget(QWidget):
             # Continue
             return False
 
-    def streamResponse(self, content):
-        self.contentView.insertPlainText(content)
+    def streamResponse(self, apiResponse):
+        # in case of group discussion; getting the last message only is not enough
+        conversation = json.loads(apiResponse)
+        messages = []
+        for i in conversation:
+            role = i.get("role", "")
+            content = i.get("content", "")
+            if role in ("user", "assistant"):
+                if role == "assistant":
+                    content = convertOutputText(content.rstrip())
+                    messages.append(f"[{self.assistant}] {content}")
+                    self.lastResponse = content
+                else:
+                    messages.append(f"[{self.user}] {content}")
+        self.contentView.setPlainText("\n\n".join(messages))
         self.contentScrollBar.setValue(self.contentScrollBar.maximum())
-        self.lastResponse = content
+
+        #if config.ttsOutput:
+        #    TTSUtil.play("")
 
     def addContent(self, newContent, user=True) -> None:
         content = self.contentView.toPlainText()
@@ -242,6 +258,7 @@ class DesktopAssistant(QMainWindow):
 
     def toggleAutoPaste(self):
         config.pasteTextOnWindowActivation = not config.pasteTextOnWindowActivation
+        config.saveConfig()
 
     def createMenubar(self):
         # Create a menu bar

@@ -15,9 +15,9 @@ except:
 import sys, platform, webbrowser, shutil, pyperclip
 from toolmate import startAutogenstudioServer, runToolMateCommand, isServerAlive, print2, getCliOutput
 from toolmate.gui.desktop_assistant import DesktopAssistant
-from pathlib import Path
+#from pathlib import Path
 from functools import partial
-from prompt_toolkit.clipboard.pyperclip import PyperclipClipboard
+#from prompt_toolkit.clipboard.pyperclip import PyperclipClipboard
 from toolmate.utils.tts_utils import TTSUtil
 
 toolMateAIFile = os.path.realpath(__file__)
@@ -38,7 +38,7 @@ class ToolMateHub(QSystemTrayIcon):
 
     def startApiServer(self):
         host = config.toolmate_api_client_host
-        port = config.toolmate_api_client_port
+        port = config.toolmate_api_client_port_desktop
         if not isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
             configFile = os.path.join(config.toolMateAIFolder, "config.py")
             if (os.path.getsize(configFile) == 0 or not hasattr(config, "llmInterface") or not config.llmInterface) and shutil.which("tmsetup"):
@@ -46,10 +46,10 @@ class ToolMateHub(QSystemTrayIcon):
             if shutil.which("toolmateserver"):
                 print("Loading ToolMate AI ...")
                 if shutil.which("nohup"):
-                    cli = f'''{shutil.which("nohup")} "{shutil.which("toolmateserver")}" > ~/toolmate/nohup-api-server.out 2>&1 &'''
+                    cli = f'''{shutil.which("nohup")} "{shutil.which("toolmateserver")}" -p {port} > ~/toolmate/nohup-api-server.out 2>&1 &'''
                     os.system(cli)
                 else:
-                    subprocess.Popen(shutil.which("toolmateserver"), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    subprocess.Popen(shutil.which(f"toolmateserver -p {port}"), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 # wait until the server is up
                 while not isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
                     pass
@@ -67,7 +67,7 @@ class ToolMateHub(QSystemTrayIcon):
         # pre-load desktop assistant gui
         config.desktopAssistant = DesktopAssistant()
 
-        self.clipboard = PyperclipClipboard()
+        #self.clipboard = PyperclipClipboard()
         self.menu = QMenu(parent)
 
         #if config.developer:

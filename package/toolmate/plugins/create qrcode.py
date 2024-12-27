@@ -54,4 +54,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=create_qrcode)
+config.addToolCall(signature=functionSignature, method=create_qrcode)

@@ -42,4 +42,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=datetimes, deviceInfo=True)
+config.addToolCall(signature=functionSignature, method=datetimes, deviceInfo=True)

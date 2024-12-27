@@ -61,7 +61,7 @@ try:
             "required": [],
         },
     }
-    config.addFunctionCall(signature=functionSignature, method=uniquebible_api)
+    config.addToolCall(signature=functionSignature, method=uniquebible_api)
     config.aliases["@bapi "] = "@uniquebible_api "
     config.builtinTools["bapi"] = "Retrieve bible data with UniqueBible API"
     config.inputSuggestions.append({"@uniquebible_api": apiCommandSuggestions})
@@ -87,7 +87,7 @@ try:
             "required": [],
         },
     }
-    config.addFunctionCall(signature=functionSignature, method=uniquebible_web)
+    config.addToolCall(signature=functionSignature, method=uniquebible_web)
     config.inputSuggestions.append({"@uniquebible_web": apiCommandSuggestions})
 
 except:
@@ -160,7 +160,7 @@ try:
             "required": [],
         },
     }
-    config.addFunctionCall(signature=functionSignature, method=extract_bible_references)
+    config.addToolCall(signature=functionSignature, method=extract_bible_references)
     config.inputSuggestions.append("Extract Bible references: ")
 
     # Tool: @bible
@@ -242,7 +242,7 @@ try:
             "required": [],
         },
     }
-    config.addFunctionCall(signature=functionSignature, method=bible)
+    config.addToolCall(signature=functionSignature, method=bible)
     config.inputSuggestions.append("Show bible verses: ")
 
     # input suggestions
@@ -301,7 +301,7 @@ try:
             "required": [],
         },
     }
-    config.addFunctionCall(signature=functionSignature, method=uniquebible)
+    config.addToolCall(signature=functionSignature, method=uniquebible)
     config.aliases["@b "] = "@uniquebible "
     config.builtinTools["b"] = "Retrieve bible data with UniqueBible App commands"
 
@@ -389,7 +389,7 @@ try:
                 "required": [],
             },
         }
-        config.addFunctionCall(signature=functionSignature, method=bible_commentary)
+        config.addToolCall(signature=functionSignature, method=bible_commentary)
         config.inputSuggestions.append("Read bible commentary: ")
 
         commentarySuggestions = {}
@@ -431,7 +431,7 @@ try:
                 "required": [],
             },
         }
-        config.addFunctionCall(signature=functionSignature, method=search_bible)
+        config.addToolCall(signature=functionSignature, method=search_bible)
 
         # Tool: @search_bible_paragraphs
         def search_bible_paragraphs(_):
@@ -454,7 +454,7 @@ try:
                 "required": [],
             },
         }
-        config.addFunctionCall(signature=functionSignature, method=search_bible_paragraphs)
+        config.addToolCall(signature=functionSignature, method=search_bible_paragraphs)
     config.uniquebible = True
 except:
     #print(traceback.format_exc())

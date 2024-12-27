@@ -29,4 +29,4 @@ if config.isTermux:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=share)
+    config.addToolCall(signature=functionSignature, method=share)

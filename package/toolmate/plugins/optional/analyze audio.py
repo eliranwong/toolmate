@@ -217,4 +217,4 @@ if not config.isTermux:
     }
 
     # Integrate the signature and method into LetMeDoIt AI
-    config.addFunctionCall(signature=functionSignature, method=examine_audio)
+    config.addToolCall(signature=functionSignature, method=examine_audio)

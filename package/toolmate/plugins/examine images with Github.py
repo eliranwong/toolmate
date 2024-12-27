@@ -96,4 +96,4 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=examine_images_github)
+    config.addToolCall(signature=functionSignature, method=examine_images_github)

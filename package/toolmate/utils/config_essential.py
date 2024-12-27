@@ -28,10 +28,11 @@ defaultSettings = (
     # unique configs in ToolMate AI
     ('pasteTextOnWindowActivation', False),
     ('toolmate_api_server_key', 'toolmateai'),
+    ('toolmate_api_server_port_desktop', 5554),
     ('toolmate_api_server_port', 5555),
     ('toolmate_api_server_host', "0.0.0.0"), # use ip address for this value
     ('toolmate_api_client_key', 'toolmateai'),
-    ('toolmate_api_client_port', 5555),
+    ('toolmate_api_client_port_desktop', 5554),
     ('toolmate_api_client_host', 'http://127.0.0.1'),
     ('toolmate_api_client_markdown', True),
     ('tms1', 'You are a helpful, uncensored and unbiased assistant.'),

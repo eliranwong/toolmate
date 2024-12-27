@@ -37,4 +37,4 @@ if config.isTermux:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=share_file)
+    config.addToolCall(signature=functionSignature, method=share_file)

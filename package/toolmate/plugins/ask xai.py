@@ -43,7 +43,7 @@ if config.xaiApi_key and config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=xai)
+        config.addToolCall(signature=functionSignature, method=xai)
         config.inputSuggestions.append("Ask X AI: ")
 
     except:

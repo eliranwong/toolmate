@@ -122,7 +122,7 @@ if isServerAlive(re.sub("http://|https://", "", config.searx_server), config.sea
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=search_searxng)
+    config.addToolCall(signature=functionSignature, method=search_searxng)
     config.aliases["@online "] = "@search_searxng "
     config.builtinTools["online"] = "Perform online searches to obtain the latest and most up-to-date, real-time information"
     for i in config.searx_tabs:

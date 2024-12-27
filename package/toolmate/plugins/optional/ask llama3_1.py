@@ -44,5 +44,5 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=ask_llama3_1)
+config.addToolCall(signature=functionSignature, method=ask_llama3_1)
 config.inputSuggestions.append("Ask Llama3.1: ")

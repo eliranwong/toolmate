@@ -56,4 +56,4 @@ if config.isTermux and config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=send_email)
+    config.addToolCall(signature=functionSignature, method=send_email)

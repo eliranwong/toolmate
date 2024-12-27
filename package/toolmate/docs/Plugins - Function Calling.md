@@ -33,7 +33,7 @@ Each function call plugin has four essential elements:
 
 4. Integration of the function method and the function signature into LetMeDoIt AI:
 
-* use shared method "config.addFunctionCall" for the integration
+* use shared method "config.addToolCall" for the integration
 
 # Example 1 - install python package
 
@@ -76,7 +76,7 @@ functionSignature = {
 }
 
 # Integrate the signature and method into LetMeDoIt AI
-config.addFunctionCall(name="install_python_package", signature=functionSignature, method=install_python_package)
+config.addToolCall(name="install_python_package", signature=functionSignature, method=install_python_package)
 ```
 
 # Example 2 - edit text
@@ -129,7 +129,7 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(name="edit_text", signature=functionSignature, method=edit_text)
+config.addToolCall(name="edit_text", signature=functionSignature, method=edit_text)
 ```
 
 # Example 3 - Working with Both Required and Optional Arguments
@@ -239,7 +239,7 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(name="add_calendar_event", signature=functionSignature, method=add_calendar_event)
+config.addToolCall(name="add_calendar_event", signature=functionSignature, method=add_calendar_event)
 ```
 
 # A Step-by-step Guide

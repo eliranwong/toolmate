@@ -49,4 +49,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=create_map)
+config.addToolCall(signature=functionSignature, method=create_map)

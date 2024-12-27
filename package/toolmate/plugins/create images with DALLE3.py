@@ -123,4 +123,4 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=create_image_dalle3)
+    config.addToolCall(signature=functionSignature, method=create_image_dalle3)

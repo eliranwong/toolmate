@@ -44,4 +44,4 @@ if config.isTermux:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=search_contacts)
+    config.addToolCall(signature=functionSignature, method=search_contacts)

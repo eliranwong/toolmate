@@ -129,7 +129,7 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=perplexica_github)
+        config.addToolCall(signature=functionSignature, method=perplexica_github)
         config.inputSuggestions.append("Ask Perplexica: ")
 
     else:

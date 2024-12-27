@@ -43,7 +43,7 @@ if config.googleaiApi_key and config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=googleai)
+        config.addToolCall(signature=functionSignature, method=googleai)
         config.inputSuggestions.append("Ask GoogleAI: ")
 
     except:

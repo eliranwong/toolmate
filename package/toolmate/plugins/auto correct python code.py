@@ -97,4 +97,4 @@ persistentConfigs = (
 )
 config.setConfig(persistentConfigs)
 
-config.addFunctionCall(signature=functionSignature, method=correct_python_code)
+config.addToolCall(signature=functionSignature, method=correct_python_code)

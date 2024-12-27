@@ -69,7 +69,7 @@ def runPlugins():
         print(traceback.format_exc())
 
     # The following config values can be modified with plugins, to extend functionalities
-    config.addFunctionCall = addFunctionCall
+    config.addToolCall = addFunctionCall
     config.aliases = {}
     config.predefinedContexts = {
         "[none]": "",

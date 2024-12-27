@@ -45,7 +45,7 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=github)
+        config.addToolCall(signature=functionSignature, method=github)
         config.inputSuggestions.append("Ask ChatGPT: ")
 
     except:

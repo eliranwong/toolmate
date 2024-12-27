@@ -38,5 +38,5 @@ functionSignature = {
 }
 
 # Integrate the signature and method into LetMeDoIt AI
-config.addFunctionCall(signature=functionSignature, method=open_browser)
+config.addToolCall(signature=functionSignature, method=open_browser)
 config.inputSuggestions.append("Open url: ")

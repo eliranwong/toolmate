@@ -72,4 +72,4 @@ if config.online:
     }
 
     # Integrate the signature and method into LetMeDoIt AI
-    config.addFunctionCall(signature=functionSignature, method=transcribe_audio_openai)
+    config.addToolCall(signature=functionSignature, method=transcribe_audio_openai)

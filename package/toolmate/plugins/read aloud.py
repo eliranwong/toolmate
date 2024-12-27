@@ -43,5 +43,5 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=read_aloud)
+config.addToolCall(signature=functionSignature, method=read_aloud)
 config.inputSuggestions.append("Read aloud: ")

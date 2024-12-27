@@ -1,5 +1,5 @@
 import requests, argparse, json, sys, os, pprint, re, shutil, pydoc, pyperclip
-from toolmate import config, convertOutputText, wrapText, startSpinning, stopSpinning, readTextFile, writeTextFile, print2, print3, getPygmentsStyle, showErrors, isServerAlive, getLlms, searchFolder, getCliOutput
+from toolmate import config, packageFolder, convertOutputText, wrapText, startSpinning, stopSpinning, readTextFile, writeTextFile, print2, print3, getPygmentsStyle, showErrors, isServerAlive, getLlms, searchFolder, getCliOutput
 from toolmate.utils.tts_utils import TTSUtil
 from toolmate.utils.single_prompt import SinglePrompt
 
@@ -13,6 +13,7 @@ from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.completion import WordCompleter, FuzzyCompleter
 from pathlib import Path
+from typing import Optional
 
 
 def highlightMarkdownSyntax(content):
@@ -200,6 +201,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
                                     You may create your own aliases to make the shortcuts more memorable.""")
     # Add arguments
     parser.add_argument("default", nargs="*", default=None, help="instruction sent to ToolMate API server; work on previous conversation if not given.")
+    parser.add_argument('-ab', '--abort', action='store_true', dest='abort', help="abort the currently running inference")
     parser.add_argument('-ar', '--autorag', action='store_true', dest='autorag', help="use AutoGen retriever for RAG tools, such as 'examine_files' and 'examine_web_content'; this feature is available in full version only")
     parser.add_argument('-b', '--backend', action='store', dest='backend', help="change AI backend if the model's backend is different")
     parser.add_argument('-bc', '--backupconversation', action='store_true', dest='backupconversation', help="back up the current conversation in ToolMate AI user directory")
@@ -283,6 +285,10 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
         if instruction and not instruction.lower() == config.exit_entry:
             return instruction
         return ""
+
+    if args.abort:
+        stopFile = os.path.join(packageFolder, "temp", "stop_running")
+        Path(stopFile).touch()
 
     mainOutput = ""
     if args.searchpatterns:
@@ -590,11 +596,11 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
     if default:
         return mainOutput
 
-def getToolmate(data: dict):
+def getToolmate(data: dict, this_host: Optional[str]=None, this_port: Optional[int]=None):
     if not "wd" in data:
         data["wd"] = os.getcwd()
-    host = config.toolmate_api_client_host
-    port = config.toolmate_api_client_port
+    host = this_host if this_host is not None else config.toolmate_api_client_host
+    port = this_port if this_port is not None else config.toolmate_api_client_port
     endpoint = f"{host}:{port}/api/toolmate"
     headers = {
         "Content-Type": "application/json",

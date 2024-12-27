@@ -78,4 +78,4 @@ if not config.isLite:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=examine_files)
+    config.addToolCall(signature=functionSignature, method=examine_files)

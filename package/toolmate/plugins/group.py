@@ -71,4 +71,4 @@ if not config.isLite and config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=group)
+    config.addToolCall(signature=functionSignature, method=group)

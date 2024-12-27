@@ -32,4 +32,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=chat)
+config.addToolCall(signature=functionSignature, method=chat)

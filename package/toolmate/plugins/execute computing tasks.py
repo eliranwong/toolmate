@@ -101,4 +101,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=task)
+config.addToolCall(signature=functionSignature, method=task)

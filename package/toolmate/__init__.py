@@ -62,7 +62,7 @@ if config.llmInterface == "chatgpt":
     config.llmInterface = "openai"
 
 from toolmate.utils.tool_plugins import Plugins
-config.addFunctionCall = Plugins.addFunctionCall
+config.addToolCall = config.addFunctionCall = Plugins.addToolCall
 
 from toolmate.utils.vlc_utils import VlcUtil
 config.isVlcPlayerInstalled = VlcUtil.isVlcPlayerInstalled()

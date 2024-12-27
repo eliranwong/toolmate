@@ -44,7 +44,7 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=anthropic)
+        config.addToolCall(signature=functionSignature, method=anthropic)
         config.inputSuggestions.append("Ask Anthropic: ")
 
     except:

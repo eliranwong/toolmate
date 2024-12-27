@@ -63,4 +63,4 @@ if not config.isLite and config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=examine_images_vertexai)
+    config.addToolCall(signature=functionSignature, method=examine_images_vertexai)

@@ -41,5 +41,5 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=mistral)
+    config.addToolCall(signature=functionSignature, method=mistral)
     config.inputSuggestions.append("Ask Mistral: ")

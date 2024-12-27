@@ -98,6 +98,6 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=examine_images_groq)
+    config.addToolCall(signature=functionSignature, method=examine_images_groq)
     config.inputSuggestions.append("Describe this image in detail: ")
     config.inputSuggestions.append("Extract text from this image: ")

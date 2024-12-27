@@ -192,4 +192,4 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=modify_images)
+    config.addToolCall(signature=functionSignature, method=modify_images)

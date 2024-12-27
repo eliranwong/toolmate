@@ -165,4 +165,4 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=add_outlook_calendar_event, deviceInfo=True, datetimeSensitive=True)
+    config.addToolCall(signature=functionSignature, method=add_outlook_calendar_event, deviceInfo=True, datetimeSensitive=True)

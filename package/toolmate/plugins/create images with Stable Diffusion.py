@@ -122,4 +122,4 @@ if not config.isLite and isSDcppInstalled:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=create_image_sd)
+    config.addToolCall(signature=functionSignature, method=create_image_sd)

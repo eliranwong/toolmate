@@ -1,6 +1,10 @@
+* extra server port configuration for gui backend
+
 # 0.6.14-0.6.16
 
 * added support of Anthropic Claude 3.5 Sonnet
+
+* added support of custom Azure model list
 
 # 0.6.11-0.6.13
 

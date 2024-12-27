@@ -99,7 +99,7 @@ class Plugins:
 
     # integrate function call plugin
     @staticmethod
-    def addFunctionCall(signature: str, method: Callable[[dict], str], deviceInfo=False, datetimeSensitive=False):
+    def addToolCall(signature: str, method: Callable[[dict], str], deviceInfo=False, datetimeSensitive=False):
         if hasattr(config, "currentMessages"):
             name = signature["name"]
             if not name in config.toolFunctionSchemas: # prevent duplicaiton

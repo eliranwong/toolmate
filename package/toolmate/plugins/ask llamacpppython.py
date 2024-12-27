@@ -58,5 +58,5 @@ if not config.isLite and runnable:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=llamacpppython)
+    config.addToolCall(signature=functionSignature, method=llamacpppython)
     config.inputSuggestions.append("Ask ChatGPT: ")

@@ -43,4 +43,4 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=send_tweet)
+    config.addToolCall(signature=functionSignature, method=send_tweet)

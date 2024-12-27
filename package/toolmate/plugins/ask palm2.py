@@ -75,7 +75,7 @@ if not config.isLite and config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=palm2)
+        config.addToolCall(signature=functionSignature, method=palm2)
         config.inputSuggestions.append("Ask PaLM 2: ")
     else:
         print("Plugin `ask palm2` not enabled! Read setup at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Google%20Cloud%20Service%20Credential%20Setup.md")

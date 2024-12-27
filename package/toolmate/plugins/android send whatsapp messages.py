@@ -38,4 +38,4 @@ if config.isTermux and config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=send_whatsapp)
+    config.addToolCall(signature=functionSignature, method=send_whatsapp)

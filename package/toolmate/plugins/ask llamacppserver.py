@@ -38,5 +38,5 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=llamacppserver)
+config.addToolCall(signature=functionSignature, method=llamacppserver)
 config.inputSuggestions.append("Ask Llama.cpp Server: ")

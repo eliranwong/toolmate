@@ -91,7 +91,7 @@ Add the following lines to the plugin.  You may read the self-explanatory commen
 
 ```
 # The following line integrate the function method and signature into LetMeDoIt AI
-config.addFunctionCall(name="search_news", signature=functionSignature, method=search_news)
+config.addToolCall(name="search_news", signature=functionSignature, method=search_news)
 
 # The following line is optional. It adds an input suggestion to LetMeDoIt AI user input prompt
 config.inputSuggestions.append("Tell me the latest news about ")
@@ -223,7 +223,7 @@ functionSignature = {
 }
 
 # The following line integrate the function method and signature into LetMeDoIt AI
-config.addFunctionCall(name="search_news", signature=functionSignature, method=search_news)
+config.addToolCall(name="search_news", signature=functionSignature, method=search_news)
 
 # The following line is optional. It adds an input suggestion to LetMeDoIt AI user input prompt
 config.inputSuggestions.append("Tell me the latest news about ")

@@ -70,4 +70,4 @@ if config.isTermux and config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=add_calendar_event, deviceInfo=True, datetimeSensitive=True)
+    config.addToolCall(signature=functionSignature, method=add_calendar_event, deviceInfo=True, datetimeSensitive=True)

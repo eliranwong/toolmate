@@ -80,4 +80,4 @@ if not config.isLite and config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=examine_web_content)
+    config.addToolCall(signature=functionSignature, method=examine_web_content)

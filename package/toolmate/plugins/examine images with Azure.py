@@ -96,4 +96,4 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=examine_images_azure)
+    config.addToolCall(signature=functionSignature, method=examine_images_azure)

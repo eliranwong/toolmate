@@ -108,4 +108,4 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=download_youtube_audio)
+    config.addToolCall(signature=functionSignature, method=download_youtube_audio)

@@ -193,7 +193,7 @@ class QtApiResponseStreamer:
             apiResponse = getToolmate({
                 "instruction": request,
                 "chat": chat,
-            })
+            }, this_port=config.toolmate_api_client_port_desktop)
             conversation = apiResponse.json()
         except Exception as e:
             conversation = f"Error: {str(e)}"

@@ -53,4 +53,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=edit_text)
+config.addToolCall(signature=functionSignature, method=edit_text)

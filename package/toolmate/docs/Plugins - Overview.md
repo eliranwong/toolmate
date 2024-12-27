@@ -54,7 +54,7 @@ LetMeDoIt AI utilizes 'config' modules to interact with plugins. Developers can 
 
 * config.predefinedContexts [read more](https://github.com/eliranwong/letmedoit/wiki/Plugins-%E2%80%90-Predefined-Contexts)
 
-* config.addFunctionCall [read more](https://github.com/eliranwong/letmedoit/wiki/Plugins-%E2%80%90-Function-Calling)
+* config.addToolCall [read more](https://github.com/eliranwong/letmedoit/wiki/Plugins-%E2%80%90-Function-Calling)
 
 # Enable a Plugin to Execute Task
 

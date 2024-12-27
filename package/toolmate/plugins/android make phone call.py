@@ -34,4 +34,4 @@ if config.isTermux:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=phone_call)
+    config.addToolCall(signature=functionSignature, method=phone_call)

@@ -94,4 +94,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=examine_images_ollama)
+config.addToolCall(signature=functionSignature, method=examine_images_ollama)

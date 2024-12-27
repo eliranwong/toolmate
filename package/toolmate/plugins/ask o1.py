@@ -56,7 +56,7 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=o1)
+        config.addToolCall(signature=functionSignature, method=o1)
         config.inputSuggestions.append("Ask o1: ")
 
     except:

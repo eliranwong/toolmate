@@ -35,4 +35,4 @@ if config.isTermux:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=play_media)
+    config.addToolCall(signature=functionSignature, method=play_media)

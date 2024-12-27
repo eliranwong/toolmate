@@ -83,4 +83,4 @@ if not config.isLite:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=remove_image_background)
+    config.addToolCall(signature=functionSignature, method=remove_image_background)

@@ -154,3 +154,4 @@ ftfy
 fastapi
 uvicorn
 xonsh[full]
+markitdown

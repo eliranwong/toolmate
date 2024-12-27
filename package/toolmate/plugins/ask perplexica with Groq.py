@@ -129,7 +129,7 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=perplexica_groq)
+        config.addToolCall(signature=functionSignature, method=perplexica_groq)
         config.inputSuggestions.append("Ask Perplexica: ")
 
     else:

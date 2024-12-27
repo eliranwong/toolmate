@@ -39,7 +39,7 @@ if config.isTermux:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=send_sms)
+    config.addToolCall(signature=functionSignature, method=send_sms)
 
     config.aliases["@read_sms "] = "@command termux-sms-list "
     config.builtinTools["read_sms"] = "read sms"

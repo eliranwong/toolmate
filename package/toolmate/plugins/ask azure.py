@@ -45,7 +45,7 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=azure)
+        config.addToolCall(signature=functionSignature, method=azure)
         config.inputSuggestions.append("Ask ChatGPT: ")
 
     except:

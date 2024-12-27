@@ -48,4 +48,4 @@ if not config.isLite:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=help)
+    config.addToolCall(signature=functionSignature, method=help)

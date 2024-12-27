@@ -23,7 +23,7 @@ functionSignature = {
         "required": [],
     },
 }
-config.addFunctionCall(signature=functionSignature, method=copy_to_clipboard)
+config.addToolCall(signature=functionSignature, method=copy_to_clipboard)
 
 # Tool: @paste_from_clipboard
 def paste_from_clipboard(function_args):
@@ -47,7 +47,7 @@ functionSignature = {
         "required": [],
     },
 }
-config.addFunctionCall(signature=functionSignature, method=paste_from_clipboard)
+config.addToolCall(signature=functionSignature, method=paste_from_clipboard)
 
 '''
 Notes about pbcopy and pbpaste alternatives:

@@ -1233,9 +1233,9 @@
       <data key="d1">"config.outputTextConverters is a variable used in LetMeDoIt AI's plugins to transform text output."</data>
       <data key="d2">chunk-93ddd8ad41905bb4e11714d30ecf4b1e</data>
     </node>
-    <node id="&quot;CONFIG.ADDFUNCTIONCALL&quot;">
+    <node id="&quot;config.addToolCall&quot;">
       <data key="d0">"VARIABLE"</data>
-      <data key="d1">"This variable represents a way to add a function call within the configuration context, not representing a specific entity type like person, organization, geo, event, etc."&lt;SEP&gt;"config.addFunctionCall is a variable used in LetMeDoIt AI's plugins to add function calls."</data>
+      <data key="d1">"This variable represents a way to add a function call within the configuration context, not representing a specific entity type like person, organization, geo, event, etc."&lt;SEP&gt;"config.addToolCall is a variable used in LetMeDoIt AI's plugins to add function calls."</data>
       <data key="d2">chunk-93ddd8ad41905bb4e11714d30ecf4b1e&lt;SEP&gt;chunk-71dca6296e35b426fb6965e5d82c241e</data>
     </node>
     <node id="&quot;CONFIG.PY&quot;">

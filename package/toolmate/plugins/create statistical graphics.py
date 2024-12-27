@@ -58,4 +58,4 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=create_statistical_graphics)
+config.addToolCall(signature=functionSignature, method=create_statistical_graphics)

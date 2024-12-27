@@ -97,4 +97,4 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=examine_images_pixtral)
+    config.addToolCall(signature=functionSignature, method=examine_images_pixtral)

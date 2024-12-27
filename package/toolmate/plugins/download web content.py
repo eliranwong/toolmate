@@ -99,4 +99,4 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=download_web_content)
+    config.addToolCall(signature=functionSignature, method=download_web_content)

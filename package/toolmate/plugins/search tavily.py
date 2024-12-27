@@ -40,5 +40,5 @@ if not config.isLite and config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=search_tavily)
+    config.addToolCall(signature=functionSignature, method=search_tavily)
     config.inputSuggestions.append("Search Tavily: ")

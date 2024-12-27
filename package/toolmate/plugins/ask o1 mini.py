@@ -56,7 +56,7 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=o1_mini)
+        config.addToolCall(signature=functionSignature, method=o1_mini)
         config.inputSuggestions.append("Ask o1-mini: ")
 
     except:

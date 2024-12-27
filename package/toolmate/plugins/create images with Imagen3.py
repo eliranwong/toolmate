@@ -150,4 +150,4 @@ if not config.isLite and config.online:
       },
   }
 
-  config.addFunctionCall(signature=functionSignature, method=create_image_imagen3)
+  config.addToolCall(signature=functionSignature, method=create_image_imagen3)

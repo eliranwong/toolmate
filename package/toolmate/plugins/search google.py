@@ -54,4 +54,4 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=search_google)
+    config.addToolCall(signature=functionSignature, method=search_google)

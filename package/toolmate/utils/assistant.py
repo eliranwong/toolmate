@@ -3662,8 +3662,11 @@ Acess the risk level of the following `{target.capitalize()}`:
                 else:
                     description = rawDescription
                 if not description.strip():
-                    # enable tool to work on previous generated response
-                    description = getAssistantPreviousResponse()[0]
+                    if action == "screenshot":
+                        description = os.path.join(os.getcwd(), "screenshot.png")
+                    else:
+                        # enable tool to work on previous generated response
+                        description = getAssistantPreviousResponse()[0]
                 elif re.search("^`[^`.,?!]+?`$", description.strip()) or re.search("^`[^`.,?!]+?` `[^`.,?!]+?`$", description.strip()):
                     # in case description is a predefined system message or a predefined context
                     assistantPreviousResponse = getAssistantPreviousResponse()[0]

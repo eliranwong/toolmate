@@ -48,7 +48,7 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=search_weather)
+        config.addToolCall(signature=functionSignature, method=search_weather)
     else:
         print1("To use plugin 'search weather info', you need to set up an OpenWeatherMap API key first.")
         print3("Read: https://github.com/eliranwong/letmedoit/wiki/OpenWeatherMap-API-Setup")

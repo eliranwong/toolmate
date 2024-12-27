@@ -145,8 +145,8 @@ if not config.isLite:
     }
 
     config.inputSuggestions += ["Search chat records: ", "Load chat records with this ID: ", "Load chat records in this file: "]
-    config.addFunctionCall(signature=functionSignature1, method=search_conversations)
-    config.addFunctionCall(signature=functionSignature2, method=load_conversations)
+    config.addToolCall(signature=functionSignature1, method=search_conversations)
+    config.addToolCall(signature=functionSignature2, method=load_conversations)
 
 else:
 
@@ -184,4 +184,4 @@ else:
     }
 
     config.inputSuggestions += ["Search chat records: "]
-    config.addFunctionCall(signature=functionSignature1, method=search_conversations)
+    config.addToolCall(signature=functionSignature1, method=search_conversations)

@@ -72,7 +72,7 @@ if not config.isLite and config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=codey)
+        config.addToolCall(signature=functionSignature, method=codey)
         config.inputSuggestions.append("Ask Codey: ")
     else:
         print("Plugin `ask codey` not enabled! Read setup at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Google%20Cloud%20Service%20Credential%20Setup.md")

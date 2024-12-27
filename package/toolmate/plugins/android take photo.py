@@ -38,4 +38,4 @@ if config.isTermux:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=take_photo)
+    config.addToolCall(signature=functionSignature, method=take_photo)

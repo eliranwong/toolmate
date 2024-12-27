@@ -42,5 +42,5 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=groq)
+    config.addToolCall(signature=functionSignature, method=groq)
     config.inputSuggestions.append("Ask Groq: ")

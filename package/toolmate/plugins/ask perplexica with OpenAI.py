@@ -126,7 +126,7 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=perplexica_openai)
+        config.addToolCall(signature=functionSignature, method=perplexica_openai)
         config.inputSuggestions.append("Ask Perplexica: ")
 
     else:

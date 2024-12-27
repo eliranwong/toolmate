@@ -129,4 +129,4 @@ if not config.isLite and config.online:
     }
 
     # Integrate the signature and method into LetMeDoIt AI
-    config.addFunctionCall(signature=functionSignature, method=transcribe_audio_google)
+    config.addToolCall(signature=functionSignature, method=transcribe_audio_google)

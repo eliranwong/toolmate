@@ -42,4 +42,4 @@ if not config.isLite and config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=search_finance)
+    config.addToolCall(signature=functionSignature, method=search_finance)

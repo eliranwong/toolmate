@@ -1,4 +1,4 @@
-from toolmate import config, getStringWidth, wrapText
+from toolmate import config, packageFolder, getStringWidth, wrapText
 from toolmate.utils.tts_utils import TTSUtil
 #import pygments
 #from pygments.lexers.markup import MarkdownLexer
@@ -6,7 +6,7 @@ from toolmate.utils.tts_utils import TTSUtil
 #from prompt_toolkit import print_formatted_text
 from prompt_toolkit.keys import Keys
 from prompt_toolkit.input import create_input
-import asyncio, shutil, textwrap, re
+import asyncio, shutil, os, re
 
 
 class StreamingWordWrapper:
@@ -110,7 +110,11 @@ class StreamingWordWrapper:
         blockStart = False
         wrapWords = config.wrapWords
         firstEvent = True
+        stopFile = os.path.join(packageFolder, "temp", "stop_running")
         for event in completion:
+            if os.path.isfile(stopFile):
+                os.remove(stopFile)
+                finishOutputs(wrapWords, chat_response)
             if not streaming_event.is_set() and not self.streaming_finished:
                 # RETRIEVE THE TEXT FROM THE RESPONSE
                 if openai:

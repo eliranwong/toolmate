@@ -123,4 +123,4 @@ if not config.isTermux and config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=send_outlook)
+    config.addToolCall(signature=functionSignature, method=send_outlook)

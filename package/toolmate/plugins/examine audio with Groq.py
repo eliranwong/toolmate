@@ -81,4 +81,4 @@ if config.online:
     }
 
     # Integrate the signature and method into LetMeDoIt AI
-    config.addFunctionCall(signature=functionSignature, method=examine_audio_groq)
+    config.addToolCall(signature=functionSignature, method=examine_audio_groq)

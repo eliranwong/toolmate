@@ -67,5 +67,5 @@ functionSignature = {
     },
 }
 
-config.addFunctionCall(signature=functionSignature, method=ask_ollama)
+config.addToolCall(signature=functionSignature, method=ask_ollama)
 config.inputSuggestions.append("Ask Ollama: ")

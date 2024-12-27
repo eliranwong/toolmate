@@ -100,4 +100,4 @@ if config.terminalEnableTermuxAPI:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=execute_termux_command)
+    config.addToolCall(signature=functionSignature, method=execute_termux_command)

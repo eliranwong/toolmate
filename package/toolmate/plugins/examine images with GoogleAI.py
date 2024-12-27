@@ -111,4 +111,4 @@ if config.online:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=examine_images_googleai)
+    config.addToolCall(signature=functionSignature, method=examine_images_googleai)

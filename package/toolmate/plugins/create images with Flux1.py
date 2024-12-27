@@ -186,4 +186,4 @@ if not config.isLite and isSDcppInstalled:
         },
     }
 
-    config.addFunctionCall(signature=functionSignature, method=create_image_flux)
+    config.addToolCall(signature=functionSignature, method=create_image_flux)

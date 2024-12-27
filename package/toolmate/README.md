@@ -40,7 +40,7 @@ Windows, macOS, Linux, ChromeOS, Android
 
 # AI Backends and Models
 
-![aibackends](https://github.com/user-attachments/assets/14edeb31-d3a4-4c41-8540-f6eb7381659b)
+![backends](https://github.com/user-attachments/assets/cf60af53-3770-4038-a256-6d931e846c00)
 
 ToolMate AI supports a wide range of AI backends and models, including [Ollama, Llama.cpp, Llama-cpp-python, Anthropic API, Groq Cloud API, Mistral AI API, X AI API, OpenAI API, Github API, Azure API, Google AI Studio API, Google Vertex AI and Google GenAI SDK](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Supported%20Backends%20and%20Models.md). Llama-cpp-python is selected as the default backend because it is completely free and requires no additional setup. However, users can switch backends at any time.
 
@@ -108,10 +108,6 @@ Starting with version 0.2.86+, users can utilize the `@` symbol to designate a s
 Android-only tools:
 
 @show_location @show_connection @start_recording @stop_recording @phone_call @play_media @search_contacts @take_photo @selfie @read_sms @send_sms @send_email @send_whatsapp @share @share_file
-
-Optional and additional bible tools, if you install optional `bible` module, by running `pip install --upgrade toolmate[bible]`:
-
-@bible @bible_commentary @extract_bible_references @search_bible_ @search_bible_paragraphs @uba @uniquebible @uba_api @uniquebible_api
 
 For those interested in expanding the capabilities of ToolMate AI, [custom tools can be added to the system via plugins](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Plugins%20-%20How%20to%20Write%20a%20Custom%20Plugin.md).
 

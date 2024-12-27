@@ -44,7 +44,7 @@ if not config.isLite and config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=genai)
+        config.addToolCall(signature=functionSignature, method=genai)
         config.inputSuggestions.append("Ask Gemini: ")
     else:
         print("Plugin `ask gemini` not enabled! Read setup at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Google%20Cloud%20Service%20Credential%20Setup.md")

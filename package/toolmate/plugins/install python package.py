@@ -45,4 +45,4 @@ if config.online:
     }
 
     # Integrate the signature and method into LetMeDoIt AI
-    config.addFunctionCall(signature=functionSignature, method=install_python_package)
+    config.addToolCall(signature=functionSignature, method=install_python_package)

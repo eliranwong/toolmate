@@ -61,7 +61,7 @@ if config.online:
     }
 
     # The following line integrate the function method and signature into LetMeDoIt AI
-    config.addFunctionCall(signature=functionSignature, method=search_google_news)
+    config.addToolCall(signature=functionSignature, method=search_google_news)
 
     # The following line is optional. It adds an input suggestion to LetMeDoIt AI user input prompt
     config.inputSuggestions.append("Tell me the latest news about ")

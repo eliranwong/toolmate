@@ -87,4 +87,4 @@ if not config.isLite:
     }
 
     # Integrate the signature and method into LetMeDoIt AI
-    config.addFunctionCall(signature=functionSignature, method=examine_audio_whisper)
+    config.addToolCall(signature=functionSignature, method=examine_audio_whisper)

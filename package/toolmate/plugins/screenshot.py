@@ -1,7 +1,7 @@
 """
-ToolMate AI Plugin - search google
+ToolMate AI Plugin - screenshot
 
-Search internet for keywords when LLM lacks information or when user ask about news or latest updates
+Take a screenshot
 
 [TOOL_CALL]
 """
@@ -17,32 +17,33 @@ def screenshot(function_args):
     config.stopSpinning()
     if function_args:
         filepath = function_args.get("filepath")
-        #config.currentMessages[-1] = {"role": "user", "content": keywords}
     else:
         filepath = config.currentMessages[-1]["content"]
-
+    if not filepath.endswith(".png"):
+        filepath += ".png"
+    filepath = filepath.rstrip()
     # Capture the entire screen
     screenshot = ImageGrab.grab()
     # Save the screenshot
     screenshot.save(filepath)
-
-    
-
+    config.currentMessages[-1]["content"] = "Take a screenshot."
+    config.toolTextOutput = f"Screenshot saved: {filepath}"
+    print(config.toolTextOutput)
     return ""
 
 functionSignature = {
     "examples": [],
     "name": "screenshot",
-    "description": "Take a screenshot",
+    "description": "Take a screenshot and save it in a file",
     "parameters": {
         "type": "object",
         "properties": {} if not config.tool_selection_agent else {
-            "filepath": {
+            "filepath_or_filename": {
                 "type": "string",
-                "description": '''File path for saving the screenshot; return "screenshot.png" if it is not given.''',
+                "description": '''The file path or name for saving the screenshot; return "screenshot.png" if it is not given.''',
             },
         },
-        "required": [] if not config.tool_selection_agent else ["filepath"],
+        "required": [] if not config.tool_selection_agent else ["filepath_or_filename"],
     },
 }
 

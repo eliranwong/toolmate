@@ -699,6 +699,7 @@ class ToolMate:
         if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
             config.anthropicApi_key = apikey
             CallLLM.checkCompletion("anthropic")
+            os.environ["ANTHROPIC_API_KEY"] = config.anthropicApi_key
         else:
             config.anthropicApi_key = "toolmate"
         config.saveConfig()

@@ -1,3 +1,7 @@
+# 0.6.17-0.6.19
+
+* added two tools `screenshot` and `extract_text`
+
 * extra server port configuration for gui backend
 
 # 0.6.14-0.6.16

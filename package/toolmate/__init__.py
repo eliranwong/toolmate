@@ -119,6 +119,8 @@ createShortcuts()
 
 # setup optional credentials
 setChatGPTAPIkey()
+if config.anthropicApi_key and not config.anthropicApi_key == "toolmate":
+    os.environ["ANTHROPIC_API_KEY"] = config.anthropicApi_key
 if not config.isLite:
     setGoogleCredentials()
     downloadNltkPackages()

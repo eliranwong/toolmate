@@ -626,6 +626,14 @@ def getAzureClient():
         api_version=azure_api_version,
         api_key=config.azureApi_key)
 
+def getOpenAIClient():
+    # priority in order: azure > github > openai
+    if config.azureApi_key and not config.azureApi_key == "toolmate":
+        return getAzureClient()
+    if config.githubApi_key and not config.githubApi_key == "toolmate":
+        return getGithubClient()
+    return OpenAI()
+
 def getGroqApi_key():
     '''
     support multiple grop api keys

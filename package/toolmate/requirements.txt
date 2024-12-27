@@ -156,6 +156,7 @@ fastapi
 uvicorn
 xonsh[full]
 markitdown
+pyautogui
 # Captain Agent requirements
 # those are commented are duplicates
 #markdownify

@@ -1,89 +1,30 @@
 from toolmate import showErrors, showRisk, executeToolFunction, getPythonFunctionResponse, getPygmentsStyle, fineTunePythonCode, confirmExecution, useChatSystemMessage
 from toolmate import config
-from toolmate import print1, print2, print3, getDynamicTokens, validParameters, refineToolTextOutput, getGithubClient
-import re, traceback, openai, pprint, copy, textwrap, json, pygments
+from toolmate import print1, print2, print3, validParameters, refineToolTextOutput, getAnthropicClient, check_llm_errors, separateSystemMessage
+import re, traceback, pprint, copy, textwrap, json, pygments
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit import prompt
 from typing import Optional
 
-def check_api_keys(func):
-    def wrapper(*args, **kwargs):
-        if isinstance(config.githubApi_key, str):
-            return func(*args, **kwargs)
-        elif isinstance(config.githubApi_key, list):
-            for _ in range(len(config.githubApi_key)):
-                try:
-                    output = func(*args, **kwargs)
-                    break
-                except:
-                    print(f"Failed API Key: {config.githubApi_key[0]}")
-            return output
-    return wrapper
 
-def check_openai_errors(func):
-    def wrapper(*args, **kwargs):
-        def finishError():
-            print(f"Failed API Key: {config.githubApi_key[0] if isinstance(config.githubApi_key, list) else config.githubApi_key}")
-            config.stopSpinning()
-            return "[INVALID]"
-        try:
-            return func(*args, **kwargs)
-        except openai.APIError as e:
-            print("Error: Issue on OpenAI side.")
-            print("Solution: Retry your request after a brief wait and contact us if the issue persists.")
-            return finishError()
-        except openai.APIConnectionError as e:
-            print("Error: Issue connecting to our services.")
-            print("Solution: Check your network settings, proxy configuration, SSL certificates, or firewall rules.")
-            return finishError()
-        except openai.APITimeoutError as e:
-            print("Error: Request timed out.")
-            print("Solution: Retry your request after a brief wait and contact us if the issue persists.")
-            return finishError()
-        except openai.AuthenticationError as e:
-            print("Error: Your API key or token was invalid, expired, or revoked.")
-            print("Solution: Check your API key or token and make sure it is correct and active. You may need to generate a new one from your account dashboard.")
-            return finishError()
-        except openai.BadRequestError as e:
-            print("Error: Your request was malformed or missing some required parameters, such as a token or an input.")
-            print("Solution: The error message should advise you on the specific error made. Check the [documentation](https://platform.openai.com/docs/api-reference/) for the specific API method you are calling and make sure you are sending valid and complete parameters. You may also need to check the encoding, format, or size of your request data.")
-            return finishError()
-        except openai.ConflictError as e:
-            print("Error: The resource was updated by another request.")
-            print("Solution: Try to update the resource again and ensure no other requests are trying to update it.")
-            return finishError()
-        except openai.InternalServerError as e:
-            print("Error: Issue on OpenAI servers.")
-            print("Solution: Retry your request after a brief wait and contact us if the issue persists. Check the [status page](https://status.openai.com).")
-            return finishError()
-        except openai.NotFoundError as e:
-            print("Error: Requested resource does not exist.")
-            print("Solution: Ensure you are the correct resource identifier.")
-            return finishError()
-        except openai.PermissionDeniedError as e:
-            print("Error: You don't have access to the requested resource.")
-            print("Solution: Ensure you are using the correct API key, organization ID, and resource ID.")
-            return finishError()
-        except openai.RateLimitError as e:
-            print("Error: You have hit your assigned rate limit.")
-            print("Solution: Pace your requests. Read more in OpenAI [Rate limit guide](https://platform.openai.com/docs/guides/rate-limits).")
-            return finishError()
-        except openai.UnprocessableEntityError as e:
-            print("Error: Unable to process the request despite the format being correct.")
-            print("Solution: Please try the request again.")
-            return finishError()
-        except:
-            print(traceback.format_exc())
-            return finishError()
-    return wrapper
+"""
+https://github.com/anthropics/anthropic-sdk-python
+https://docs.anthropic.com/en/docs/build-with-claude/tool-use
+https://docs.ag2.ai/docs/topics/non-openai-models/cloud-anthropic
 
+Default configuration:
+('anthropicApi_key', ""),
+('anthropicApi_tool_model', "claude-3-5-sonnet-latest"), # "claude-3-5-sonnet-latest"
+('anthropicApi_tool_model_max_tokens', 8192),
+('systemMessage_anthropic', 'You are a helpful, uncensored and unbiased assistant.'),
+"""
 
-class CallOpenAIGithub:
+class CallAnthropic:
 
     @staticmethod
-    @check_openai_errors
+    @check_llm_errors
     def riskAssessment(code):
         content = f"""You are a senior python engineer.
     Assess the risk level of damaging my device upon executing the python code that I will provide for you.
@@ -94,7 +35,7 @@ class CallOpenAIGithub:
     {code}
     ```"""
         try:
-            answer = CallOpenAIGithub.getSingleChatResponse(content, temperature=0.0, keepSystemMessage=True)
+            answer = CallAnthropic.getSingleChatResponse(content, temperature=0.0, keepSystemMessage=True)
             if not answer:
                 answer = "high"
             answer = re.sub("[^A-Za-z]", "", answer).lower()
@@ -105,24 +46,23 @@ class CallOpenAIGithub:
             return "high"
 
     @staticmethod
-    @check_api_keys
-    @check_openai_errors
+    @check_llm_errors
     def checkCompletion():
-        getGithubClient().chat.completions.create(
-            model="gpt-4o",
+        getAnthropicClient().messages.create(
+            model=config.anthropicApi_tool_model,
             messages=[{"role": "user", "content" : "hello"}],
-            n=1,
-            max_tokens=10,
+            #n=1,
+            max_tokens=config.anthropicApi_tool_model_max_tokens,
         )
 
     @staticmethod
-    @check_openai_errors
+    @check_llm_errors
     def autoCorrectPythonCode(code, trace):
         for i in range(config.max_consecutive_auto_correction):
             userInput = f"Original python code:\n```\n{code}\n```\n\nTraceback:\n```\n{trace}\n```"
             messages = [{"role": "user", "content" : userInput}]
             print3(f"Auto-correction attempt: {(i + 1)}")
-            function_call_message, function_call_response = CallOpenAIGithub.getSingleFunctionCallResponse(messages, "correct_python_code")
+            function_call_message, function_call_response = CallAnthropic.getSingleFunctionCallResponse(messages, "correct_python_code")
             code = json.loads(function_call_message["function_call"]["arguments"]).get("code")
             # display response
             print1(config.divider)
@@ -157,8 +97,7 @@ class CallOpenAIGithub:
             return "[INVALID]"
 
     @staticmethod
-    @check_api_keys
-    @check_openai_errors
+    @check_llm_errors
     def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
         """
         non-streaming single call
@@ -169,19 +108,21 @@ class CallOpenAIGithub:
                 messages.insert(-1, item)
             else:
                 messages.append(item)
-        chatMessages = copy.deepcopy(messages) if keepSystemMessage else useChatSystemMessage(copy.deepcopy(messages))
+        chatMessages = copy.deepcopy(messages)
         if prefill is not None:
                 chatMessages.append({'role': 'assistant', 'content': prefill})
         try:
-            completion = getGithubClient().chat.completions.create(
-                model=config.chatGPTApiModel,
+            systemMessage, chatMessages = separateSystemMessage(chatMessages)
+            completion = getAnthropicClient().messages.create(
+                model=config.anthropicApi_tool_model,
                 messages=chatMessages,
-                n=1,
+                system=systemMessage if keepSystemMessage else config.systemMessage_anthropic,
+                #n=1,
                 temperature=temperature if temperature is not None else config.llmTemperature,
-                max_tokens=config.chatGPTApiMaxTokens,
+                max_tokens=config.anthropicApi_tool_model_max_tokens,
                 stop=stop if stop else None,
             )
-            return completion.choices[0].message.content
+            return completion.content[0].text
         except:
             return ""
 
@@ -196,12 +137,12 @@ class CallOpenAIGithub:
         # ChatGPT's built-in function named "python"
         if function_name == "python":
             notifyDeveloper(function_name)
-            python_code = textwrap.dedent(func_arguments)
+            python_code = textwrap.dedent(str(func_arguments))
             refinedCode = fineTunePythonCode(python_code)
 
             print1(config.divider)
             print2("running python code ...")
-            risk = CallOpenAIGithub.riskAssessment(python_code)
+            risk = CallAnthropic.riskAssessment(python_code)
             showRisk(risk)
             if config.developer or config.codeDisplay:
                 print("```")
@@ -252,7 +193,7 @@ class CallOpenAIGithub:
             notifyDeveloper(function_name)
             fuction_to_call = config.toolFunctionMethods[function_name]
             # convert the arguments from json into a dict
-            function_args = json.loads(func_arguments)
+            function_args = func_arguments
             function_response = fuction_to_call(function_args)
         return function_response
 
@@ -260,7 +201,7 @@ class CallOpenAIGithub:
     def runSingleFunctionCall(messages, function_name):
         messagesCopy = copy.deepcopy(messages)
         try:
-            function_call_message, function_call_response = CallOpenAIGithub.getSingleFunctionCallResponse(messages, function_name)
+            function_call_message, function_call_response = CallAnthropic.getSingleFunctionCallResponse(messages, function_name)
             messages.append(function_call_message)
             messages.append(
                 {
@@ -276,70 +217,83 @@ class CallOpenAIGithub:
         return messages
 
     @staticmethod
-    def convertFunctionSignaturesIntoTools(functionSignatures):
-        return [{"type": "function", "function": functionSignature} for functionSignature in functionSignatures]
-
-    @staticmethod
-    @check_api_keys
-    @check_openai_errors
+    @check_llm_errors
     def getSingleFunctionCallResponse(messages: list[dict], function_name: str, temperature=None, **kwargs):
-        functionSignatures = [config.toolFunctionSchemas[function_name]]
-        completion = getGithubClient().chat.completions.create(
-            model=config.chatGPTApiModel,
+        schema = config.toolFunctionSchemas[function_name]
+        schemaCopy = copy.deepcopy(schema)
+        schemaCopy["input_schema"] = schemaCopy.pop("parameters")
+        systemMessage, messages = separateSystemMessage(messages)
+        completion = getAnthropicClient().messages.create(
+            model=config.anthropicApi_tool_model,
             messages=messages,
-            n=1,
+            system=systemMessage,
+            #n=1,
             temperature=temperature if temperature is not None else config.llmTemperature,
-            max_tokens=getDynamicTokens(messages, functionSignatures),
-            tools=CallOpenAIGithub.convertFunctionSignaturesIntoTools(functionSignatures),
+            max_tokens=config.anthropicApi_tool_model_max_tokens,
+            tools=[schemaCopy],
             tool_choice={"type": "function", "function": {"name": function_name}},
             stream=False,
             **kwargs,
         )
-        function_call_message = completion.choices[0].message
-        tool_call = function_call_message.tool_calls[0]
-        func_arguments = tool_call.function.arguments
+        responseDict = {}
+        for i in completion.content:
+            if hasattr(i, "input"):
+                responseDict = i.input
+                break
         function_call_message_mini = {
             "role": "assistant",
             "content": "",
             "function_call": {
-                "name": tool_call.function.name,
-                "arguments": func_arguments,
+                "name": function_name,
+                "arguments": responseDict,
             }
         }
-        function_call_response = CallOpenAIGithub.finetuneSingleFunctionCallResponse(func_arguments, function_name)
+        function_call_response = CallAnthropic.finetuneSingleFunctionCallResponse(responseDict, function_name)
         return function_call_message_mini, function_call_response
 
     @staticmethod
-    @check_api_keys
-    @check_openai_errors
+    @check_llm_errors
     def regularCall(messages: dict, **kwargs):
-        chatMessages = useChatSystemMessage(copy.deepcopy(messages))
-        return getGithubClient().chat.completions.create(
-            model=config.chatGPTApiModel,
+        _, chatMessages = separateSystemMessage(messages)
+        return getAnthropicClient().messages.create(
+            model=config.anthropicApi_tool_model,
             messages=chatMessages,
-            n=1,
+            system=config.systemMessage_anthropic,
+            #n=1,
             temperature=config.llmTemperature,
-            max_tokens=getDynamicTokens(chatMessages),
+            max_tokens=config.anthropicApi_tool_model_max_tokens,
             stream=True,
             **kwargs,
         )
 
     @staticmethod
-    @check_api_keys
-    @check_openai_errors
+    @check_llm_errors
     def getDictionaryOutput(messages: list, schema: dict, **kwargs) -> dict:
-        completion = getGithubClient().chat.completions.create(
-            model=config.chatGPTApiModel,
+        schemaCopy = copy.deepcopy(schema)
+        schemaCopy["input_schema"] = schemaCopy.pop("parameters")
+        systemMessage, messages = separateSystemMessage(messages)
+        completion = getAnthropicClient().messages.create(
+            model=config.anthropicApi_tool_model,
             messages=messages,
-            n=1,
+            system=systemMessage,
+            #n=1,
             temperature=config.llmTemperature,
-            max_tokens=getDynamicTokens(messages, [schema]),
-            tools=[{"type": "function", "function": schema}],
-            tool_choice={"type": "function", "function": {"name": schema["name"]}},
+            max_tokens=config.anthropicApi_tool_model_max_tokens,
+            tools=[schemaCopy],
+            tool_choice={"type": "tool", "name": schema["name"]},
             stream=False,
             **kwargs,
         )
-        responseDict = json.loads(completion.choices[0].message.tool_calls[0].function.arguments)
+        """
+```completion
+Message(id='msg_0187aSAVWogpDsreGbTADJnh', content=[TextBlock(text="I'll check the current weather in San Francisco, CA for you.", type='text'), ToolUseBlock(id='toolu_019gaQrGzZxF7s6Wsx7MAXrj', input={'location': 'San Francisco, CA'}, name='get_weather', type='tool_use')], model='claude-3-5-sonnet-20241022', role='assistant', stop_reason='tool_use', stop_sequence=None, type='message', usage=Usage(cache_creation_input_tokens=0, cache_read_input_tokens=0, input_tokens=403, output_tokens=71))
+```
+        """
+        responseDict = {}
+        for i in completion.content:
+            if hasattr(i, "input"):
+                responseDict = i.input
+                break
         return responseDict
 
     # Auto Function Call equivalence
@@ -347,7 +301,7 @@ class CallOpenAIGithub:
     @staticmethod
     def runToolCall(messages: dict):
         if not config.selectedTool:
-            return CallOpenAIGithub.regularCall(messages)
+            return CallAnthropic.regularCall(messages)
         else:
             # 2. Tool Selection
             if config.selectedTool and not config.selectedTool == "chat" and config.selectedTool in config.toolFunctionSchemas:
@@ -355,7 +309,7 @@ class CallOpenAIGithub:
                 tool_schema = config.toolFunctionSchemas[tool_name]
                 config.selectedTool = ""
             else:
-                return CallOpenAIGithub.regularCall(messages)
+                return CallAnthropic.regularCall(messages)
             # 3. Parameter Extraction
             if config.developer:
                 print1("extracting parameters ...")
@@ -365,9 +319,9 @@ class CallOpenAIGithub:
                     tool_parameters = {}
                     tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
                 else:
-                    tool_parameters = CallOpenAIGithub.getDictionaryOutput(messages=messages, schema=tool_schema)
+                    tool_parameters = CallAnthropic.getDictionaryOutput(messages=messages, schema=tool_schema)
                     if not validParameters(tool_parameters, tool_schema["parameters"]["required"]):
-                        return CallOpenAIGithub.regularCall(messages)
+                        return CallAnthropic.regularCall(messages)
                     # 4. Function Execution
                     tool_response = executeToolFunction(func_arguments=tool_parameters, function_name=tool_name)
             except:
@@ -376,7 +330,7 @@ class CallOpenAIGithub:
             # 5. Chat Extension
             if tool_response == "[INVALID]":
                 # invalid tool call; return a regular call instead
-                return CallOpenAIGithub.regularCall(messages)
+                return CallAnthropic.regularCall(messages)
             else:
                 # record tool selection
                 #config.currentMessages[-1]["tool"] = tool_name
@@ -406,7 +360,7 @@ class CallOpenAIGithub:
                     )
                     config.toolTextOutput = ""
 
-                    return CallOpenAIGithub.regularCall(messages)
+                    return CallAnthropic.regularCall(messages)
                 elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
                     # tool function executed without chat extension
                     if config.toolTextOutput:
@@ -421,7 +375,7 @@ class CallOpenAIGithub:
         """
         Extract action parameters
         """
-        parameters = CallOpenAIGithub.getDictionaryOutput(messages=ongoingMessages, schema=schema, **kwargs)
+        parameters = CallAnthropic.getDictionaryOutput(messages=ongoingMessages, schema=schema, **kwargs)
         if config.developer:
             print2("```parameters")
             pprint.pprint(parameters)

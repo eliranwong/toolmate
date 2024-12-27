@@ -7,6 +7,7 @@ from toolmate.utils.call_googleai import CallGoogleAI
 from toolmate.utils.call_xai import CallXAI
 from toolmate.utils.call_openai_azure import CallOpenAIAzure
 from toolmate.utils.call_openai_github import CallOpenAIGithub
+from toolmate.utils.call_anthropic import CallAnthropic
 from toolmate.utils.call_openai import CallOpenAI, CallLetMeDoIt
 from toolmate.utils.call_llamacppserver import CallLlamaCppServer
 import copy
@@ -97,6 +98,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallOpenAIAzure.checkCompletion()
         elif llmInterface == "github":
             return CallOpenAIGithub.checkCompletion()
+        elif llmInterface == "anthropic":
+            return CallAnthropic.checkCompletion()
         # letmedoit
         return CallLetMeDoIt.checkCompletion()
 
@@ -127,6 +130,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallOpenAIAzure.autoCorrectPythonCode(code, trace)
         elif llmInterface == "github":
             return CallOpenAIGithub.autoCorrectPythonCode(code, trace)
+        elif llmInterface == "anthropic":
+            return CallAnthropic.autoCorrectPythonCode(code, trace)
         # letmedoit
         return CallLetMeDoIt.autoCorrectPythonCode(code, trace)
 
@@ -156,6 +161,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallOpenAIAzure.runSingleFunctionCall(messages, function_name)
         elif config.llmInterface == "github":
             return CallOpenAIGithub.runSingleFunctionCall(messages, function_name)
+        elif config.llmInterface == "anthropic":
+            return CallAnthropic.runSingleFunctionCall(messages, function_name)
         # letmedoit
         return CallLetMeDoIt.runSingleFunctionCall(messages, function_name)
 
@@ -221,6 +228,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallOpenAIAzure.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "github":
             return CallOpenAIGithub.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
+        elif config.llmInterface == "anthropic":
+            return CallAnthropic.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         # letmedoit
         return CallLetMeDoIt.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
 
@@ -252,6 +261,8 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallOpenAIAzure.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmInterface == "github":
             return CallOpenAIGithub.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
+        elif config.llmInterface == "anthropic":
+            return CallAnthropic.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         # letmedoit
         return CallLetMeDoIt.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
 
@@ -281,5 +292,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallOpenAIAzure.runToolCall(messages)
         elif config.llmInterface == "github":
             return CallOpenAIGithub.runToolCall(messages)
+        elif config.llmInterface == "anthropic":
+            return CallAnthropic.runToolCall(messages)
         # letmedoit
         return CallLetMeDoIt.runToolCall(messages)

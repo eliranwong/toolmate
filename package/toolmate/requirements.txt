@@ -7,10 +7,10 @@ groq==0.13.0
 mistralai==1.2.5
 openai==1.57.2
 tiktoken==0.8.0
-anthropic==0.40.0
+anthropic==0.42.0
 google-genai==0.3.0
 # pyautogen,langchain,unstructured,litellm[proxy]
-autogen[gemini,mistral,groq,ollama,retrievechat,teachable,lmm,graph,long-context]==0.5.3
+autogen[anthropic,gemini,mistral,groq,ollama,retrievechat,teachable,lmm,graph,long-context]==0.5.3
 autogenstudio==0.1.5
 langchain-unstructured[local]==0.1.6
 unstructured[all-docs]==0.15.14
@@ -50,7 +50,7 @@ google-api-core==2.24.0
 google-api-python-client==2.154.0
 google-auth==2.36.0
 google-auth-httplib2==0.2.0
-google-cloud-aiplatform==1.74.0
+google-cloud-aiplatform==1.75.0
 google-cloud-bigquery==3.27.0
 google-cloud-core==2.4.1
 google-cloud-resource-manager==1.13.1

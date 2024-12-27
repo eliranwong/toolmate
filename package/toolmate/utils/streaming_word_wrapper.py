@@ -124,6 +124,12 @@ class StreamingWordWrapper:
                         continue
                     else: # openai, groq
                         answer = event.choices[0].delta.content
+                elif hasattr(event, "delta") and hasattr(event.delta, "text"): # anthropic
+                    answer = event.delta.text
+                elif hasattr(event, "content_block") and hasattr(event.content_block, "text"):
+                    answer = event.content_block.text
+                elif str(type(event)).startswith("<class 'anthropic.types"): # anthropic
+                    continue
                 elif hasattr(event, "message"): # newer ollama python package
                     answer = event.message.content
                 elif isinstance(event, dict):

@@ -158,6 +158,8 @@ class ToolMate:
             self.changeGithubAPIkey()
         if not config.azureApi_key:
             self.changeAzureAPIkey()
+        if not config.anthropicApi_key:
+            self.changeAnthropicAPIkey()
         if not config.googleaiApi_key:
             self.changeGoogleaiApikey()
         if not config.xaiApi_key:
@@ -649,6 +651,7 @@ class ToolMate:
         self.changeMistralApi()
         self.changeGoogleaiApikey()
         self.changeXaiApikey()
+        self.changeAnthropicAPIkey()
         self.changeChatGPTAPIkey()
         self.changeGithubAPIkey()
         self.changeAzureAPIkey()
@@ -685,6 +688,19 @@ class ToolMate:
             CallLLM.checkCompletion("xai")
         else:
             config.xaiApi_key = "toolmate"
+        config.saveConfig()
+        print2("Configurations updated!")
+
+    def changeAnthropicAPIkey(self):
+        print3("# Anthropic API Key: allows access to Claude models")
+        print1("To set up Anthropic API Key, read:\nhttps://www.anthropic.com/api\n")
+        print1("Enter your Anthropic API Key [optional]:")
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.anthropicApi_key, is_password=True)
+        if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+            config.anthropicApi_key = apikey
+            CallLLM.checkCompletion("anthropic")
+        else:
+            config.anthropicApi_key = "toolmate"
         config.saveConfig()
         print2("Configurations updated!")
 
@@ -890,7 +906,7 @@ class ToolMate:
                     messages[originalIndex] = message
                     # in a long conversation, ChatGPT often forgets its system message
                     # move forward if conversation have started, to enhance system message
-                    if not config.llmInterface == "mistral" and config.conversationStarted and not originalIndex == len(messages) - 1:
+                    if not config.llmInterface in ("mistral", "anthropic") and config.conversationStarted and not originalIndex == len(messages) - 1:
                         item = messages.pop(originalIndex)
                         messages.append(item)
                     break
@@ -1431,6 +1447,7 @@ class ToolMate:
             "ollama": "Ollama [FREE]",
             "groq": "Groq Cloud API [FREE/PAID]",
             "mistral": "Mistral AI API [FREE/PAID]",
+            "anthropic": "Anthropic AI API [PAID]",
             "xai": "X AI API [PAID]",
             "googleai": "Google AI Studio API [PAID]",
             "vertexai": "Google Vertex AI [PAID]",
@@ -1544,6 +1561,10 @@ class ToolMate:
             #if not config.xaiApi_key or config.xaiApi_key == "toolmate":
             self.changeXaiApikey()
             self.setLlmModel_xai()
+            self.setMaxTokens(feature="default")
+        elif config.llmInterface == "anthropic":
+            self.changeAnthropicAPIkey()
+            self.setLlmModel_anthropic()
             self.setMaxTokens(feature="default")
         elif config.llmInterface == "genai":
             print2("# GenAI Configurations ...")
@@ -1900,6 +1921,18 @@ class ToolMate:
             config.googleaiApi_tool_model = model
             print3(f"Gemini model: {model}")
 
+    def setLlmModel_anthropic(self):
+        models = getLlms()["anthropic"]
+        model = self.dialogs.getValidOptions(
+            options=models,
+            title="Anthropic Claude Models",
+            default=config.anthropicApi_tool_model if config.anthropicApi_tool_model in models else models[0],
+            text="Select a tool call model:\n(for both chat and task execution)",
+        )
+        if model:
+            config.anthropicApi_tool_model = model
+            print3(f"Anthropic Claude model: {model}")
+
     def setLlmModel_xai(self):
         models = getLlms()["xai"]
         model = self.dialogs.getValidOptions(
@@ -1911,8 +1944,6 @@ class ToolMate:
         if model:
             config.xaiApi_tool_model = model
             print3(f"X AI model: {model}")
-            # set max tokens
-            print3(f"Maximum output tokens: {config.xaiApi_tool_model_max_tokens}")
 
     def setLlmModel_vertexai(self):
         models = getLlms()["vertexai"]
@@ -1939,7 +1970,12 @@ class ToolMate:
             print3(f"Gemini model: {model}")
 
     def setLlmModel_chatgpt(self):
-        models = list(chatgptTokenLimits.keys()) if config.llmInterface == "openai" else ["gpt-4o", "gpt-4o-mini"]
+        if config.llmInterface == "openai":
+            models = list(chatgptTokenLimits.keys())
+        if config.llmInterface == "azure":
+            models = config.azureOpenAIModels
+        else: # github
+            models = ["gpt-4o", "gpt-4o-mini"]
         model = self.dialogs.getValidOptions(
             options=models,
             title="ChatGPT Model",
@@ -2066,6 +2102,8 @@ class ToolMate:
             systemMessage_chat = config.systemMessage_vertexai
         elif config.llmInterface == "googleai":
             systemMessage_chat = config.systemMessage_googleai
+        elif config.llmInterface == "anthropic":
+            systemMessage_chat = config.systemMessage_anthropic
         elif config.llmInterface == "xai":
             systemMessage_chat = config.systemMessage_xai
         elif config.llmInterface in ("openai", "letmedoit", "github", "azure"):
@@ -2188,6 +2226,8 @@ class ToolMate:
                 config.systemMessage_googleai = message
             elif config.llmInterface == "xai":
                 config.systemMessage_xai = message
+            elif config.llmInterface == "anthropic":
+                config.systemMessage_anthropic = message
             elif config.llmInterface in ("openai", "letmedoit", "github", "azure"):
                 config.systemMessage_chatgpt = message
             if customChatMessage is None:
@@ -2377,6 +2417,10 @@ class ToolMate:
             if showMessage:
                 print1("Visit https://console.mistral.ai/limits/ to read about tokens limits")
             currentMaxTokens = config.mistralApi_chat_model_max_tokens if feature == "chat" else config.mistralApi_tool_model_max_tokens
+        elif config.llmInterface == "anthropic":
+            if showMessage:
+                print1("Visit https://docs.anthropic.com/en/api/rate-limits#updated-rate-limits to read about tokens limits")
+            currentMaxTokens = config.anthropicApi_tool_model_max_tokens if feature == "chat" else config.anthropicApi_tool_model_max_tokens
         elif config.llmInterface in ("openai", "letmedoit", "github", "azure"):
             if showMessage:
                 url = "https://docs.github.com/en/github-models/prototyping-with-ai-models#rate-limits" if config.llmInterface == "github" else "https://platform.openai.com/docs/models"
@@ -2401,6 +2445,8 @@ class ToolMate:
                 config.googleaiApi_tool_model_max_tokens = maxtokens
             elif config.llmInterface == "xai":
                 config.xaiApi_tool_model_max_tokens = maxtokens
+            elif config.llmInterface == "anthropic":
+                config.anthropicApi_tool_model_max_tokens = maxtokens
             elif config.llmInterface in ("llamacpppython", "llamacppserver"):
                 if feature == "chat":
                     config.llamacppChatModel_max_tokens = maxtokens

@@ -42,7 +42,7 @@ Windows, macOS, Linux, ChromeOS, Android
 
 ![aibackends](https://github.com/user-attachments/assets/14edeb31-d3a4-4c41-8540-f6eb7381659b)
 
-ToolMate AI supports a wide range of AI backends and models, including [Ollama, Llama.cpp, Llama-cpp-python, Groq Cloud API, Mistral AI API, X AI API, OpenAI API, Github API, Azure API, Google AI Studio API and Google Vertex AI](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Supported%20Backends%20and%20Models.md). Llama-cpp-python is selected as the default backend because it is completely free and requires no additional setup. However, users can switch backends at any time.
+ToolMate AI supports a wide range of AI backends and models, including [Ollama, Llama.cpp, Llama-cpp-python, Anthropic API, Groq Cloud API, Mistral AI API, X AI API, OpenAI API, Github API, Azure API, Google AI Studio API, Google Vertex AI and Google GenAI SDK](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Supported%20Backends%20and%20Models.md). Llama-cpp-python is selected as the default backend because it is completely free and requires no additional setup. However, users can switch backends at any time.
 
 Our recommendations:
 * For backend selection, we consider [Ollama](https://ollama.com/) as the best friendly free `offline` option and [Groq Cloud API](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Groq%20API%20Setup.md) as the best freiendly and free `online` option.
@@ -52,6 +52,8 @@ Our recommendations:
 Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Supported%20Backends%20and%20Models.md
 
 # New Additions
+
+[NEW! Support Anthropic Claude 3.5 Sonnet](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Anthropic%20API%20Setup.md)
 
 [NEW! Support Gemini 2.0 Models](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Gemini.md)
 

@@ -1,3 +1,7 @@
+# 0.6.14-0.6.16
+
+* added support of Anthropic Claude 3.5 Sonnet
+
 # 0.6.11-0.6.13
 
 * added "Researches" submenu to system tray

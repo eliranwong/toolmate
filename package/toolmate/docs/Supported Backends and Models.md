@@ -4,13 +4,15 @@ ToolMate AI is designed to support a wide range of backends and models.  Both fr
 
 # Supported Backends and Models
 
-ToolMate AI supports nine interfaces: llamcpp, llama-cpp-python, ollama, googleai, vertexai, mistral, grok, xai, and chatgpt. It also maintains backward compatibility with LetMeDoIt AI in LetMeDoIt Mode.
-
-* llamacpp - [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library)
-
-* llamacppserver - [Llama.cpp](https://github.com/ggerganov/llama.cpp) [server](https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library) - This option supports llama.cpp, [compiled from source](https://github.com/ggerganov/llama.cpp#build), with GPU acceleration. Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/GPU%20Acceleration%20with%20Llama_cpp%20server.md
+ToolMate AI supports nine interfaces: ollama, llamcpp, llama-cpp-python, googleai, vertexai, genai, anthropic, mistral, grok, xai, chatgpt, github and azure. It also maintains backward compatibility with LetMeDoIt AI in LetMeDoIt Mode.
 
 * ollama - [Ollama](https://ollama.com/) / [Ollama Hosted models](https://ollama.com/library)
+
+* llama-cpp-python - [Llama.cpp](https://github.com/ggerganov/llama.cpp) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library)
+
+* llama.cpp server - [Llama.cpp](https://github.com/ggerganov/llama.cpp) [server](https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md) / [Hugging Face models](https://huggingface.co/) + [Ollama Hosted models](https://ollama.com/library) - This option supports llama.cpp, [compiled from source](https://github.com/ggerganov/llama.cpp#build), with GPU acceleration. Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/GPU%20Acceleration%20with%20Llama_cpp%20server.md
+
+* anthropic - [Claude 3.5 Sonnet](https://docs.anthropic.com/en/docs/about-claude/models)
 
 * groq - [Groq cloud api and model](https://console.groq.com/keys) / [Groq Hosted models](https://console.groq.com/docs/models)
 
@@ -21,6 +23,12 @@ ToolMate AI supports nine interfaces: llamcpp, llama-cpp-python, ollama, googlea
 * googleai - Gemini via Google AI Studio API (recent addition)
 
 * vertexai - [Gemini via Google Vertex AI](https://cloud.google.com/vertex-ai) / [Gemini Pro & Gemini Pro Vision](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
+
+* GenAI SDK - [Supports Gemini 2.0](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Gemini.md)
+
+* Azure AI [Paid Azure API Keys](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Azure%20API%20Setup.md)
+
+* github marketplace - [Free Github API Keys](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Github%20API%20Setup.md)
 
 * chatgpt - [OpenAI API](https://platform.openai.com/) / [ChatGPT models](https://platform.openai.com/docs/models)
 

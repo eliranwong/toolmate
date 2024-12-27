@@ -1,7 +1,7 @@
 """
-ToolMate AI Plugin - ask azure
+ToolMate AI Plugin - ask anthropic
 
-Ask Azure for conversation only; no function calling
+Ask Anthropic Model for conversation only; no function calling
 
 [TOOL_CALL]
 """
@@ -11,28 +11,27 @@ from toolmate import config
 
 if config.online:
 
-    from toolmate.utils.call_openai_azure import CallOpenAIAzure
+    from toolmate.utils.call_anthropic import CallAnthropic
 
     try:
-        CallOpenAIAzure.checkCompletion()
 
-        def azure(function_args):
+        def anthropic(function_args):
             config.stopSpinning()
             if function_args:
                 query = function_args.get("query") # required
                 config.currentMessages[-1] = {"role": "user", "content": query}
-            else:
-                query = config.currentMessages[-1]["content"]
-            completion = CallOpenAIAzure.regularCall(config.currentMessages)
-            config.toolmate.streamCompletion(completion, openai=True)
+            #else:
+            #    query = config.currentMessages[-1]["content"]
+            completion = CallAnthropic.regularCall(config.currentMessages)
+            config.toolmate.streamCompletion(completion)
             return ""
 
         functionSignature = {
             "examples": [
-                "Ask ChatGPT",
+                "Ask Anthropic",
             ],
-            "name": "azure",
-            "description": "Ask ChatGPT to chat or provide information",
+            "name": "anthropic",
+            "description": "Ask Anthropic to chat or provide information",
             "parameters": {
                 "type": "object",
                 "properties": {} if not config.tool_selection_agent else {
@@ -45,8 +44,8 @@ if config.online:
             },
         }
 
-        config.addFunctionCall(signature=functionSignature, method=azure)
-        config.inputSuggestions.append("Ask ChatGPT: ")
+        config.addFunctionCall(signature=functionSignature, method=anthropic)
+        config.inputSuggestions.append("Ask Anthropic: ")
 
     except:
-        print("Plugin `ask azure` not enabled! Check if your API key is valid!")
+        print("Plugin `ask anthropic` not enabled! Check if your API key is valid!")

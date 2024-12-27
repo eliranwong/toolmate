@@ -1,6 +1,6 @@
 from toolmate import config
 from toolmate.utils.terminal_mode_dialogs import TerminalModeDialogs
-import sys, os, html, geocoder, platform, socket, datetime, requests, getpass, webbrowser, unicodedata
+import sys, os, html, geocoder, platform, socket, datetime, requests, getpass, webbrowser, unicodedata, copy
 import traceback, uuid, re, textwrap, signal, wcwidth, shutil, threading, time, subprocess, json, base64, html2text, pydoc, codecs, psutil
 from importlib_metadata import version as lib_version
 from packaging import version
@@ -22,6 +22,7 @@ from ollama import list as ollama_ls
 import speech_recognition as sr
 import zipfile
 from openai import OpenAI, AzureOpenAI
+from anthropic import Anthropic
 import tiktoken
 if not config.isLite:
     try:
@@ -288,6 +289,18 @@ Action: {select(tool_names, name="tool")}"""
     
     return lm.get("tool")
 
+# system message
+
+def separateSystemMessage(messages):
+    systemMessage = ""
+    messagesCopy = copy.deepcopy(messages)
+    for index, message in enumerate(messagesCopy):
+        if message.get("role", "") == "system":
+            systemMessage = message.get("content", "")
+            del messagesCopy[index]
+            break
+    return systemMessage, messagesCopy
+
 # llm
 
 def getLlms() -> dict:
@@ -296,6 +309,7 @@ def getLlms() -> dict:
     except:
         ollamaModels = []
     llms = {
+        "anthropic": ["claude-3-5-sonnet-latest"], # https://docs.anthropic.com/en/docs/about-claude/models
         "llamacpppython": ["llamacpppython"],
         "llamacppserver": ["llamacppserver"],
         "ollama": ollamaModels,
@@ -345,8 +359,8 @@ def getLlms() -> dict:
             "gemini-1.5-pro",
         ],
         # The following order matters for changing models if user selects an OpenAI model but not specifying the backend
+        "azure": config.azureOpenAIModels,
         "github": ["gpt-4o", "gpt-4o-mini"],
-        "azure": ["gpt-4o", "gpt-4o-mini"],
         "openai": list(chatgptTokenLimits.keys()),
         "letmedoit": list(chatgptTokenLimits.keys()),
     }
@@ -383,6 +397,8 @@ def changeBackendAndModel(backend, model):
         config.vertexai_model = model
     elif backend == "genai":
         config.genai_model = model
+    elif backend == "anthropic":
+        config.anthropicApi_tool_model = model
     elif backend in ("openai", "letmedoit", "github", "azure"):
         config.chatGPTApiModel = model
     print3(f"Model configured: {model}")
@@ -409,6 +425,8 @@ def getCurrentModel():
         return config.vertexai_model
     elif config.llmInterface == "genai":
         return config.genai_model
+    elif config.llmInterface == "anthropic":
+        return config.anthropicApi_tool_model
     elif config.llmInterface in ("openai", "letmedoit", "github", "azure"):
         return config.chatGPTApiModel
     elif config.llmInterface == "llamacpppython":
@@ -494,6 +512,11 @@ def getXAIClient():
     return OpenAI(
         api_key=config.xaiApi_key,
         base_url="https://api.x.ai/v1",
+    )
+
+def getAnthropicClient():
+    return Anthropic(
+        api_key=config.anthropicApi_key,
     )
 
 def getGithubApi_key():
@@ -699,6 +722,14 @@ def getAutogenConfigList():
             "model": config.ollamaToolModel,
             "client_host": getOllamaServerHost(),
             "tags": ["ollama"],
+        })
+    # anthropic
+    if config.anthropicApi_key:
+        config_list.append({
+            "api_type": "anthropic",
+            "model": config.anthropicApi_tool_model,
+            "api_key": config.anthropicApi_key,
+            "tags": ["anthropic"],
         })
     # openai
     if config.openaiApiKey:
@@ -1591,6 +1622,8 @@ def useChatSystemMessage(messages: dict, mergeSystemIntoUserMessage=False, thisS
                 messages[originalIndex]["content"] = config.systemMessage_vertexai
             elif config.llmInterface == "genai":
                 messages[originalIndex]["content"] = config.systemMessage_genai
+            elif config.llmInterface == "anthropic":
+                messages[originalIndex]["content"] = config.systemMessage_anthropic
             elif config.llmInterface in ("openai", "letmedoit", "github", "azure"):
                 messages[originalIndex]["content"] = config.systemMessage_chatgpt
             # merge system message

@@ -13,6 +13,23 @@ A Free Github API Key allows you to use OpenAI models, like gpt-4o
 8. Select Azure Open AI
 9. Copy one of the `API keys` and `inference endpoint` store it in a secure place
 
+Optional - Change Tokens per Minute Rate Limit
+
+1. Under the newly created resource, select the newly depolyed model > `Edit`
+2. Adjust "Tokens per Minute Rate Limit"
+3. Click `Save and close`
+
+![Tokens_per_minute_rate_limit](https://github.com/user-attachments/assets/71fa9a47-1963-47fc-bc00-520e6000dcab)
+
+Optional - Add custom model names to the model selection list in ToolMate AI
+
+The Azure model selection' in ToolMate interface can be configured by changing the value of `azureOpenAIModels` manually in `config.py`. Its default value is `["gpt-4o", "gpt-4o-mini"]`. You may change it to, for example, `["gpt-4o", "gpt-4o-mini", "gpt-4", "gpt-4o-realtime-preview"]`.  Make sure you have the configured names match the deployed model names in your Azure resources.
+
+Alternately, 
+
+1. Run `tmsetup -ec`
+2. Locate the item `azureOpenAIModels` and change its value
+
 # Setup in ToolMate AI
 
 Setup AI backend either in interactive mode:
@@ -37,3 +54,12 @@ or via CLI option:
 
 ![azure3](https://github.com/user-attachments/assets/c202d160-396f-44c5-beea-7570ae960560)
 
+# Links
+
+https://github.com/marketplace
+
+https://ai.azure.com/github
+
+https://portal.azure.com/
+
+https://learn.microsoft.com/en-us/azure/ai-services/openai/reference

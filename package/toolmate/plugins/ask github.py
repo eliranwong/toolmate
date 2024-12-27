@@ -1,7 +1,7 @@
 """
-ToolMate AI Plugin - ask chatgpt
+ToolMate AI Plugin - ask github
 
-Ask ChatGPT for conversation only; no function calling
+Ask Github for conversation only; no function calling
 
 [TOOL_CALL]
 """
@@ -21,8 +21,8 @@ if config.online:
             if function_args:
                 query = function_args.get("query") # required
                 config.currentMessages[-1] = {"role": "user", "content": query}
-            else:
-                query = config.currentMessages[-1]["content"]
+            #else:
+            #    query = config.currentMessages[-1]["content"]
             completion = CallOpenAIGithub.regularCall(config.currentMessages)
             config.toolmate.streamCompletion(completion, openai=True)
             return ""
@@ -49,4 +49,4 @@ if config.online:
         config.inputSuggestions.append("Ask ChatGPT: ")
 
     except:
-        print("Plugin `ask chatgpt` not enabled! Check if your OpenAI API key is valid!")
+        print("Plugin `ask github` not enabled! Check if your API key is valid!")

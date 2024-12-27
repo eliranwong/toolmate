@@ -83,7 +83,7 @@ defaultSettings = (
     ('appName', ''),
     ('text2art_font1', 'cybermedum'),
     ('text2art_font2', 'white_bubble'),
-    ('llmInterface', ""), # "llamacpppython", "llamacppserver", "ollama", "openai", "letmedoit", "github", "azure", "groq", "mistral", "xai", "googleai", "vertexai"
+    ('llmInterface', ""), # "anthropic", "llamacpppython", "llamacppserver", "ollama", "openai", "letmedoit", "github", "azure", "groq", "mistral", "xai", "googleai", "vertexai"
     ('tool_selection_agent', False), # automatically screens user request and recommend tools, can also be manually triggered by tool `@recommend_tool`
     ('tool_selection_requirements', False), # convey each tool's requirements to the tool selection agent for the tool selection process.
     ('auto_tool_selection', False), # apply only if tool_selection_agent is set to True
@@ -234,7 +234,8 @@ defaultSettings = (
     ('systemMessage_llamacppserver', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone llamacppserver chatbot
     ('systemMessage_chatgpt', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone chatgpt chatbot
     ('systemMessage_vertexai', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone geminipro chatbot
-    ('systemMessage_genai', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone geminipro chatbot
+    ('systemMessage_genai', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone genai chatbot
+    ('systemMessage_anthropic', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone anthropic chatbot
     ('systemMessage_palm2', 'You are a helpful, uncensored and unbiased assistant.'), # system message for standalone palm2 chatbot
     ('systemMessage_codey', 'You are an expert on coding.'), # system message for standalone codey chatbot
     ('embeddingModel', 'paraphrase-multilingual-mpnet-base-v2'), # reference: https://www.sbert.net/docs/pretrained_models.html
@@ -245,6 +246,7 @@ defaultSettings = (
     ('mouseSupport', False),
     ('autoUpgrade', True),
     ('customTrayCommands', ['mistral', 'llama3']),
+    ('azureOpenAIModels', ["gpt-4o", "gpt-4o-mini"]),
     ('azureApi_key', ''),
     ('azureBaseUrl', ''),
     ('githubApi_key', ''),
@@ -304,6 +306,9 @@ defaultSettings = (
     ('vertexai_service_location', "us-central1"),
     ('vertexai_model', "gemini-1.5-flash"), # "gemini-1.5-flash", "gemini-1.5-pro"; https://cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versions; read models that support function calling https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling
     ('vertexai_max_output_tokens', 8192), # check supported value at https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
+    ('anthropicApi_key', ""),
+    ('anthropicApi_tool_model', "claude-3-5-sonnet-latest"), # "claude-3-5-sonnet-latest"
+    ('anthropicApi_tool_model_max_tokens', 8192),
     ('genaiApi_key', config.googleaiApi_key if hasattr(config, "googleaiApi_key") else ""),
     ('genai_project_id', config.vertexai_project_id if hasattr(config, "vertexai_project_id") else ""),
     ('genai_service_location', config.vertexai_service_location if hasattr(config, "vertexai_service_location") else "us-central1"),

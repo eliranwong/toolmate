@@ -19,9 +19,9 @@ def screenshot(function_args):
         filepath = function_args.get("filepath")
     else:
         filepath = config.currentMessages[-1]["content"]
+    filepath = filepath.rstrip()
     if not filepath.endswith(".png"):
         filepath += ".png"
-    filepath = filepath.rstrip()
     # Capture the entire screen
     screenshot = ImageGrab.grab()
     # Save the screenshot

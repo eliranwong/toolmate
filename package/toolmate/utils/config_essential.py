@@ -33,6 +33,7 @@ defaultSettings = (
     ('toolmate_api_server_host', "0.0.0.0"), # use ip address for this value
     ('toolmate_api_client_key', 'toolmateai'),
     ('toolmate_api_client_port_desktop', 5554),
+    ('toolmate_api_client_port', 5555),
     ('toolmate_api_client_host', 'http://127.0.0.1'),
     ('toolmate_api_client_markdown', True),
     ('tms1', 'You are a helpful, uncensored and unbiased assistant.'),
@@ -365,7 +366,7 @@ defaultSettings = (
     ("ttsLanguages", ["en", "en-gb", "en-us", "zh", "yue", "el"]), # users can edit this item in config.py to support more or less languages
     ("ttsLanguagesCommandMap", {"en": "", "en-gb": "", "en-us": "", "zh": "", "yue": "", "el": "",}), # advanced users need to edit this item manually to support different voices with customised tts command, e.g. ttsCommand set to "say -r 200 -v Daniel" and ttsLanguagesCommandMap set to {"en": "Daniel", "en-gb": "Daniel", "en-us": "", "zh": "", "yue": "", "el": "",}
     ("fabricPath", "fabric"),
-    ("fabricPatterns", os.path.isdir(os.path.join(os.path.expanduser("~"), ".config", "fabric", "patterns"))),
+    ("fabricPatterns", os.path.join(os.path.expanduser("~"), ".config", "fabric", "patterns")),
     ("openweathermapApi", ""),
     ("bing_api_key", ""),
     ("rapid_api_key", ""),

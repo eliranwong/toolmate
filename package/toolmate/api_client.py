@@ -135,45 +135,45 @@ def tms20():
     main(chatSystem=config.tms20)
 
 def tmt1():
-    main(chatSystem=config.tmt1)
+    main(defaultTool=config.tmt1)
 def tmt2():
-    main(chatSystem=config.tmt2)
+    main(defaultTool=config.tmt2)
 def tmt3():
-    main(chatSystem=config.tmt3)
+    main(defaultTool=config.tmt3)
 def tmt4():
-    main(chatSystem=config.tmt4)
+    main(defaultTool=config.tmt4)
 def tmt5():
-    main(chatSystem=config.tmt5)
+    main(defaultTool=config.tmt5)
 def tmt6():
-    main(chatSystem=config.tmt6)
+    main(defaultTool=config.tmt6)
 def tmt7():
-    main(chatSystem=config.tmt7)
+    main(defaultTool=config.tmt7)
 def tmt8():
-    main(chatSystem=config.tmt8)
+    main(defaultTool=config.tmt8)
 def tmt9():
-    main(chatSystem=config.tmt9)
+    main(defaultTool=config.tmt9)
 def tmt10():
-    main(chatSystem=config.tmt10)
+    main(defaultTool=config.tmt10)
 def tmt11():
-    main(chatSystem=config.tmt11)
+    main(defaultTool=config.tmt11)
 def tmt12():
-    main(chatSystem=config.tmt12)
+    main(defaultTool=config.tmt12)
 def tmt13():
-    main(chatSystem=config.tmt13)
+    main(defaultTool=config.tmt13)
 def tmt14():
-    main(chatSystem=config.tmt14)
+    main(defaultTool=config.tmt14)
 def tmt15():
-    main(chatSystem=config.tmt15)
+    main(defaultTool=config.tmt15)
 def tmt16():
-    main(chatSystem=config.tmt16)
+    main(defaultTool=config.tmt16)
 def tmt17():
-    main(chatSystem=config.tmt17)
+    main(defaultTool=config.tmt17)
 def tmt18():
-    main(chatSystem=config.tmt18)
+    main(defaultTool=config.tmt18)
 def tmt19():
-    main(chatSystem=config.tmt19)
+    main(defaultTool=config.tmt19)
 def tmt20():
-    main(chatSystem=config.tmt20)
+    main(defaultTool=config.tmt20)
 
 def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
     configFile = os.path.join(config.toolMateAIFolder, "config.py")

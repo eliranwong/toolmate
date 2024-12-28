@@ -2,6 +2,15 @@
 
 ToolMate AI, formerly known as FreeGenius AI, is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. With the ability to perform multi-step actions, users can customize workflows to tackle complex projects with ease.
 
+# Audio Overview
+
+[Listen to the introduction](ToolMateAI.mp3)
+
+<audio controls>
+  <source src="ToolMateAI.mp3" type="audio/mp3">
+  Your browser does not support the audio element.
+</audio>
+
 # Three Inteface Options
 
 1. [Graphical User Interface](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/GUI.md)

@@ -369,6 +369,7 @@ defaultSettings = (
     ("fabricPatterns", os.path.join(os.path.expanduser("~"), ".config", "fabric", "patterns")),
     ("openweathermapApi", ""),
     ("bing_api_key", ""),
+    ("bing_api_endpoint", "https://api.bing.microsoft.com/bing/v7.0/search"),
     ("rapid_api_key", ""),
     ("elevenlabsApi", ""),
     ("elevenlabsVoice", "21m00Tcm4TlvDq8ikWAM"),

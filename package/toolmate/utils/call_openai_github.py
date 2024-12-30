@@ -105,8 +105,8 @@ class CallOpenAIGithub:
             return "high"
 
     @staticmethod
+    #@check_openai_errors
     @check_api_keys
-    @check_openai_errors
     def checkCompletion():
         getGithubClient().chat.completions.create(
             model="gpt-4o",
@@ -157,8 +157,8 @@ class CallOpenAIGithub:
             return "[INVALID]"
 
     @staticmethod
+    #@check_openai_errors
     @check_api_keys
-    @check_openai_errors
     def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
         """
         non-streaming single call
@@ -280,8 +280,8 @@ class CallOpenAIGithub:
         return [{"type": "function", "function": functionSignature} for functionSignature in functionSignatures]
 
     @staticmethod
+    #@check_openai_errors
     @check_api_keys
-    @check_openai_errors
     def getSingleFunctionCallResponse(messages: list[dict], function_name: str, temperature=None, **kwargs):
         functionSignatures = [config.toolFunctionSchemas[function_name]]
         completion = getGithubClient().chat.completions.create(
@@ -310,8 +310,8 @@ class CallOpenAIGithub:
         return function_call_message_mini, function_call_response
 
     @staticmethod
+    #@check_openai_errors
     @check_api_keys
-    @check_openai_errors
     def regularCall(messages: dict, **kwargs):
         chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         return getGithubClient().chat.completions.create(
@@ -325,8 +325,8 @@ class CallOpenAIGithub:
         )
 
     @staticmethod
+    #@check_openai_errors
     @check_api_keys
-    @check_openai_errors
     def getDictionaryOutput(messages: list, schema: dict, **kwargs) -> dict:
         completion = getGithubClient().chat.completions.create(
             model=config.chatGPTApiModel,

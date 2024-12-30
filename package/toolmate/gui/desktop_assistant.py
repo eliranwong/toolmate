@@ -100,7 +100,7 @@ class CentralWidget(QWidget):
 
     def getAllTools(self):
         query = "@"
-        endpoint = f"{config.toolmate_api_client_host}:{config.toolmate_api_client_port}/api/tools"
+        endpoint = f"{config.toolmate_api_client_host}:{config.toolmate_api_client_port_desktop}/api/tools"
 
         url = f"""{endpoint}?query={query}"""
         headers = {

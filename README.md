@@ -4,12 +4,7 @@ ToolMate AI, formerly known as FreeGenius AI, is a cutting-edge AI companion tha
 
 # Audio Overview
 
-[Listen to the introduction](ToolMateAI.mp3)
-
-<audio controls>
-  <source src="ToolMateAI.mp3" type="audio/mp3">
-  Your browser does not support the audio element.
-</audio>
+[Listen to the introduction](https://letmedoit.ai/ToolMateAI.mp3)
 
 # Three Inteface Options
 

@@ -145,8 +145,13 @@ def main():
     host = config.toolmate_api_client_host
     port = config.toolmate_api_client_port
     if isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
-        print("Reloading configurations ...")
-        getToolmate({"reloadsettings": True})
+        print(f"Reloading configurations at {host}:{port} ...")
+        getToolmate({"reloadsettings": True},this_port=port)
+        print("Reloaded!")
+    port = config.toolmate_api_client_port_desktop
+    if isServerAlive(re.sub("^(http://|https://)", "", host, re.IGNORECASE), port):
+        print(f"Reloading configurations at {host}:{port} ...")
+        getToolmate({"reloadsettings": True},this_port=port)
         print("Reloaded!")
 
     # clear title

@@ -1,3 +1,9 @@
+# 0.6.20-0.6.21
+
+* fixed search tool feature in gui
+
+* improved handling of backends with multiple api keys
+
 # 0.6.17-0.6.19
 
 * added two tools `screenshot` and `extract_text`

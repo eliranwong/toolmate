@@ -1,3 +1,7 @@
+# 0.6.22
+
+* added a tool `convert_audio_into_video`
+
 # 0.6.20-0.6.21
 
 * fixed search tool feature in gui

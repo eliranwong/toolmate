@@ -6,6 +6,8 @@ ToolMate AI, formerly known as FreeGenius AI, is a cutting-edge AI companion tha
 
 [![Watch the video](https://img.youtube.com/vi/kLv0lUNoTQw/maxresdefault.jpg)](https://youtu.be/kLv0lUNoTQw)
 
+[Click to listen audio overview](https://youtu.be/kLv0lUNoTQw)
+
 # Three Inteface Options
 
 1. [Graphical User Interface](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/GUI.md)

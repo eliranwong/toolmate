@@ -21,7 +21,7 @@ def extract_text(function_args):
         filepath = config.currentMessages[-1]["content"]
     filepath = filepath.rstrip()
     if os.path.isfile(filepath):
-        if re.search("(\.jpg|\.jpeg|\.png)$", filepath.lower()):
+        if re.search(r"(\.jpg|\.jpeg|\.png)$", filepath.lower()):
             md = MarkItDown(llm_client=getOpenAIClient(), llm_model="gpt-4o")
         else:
             md = MarkItDown()

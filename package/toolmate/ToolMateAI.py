@@ -5,7 +5,7 @@ if os.getcwd() != localStorage:
     os.chdir(localStorage)
 
 try:
-    from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication, QMessageBox
+    from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication, QMessageBox, QInputDialog, QLineEdit
     from PySide6.QtGui import QIcon, QAction, QGuiApplication
     from PySide6.QtCore import QEvent
 except:
@@ -130,6 +130,29 @@ class ToolMateHub(QSystemTrayIcon):
         menuAction.setMenu(submenu)
         self.menu.addAction(menuAction)"""
 
+        # submenu - playgrounds
+        submenu = QMenu()
+        playgrounds = {
+            "Anthropic": "https://console.anthropic.com/dashboard",
+            "Azure": "https://ai.azure.com/resource/playground",
+            "ChatGPT": "https://chatgpt.com/",
+            "Claude": "https://claude.ai/",
+            "Copilot": "https://copilot.microsoft.com/chats",
+            "Google Gemini": "https://gemini.google.com/app",
+            "Google AI Studio": "https://aistudio.google.com/",
+            "Google Vertex AI": "https://console.cloud.google.com/vertex-ai/studio",
+            "Groq": "https://console.groq.com/playground",
+            "Mistral": "https://chat.mistral.ai/chat",
+        }
+        for key, value in playgrounds.items():
+            action = QAction(key, self)
+            action.triggered.connect(partial(webbrowser.open, value))
+            submenu.addAction(action)
+
+        menuAction = QAction("Playgrounds", self)
+        menuAction.setMenu(submenu)
+        self.menu.addAction(menuAction)
+
         # submenu - researches
         submenu = QMenu()
 
@@ -162,37 +185,48 @@ class ToolMateHub(QSystemTrayIcon):
         menuAction.setMenu(submenu)
         self.menu.addAction(menuAction)
 
-        # submenu - clipboard
-        """submenu = QMenu()
+        self.menu.addSeparator()
 
-        action = QAction("read", self)
+        # submenu - clipboard
+        submenu = QMenu()
+
+        action = QAction("Read aloud", self)
         action.triggered.connect(self.readClipboard)
         submenu.addAction(action)
 
-        action = QAction("prompt", self)
-        action.triggered.connect(lambda: runToolMateCommand("toolmate -p true -u false -n true -i false"))
+        action = QAction("Give a summary", self)
+        action.triggered.connect(self.getSummary)
         submenu.addAction(action)
 
-        action = QAction("summarize", self)
-        action.triggered.connect(lambda: runToolMateCommand("toolmate -rp true -u false -n true -i false -c 'Let me Summarize'"))
+        action = QAction("Explain", self)
+        action.triggered.connect(self.getExplanation)
         submenu.addAction(action)
 
-        action = QAction("explain", self)
-        action.triggered.connect(lambda: runToolMateCommand("toolmate -rp true -u false -n true -i false -c 'Let me Explain'"))
+        action = QAction("Improve writing", self)
+        action.triggered.connect(self.getImprovedWriting)
         submenu.addAction(action)
 
-        action = QAction("translate", self)
-        action.triggered.connect(lambda: runToolMateCommand("toolmate -rp true -u false -n true -i false -c 'Let me Translate'"))
+        action = QAction("Rephrase", self)
+        action.triggered.connect(self.getRephrases)
         submenu.addAction(action)
 
-        action = QAction("edit", self)
-        action.triggered.connect(lambda: runToolMateCommand("etextedit -p true"))
+        action = QAction("Elaborate", self)
+        action.triggered.connect(self.getElaboration)
+        submenu.addAction(action)
+
+        action = QAction("Suggest Questions", self)
+        action.triggered.connect(self.getSuggestedQuestions)
+        submenu.addAction(action)
+
+        action = QAction("Translate", self)
+        action.triggered.connect(self.getTranslation)
         submenu.addAction(action)
 
         menuAction = QAction("Clipboard", self)
         menuAction.setMenu(submenu)
         self.menu.addAction(menuAction)
 
+        """
         # submenu - utilities
         submenu = QMenu()
 
@@ -241,7 +275,7 @@ class ToolMateHub(QSystemTrayIcon):
         self.menu.addSeparator()
 
         helpAction = QAction("Wiki", self)
-        helpAction.triggered.connect(lambda: webbrowser.open("https://github.com/eliranwong/letmedoit/wiki"))
+        helpAction.triggered.connect(lambda: webbrowser.open("https://github.com/eliranwong/toolmate/wiki"))
         self.menu.addAction(helpAction)
 
         self.menu.addSeparator()
@@ -261,11 +295,88 @@ class ToolMateHub(QSystemTrayIcon):
         QGuiApplication.instance().quit()
 
     def readClipboard(self):
-        if config.terminalEnableTermuxAPI:
-            clipboardText = getCliOutput("termux-clipboard-get")
-        else:
-            clipboardText = self.clipboard.get_data().text
+        clipboardText = pyperclip.paste()
         TTSUtil.play(re.sub(config.tts_doNotReadPattern, "", clipboardText))
+
+    def getSummary(self):
+        clipboardText = pyperclip.paste()
+        userInput = f"""# Instruction
+Give a summary of the following content:
+
+# Content
+{clipboardText}"""
+        self.sendUserInput(userInput)
+
+    def getExplanation(self):
+        clipboardText = pyperclip.paste()
+        userInput = f"""# Instruction
+Explain the following content:
+
+# Content
+{clipboardText}"""
+        self.sendUserInput(userInput)
+
+    def getImprovedWriting(self):
+        clipboardText = pyperclip.paste()
+        userInput = f"""@improve_writing
+{clipboardText}"""
+        self.sendUserInput(userInput)
+
+    def getRephrases(self):
+        clipboardText = pyperclip.paste()
+        userInput = f"""# Instruction
+Rephrase the following content:
+
+# Content
+{clipboardText}"""
+        self.sendUserInput(userInput)
+
+    def getElaboration(self):
+        clipboardText = pyperclip.paste()
+        userInput = f"""# Instruction
+Rewrite and elaborate on the following content in greater detail:
+
+# Content
+{clipboardText}"""
+        self.sendUserInput(userInput)
+
+    def getSuggestedQuestions(self):
+        clipboardText = pyperclip.paste()
+        userInput = f"""# Instruction
+Suggest follow-up questions based on the following content:
+
+# Content
+{clipboardText}"""
+        self.sendUserInput(userInput)
+
+    def getTranslationLanguage(self):
+        text, ok = QInputDialog.getText(
+            config.desktopAssistant,
+            "Desktop Assistant",
+            "To which language you would like to translate the content into?",
+            QLineEdit.Normal,
+            config.translateInto,
+        )
+        return text if ok else ""
+
+    def getTranslation(self):
+        if toLanguage := self.getTranslationLanguage():
+            clipboardText = pyperclip.paste()
+            userInput = f"""# Instruction
+Translate the following content into {toLanguage}:
+
+# Content
+{clipboardText}"""
+            self.sendUserInput(userInput)
+            # save new config
+            config.translateInto = toLanguage
+            config.saveConfig()
+
+    def sendUserInput(self, userInput):
+        config.desktopAssistant.show()
+        config.desktopAssistant.newConversation()
+        config.desktopAssistant.centralWidget.userInputMultiline.setPlainText(userInput)
+        config.desktopAssistant.centralWidget.submit()
 
     def launchPerplexica(self):
         current_dir = os.getcwd()

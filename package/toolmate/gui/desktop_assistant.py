@@ -1,12 +1,12 @@
-from toolmate import config, convertOutputText
+from toolmate import config, convertOutputText, getCurrentDateTime
 from toolmate.utils.call_llm import CallLLM
 from toolmate.gui.worker import QtApiResponseStreamer
-from toolmate.utils.tts_utils import TTSUtil
-import getpass, requests, json
-
+#from toolmate.utils.tts_utils import TTSUtil
+import getpass, requests, json, os, time
+from PIL import ImageGrab
 from PySide6.QtCore import Qt, QThreadPool
 from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QCompleter, QMainWindow, QWidget, QMessageBox, QPlainTextEdit, QProgressBar, QHBoxLayout, QVBoxLayout, QLineEdit, QSplitter, QComboBox, QPushButton
+from PySide6.QtWidgets import QCompleter, QMainWindow, QWidget, QMessageBox, QPlainTextEdit, QProgressBar, QHBoxLayout, QVBoxLayout, QLineEdit, QSplitter, QInputDialog, QPushButton, QFileDialog
 
 class CentralWidget(QWidget):
 
@@ -67,8 +67,6 @@ class CentralWidget(QWidget):
         # widgets
         # user input
         self.userInput = QLineEdit()
-        self.userInputMultiline = QPlainTextEdit()
-        self.userInputMultiline.setPlaceholderText("Enter your request here ...")
         completer = QCompleter([f"@{i}" for i in self.getAllTools()]+["tm -exec", "tmc -exec"])
         completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
         completer.setCompletionMode(QCompleter.PopupCompletion)
@@ -77,26 +75,89 @@ class CentralWidget(QWidget):
         self.userInput.setPlaceholderText("Find a tool here ...")
         self.userInput.mousePressEvent = lambda _ : self.userInput.selectAll()
         self.userInput.setClearButtonEnabled(True)
+        self.userInput.returnPressed.connect(self.addTool)
+        self.userInputMultiline = QPlainTextEdit()
+        self.userInputMultiline.setPlaceholderText("Enter your request here ...")
+        self.addFileButton = QPushButton("+File")
+        self.addFileButton.clicked.connect(self.insertFilePath)
+        self.addFolderButton = QPushButton("+Folder")
+        self.addFolderButton.clicked.connect(self.insertFolderPath)
+        self.addScreenshotButton = QPushButton("+Screenshot")
+        self.addScreenshotButton.clicked.connect(self.insertScreenshot)
         self.sendButton = QPushButton("Send")
         self.sendButton.clicked.connect(self.submit)
+        self.addButton = QPushButton("+")
+        self.addButton.clicked.connect(self.addTool)
         # content view
         self.contentView = QPlainTextEdit()
         self.contentView.setReadOnly(True)
-        self.setFontSize()
+        font = self.contentView.font()
+        font.setPointSize(config.desktopAssistantFontSize)
+        self.contentView.setFont(font)
         # progress bar
         self.progressBar = QProgressBar()
         self.progressBar.setRange(0, 0) # Set the progress bar to use an indeterminate progress indicator
         
         # update layout
+        addToolWdiget = QWidget()
+        addToolLayout = QHBoxLayout()
+        addToolLayout.addWidget(self.userInput)
+        addToolLayout.addWidget(self.addButton)
+        addToolWdiget.setLayout(addToolLayout)
+
+        addDataWdiget = QWidget()
+        addDataLayout = QHBoxLayout()
+        addDataLayout.addWidget(self.addFileButton)
+        addDataLayout.addWidget(self.addFolderButton)
+        addDataLayout.addWidget(self.addScreenshotButton)
+        addDataLayout.addWidget(self.sendButton)
+        addDataWdiget.setLayout(addDataLayout)
+
         rtTopLayout.addWidget(self.contentView)
-        rtBottomLayout.addWidget(self.userInput)
+        rtBottomLayout.addWidget(addToolWdiget)
         rtBottomLayout.addWidget(self.userInputMultiline)
-        rtBottomLayout.addWidget(self.sendButton)
+        rtBottomLayout.addWidget(addDataWdiget)
         rtBottomLayout.addWidget(self.progressBar)
         self.progressBar.hide()
 
-        # Connections
-        self.userInput.returnPressed.connect(self.addTool)
+    def insertScreenshot(self):
+        self.parent.hide()
+        time.sleep(1)
+        screenshotPath = os.path.join(os.path.expanduser("~"), "toolmate", "images", f"screenshot_{getCurrentDateTime()}.png")
+        screenshot = ImageGrab.grab()
+        screenshot.save(screenshotPath)
+        self.userInputMultiline.insertPlainText(f' "{screenshotPath}" ')
+        self.parent.show()
+
+    def insertFilePath(self):
+        if filePath := self.getFilePath():
+            self.userInputMultiline.insertPlainText(f' "{filePath}" ')
+
+    def insertFolderPath(self):
+        if folderPath := self.getFolderPath():
+            self.userInputMultiline.insertPlainText(f' "{folderPath}" ')
+
+    def getFilePath(self):
+        options = QFileDialog.Options()
+        filePath, *_ = QFileDialog.getOpenFileName(
+            self,
+            "Add File",
+            os.path.expanduser("~"),
+            "All Files (*)",
+            "",
+            options,
+        )
+        return filePath if filePath else ""
+
+    def getFolderPath(self):
+        options = QFileDialog.DontResolveSymlinks | QFileDialog.ShowDirsOnly
+        directory = QFileDialog.getExistingDirectory(
+            self,
+            "Add folder",
+            os.path.expanduser("~"),
+            options,
+        )
+        return directory if directory else ""
 
     def getAllTools(self):
         query = "@"
@@ -116,20 +177,26 @@ class CentralWidget(QWidget):
             pass
         return []
 
-    def setFontSize(self, index=None):
-        if index is not None:
-            config.desktopAssistantFontSize = index + 1
-        # content view
-        font = self.contentView.font()
-        font.setPointSize(config.desktopAssistantFontSize)
-        self.contentView.setFont(font)
-        config.saveConfig()
+    def setFontSize(self):
+        integer, ok = QInputDialog.getInt(self,
+                                          "Desktop Assistant", "Change font size:", config.desktopAssistantFontSize, 1,
+                                          50, 1)
+        if ok:
+            config.desktopAssistantFontSize = integer
+            # content view
+            font = self.contentView.font()
+            font.setPointSize(config.desktopAssistantFontSize)
+            self.contentView.setFont(font)
+            config.saveConfig()
 
     def addTool(self):
         toolText = self.userInput.text().strip()
         if toolText:
-            self.userInputMultiline.insertPlainText(f" {toolText} ")
-            self.userInput.setText("")
+            if toolText in ("tm -exec", "tmc -exec"):
+                self.submit()
+            else:
+                self.userInputMultiline.insertPlainText(f" {toolText} ")
+                self.userInput.setText("")
 
     def submit(self):
         toolText = self.userInput.text().strip()
@@ -137,8 +204,9 @@ class CentralWidget(QWidget):
         if execute:
             request = toolText
         else:
-            requestText = self.userInputMultiline.toPlainText().strip()
-            request = f"{toolText} {requestText}".strip()
+            #requestText = self.userInputMultiline.toPlainText().strip()
+            #request = f"{toolText} {requestText}".strip()
+            request = self.userInputMultiline.toPlainText().strip()
         if request:
             self.userInput.setDisabled(True)
             self.addContent(request)
@@ -186,7 +254,7 @@ class CentralWidget(QWidget):
         for i in conversation:
             role = i.get("role", "")
             content = i.get("content", "")
-            if role in ("user", "assistant"):
+            if role in ("user", "assistant") and content.strip():
                 if role == "assistant":
                     content = convertOutputText(content.rstrip())
                     messages.append(f"[{self.assistant}] {content}")
@@ -220,7 +288,6 @@ class DesktopAssistant(QMainWindow):
         # shortcuts
         self.processResponse = self.centralWidget.processResponse
         self.streamResponse = self.centralWidget.streamResponse
-        self.setFontSize = self.centralWidget.setFontSize
 
     def closeEvent(self, event):
         if self.standalone:
@@ -246,15 +313,6 @@ class DesktopAssistant(QMainWindow):
     
     def printTextOutput(self, output):
         self.centralWidget.addContent(output, False)
-
-    def showFontSizeComboBox(self):
-        self.fontSizeComboBox = QComboBox()
-        self.fontSizeComboBox.setWindowTitle("Select Font Size")
-        self.fontSizeComboBox.setFixedWidth(400)
-        self.fontSizeComboBox.addItems([str(i) for i in range(1, 51)])
-        self.fontSizeComboBox.setCurrentIndex((config.desktopAssistantFontSize - 1))
-        self.fontSizeComboBox.currentIndexChanged.connect(self.setFontSize)
-        self.fontSizeComboBox.show()
 
     def toggleAutoPaste(self):
         config.pasteTextOnWindowActivation = not config.pasteTextOnWindowActivation
@@ -282,7 +340,7 @@ class DesktopAssistant(QMainWindow):
         file_menu.addSeparator()
 
         new_action = QAction("Change Font Size", self)
-        new_action.triggered.connect(self.showFontSizeComboBox)
+        new_action.triggered.connect(self.centralWidget.setFontSize)
         file_menu.addAction(new_action)
 
         file_menu.addSeparator()

@@ -371,7 +371,8 @@ Remember, output the new copy of python code ONLY, without additional notes or e
                         print2(config.divider)
                     messages[-1]["content"] = getRagPrompt(user_request, tool_response)
                     return CallLlamaCpp.regularCall(messages)
-                elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
+                #elif (not config.currentMessages[-1].get("role", "") == "assistant" and not config.currentMessages[-2].get("role", "") == "assistant") or (config.currentMessages[-1].get("role", "") == "system" and not config.currentMessages[-2].get("role", "") == "assistant"):
+                else:
                     # tool function executed without chat extension
                     if config.toolTextOutput:
                         config.toolTextOutput = refineToolTextOutput(config.toolTextOutput)

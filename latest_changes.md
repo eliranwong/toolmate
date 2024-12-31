@@ -1,3 +1,13 @@
+# 0.6.23-0.6.24
+
+* Improved GUI; added +File +Folder +Screenshot buttons
+
+* Improved system tray; added Playgrounds and Clipboard utilities
+
+* added tools `ask_copilot`
+
+* fixed main updating message chain in api clients
+
 # 0.6.22
 
 * added a tool `convert_audio_into_video`

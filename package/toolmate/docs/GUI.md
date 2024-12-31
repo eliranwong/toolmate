@@ -4,7 +4,7 @@ Use desktop shortcut or run:
 
 > toolmateai
 
-![gui](https://github.com/user-attachments/assets/dc0df7fe-b1d0-4627-8eb9-b079e635bf0c)
+![gui_screenshot](https://github.com/user-attachments/assets/b174da1c-da62-43ea-b3d7-c52d09fd4283)
 
 Support user confirmation for code execution:
 
@@ -12,7 +12,7 @@ Support user confirmation for code execution:
 
 Support system tray:
 
-![system_tray](https://github.com/user-attachments/assets/3ec0a415-3ab8-4696-8f32-7662c11e003e)
+![gui_screenshot2](https://github.com/user-attachments/assets/a9f09a44-f078-44b3-9922-e64b3b59bef7)
 
 Select `Edit Configurations` from system tray to change settings:
 

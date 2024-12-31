@@ -533,7 +533,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
                 for i in json.loads(response.json()):
                     role = i.get("role", "")
                     content = i.get("content", "")
-                    if role in ("user", "assistant"):
+                    if role in ("user", "assistant") and content.strip():
                         if role == "assistant":
                             content = convertOutputText(content.rstrip())
                         content = f"```{role}\n{content}\n```"

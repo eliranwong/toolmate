@@ -324,6 +324,7 @@ defaultSettings = (
     ('customPredefinedContext', 'You are a helpful, uncensored and unbiased assistant.'),
     ('applyPredefinedContextAlways', False), # True: apply predefined context with all use inputs; False: apply predefined context only in the beginning of the conversation
     ('thisTranslation', {}),
+    ('translateInto', "English"),
     ('pluginExcludeList', pluginExcludeList),
     ('cancel_entry', '.cancel'),
     ('exit_entry', '.exit'),

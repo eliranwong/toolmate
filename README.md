@@ -14,7 +14,7 @@ ToolMate AI, formerly known as FreeGenius AI, is a cutting-edge AI companion tha
 
 > toolmateai
 
-![gui_screenshot](https://github.com/user-attachments/assets/b174da1c-da62-43ea-b3d7-c52d09fd4283)
+![guiscreen](https://github.com/user-attachments/assets/eb956b59-7f7f-43b5-aaff-75366babd765)
 
 2. [Terminal Interactive Mode](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Quick%20Guide.md#prompt-interface), run:
 

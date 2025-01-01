@@ -4,7 +4,7 @@ Use desktop shortcut or run:
 
 > toolmateai
 
-![guiscreen](https://github.com/user-attachments/assets/eb956b59-7f7f-43b5-aaff-75366babd765)
+![toolmateai](https://github.com/user-attachments/assets/92d8a3aa-61fb-48d0-8bca-84ba02ff7237)
 
 Support user confirmation for code execution:
 

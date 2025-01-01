@@ -1,3 +1,7 @@
+# 0.6.25
+
+* added chat history panel in gui
+
 # 0.6.23-0.6.24
 
 * Improved GUI; added +File +Folder +Screenshot buttons

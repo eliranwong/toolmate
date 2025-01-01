@@ -14,7 +14,7 @@ ToolMate AI, formerly known as FreeGenius AI, is a cutting-edge AI companion tha
 
 > toolmateai
 
-![guiscreen](https://github.com/user-attachments/assets/eb956b59-7f7f-43b5-aaff-75366babd765)
+![toolmateai](https://github.com/user-attachments/assets/92d8a3aa-61fb-48d0-8bca-84ba02ff7237)
 
 2. [Terminal Interactive Mode](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Quick%20Guide.md#prompt-interface), run:
 
@@ -27,6 +27,40 @@ ToolMate AI, formerly known as FreeGenius AI, is a cutting-edge AI companion tha
 > tm -h
 
 ![cli_tm](https://github.com/user-attachments/assets/fe8669e7-f2d9-4234-9225-c2b1453698f9)
+
+# Simply to Use
+
+With tool auto-selection agent enabled, simply enter your request, e.g.
+
+> Send a thank you email to Peter at peter@gmail.com
+
+You can also specify a tool manually, e.g.
+
+> @send_gmail Send a thank you email to Peter at peter@gmail.com
+
+Remark: Default tool `@chat` is applied to chat with users when tool-selection agent is not enabled and a tool is not specified.
+
+To run prompt directly via terminal, simply prefix your requests with `tm` or `tmc`, e.g.
+
+> tm Send a thank you email to Peter at peter@gmail.com
+
+Remarks: `tm` always starts a new conversation whereas `tmc` extend a conversation in a chat session.
+
+To run multiple tools in a single request, simply declare tools, with each tool signature, which starts with `@`, followed by an instruction, e.g.
+
+```
+@chat Tell me a joke
+@chat Tell me anther one
+@send_gmail Send these joke to Peter at peter@gmail.com
+```
+
+Read more about tools at:
+
+https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Selection%20Configurations.md
+
+https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20Descriptions.md
+
+https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md
 
 # Background
 
@@ -49,11 +83,6 @@ Windows, macOS, Linux, ChromeOS, Android
 ![backends](https://github.com/user-attachments/assets/cf60af53-3770-4038-a256-6d931e846c00)
 
 ToolMate AI supports a wide range of AI backends and models, including [Ollama, Llama.cpp, Llama-cpp-python, Anthropic API, Groq Cloud API, Mistral AI API, X AI API, OpenAI API, Github API, Azure API, Google AI Studio API, Google Vertex AI and Google GenAI SDK](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Supported%20Backends%20and%20Models.md). Llama-cpp-python is selected as the default backend because it is completely free and requires no additional setup. However, users can switch backends at any time.
-
-Our recommendations:
-* For backend selection, we consider [Ollama](https://ollama.com/) as the best friendly free `offline` option and [Groq Cloud API](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Groq%20API%20Setup.md) as the best freiendly and free `online` option.
-
-* Remarks: Though Llama.cpp requires extra setup, it runs faster inference with the same model, compared to Ollama, when they are running on Android Termux.
 
 Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Supported%20Backends%20and%20Models.md
 

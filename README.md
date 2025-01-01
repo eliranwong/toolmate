@@ -16,6 +16,8 @@ ToolMate AI, formerly known as FreeGenius AI, is a cutting-edge AI companion tha
 
 ![toolmateai](https://github.com/user-attachments/assets/92d8a3aa-61fb-48d0-8bca-84ba02ff7237)
 
+![ToolSelectionWindow](https://github.com/user-attachments/assets/9cc9503b-5ac6-4fc1-959a-3a58c2b3b869)
+
 2. [Terminal Interactive Mode](https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Quick%20Guide.md#prompt-interface), run:
 
 > toolmate
@@ -28,7 +30,7 @@ ToolMate AI, formerly known as FreeGenius AI, is a cutting-edge AI companion tha
 
 ![cli_tm](https://github.com/user-attachments/assets/fe8669e7-f2d9-4234-9225-c2b1453698f9)
 
-# Simply to Use
+# Simple to Use
 
 With tool auto-selection agent enabled, simply enter your request, e.g.
 
@@ -44,7 +46,7 @@ To run prompt directly via terminal, simply prefix your requests with `tm` or `t
 
 > tm Send a thank you email to Peter at peter@gmail.com
 
-Remarks: `tm` always starts a new conversation whereas `tmc` extend a conversation in a chat session.
+Remarks: `tm` always starts a new conversation, whereas `tmc` extends a conversation in a chat session. You can always return and continue the previous conversation by using the `tmc` command, even if you have run other commands after the initial conversation or closed the terminal window and opened a new one, as long as you do not restart the backend `tmserver` or your device system.
 
 To run multiple tools in a single request, simply declare tools, with each tool signature, which starts with `@`, followed by an instruction, e.g.
 
@@ -53,6 +55,23 @@ To run multiple tools in a single request, simply declare tools, with each tool 
 @chat Tell me anther one
 @send_gmail Send these joke to Peter at peter@gmail.com
 ```
+
+Pre-defined workflow is supported, e.g.:
+
+Save the following content in a file and named, for example, `my_workflow.txt`:
+
+```
+@search_google Updates about ToolMate AI?
+@send_gmail Email this information to Peter at peter@gmail.com
+```
+
+In GUI or Terminal modes, run:
+
+> @workflow my_workflow.txt
+
+In CLI mode, run:
+
+> cat my_workflow.txt | tm
 
 Read more about tools at:
 

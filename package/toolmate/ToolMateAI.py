@@ -374,7 +374,7 @@ Translate the following content into {toLanguage}:
 
     def sendUserInput(self, userInput):
         config.desktopAssistant.show()
-        config.desktopAssistant.newConversation()
+        config.desktopAssistant.centralWidget.newConversation()
         config.desktopAssistant.centralWidget.userInputMultiline.setPlainText(userInput)
         config.desktopAssistant.centralWidget.submit()
 

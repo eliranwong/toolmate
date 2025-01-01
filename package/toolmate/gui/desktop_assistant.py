@@ -6,7 +6,64 @@ import getpass, requests, json, os, time, re
 from PIL import ImageGrab
 from PySide6.QtCore import Qt, QThreadPool, QDir, QSortFilterProxyModel
 from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QCompleter, QMainWindow, QWidget, QMessageBox, QPlainTextEdit, QProgressBar, QHBoxLayout, QVBoxLayout, QLineEdit, QSplitter, QInputDialog, QPushButton, QFileDialog, QTreeView, QFileSystemModel
+from PySide6.QtWidgets import QCompleter, QMainWindow, QWidget, QMessageBox, QPlainTextEdit, QProgressBar, QHBoxLayout, QVBoxLayout, QLineEdit, QSplitter, QInputDialog, QPushButton, QFileDialog, QTreeView, QFileSystemModel, QTableWidget, QTableWidgetItem, QHeaderView
+
+
+class ToolSelectionWindow(QWidget):
+    def __init__(self, data, parent=None):
+        super().__init__(parent)
+        self.parent = parent
+        self.setWindowTitle("Select a Tool")
+
+        # Set a layout
+        layout = QVBoxLayout(self)
+
+        # Create a QLineEdit for the regex input
+        self.filter_input = QLineEdit()
+        self.filter_input.setPlaceholderText("Enter regex to filter tools")
+        layout.addWidget(self.filter_input)
+
+        # Create a QTableWidget
+        self.table_widget = QTableWidget()
+        self.table_widget.setColumnCount(2)
+        self.table_widget.setHorizontalHeaderLabels(["Tool", "Description"])
+        layout.addWidget(self.table_widget)
+
+        # Set the resize mode for the columns
+        header = self.table_widget.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.ResizeToContents)  # Tool column
+        header.setSectionResizeMode(1, QHeaderView.Stretch)           # Description column
+
+        # Store and populate the table with data
+        self.data = data
+        self.populate_table(self.data)
+
+        # Connect signals
+        self.filter_input.textChanged.connect(self.filter_table)
+        self.table_widget.cellClicked.connect(self.cell_clicked)
+
+    def populate_table(self, data):
+        self.table_widget.setRowCount(0)  # Clear existing rows
+        for row, (tool, description) in enumerate(data.items()):
+            self.table_widget.insertRow(row)
+            self.table_widget.setItem(row, 0, QTableWidgetItem(tool))
+            self.table_widget.setItem(row, 1, QTableWidgetItem(description))
+
+    def filter_table(self):
+        pattern = self.filter_input.text()
+        try:
+            regex = re.compile(pattern, re.IGNORECASE)
+        except re.error:
+            return  # Invalid regex, do nothing
+
+        filtered_data = {k: v for k, v in self.data.items() if regex.search(k) or regex.search(v)}
+        self.populate_table(filtered_data)
+
+    def cell_clicked(self, row, _):
+        tool_item = self.table_widget.item(row, 0)
+        toolEntry = "@" + tool_item.text()
+        if tool_item:
+            self.parent.userInputMultiline.insertPlainText(f" {toolEntry} ")
 
 
 class FileFilterProxyModel(QSortFilterProxyModel):
@@ -82,7 +139,7 @@ class CentralWidget(QWidget):
         # widgets
         # user input
         self.userInput = QLineEdit()
-        completer = QCompleter([f"@{i}" for i in self.getAllTools()]+["tm -exec", "tmc -exec"])
+        completer = QCompleter([f"@{i}" for i in self.getAllToolNames()]+["tm -exec", "tmc -exec"])
         completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
         completer.setCompletionMode(QCompleter.PopupCompletion)
         completer.setFilterMode(Qt.MatchContains)
@@ -94,15 +151,24 @@ class CentralWidget(QWidget):
         self.userInputMultiline = QPlainTextEdit()
         self.userInputMultiline.setPlaceholderText("Enter your request here ...")
         self.addFileButton = QPushButton("+File")
+        self.addFileButton.setToolTip("Add file to request")
         self.addFileButton.clicked.connect(self.insertFilePath)
         self.addFolderButton = QPushButton("+Folder")
+        self.addFolderButton.setToolTip("Add file to request")
         self.addFolderButton.clicked.connect(self.insertFolderPath)
         self.addScreenshotButton = QPushButton("+Screenshot")
+        self.addScreenshotButton.setToolTip("Add screenshot to request")
         self.addScreenshotButton.clicked.connect(self.insertScreenshot)
         self.sendButton = QPushButton("Send")
         self.sendButton.clicked.connect(self.submit)
         self.addButton = QPushButton("+")
+        self.addButton.setFixedWidth(45)
+        self.addButton.setToolTip("Add tool to request")
         self.addButton.clicked.connect(self.addTool)
+        self.toolsButton = QPushButton("...")
+        self.toolsButton.setFixedWidth(45)
+        self.toolsButton.setToolTip("Open tool selection window")
+        self.toolsButton.clicked.connect(self.openToolSelectionWindow)
         # content view
         self.contentView = QPlainTextEdit()
         self.contentView.setReadOnly(True)
@@ -143,6 +209,7 @@ class CentralWidget(QWidget):
         addToolLayout = QHBoxLayout()
         addToolLayout.addWidget(self.userInput)
         addToolLayout.addWidget(self.addButton)
+        addToolLayout.addWidget(self.toolsButton)
         addToolWdiget.setLayout(addToolLayout)
 
         addDataWdiget = QWidget()
@@ -159,6 +226,18 @@ class CentralWidget(QWidget):
         rtBottomLayout.addWidget(addDataWdiget)
         rtBottomLayout.addWidget(self.progressBar)
         self.progressBar.hide()
+
+    def openToolSelectionWindow(self):
+        # Create a new QMainWindow to host the ToolSelectionWindow
+        toolSelectionWindow = QMainWindow(self)
+        toolSelectionWindow.setWindowTitle("Select a Tool")
+        # Create an instance of TaskViewerWidget
+        toolSelectionWidget = ToolSelectionWindow(self.getAllTools(), self)
+        # Set the TaskViewerWidget as the central widget of the new window
+        toolSelectionWindow.setCentralWidget(toolSelectionWidget)
+        # Show the new window
+        toolSelectionWindow.resize(950, 600)
+        toolSelectionWindow.show()
 
     def onFileClicked(self, index):
         index = self.proxy_model.mapToSource(index)
@@ -214,6 +293,10 @@ class CentralWidget(QWidget):
         )
         return directory if directory else ""
 
+    def getAllToolNames(self):
+        allTools = self.getAllTools()
+        return list(allTools.keys())
+
     def getAllTools(self):
         query = "@"
         endpoint = f"{config.toolmate_api_client_host}:{config.toolmate_api_client_port_desktop}/api/tools"
@@ -226,11 +309,11 @@ class CentralWidget(QWidget):
         try:
             response = requests.post(url, headers=headers)
             results = json.loads(response.json())["results"]
-            return list(results.keys())
+            return results
         except Exception as e:
             #response = f"Error: {e}"
             pass
-        return []
+        return {}
 
     def setFontSize(self):
         integer, ok = QInputDialog.getInt(self,

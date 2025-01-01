@@ -79,7 +79,7 @@ if config.online:
             "analyze image",
         ],
         "name": "examine_images_azure",
-        "description": "Describe or compare images with ChatGPT",
+        "description": "Describe or compare images with ChatGPT using Azure API",
         "parameters": {
             "type": "object",
             "properties": {

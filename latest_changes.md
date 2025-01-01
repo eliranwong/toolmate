@@ -1,3 +1,11 @@
+# 0.6.27
+
+* added tool selection window
+
+# 0.6.26
+
+* fixed clipboard utilities
+
 # 0.6.25
 
 * added chat history panel in gui

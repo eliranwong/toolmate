@@ -2,23 +2,41 @@ from toolmate import config, convertOutputText, getCurrentDateTime
 from toolmate.utils.call_llm import CallLLM
 from toolmate.gui.worker import QtApiResponseStreamer
 #from toolmate.utils.tts_utils import TTSUtil
-import getpass, requests, json, os, time
+import getpass, requests, json, os, time, re
 from PIL import ImageGrab
-from PySide6.QtCore import Qt, QThreadPool
+from PySide6.QtCore import Qt, QThreadPool, QDir, QSortFilterProxyModel
 from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QCompleter, QMainWindow, QWidget, QMessageBox, QPlainTextEdit, QProgressBar, QHBoxLayout, QVBoxLayout, QLineEdit, QSplitter, QInputDialog, QPushButton, QFileDialog
+from PySide6.QtWidgets import QCompleter, QMainWindow, QWidget, QMessageBox, QPlainTextEdit, QProgressBar, QHBoxLayout, QVBoxLayout, QLineEdit, QSplitter, QInputDialog, QPushButton, QFileDialog, QTreeView, QFileSystemModel
+
+
+class FileFilterProxyModel(QSortFilterProxyModel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def filterAcceptsRow(self, source_row, source_parent):
+        model = self.sourceModel()
+        index = model.index(source_row, 0, source_parent)
+        file_name = model.fileName(index)
+        if model.isDir(index):
+            return True if file_name == "chats" or re.search(r"^[0-9][0-9][0-9][0-9]-[0-9][0-9]$", file_name) else False # display only chats folder and date folders
+        return True if re.search(r"^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9]_[0-9][0-9]_[0-9][0-9]\.chat$", file_name) else False # display only chat files
+
 
 class CentralWidget(QWidget):
 
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
+        # chat history directory
+        self.chatHistoryDir = os.path.join(config.localStorage, "chats")
         # set up interface
         self.setupUI()
         # set up variables
         self.setupVariables()
     
     def setupVariables(self):
+        # chat file
+        self.chatfile = None
         # username
         self.user = getpass.getuser().split(" ")[0].capitalize()
         self.assistant = config.toolMateAIName.split(" ")[0]
@@ -37,9 +55,9 @@ class CentralWidget(QWidget):
         layout000 = QHBoxLayout()
         self.setLayout(layout000)
         
-        widgetLt = QWidget()
+        self.widgetLt = QWidget()
         layout000Lt = QVBoxLayout()
-        widgetLt.setLayout(layout000Lt)
+        self.widgetLt.setLayout(layout000Lt)
 
         widgetRt = QWidget()
         layout000Rt = QVBoxLayout()
@@ -57,12 +75,9 @@ class CentralWidget(QWidget):
         widgetRt.setLayout(layout000Rt)
         
         splitter = QSplitter(Qt.Horizontal, self)
-        splitter.addWidget(widgetLt)
+        splitter.addWidget(self.widgetLt)
         splitter.addWidget(widgetRt)
         layout000.addWidget(splitter)
-
-        # add widgets to left column later
-        widgetLt.hide()
 
         # widgets
         # user input
@@ -97,7 +112,32 @@ class CentralWidget(QWidget):
         # progress bar
         self.progressBar = QProgressBar()
         self.progressBar.setRange(0, 0) # Set the progress bar to use an indeterminate progress indicator
-        
+
+        # Set up the file system model
+        self.model = QFileSystemModel()
+        self.model.setRootPath(self.chatHistoryDir)
+        self.model.setFilter(QDir.AllDirs | QDir.NoDotAndDotDot | QDir.Files)
+
+        # Set up the filter proxy model
+        self.proxy_model = FileFilterProxyModel()
+        self.proxy_model.setSourceModel(self.model)
+        # Sort the first column (Name) in descending order
+        self.proxy_model.sort(0, Qt.DescendingOrder)
+
+        # Set up the tree view
+        self.tree = QTreeView()
+        self.tree.setModel(self.proxy_model)
+        self.tree.setRootIndex(self.proxy_model.mapFromSource(self.model.index(self.chatHistoryDir)))
+        # Show only the first column `Name`
+        self.tree.setHeaderHidden(True)
+        self.tree.hideColumn(1) # Size
+        self.tree.hideColumn(2) # Type
+        self.tree.hideColumn(3) # Data Modified
+        # file selection action
+        self.tree.clicked.connect(self.onFileClicked)
+
+        layout000Lt.addWidget(self.tree)
+
         # update layout
         addToolWdiget = QWidget()
         addToolLayout = QHBoxLayout()
@@ -120,6 +160,21 @@ class CentralWidget(QWidget):
         rtBottomLayout.addWidget(self.progressBar)
         self.progressBar.hide()
 
+    def onFileClicked(self, index):
+        index = self.proxy_model.mapToSource(index)
+        filePath = self.model.filePath(index)
+        self.openChatFile(filePath)
+
+    def openChatFile(self, filePath):
+        if os.path.isfile(filePath):
+            self.chatfile = filePath
+            self.newSession = False
+            self.userInput.setText("")
+            self.userInputMultiline.setPlainText(".")
+            self.submit()
+        else:
+            self.chatfile = None
+
     def insertScreenshot(self):
         self.parent.hide()
         time.sleep(1)
@@ -130,18 +185,18 @@ class CentralWidget(QWidget):
         self.parent.show()
 
     def insertFilePath(self):
-        if filePath := self.getFilePath():
+        if filePath := self.getFilePath(title="Add File"):
             self.userInputMultiline.insertPlainText(f' "{filePath}" ')
 
     def insertFolderPath(self):
         if folderPath := self.getFolderPath():
             self.userInputMultiline.insertPlainText(f' "{folderPath}" ')
 
-    def getFilePath(self):
+    def getFilePath(self, title="Open File"):
         options = QFileDialog.Options()
         filePath, *_ = QFileDialog.getOpenFileName(
             self,
-            "Add File",
+            title,
             os.path.expanduser("~"),
             "All Files (*)",
             "",
@@ -216,7 +271,8 @@ class CentralWidget(QWidget):
 
             self.sendButton.hide()
             self.progressBar.show()
-            QtApiResponseStreamer(self).workOnRequest(request, chat=False if self.newSession else True)
+            QtApiResponseStreamer(self).workOnRequest(request, chat=False if self.newSession else True, chatfile=self.chatfile)
+            self.chatfile = None
             self.newSession = False
 
             if not execute:
@@ -270,11 +326,31 @@ class CentralWidget(QWidget):
     def addContent(self, newContent, user=True) -> None:
         content = self.contentView.toPlainText()
         if content:
-            self.contentView.insertPlainText("\n\n")
+            self.contentView.setPlainText(content + "\n\n")
         if user:
-            self.contentView.insertPlainText(f"[{self.user}] {newContent}\n\n[{self.assistant}] ")
+            self.contentView.setPlainText(content + f"\n\n[{self.user}] {newContent}\n\n[{self.assistant}] ")
         else:
-            self.contentView.insertPlainText(newContent)
+            self.contentView.setPlainText(content + newContent)
+
+    def newConversation(self):
+        self.contentView.setPlainText("")
+        self.newSession = True
+
+    def openConversation(self):
+        if filePath := self.getFilePath(title="Open Chat File"):
+            self.openChatFile(filePath)
+
+    def saveConversation(self):
+        current_newSession = self.newSession
+        current_toolText = self.userInput.text()
+        current_request = self.userInputMultiline.toPlainText().strip()
+        self.newSession = True
+        self.userInput.setText("")
+        self.userInputMultiline.setPlainText(".")
+        self.submit()
+        self.newSession = current_newSession
+        self.userInput.setText(current_toolText)
+        self.userInputMultiline.setPlainText(current_request)
 
 class DesktopAssistant(QMainWindow):
     def __init__(self, standalone=False) -> None:
@@ -318,16 +394,29 @@ class DesktopAssistant(QMainWindow):
         config.pasteTextOnWindowActivation = not config.pasteTextOnWindowActivation
         config.saveConfig()
 
+    def toolgeChatHistory(self):
+        self.centralWidget.widgetLt.hide() if self.centralWidget.widgetLt.isVisible() else self.centralWidget.widgetLt.show()
+
     def createMenubar(self):
         # Create a menu bar
         menubar = self.menuBar()
 
         # Create a File menu and add it to the menu bar
-        file_menu = menubar.addMenu("ToolMate AI")
+        file_menu = menubar.addMenu("Chat")
 
         new_action = QAction("New Session", self)
         new_action.setShortcut("Ctrl+N")
-        new_action.triggered.connect(self.newConversation)
+        new_action.triggered.connect(self.centralWidget.newConversation)
+        file_menu.addAction(new_action)
+
+        new_action = QAction("Open", self)
+        new_action.setShortcut("Ctrl+O")
+        new_action.triggered.connect(self.centralWidget.openConversation)
+        file_menu.addAction(new_action)
+
+        new_action = QAction("Save", self)
+        new_action.setShortcut("Ctrl+W")
+        new_action.triggered.connect(self.centralWidget.saveConversation)
         file_menu.addAction(new_action)
 
         file_menu.addSeparator()
@@ -344,9 +433,13 @@ class DesktopAssistant(QMainWindow):
         file_menu.addAction(new_action)
 
         file_menu.addSeparator()
-
+        
         new_action = QAction("Toggle Auto Paste", self)
         new_action.triggered.connect(self.toggleAutoPaste)
+        file_menu.addAction(new_action)
+
+        new_action = QAction("Toggle Chat History", self)
+        new_action.triggered.connect(self.toolgeChatHistory)
         file_menu.addAction(new_action)
 
         file_menu.addSeparator()
@@ -374,7 +467,3 @@ class DesktopAssistant(QMainWindow):
         file_menu.addAction(new_action)
 
         file_menu.addSeparator()"""
-
-    def newConversation(self):
-        self.centralWidget.contentView.setPlainText("")
-        self.centralWidget.newSession = True

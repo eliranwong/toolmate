@@ -68,6 +68,7 @@ class Request(BaseModel):
     imagesteps: int | None = None
     markdown: bool | None = None
     wordwrap: bool | None = None
+    backupconversationfirst: bool | None = None
     backupconversation: bool | None = None
     backupsettings: bool | None = None
     reloadsettings: bool | None = None
@@ -113,10 +114,16 @@ async def process_instruction(request: Request, api_key: str = Depends(get_api_k
     imagesteps = request.imagesteps
     markdown = request.markdown
     wordwrap = request.wordwrap
+    backupconversationfirst = request.backupconversationfirst
     backupconversation = request.backupconversation
     backupsettings = request.backupsettings
     reloadsettings = request.reloadsettings
     powerdown = request.powerdown
+
+    # save current conversation before working on new instruction
+    if backupconversationfirst:
+        print("Backup conversation before working on new instruction...")
+        config.toolmate.saveChat(config.currentMessages)
 
     # reload configurations
     if reloadsettings:

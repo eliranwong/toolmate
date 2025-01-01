@@ -71,7 +71,7 @@ if not config.isLite:
             elif re.search("^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9]_[0-9][0-9]_[0-9][0-9]$", chatFile):
                 # match chat id format
                 folderPath = os.path.join(config.localStorage, "chats", re.sub("^([0-9]+?-[0-9]+?)-.*?$", r"\1", chatFile))
-                chatFile = os.path.join(folderPath, f"{chatFile}.txt")
+                chatFile = os.path.join(folderPath, f"{chatFile}.chat")
                 if os.path.isfile(chatFile):
                     isfile = True
                 else:
@@ -161,9 +161,9 @@ else:
             query = config.currentMessages[-1]["content"]
         query = query.replace('"', '\\"')
         chatFolder = os.path.join(config.localStorage, "chats")
-        # Linux/macOS: find chats/ -name "*.txt" -type f -exec grep -rin --color=auto "your_string" {} +
-        # Windows: findstr /s "your_string" *.txt /path/to/your/folder
-        cli = '''find {0} -name "*.txt" -type f -exec grep -Erin --color=auto "{1}" {2}{3} +'''.format(chatFolder, query, "{", "}")
+        # Linux/macOS: find chats/ -name "*.chat" -type f -exec grep -rin --color=auto "your_string" {} +
+        # Windows: findstr /s "your_string" *.chat /path/to/your/folder
+        cli = '''find {0} -name "*.chat" -type f -exec grep -Erin --color=auto "{1}" {2}{3} +'''.format(chatFolder, query, "{", "}")
         os.system(cli)
         return ""
 

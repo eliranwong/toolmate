@@ -204,7 +204,8 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
     parser.add_argument('-ab', '--abort', action='store_true', dest='abort', help="abort the currently running inference")
     parser.add_argument('-ar', '--autorag', action='store_true', dest='autorag', help="use AutoGen retriever for RAG tools, such as 'examine_files' and 'examine_web_content'; this feature is available in full version only")
     parser.add_argument('-b', '--backend', action='store', dest='backend', help="change AI backend if the model's backend is different")
-    parser.add_argument('-bc', '--backupconversation', action='store_true', dest='backupconversation', help="back up the current conversation in ToolMate AI user directory")
+    parser.add_argument('-bc', '--backupconversation', action='store_true', dest='backupconversation', help="back up the whole conversation in ToolMate AI user directory, including the latest instruction and assistant responses")
+    parser.add_argument('-bcf', '--backupconversationfirst', action='store_true', dest='backupconversationfirst', help="back up the current conversation in ToolMate AI user directory before working on new instruction")
     parser.add_argument('-bs', '--backupsettings', action='store_true', dest='backupsettings', help="back up the current settings in ToolMate AI user directory")
     parser.add_argument('-c', '--chat', action='store_true', dest='chat', help="enable to chat as an on-going conversation")
     parser.add_argument('-cf', '--chatfile', action='store', dest='chatfile', help="a chat file containing a saved conversation")
@@ -513,6 +514,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
             "imagesteps": args.imagesteps,
             "markdown": args.markdown,
             "wordwrap": args.wordwrap,
+            "backupconversationfirst": args.backupconversationfirst,
             "backupconversation": args.backupconversation,
             "backupsettings": args.backupsettings,
             "reloadsettings": args.reloadsettings,

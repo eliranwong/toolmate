@@ -188,20 +188,22 @@ class QtApiResponseStreamer:
         self.parent = parent
         self.threadpool = QThreadPool()
 
-    def processRequest(self, request, chat, progress_callback):
+    def processRequest(self, request, chat, chatfile, progress_callback):
         try:
             apiResponse = getToolmate({
                 "instruction": request,
                 "chat": chat,
+                "chatfile": chatfile,
+                "backupconversationfirst": True if chatfile or not chat else False,
             }, this_port=config.toolmate_api_client_port_desktop)
             conversation = apiResponse.json()
         except Exception as e:
             conversation = f"Error: {str(e)}"
         progress_callback.emit(conversation) # stream a text response in json format
 
-    def workOnRequest(self, request, chat=True):
+    def workOnRequest(self, request, chat=True, chatfile=None):
         # Pass the function to execute
-        worker = Worker(self.processRequest, request, chat) # Any other args, kwargs are passed to the run function
+        worker = Worker(self.processRequest, request, chat, chatfile) # Any other args, kwargs are passed to the run function
         worker.signals.result.connect(self.parent.processResponse) # process the output return by self.parent.getResponse
         worker.signals.progress.connect(self.parent.streamResponse)
         # Connection

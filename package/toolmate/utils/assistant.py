@@ -2905,6 +2905,9 @@ class ToolMate:
     def saveChat(self, messages):
         if config.conversationStarted:
             messagesCopy = copy.deepcopy(messages)
+            if len(messagesCopy) == 3 and messagesCopy[1].get("content", "").strip() == "Hi!":
+                # abort saving if only greeting messages
+                return None
             timestamp = getCurrentDateTime()
 
             if hasattr(config, "save_chat_record"):
@@ -2918,7 +2921,7 @@ class ToolMate:
                 folderPath = os.path.join(config.localStorage, "chats", re.sub("^([0-9]+?-[0-9]+?)-.*?$", r"\1", timestamp))
                 Path(folderPath).mkdir(parents=True, exist_ok=True)
                 if os.path.isdir(folderPath):
-                    chatFile = os.path.join(folderPath, f"{timestamp}.txt")
+                    chatFile = os.path.join(folderPath, f"{timestamp}.chat")
                     with open(chatFile, "w", encoding="utf-8") as fileObj:
                         fileObj.write(pprint.pformat([i for i in messagesCopy if i.get("role", "") in ("user", "assistant")]))
                         print3(f"Conversation saved: {chatFile}")

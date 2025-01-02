@@ -10,6 +10,10 @@ Tool Selection Window:
 
 ![ToolSelectionWindow](https://github.com/user-attachments/assets/9cc9503b-5ac6-4fc1-959a-3a58c2b3b869)
 
+Clipboard Integration
+
+![work_with_clipboard](https://github.com/user-attachments/assets/e34e1284-dee2-41a5-9a7c-f28532015f88)
+
 Support user confirmation for code execution:
 
 ![user_confirmation](https://github.com/user-attachments/assets/3172aa25-9def-4c41-b896-9d18a2a18334)

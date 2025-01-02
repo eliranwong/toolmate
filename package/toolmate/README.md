@@ -300,6 +300,6 @@ You are welcome to make contributions to this project by:
 
 * donations to show support and invest for the future
 
-Support link: https://www.paypal.me/letmedoitai
+Support link: https://www.paypal.me/toolmate
 
 Please kindly report of any issues at https://github.com/eliranwong/toolmate/issues

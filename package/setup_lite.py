@@ -159,7 +159,7 @@ This `Lite` version supports running on Android Termux as well as on Windows / m
         "Source": "https://github.com/eliranwong/toolmate",
         "Tracker": "https://github.com/eliranwong/toolmate/issues",
         "Documentation": "https://github.com/eliranwong/toolmate/wiki",
-        "Funding": "https://www.paypal.me/letmedoitai",
+        "Funding": "https://www.paypal.me/toolmate",
     },
     classifiers=[
         # Reference: https://pypi.org/classifiers/

@@ -818,8 +818,10 @@ def getAutogenConfigList():
 
 def getAutogenCodeExecutionConfig():
     if config.code_execution_use_docker:
-        temp_dir = tempfile.TemporaryDirectory()
-        coding_directory = temp_dir.name
+        if hasattr(config, "temp_dir"):
+            config.temp_dir.cleanup()
+        config.temp_dir = tempfile.TemporaryDirectory()
+        coding_directory = config.temp_dir.name
         executor = DockerCommandLineCodeExecutor(
             image=config.code_execution_image,  # Execute code using the given docker image name.
             timeout=config.code_execution_timeout,  # Timeout for each code execution in seconds.
@@ -1826,13 +1828,7 @@ def wrapText(content, terminal_width=None):
         terminal_width = shutil.get_terminal_size().columns
     return "\n".join([textwrap.fill(line, width=terminal_width) for line in content.split("\n")])
 
-def convertOutputText(text):
-    for converter in config.outputTextConverters:
-            text = converter(text)
-    return text
-
 def print1(content): # wrap words around terminal width
-    content = convertOutputText(content)
     if config.wrapWords:
         # wrap words to fit terminal width
         terminal_width = shutil.get_terminal_size().columns

@@ -9,7 +9,7 @@ Ask ChatGPT for conversation only; no function calling
 
 from toolmate import config
 
-if config.xaiApi_key and config.online:
+if config.xaiApi_key and not config.xaiApi_key == "toolmate" and config.online:
 
     from toolmate.utils.call_xai import CallXAI
 
@@ -47,4 +47,4 @@ if config.xaiApi_key and config.online:
         config.inputSuggestions.append("Ask X AI: ")
 
     except:
-        print("Plugin `ask xai` not enabled! Check if your X AI API key is valid!")
+        print("Plugin `ask xai` not enabled! Check your X AI API key or internet connection!")

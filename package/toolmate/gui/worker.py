@@ -141,10 +141,6 @@ class QtResponseStreamer:
                 else:
                     # vertex ai
                     answer = event.text
-                # transform
-                if hasattr(config, "outputTextConverters"):
-                    for converter in config.outputTextConverters:
-                        answer = converter(answer)
                 # STREAM THE ANSWER
                 if answer is not None:
                     if firstEvent:

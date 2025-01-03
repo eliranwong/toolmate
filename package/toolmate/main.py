@@ -157,6 +157,8 @@ def main(tempInterface=""):
         Path(tempFolder).mkdir(parents=True, exist_ok=True)
     except:
         pass
+    if hasattr(config, "temp_dir"):
+        config.temp_dir.cleanup()
     # clear title
     clear_title()
 

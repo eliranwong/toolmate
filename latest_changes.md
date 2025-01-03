@@ -1,3 +1,11 @@
+# 0.6.28
+
+* added plugin `ask perplexica with anthropic`
+
+* added plugin `convert Chinese characters`
+
+* automate configuration backup
+
 # 0.6.27
 
 * added tool selection window

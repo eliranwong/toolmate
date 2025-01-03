@@ -1,6 +1,6 @@
 # ToolMate AI
 
-ToolMate AI, formerly known as FreeGenius AI, is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. With the ability to perform multi-step actions, users can customize workflows to tackle complex projects with ease.
+[ToolMate AI](https://toolmate.ai/), formerly known as LetMeDoIt AI, is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. With the ability to perform multi-step actions, users can customize workflows to tackle complex projects with ease.
 
 # Audio Overview
 
@@ -157,7 +157,7 @@ Read more at https://github.com/eliranwong/toolmate/blob/main/package/toolmate/d
 
 Starting with version 0.2.86+, users can utilize the `@` symbol to designate a specific tool within the application. The `toolmate` package now comes with a suite of pre-built tools:
 
-@add_google_calendar_event @add_outlook_calendar_event @agents @append_command @append_fabric @append_instruction @apps @b @bapi @bible @bible_commentary @captain @chat @chatgpt @codey @command @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_imagen3 @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @edit_text @examine_audio_google @examine_audio_groq @examine_audio_openai @examine_audio_whisper @examine_files @examine_images_openai @examine_images_googleai @examine_images_groq @examine_images_llamacpp @examine_images_ollama @examine_images_pixtral @examine_images_vertexai @examine_web_content @execute_python_code @extract_bible_references @extract_python_code @fabric @files @general @googleai @groq @group @help @images @improve_writing @install_python_package @it @list_current_directory_contents @llamacpppython @llamacppserver @load_conversations @lyrics @map @mistral @modify_images @music @news @o1 @o1_mini @ollama @online @open_browser @packages @palm2 @paste_from_clipboard @perplexica_openai @perplexica_googleai @perplexica_groq @perplexica_xai @proxy @qna @radio @read_aloud @recommend_tool @reflection @remove_image_background @repos @save_memory @science @scientific_publications @search_bible @search_bible_paragraphs @search_conversations @search_finance @search_google @search_google_news @search_memory @search_searxng @search_sqlite @search_tavily @search_weather @send_gmail @send_outlook @send_tweet @social_media @software_wikis @task @tavily @transcribe_audio_google @transcribe_audio_groq @transcribe_audio_openai @transcribe_audio_whisper @translate @uniquebible @uniquebible_api @uniquebible_web @vertexai @videos @web @wikimedia @workflow @xai
+@add_google_calendar_event @add_outlook_calendar_event @agents @anthropic @append_command @append_fabric @append_fabric_pattern @append_instruction @apps @azure @b @bapi @bible @bible_commentary @captain @chat @codey @command @convert_relative_datetime @copy_to_clipboard @correct_python_code @create_image_dalle3 @create_image_imagen3 @create_map @create_qrcode @create_statistical_graphics @datetimes @deep_reflection @download_web_content @download_youtube_audio @download_youtube_video @edit_text @examine_audio_google @examine_audio_groq @examine_audio_openai @examine_audio_whisper @examine_files @examine_images_azure @examine_images_github @examine_images_googleai @examine_images_groq @examine_images_ollama @examine_images_openai @examine_images_pixtral @examine_images_vertexai @examine_web_content @execute_python_code @extract_bible_references @extract_python_code @extract_text @fabric @fabric_pattern @files @genai @general @github @googleai @groq @group @help @images @improve_writing @install_python_package @it @list_current_directory_contents @llamacpppython @llamacppserver @load_conversations @lyrics @map @mistral @modify_images @music @news @o1 @o1_mini @ollama @online @open_browser @openai @packages @palm2 @paste_from_clipboard @perplexica_github @perplexica_googleai @perplexica_groq @perplexica_openai @perplexica_xai @proxy @qna @radio @read_aloud @recommend_tool @reflection @remove_image_background @repos @save_memory @science @scientific_publications @screenshot @search_bible @search_bible_paragraphs @search_bing @search_conversations @search_finance @search_google @search_google_news @search_memory @search_searxng @search_sqlite @search_tavily @search_weather @send_gmail @send_outlook @send_tweet @social_media @software_wikis @task @tavily @transcribe_audio_google @transcribe_audio_groq @transcribe_audio_openai @transcribe_audio_whisper @translate @uniquebible @uniquebible_api @uniquebible_web @use_my_computer @vertexai @videos @web @wikimedia @workflow @xai
 
 Android-only tools:
 
@@ -176,11 +176,15 @@ Tips:
 
 # Selectie Screenshots
 
-## NEW! Supports Android
+## Desktop GUI Integration
+
+![work_with_clipboard](https://github.com/user-attachments/assets/e34e1284-dee2-41a5-9a7c-f28532015f88)
+
+## Android Support
 
 ![android](https://github.com/user-attachments/assets/21775454-bd8e-412b-86ab-54e424ed1754)
 
-## Brand New Tool Selection Agent
+## Tool Selection Agent
 
 ![tool_selection_agent_compressed](https://github.com/user-attachments/assets/c963ca48-cb01-4eb7-b40d-57e2a4a92eaf)
 
@@ -224,7 +228,7 @@ Fabric Integration: https://github.com/eliranwong/toolmate/blob/main/package/too
 
 ## Task Execution
 
-![toolmate_ai_screenshot](https://github.com/eliranwong/toolmate/assets/25262722/1e9dd18e-aa4b-4e2c-8d76-386af7ba00ea)
+![task_execution](https://github.com/user-attachments/assets/c5899d76-287b-4dfb-821c-561e9aa14dc0)
 
 ## Content Creation
 

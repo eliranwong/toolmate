@@ -277,6 +277,7 @@ echo 'export OLLAMA_HOST=0.0.0.0' >> ~/.bashrc
 # install fabric
 mkdir -p .local/bin
 echo "export PATH=$HOME/.local/bin:$PATH" >> ~/.bashrc
+#curl -L https://github.com/danielmiessler/fabric/releases/latest/download/fabric-linux-amd64 > ~/.local/bin/fabric && chmod +x ~/.local/bin/fabric && ~/.local/bin/fabric --setup
 curl -L https://github.com/danielmiessler/fabric/releases/latest/download/fabric-linux-arm64 > ~/.local/bin/fabric && chmod +x ~/.local/bin/fabric && ~/.local/bin/fabric --setup
 # reload variables
 source ~/.bashrc

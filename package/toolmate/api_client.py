@@ -1,5 +1,5 @@
 import requests, argparse, json, sys, os, pprint, re, shutil, pydoc, pyperclip
-from toolmate import config, packageFolder, convertOutputText, wrapText, startSpinning, stopSpinning, readTextFile, writeTextFile, print2, print3, getPygmentsStyle, showErrors, isServerAlive, getLlms, searchFolder, getCliOutput
+from toolmate import config, packageFolder, wrapText, startSpinning, stopSpinning, readTextFile, writeTextFile, print2, print3, getPygmentsStyle, showErrors, isServerAlive, getLlms, searchFolder, getCliOutput
 from toolmate.utils.tts_utils import TTSUtil
 from toolmate.utils.single_prompt import SinglePrompt
 
@@ -536,8 +536,6 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
                     role = i.get("role", "")
                     content = i.get("content", "")
                     if role in ("user", "assistant") and content.strip():
-                        if role == "assistant":
-                            content = convertOutputText(content.rstrip())
                         content = f"```{role}\n{content}\n```"
                         if args.export:
                             outputText.append(content)
@@ -563,7 +561,6 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
         else:
             try:
                 output = json.loads(response.json())[-1]["content"]
-                output = convertOutputText(output)
                 if args.export:
                     try:
                         writeTextFile(args.export, output)

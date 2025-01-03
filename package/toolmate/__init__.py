@@ -104,7 +104,6 @@ config.excludeConfigList = []
 config.includeIpInDeviceInfoTemp = config.includeIpInDeviceInfo
 config.divider = "--------------------"
 config.tts = False if not config.isVlcPlayerInstalled and not config.isPygameInstalled and not config.ttsCommand and not config.elevenlabsApi else True
-config.outputTextConverters = []
 
 # save loaded configs
 config.tempInterface = ""

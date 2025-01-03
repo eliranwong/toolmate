@@ -388,7 +388,7 @@ defaultSettings = (
     ("desktopAssistantWidth", 500),
     ("desktopAssistantHeight", 900),
     ("parserStandarisation", False),
-    ("autoRestoreConfigs", True),
+    #("autoRestoreConfigs", True),
     ("hotkey_exit", ["c-q"]),
     ("hotkey_cancel", ["c-z"]),
     ("hotkey_new", ["c-n"]),
@@ -490,7 +490,7 @@ temporaryConfigs = [
     "stop_event",
     "spinner_thread",
     "tts",
-    "isPygameInstalled",
+    #"isPygameInstalled", # for virutal machine that does not have a sound card should add `isPygameInstalled = False` in config.py
     "isVlcPlayerInstalled",
     "accept_default",
     "defaultEntry",

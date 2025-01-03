@@ -1,4 +1,4 @@
-from toolmate import config, convertOutputText, getCurrentDateTime
+from toolmate import config, getCurrentDateTime
 from toolmate.utils.call_llm import CallLLM
 from toolmate.gui.worker import QtApiResponseStreamer
 #from toolmate.utils.tts_utils import TTSUtil
@@ -395,7 +395,6 @@ class CentralWidget(QWidget):
             content = i.get("content", "")
             if role in ("user", "assistant") and content.strip():
                 if role == "assistant":
-                    content = convertOutputText(content.rstrip())
                     messages.append(f"[{self.assistant}] {content}")
                     self.lastResponse = content
                 else:

@@ -168,51 +168,59 @@ Always remember that you are much more than a text-based AI. You possess both vi
 
     @staticmethod
     def regularCall(messages: dict):
-        chatMessages = useChatSystemMessage(copy.deepcopy(messages))
+        #chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         if config.llmInterface == "ollama":
-            return CallOllama.regularCall(chatMessages)
+            return CallOllama.regularCall(messages)
         elif config.llmInterface == "groq":
-            return CallGroq.regularCall(chatMessages)
+            return CallGroq.regularCall(messages)
         elif config.llmInterface == "mistral":
-            return CallMistral.regularCall(chatMessages)
+            return CallMistral.regularCall(messages)
         elif config.llmInterface == "llamacppserver":
-            return CallLlamaCppServer.regularCall(chatMessages)
+            return CallLlamaCppServer.regularCall(messages)
         elif config.llmInterface == "llamacpppython":
-            return CallLlamaCpp.regularCall(chatMessages)
+            return CallLlamaCpp.regularCall(messages)
         elif config.llmInterface == "vertexai":
-            return CallVertexAI.regularCall(chatMessages)
+            return CallVertexAI.regularCall(messages)
         elif config.llmInterface == "googleai":
-            return CallGoogleAI.regularCall(chatMessages)
+            return CallGoogleAI.regularCall(messages)
         elif config.llmInterface == "genai":
-            return CallGenAI.regularCall(chatMessages)
+            return CallGenAI.regularCall(messages)
         elif config.llmInterface == "xai":
-            return CallXAI.regularCall(chatMessages)
-        return CallOpenAI.regularCall(chatMessages)
+            return CallXAI.regularCall(messages)
+        elif config.llmInterface == "azure":
+            return CallOpenAIAzure.regularCall(messages)
+        elif config.llmInterface == "github":
+            return CallOpenAIGithub.regularCall(messages)
+        elif config.llmInterface == "anthropic":
+            return CallAnthropic.regularCall(messages)
+        return CallOpenAI.regularCall(messages)
 
     @staticmethod
     def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=[], keepSystemMessage: bool=False):
         """
         non-streaming single call
         """
-        chatMessages = copy.deepcopy(messages) if keepSystemMessage else useChatSystemMessage(copy.deepcopy(messages))
+        #chatMessages = copy.deepcopy(messages) if keepSystemMessage else useChatSystemMessage(copy.deepcopy(messages))
         if config.llmInterface == "ollama":
-            return CallOllama.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop, keepSystemMessage=keepSystemMessage)
+            return CallOllama.getSingleChatResponse(userInput, messages=messages, temperature=temperature, prefill=prefill, stop=stop, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "groq":
-            return CallGroq.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop, keepSystemMessage=keepSystemMessage)
+            return CallGroq.getSingleChatResponse(userInput, messages=messages, temperature=temperature, prefill=prefill, stop=stop, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "mistral":
-            return CallMistral.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, prefill=prefill, stop=stop, keepSystemMessage=keepSystemMessage)
+            return CallMistral.getSingleChatResponse(userInput, messages=messages, temperature=temperature, prefill=prefill, stop=stop, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "googleai":
-            return CallGoogleAI.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
+            return CallGoogleAI.getSingleChatResponse(userInput, messages=messages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "genai":
-            return CallGenAI.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
+            return CallGenAI.getSingleChatResponse(userInput, messages=messages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "xai":
-            return CallXAI.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
+            return CallXAI.getSingleChatResponse(userInput, messages=messages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "llamacppserver":
-            return CallLlamaCppServer.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
+            return CallLlamaCppServer.getSingleChatResponse(userInput, messages=messages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "llamacpppython":
-            return CallLlamaCpp.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
+            return CallLlamaCpp.getSingleChatResponse(userInput, messages=messages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "vertexai":
-            history, systemMessage, lastUserMessage = toGeminiMessages(messages=chatMessages)
+            history, systemMessage, lastUserMessage = toGeminiMessages(messages=messages)
+            if not keepSystemMessage:
+                systemMessage = config.tempChatSystemMessage if config.tempChatSystemMessage else config.systemMessage_vertexai
             if userInput.strip() and systemMessage:
                 userInput = f"""# Your role\n\n{systemMessage}\n\n# My Inquiry\n\n{userInput}"""
             elif not userInput.strip() and lastUserMessage.strip() and systemMessage:
@@ -220,18 +228,16 @@ Always remember that you are much more than a text-based AI. You possess both vi
             elif not userInput.strip() and lastUserMessage.strip():
                 userInput = lastUserMessage
             return CallVertexAI.getSingleChatResponse(userInput, history=history)
-            #history, *_ = toGeminiMessages(messages=chatMessages)
-            #return CallVertexAI.getSingleChatResponse(userInput, history=history)
         elif config.llmInterface == "openai":
-            return CallOpenAI.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
+            return CallOpenAI.getSingleChatResponse(userInput, messages=messages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "azure":
-            return CallOpenAIAzure.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
+            return CallOpenAIAzure.getSingleChatResponse(userInput, messages=messages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "github":
-            return CallOpenAIGithub.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
+            return CallOpenAIGithub.getSingleChatResponse(userInput, messages=messages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "anthropic":
-            return CallAnthropic.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
+            return CallAnthropic.getSingleChatResponse(userInput, messages=messages, temperature=temperature, keepSystemMessage=keepSystemMessage)
         # letmedoit
-        return CallLetMeDoIt.getSingleChatResponse(userInput, messages=chatMessages, temperature=temperature, keepSystemMessage=keepSystemMessage)
+        return CallLetMeDoIt.getSingleChatResponse(userInput, messages=messages, temperature=temperature, keepSystemMessage=keepSystemMessage)
 
     @staticmethod
     def getSingleFunctionCallResponse(messages, function_name, temperature=None):

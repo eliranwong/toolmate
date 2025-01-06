@@ -1,3 +1,7 @@
+# 0.6.29
+
+* fixed handling main message chain
+
 # 0.6.28
 
 * added plugin `ask perplexica with anthropic`

@@ -109,12 +109,12 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             return "[INVALID]"
 
     @staticmethod
-    def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None, useSystemMessage: bool=True, **kwargs):
-        history, systemMessage, lastUserMessage = toGenAIMessages(messages=copy.deepcopy(messages))
+    def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs):
+        history, _, lastUserMessage = toGenAIMessages(messages=copy.deepcopy(messages))
         chat = getGenAIClient().chats.create(
-            model=config.genai_model,
+            model=config.tempChatSystemMessage if config.tempChatSystemMessage else config.genai_model,
             config=getGenAIConfig(
-                system=config.systemMessage_genai if useSystemMessage else systemMessage,
+                system=config.systemMessage_genai,
                 temperature=temperature,
                 max_output_tokens=max_tokens
             ),
@@ -126,59 +126,6 @@ candidates=[Candidate(content=Content(parts=[Part(video_metadata=None, thought=N
         ```
         """
         return chat.send_message_stream(
-            lastUserMessage,
-            **kwargs,
-        )
-
-    @staticmethod
-    def getCompletion(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None, useSystemMessage: bool=True, **kwargs):
-        history, systemMessage, lastUserMessage = toGenAIMessages(messages=copy.deepcopy(messages))
-        chat = getGenAIClient().chats.create(
-            model=config.genai_model,
-            config=getGenAIConfig(
-                system=config.systemMessage_genai if useSystemMessage else systemMessage,
-                temperature=temperature,
-                max_output_tokens=max_tokens
-            ),
-            history=history,
-        )
-        """
-GenerateContentResponse(
-    candidates=[
-        Candidate(
-            content=Content(
-                parts=[
-                    Part(video_metadata=None, thought=None, code_execution_result=None, executable_code=None, file_data=None, function_call=None, function_response=None, inline_data=None, text='Hi there! How can I help you today?\n')
-                ], 
-                role='model'
-            ), 
-        citation_metadata=None, 
-        finish_message=None, 
-        token_count=None, 
-        avg_logprobs=-0.029097123579545456, 
-        finish_reason='STOP', 
-        grounding_metadata=None, 
-        index=None, 
-        logprobs_result=None, 
-        safety_ratings=[
-            SafetyRating(blocked=None, category='HARM_CATEGORY_HATE_SPEECH', probability='NEGLIGIBLE', probability_score=None, severity=None, severity_score=None), 
-            SafetyRating(blocked=None, category='HARM_CATEGORY_DANGEROUS_CONTENT', probability='NEGLIGIBLE', probability_score=None, severity=None, severity_score=None), 
-            SafetyRating(blocked=None, category='HARM_CATEGORY_HARASSMENT', probability='NEGLIGIBLE', probability_score=None, severity=None, severity_score=None), 
-            SafetyRating(blocked=None, category='HARM_CATEGORY_SEXUALLY_EXPLICIT', probability='NEGLIGIBLE', probability_score=None, severity=None, severity_score=None)])
-        ], 
-    model_version='gemini-2.0-flash-exp', 
-    prompt_feedback=None, 
-    usage_metadata=GenerateContentResponseUsageMetadata(
-        cached_content_token_count=None, 
-        candidates_token_count=11, 
-        prompt_token_count=15, 
-        total_token_count=26
-    ), 
-    automatic_function_calling_history=[], 
-    parsed=None
-)
-        """
-        return chat.send_message(
             lastUserMessage,
             **kwargs,
         )
@@ -286,6 +233,65 @@ parsed=None
             return completion.candidates[0].content.parts[0].text
         except:
             return ""
+
+    @staticmethod
+    def getCompletion(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None, keepSystemMessage: bool=False, **kwargs):
+        history, systemMessage, lastUserMessage = toGenAIMessages(messages=copy.deepcopy(messages))
+        if keepSystemMessage:
+            system = systemMessage
+        elif config.tempChatSystemMessage:
+            system = config.tempChatSystemMessage
+        else:
+            system = config.systemMessage_genai
+        chat = getGenAIClient().chats.create(
+            model=config.genai_model,
+            config=getGenAIConfig(
+                system=system,
+                temperature=temperature,
+                max_output_tokens=max_tokens
+            ),
+            history=history,
+        )
+        """
+GenerateContentResponse(
+    candidates=[
+        Candidate(
+            content=Content(
+                parts=[
+                    Part(video_metadata=None, thought=None, code_execution_result=None, executable_code=None, file_data=None, function_call=None, function_response=None, inline_data=None, text='Hi there! How can I help you today?\n')
+                ], 
+                role='model'
+            ), 
+        citation_metadata=None, 
+        finish_message=None, 
+        token_count=None, 
+        avg_logprobs=-0.029097123579545456, 
+        finish_reason='STOP', 
+        grounding_metadata=None, 
+        index=None, 
+        logprobs_result=None, 
+        safety_ratings=[
+            SafetyRating(blocked=None, category='HARM_CATEGORY_HATE_SPEECH', probability='NEGLIGIBLE', probability_score=None, severity=None, severity_score=None), 
+            SafetyRating(blocked=None, category='HARM_CATEGORY_DANGEROUS_CONTENT', probability='NEGLIGIBLE', probability_score=None, severity=None, severity_score=None), 
+            SafetyRating(blocked=None, category='HARM_CATEGORY_HARASSMENT', probability='NEGLIGIBLE', probability_score=None, severity=None, severity_score=None), 
+            SafetyRating(blocked=None, category='HARM_CATEGORY_SEXUALLY_EXPLICIT', probability='NEGLIGIBLE', probability_score=None, severity=None, severity_score=None)])
+        ], 
+    model_version='gemini-2.0-flash-exp', 
+    prompt_feedback=None, 
+    usage_metadata=GenerateContentResponseUsageMetadata(
+        cached_content_token_count=None, 
+        candidates_token_count=11, 
+        prompt_token_count=15, 
+        total_token_count=26
+    ), 
+    automatic_function_calling_history=[], 
+    parsed=None
+)
+        """
+        return chat.send_message(
+            lastUserMessage,
+            **kwargs,
+        )
 
     # Specific Function Call equivalence
 

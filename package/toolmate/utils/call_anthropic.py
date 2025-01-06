@@ -113,10 +113,16 @@ class CallAnthropic:
                 chatMessages.append({'role': 'assistant', 'content': prefill})
         try:
             systemMessage, chatMessages = separateSystemMessage(chatMessages)
+            if keepSystemMessage:
+                system = systemMessage
+            elif config.tempChatSystemMessage:
+                system = config.tempChatSystemMessage
+            else:
+                system = config.systemMessage_anthropic
             completion = getAnthropicClient().messages.create(
                 model=config.anthropicApi_tool_model,
                 messages=chatMessages,
-                system=systemMessage if keepSystemMessage else config.systemMessage_anthropic,
+                system=system,
                 #n=1,
                 temperature=temperature if temperature is not None else config.llmTemperature,
                 max_tokens=config.anthropicApi_tool_model_max_tokens,
@@ -256,7 +262,7 @@ class CallAnthropic:
     def regularCall(messages: dict, **kwargs):
         _, chatMessages = separateSystemMessage(messages)
         return getAnthropicClient().messages.create(
-            model=config.anthropicApi_tool_model,
+            model=config.tempChatSystemMessage if config.tempChatSystemMessage else config.anthropicApi_tool_model,
             messages=chatMessages,
             system=config.systemMessage_anthropic,
             #n=1,

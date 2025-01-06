@@ -115,7 +115,7 @@ class StreamingWordWrapper:
             if os.path.isfile(stopFile):
                 os.remove(stopFile)
                 finishOutputs(wrapWords, chat_response)
-            if not streaming_event.is_set() and not self.streaming_finished:
+            if streaming_event is None or (not streaming_event.is_set() and not self.streaming_finished):
                 # RETRIEVE THE TEXT FROM THE RESPONSE
                 if openai:
                     # openai

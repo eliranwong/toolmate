@@ -103,11 +103,9 @@ Remember, give me the python code ONLY, without additional notes or explanation.
             return "[INVALID]"
 
     @staticmethod
-    def regularCall(messages: dict, useSystemMessage: bool=True, **kwargs):
+    def regularCall(messages: dict, **kwargs):
         chatMessages = useChatSystemMessage(copy.deepcopy(messages), mergeSystemIntoUserMessage=True)
         history, _, lastUserMessage = toGeminiMessages(messages=chatMessages)
-        #userMessage = f"{systemMessage}\n\nHere is my request:\n{lastUserMessage}" if useSystemMessage and systemMessage else lastUserMessage
-        #userMessage = f"{config.systemMessage_vertexai}\n\nHere is my request:\n{lastUserMessage}" if useSystemMessage and config.systemMessage_vertexai else lastUserMessage
         chat = CallVertexAI.getGeminiModel().start_chat(history=history)
         return chat.send_message(
             lastUserMessage,

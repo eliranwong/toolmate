@@ -1704,7 +1704,7 @@ def isValidPythodCode(code):
     except:
         return None
 
-def extractSystemCommand(content):
+def extractSystemCommand(content, keepInvalid=False):
     try:
         content = re.search("""(```command|```bash|```shell|```sh|```)(.+?)```""", content, re.DOTALL).group(2)
         return content if keepInvalid or isValidPythodCode(content) is not None else ""

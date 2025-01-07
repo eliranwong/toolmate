@@ -81,9 +81,13 @@ https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Tool%20De
 
 https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/Running%20Multiple%20Tools%20in%20One%20Go.md
 
-# Background
+# Use ToolMate as a Library
 
-https://github.com/eliranwong/toolmate/blob/main/package/toolmate/docs/LetMeDoIt%20Mode.md
+You can use package `toolmate` as LLM APIs or library to quicken the development of your AI projects.
+
+Extended projects that based on ToolMate AI APIs:
+
+[TeamGen AI](https://github.com/eliranwong/teamgenai) - Automate generating teams of AI agents to resolve user requests
 
 # Documentation
 

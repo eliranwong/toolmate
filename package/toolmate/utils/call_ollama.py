@@ -163,7 +163,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
 
     @staticmethod
     @check_ollama_errors
-    def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, model: Optional[str]=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
+    def getSingleChatResponse(userInput: str, messages: list=[], temperature: Optional[int]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, model: Optional[str]=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
         # non-streaming single call
         if userInput:
             item = {"role": "user", "content" : userInput}

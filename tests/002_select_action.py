@@ -105,7 +105,7 @@ def execPythonFile(script="", content=""):
 if __name__ == "__main__":
     runPlugins()
     # query = "What time is it now?"
-    query = "Email an appreciation message to Eliran Wong, whose email is support@letmedoit.ai"
+    query = "Email an appreciation message to Eliran Wong, whose email is support@toolmate.ai"
     collection = get_or_create_collection("tools")
     result = query_vectors(collection, query)
     metadatas = result["metadatas"][0][0]

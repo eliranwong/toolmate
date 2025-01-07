@@ -42,7 +42,7 @@ open(os.path.join(package, "config.py"), "w").close()
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
 setup(
     name="toolmate_lite",
-    version="0.6.29",
+    version="0.6.33",
     python_requires=">=3.8, <3.13",
     description=f"ToolMate AI, developed by Eliran Wong, is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. Supports custom workflow and plugins to automate multi-step actions.",
     long_description='''# ToolMate AI Lite
@@ -53,7 +53,7 @@ This `Lite` version supports running on Android Termux as well as on Windows / m
 
 '''+long_description,
     author="Eliran Wong",
-    author_email="support@letmedoit.ai",
+    author_email="support@toolmate.ai",
     packages=[
         package,
         f"{package}.audio",
@@ -154,7 +154,7 @@ This `Lite` version supports running on Android Termux as well as on Windows / m
         ],
     },
     keywords="ai assistant ollama llama llamacpp groq openai chatgpt gemini autogen rag agent stable-diffusion fabric dalle imagen",
-    url="https://letmedoit.ai",
+    url="https://toolmate.ai",
     project_urls={
         "Source": "https://github.com/eliranwong/toolmate",
         "Tracker": "https://github.com/eliranwong/toolmate/issues",

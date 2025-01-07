@@ -63,10 +63,10 @@ if __name__ == "__main__":
     #parameters = {'code': {'type': 'string', 'description': 'Python code that integrates package pendulum to resolve my query'}}
     #print(extractToolParameters(parameters, "What time is it now?"))
     schema = {'email': {'type': 'string', 'description': "The email application. Return 'gmail' if not given.", 'enum': ['gmail', 'outlook']}, 'recipient': {'type': 'string', 'description': 'The recipient of the email.'}, 'subject': {'type': 'string', 'description': 'Give a title to the email.'}, 'body': {'type': 'string', 'description': 'The body or content of the email.'}}
-    parameters = extractToolParameters(schema, "Email an appreciation message to Eliran Wong, whose email is support@letmedoit.ai")
+    parameters = extractToolParameters(schema, "Email an appreciation message to Eliran Wong, whose email is support@toolmate.ai")
 
 # result
-#{'email': 'support@letmedoit.ai'}
-#{'email': 'support@letmedoit.ai', 'recipient': 'Eliran Wong'}
-#{'email': 'support@letmedoit.ai', 'recipient': 'Eliran Wong', 'subject': 'Appreciation Message'}
-#{'email': 'support@letmedoit.ai', 'recipient': 'Eliran Wong', 'subject': 'Appreciation Message', 'body': 'Dear Eliran,\n\nI wanted to take a moment to express my appreciation for your exceptional support and dedication to our project. Your expertise and commitment have been invaluable, and I am grateful for the positive impact you have made on our team.\n\nThank you for your hard work and continued contributions.\n\nBest regards,'}
+#{'email': 'support@toolmate.ai'}
+#{'email': 'support@toolmate.ai', 'recipient': 'Eliran Wong'}
+#{'email': 'support@toolmate.ai', 'recipient': 'Eliran Wong', 'subject': 'Appreciation Message'}
+#{'email': 'support@toolmate.ai', 'recipient': 'Eliran Wong', 'subject': 'Appreciation Message', 'body': 'Dear Eliran,\n\nI wanted to take a moment to express my appreciation for your exceptional support and dedication to our project. Your expertise and commitment have been invaluable, and I am grateful for the positive impact you have made on our team.\n\nThank you for your hard work and continued contributions.\n\nBest regards,'}

@@ -18,7 +18,7 @@ from toolmate.utils.ollama_models import ollama_models
 from prompt_toolkit import prompt
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
-from prompt_toolkit.completion import WordCompleter, FuzzyCompleter, NestedCompleter, ThreadedCompleter
+from prompt_toolkit.completion import WordCompleter, FuzzyCompleter
 from prompt_toolkit.shortcuts import clear, set_title
 from prompt_toolkit.application import run_in_terminal
 from prompt_toolkit import print_formatted_text, HTML

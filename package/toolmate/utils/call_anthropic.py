@@ -98,7 +98,7 @@ class CallAnthropic:
 
     @staticmethod
     @check_llm_errors
-    def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
+    def getSingleChatResponse(userInput, messages=[], temperature: Optional[int]=None, max_tokens: Optional[int]=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
         """
         non-streaming single call
         """
@@ -125,8 +125,9 @@ class CallAnthropic:
                 system=system,
                 #n=1,
                 temperature=temperature if temperature is not None else config.llmTemperature,
-                max_tokens=config.anthropicApi_tool_model_max_tokens,
-                stop=stop if stop else None,
+                max_tokens=max_tokens if max_tokens is not None else config.anthropicApi_tool_model_max_tokens,
+                #stop=stop if stop else None,
+                stream=False,
             )
             return completion.content[0].text
         except:
@@ -262,9 +263,9 @@ class CallAnthropic:
     def regularCall(messages: dict, **kwargs):
         _, chatMessages = separateSystemMessage(messages)
         return getAnthropicClient().messages.create(
-            model=config.tempChatSystemMessage if config.tempChatSystemMessage else config.anthropicApi_tool_model,
+            model=config.anthropicApi_tool_model,
             messages=chatMessages,
-            system=config.systemMessage_anthropic,
+            system=config.tempChatSystemMessage if config.tempChatSystemMessage else config.systemMessage_anthropic,
             #n=1,
             temperature=config.llmTemperature,
             max_tokens=config.anthropicApi_tool_model_max_tokens,

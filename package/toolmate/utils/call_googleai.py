@@ -111,7 +111,7 @@ def getToolArgumentsFromStreams(completion):
     return toolArguments
 
 @check_errors
-def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
+def getSingleChatResponse(userInput, messages=[], temperature: Optional[int]=None, max_tokens: Optional[int]=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
     """
     non-streaming single call
     """
@@ -130,8 +130,8 @@ def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Opt
             messages=chatMessages,
             n=1,
             temperature=temperature if temperature is not None else config.llmTemperature,
-            max_tokens=config.googleaiApi_tool_model_max_tokens,
-            stop=stop if stop else None,
+            max_tokens=max_tokens if max_tokens is not None else config.googleaiApi_tool_model_max_tokens,
+            #stop=stop if stop else None,
         )
         return completion.choices[0].message.content
     except:
@@ -261,8 +261,8 @@ class CallGoogleAI:
 
     @staticmethod
     @check_errors
-    def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
-        return getSingleChatResponse(userInput, messages, temperature, prefill, stop, keepSystemMessage)
+    def getSingleChatResponse(userInput, messages=[], temperature: Optional[int]=None, max_tokens: Optional[int]=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
+        return getSingleChatResponse(userInput, messages, temperature, max_tokens, prefill, stop, keepSystemMessage)
 
     @staticmethod
     def finetuneSingleFunctionCallResponse(func_arguments, function_name):

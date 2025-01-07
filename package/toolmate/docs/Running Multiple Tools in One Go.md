@@ -102,7 +102,7 @@ To integrate multiple tools and chat features in a single prompt, for example:
 ```
 @search_google Latest updates about OpenAI in 2024 
 @chat Give me a summary 
-@send_gmail Email your findings to support@letmedoit.ai in detail
+@send_gmail Email your findings to support@toolmate.ai in detail
 ```
 
 ## Multiple Model Collaboration

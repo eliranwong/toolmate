@@ -159,7 +159,7 @@ class CallOpenAIGithub:
     @staticmethod
     #@check_openai_errors
     @check_api_keys
-    def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
+    def getSingleChatResponse(userInput, messages=[], temperature: Optional[int]=None, max_tokens: Optional[int]=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
         """
         non-streaming single call
         """
@@ -178,7 +178,7 @@ class CallOpenAIGithub:
                 messages=chatMessages,
                 n=1,
                 temperature=temperature if temperature is not None else config.llmTemperature,
-                max_tokens=config.chatGPTApiMaxTokens,
+                max_tokens=max_tokens if max_tokens is not None else config.chatGPTApiMaxTokens,
                 stop=stop if stop else None,
             )
             return completion.choices[0].message.content

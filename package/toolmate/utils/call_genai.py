@@ -112,11 +112,11 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     def regularCall(messages: dict, temperature: Optional[float]=None, max_tokens: Optional[int]=None, **kwargs):
         history, _, lastUserMessage = toGenAIMessages(messages=copy.deepcopy(messages))
         chat = getGenAIClient().chats.create(
-            model=config.tempChatSystemMessage if config.tempChatSystemMessage else config.genai_model,
+            model=config.genai_model,
             config=getGenAIConfig(
-                system=config.systemMessage_genai,
-                temperature=temperature,
-                max_output_tokens=max_tokens
+                system=config.tempChatSystemMessage if config.tempChatSystemMessage else config.systemMessage_genai,
+                temperature=temperature if temperature is not None else config.llmTemperature,
+                max_output_tokens=max_tokens if max_tokens is not None else config.genai_max_output_tokens,
             ),
             history=history,
         )
@@ -148,7 +148,7 @@ candidates=[Candidate(content=Content(parts=[Part(video_metadata=None, thought=N
             function_declarations=[function_declaration],
         )
         history, _, lastUserMessage = toGenAIMessages(messages=copy.deepcopy(messages))
-        genAIConfig = getGenAIConfig(system="""You are a JSON builder expert that outputs in JSON.""", temperature=temperature, max_output_tokens=max_tokens, tools=[tool])
+        genAIConfig = getGenAIConfig(system="""You are a JSON builder expert that outputs in JSON.""", temperature=temperature if temperature is not None else config.llmTemperature, max_output_tokens=max_tokens if max_tokens is not None else config.genai_max_output_tokens, tools=[tool])
         chat = getGenAIClient().chats.create(
             model=config.genai_model,
             config=genAIConfig,
@@ -218,7 +218,7 @@ parsed=None
             return {}
 
     @staticmethod
-    def getSingleChatResponse(userInput, messages=[], temperature=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
+    def getSingleChatResponse(userInput, messages=[], temperature: Optional[int]=None, max_tokens: Optional[int]=None, prefill: Optional[str]=None, stop: Optional[list]=None, keepSystemMessage: bool=False):
         """
         non-streaming single call
         """
@@ -229,7 +229,7 @@ parsed=None
             else:
                 messages.append(item)
         try:
-            completion = CallGenAI.getCompletion(messages=messages, temperature=temperature, useSystemMessage=False if keepSystemMessage else True)
+            completion = CallGenAI.getCompletion(messages=messages, temperature=temperature if temperature is not None else config.llmTemperature, max_tokens=max_tokens if max_tokens is not None else config.genai_max_output_tokens, keepSystemMessage=keepSystemMessage)
             return completion.candidates[0].content.parts[0].text
         except:
             return ""
@@ -247,8 +247,8 @@ parsed=None
             model=config.genai_model,
             config=getGenAIConfig(
                 system=system,
-                temperature=temperature,
-                max_output_tokens=max_tokens
+                temperature=temperature if temperature is not None else config.llmTemperature,
+                max_output_tokens=max_tokens if max_tokens is not None else config.genai_max_output_tokens,
             ),
             history=history,
         )

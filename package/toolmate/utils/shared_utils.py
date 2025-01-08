@@ -552,7 +552,7 @@ def toGenAIMessages(messages: dict=[]) -> Optional[list]:
             role = i.get("role", "")
             content = i.get("content", "")
             if role in ("user", "assistant"):
-                history.append(Content(role="user" if role == "user" else "model", parts=[Part.from_text(content)]))
+                history.append(types.Content(role="user" if role == "user" else "model", parts=[types.Part.from_text(content)]))
                 if role == "user":
                     lastUserMessage = content
             elif role == "system":

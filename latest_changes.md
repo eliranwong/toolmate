@@ -1,3 +1,7 @@
+# 0.6.34
+
+* fixed multi-turn conversation with backend `genai`
+
 # 0.6.29-0.6.33
 
 * fixed handling main message chain

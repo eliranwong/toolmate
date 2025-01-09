@@ -86,7 +86,8 @@ class ApplicationState:
     search_pattern = ""
     replace_pattern = ""
     clipboard = PyperclipClipboard()
-    exitWithoutSaving = False
+    exit_without_saving = False
+    allow_go_to_end = True
 
 def get_statusbar_text():
     return " [esc-m] menu [ctrl+k] help "
@@ -674,7 +675,7 @@ def do_help():
     webbrowser.open("https://github.com/eliranwong/eTextEdit")
 
 def do_exit():
-    get_app().exit() if ApplicationState.exitWithoutSaving else check_changes_before_execute(get_app().exit)
+    get_app().exit() if ApplicationState.exit_without_saving else check_changes_before_execute(get_app().exit)
 
 def do_time_date():
     text = datetime.datetime.now().isoformat()
@@ -683,6 +684,11 @@ def do_time_date():
 def do_add_spaces(event=None):
     buffer = event.app.current_buffer if event is not None else text_field.buffer
     buffer.insert_text("    ")
+
+def do_go_to_end_once(_):
+    if ApplicationState.allow_go_to_end:
+        text_field.buffer.cursor_position = len(text_field.text)
+        ApplicationState.allow_go_to_end = False
 
 def do_go_to():
     async def coroutine():
@@ -894,7 +900,7 @@ def update_title(customTitle=None):
     set_title(customTitle if customTitle is not None else f'''eTextEdit - {os.path.basename(ApplicationState.current_path) if ApplicationState.current_path else "NEW"}''')
 
 def launch(input_text=None, filename=None, exitWithoutSaving=False, customTitle=None):
-    ApplicationState.exitWithoutSaving = exitWithoutSaving
+    ApplicationState.exit_without_saving = exitWithoutSaving
     if filename and os.path.isfile(filename):
         try:
             with open(filename, "r", encoding="utf-8") as fileObj:
@@ -924,6 +930,7 @@ def launch(input_text=None, filename=None, exitWithoutSaving=False, customTitle=
         full_screen=True,
         input=input,
         clipboard=ApplicationState.clipboard,
+        before_render=do_go_to_end_once if exitWithoutSaving else None,
     )
     application.run()
     clear_title()

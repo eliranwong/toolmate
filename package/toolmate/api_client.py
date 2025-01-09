@@ -459,7 +459,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
         else:
             clipboardText = ""
         instruction = prefix + cliDefault + stdin_text + clipboardText + default
-        if args.editor:
+        if args.editor or args.editorcommand:
             if config.customTextEditor or args.editorcommand:
                 tempTextFile = os.path.join(config.toolMateAIFolder, "temp", "edit_instruction")
                 writeTextFile(tempTextFile, instruction)
@@ -467,7 +467,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
                 os.system(f"{customTextEditor} {tempTextFile}")
                 instruction = readTextFile(tempTextFile)
             else:
-                instruction = launch(input_text=instruction, filename=None, exitWithoutSaving=True, customTitle="Edit Instruction")
+                instruction = launch(input_text=instruction, filename=None, exitWithoutSaving=True, customTitle="Edit instruction below; exit when you finish")
         if not instruction:
             # It simply uses the previously generated messages
             instruction = "."

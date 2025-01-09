@@ -1,3 +1,13 @@
+# 0.6.36
+
+* support use of text editor with command `tm` api client
+
+# 0.6.35
+
+* updated ollama model list
+
+* updated `xai` model option to `grok-2-latest`
+
 # 0.6.34
 
 * fixed multi-turn conversation with backend `genai`

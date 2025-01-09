@@ -340,7 +340,7 @@ def getLlms() -> dict:
             "open-mistral-nemo",
         ],
         "xai": [
-            "grok-beta",
+            "grok-2-latest",
         ],
         # The following order matters for changing models if user selects an Gemini model but not specifying the backend
         "genai": [

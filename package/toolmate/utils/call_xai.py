@@ -24,7 +24,7 @@ def check_errors(func):
 @check_errors
 def checkCompletion():
     getXAIClient().chat.completions.create(
-        model="grok-beta",
+        model="grok-2-latest",
         messages=[{"role": "user", "content" : "hello"}],
         n=1,
         max_tokens=10,

@@ -1,4 +1,10 @@
 ollama_models = (
+    "phi4",
+    "phi4:14b",
+    "dolphin3",
+    "dolphin3:8b",
+    "smallthinker",
+    "smallthinker:3b",
     "granite3.1-dense",
     "granite3.1-dense:2b",
     "granite3.1-dense:8b",

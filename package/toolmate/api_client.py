@@ -2,6 +2,7 @@ import requests, argparse, json, sys, os, pprint, re, shutil, pydoc, pyperclip
 from toolmate import config, packageFolder, wrapText, startSpinning, stopSpinning, readTextFile, writeTextFile, print2, print3, getPygmentsStyle, showErrors, isServerAlive, getLlms, searchFolder, getCliOutput
 from toolmate.utils.tts_utils import TTSUtil
 from toolmate.utils.single_prompt import SinglePrompt
+from toolmate.eTextEdit import launch
 
 import pygments
 from pygments.lexers.markup import MarkdownLexer
@@ -213,6 +214,8 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
     parser.add_argument('-cs', '--chatsystem', action='store', dest='chatsystem', help="override chat system message for a single request")
     parser.add_argument('-dt', '--defaulttool', action='store', dest='defaulttool', help="override default tool for a single request; applied when 'Tool Selection Agent' is disabled and no tool is specified in the request")
     parser.add_argument('-e', '--export', action='store', dest='export', help="export conversation; optionally used with -f option to specify a format for the export")
+    parser.add_argument('-ed', '--editor', action='store_true', dest='editor', help=f"""edit instruction with text editor; configured editor: {config.customTextEditor if config.customTextEditor else "etextedit"}""")
+    parser.add_argument('-edcmd', '--editorcommand', action='store', dest='editorcommand', help="specify editor command; edit instruction with this editor command instead of configured editor")
     parser.add_argument('-exec', '--execute', action='store_true', dest='execute', help="execute python code or system command; format a block of python code starting with '```python' or a block of system command starting with '```command'; ends the block with '```'")
     parser.add_argument('-f', '--format', action='store', dest='format', help="conversation output format; plain or chat; plain - readable format designed for sharing; chat - format for saving a conversation when used together with -e option; a saved chat file can be opened with -cf option; when this option is omitted, only the last assistant response is displayed by default")
     parser.add_argument('-ga', '--groupagents', action='store', dest='groupagents', type=int, help="group chat feature; maximum number of agents")
@@ -445,8 +448,6 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
             print(response.text)
 
     else: # default given; "." for display current conversation only
-        startSpinning()
-
         endpoint = f"{host}:{port}/api/toolmate"
 
         # formulate an instruction
@@ -458,9 +459,20 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
         else:
             clipboardText = ""
         instruction = prefix + cliDefault + stdin_text + clipboardText + default
+        if args.editor:
+            if config.customTextEditor or args.editorcommand:
+                tempTextFile = os.path.join(config.toolMateAIFolder, "temp", "edit_instruction")
+                writeTextFile(tempTextFile, instruction)
+                customTextEditor = args.editorcommand if args.editorcommand else config.customTextEditor
+                os.system(f"{customTextEditor} {tempTextFile}")
+                instruction = readTextFile(tempTextFile)
+            else:
+                instruction = launch(input_text=instruction, filename=None, exitWithoutSaving=True, customTitle="Edit Instruction")
         if not instruction:
             # It simply uses the previously generated messages
             instruction = "."
+
+        startSpinning()
 
         chatfile = args.chatfile if args.chatfile is not None and os.path.isfile(args.chatfile) else ""
         if chatfile or args.chat:

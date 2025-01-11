@@ -1,3 +1,7 @@
+# 0.6.38
+
+* fixed plugin converting audio into video
+
 # 0.6.36-0.6.38
 
 * support use of text editor with command `tm` api client

@@ -30,6 +30,12 @@ Alternately,
 1. Run `tmsetup -ec`
 2. Locate the item `azureOpenAIModels` and change its value
 
+# Azure Portal
+
+You can also locate the API keys or endpoints via Azure Portal.
+
+![Image](https://github.com/user-attachments/assets/9477e01a-fd7e-4726-850e-cefd3f9f4346)
+
 # Setup in ToolMate AI
 
 Setup AI backend either in interactive mode:

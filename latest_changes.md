@@ -1,4 +1,12 @@
-# 0.6.38
+# 0.6.40-0.6.51
+
+* added support of additional endpoints for dalle and whisper models in case they are deployed in a region different from the one for language models
+
+* updated ollama model list
+
+* updated dependencies
+
+# 0.6.39
 
 * fixed plugin converting audio into video
 

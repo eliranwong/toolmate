@@ -740,8 +740,8 @@ class ToolMate:
 
     def changeAzureAPIkey(self):
         print3("# Azure API Key: allows access to OpenAI models via Azure service")
-        print1("To set up Azure API Key, read:\nhttps://github.com/marketplace/models\n")
-        print1("Enter your Azure API Key [optional]:")
+        print1("To set up Azure API Key at Azure portal or https://github.com/marketplace/models\n")
+        print1("Enter your Azure API Key for accessing language models [optional]:")
         apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.azureApi_key, is_password=True)
         if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
             config.azureApi_key = apikey
@@ -749,8 +749,8 @@ class ToolMate:
             config.azureApi_key = "toolmate"
         # endpoint
         if config.azureApi_key and not config.azureApi_key == "toolmate":
-            print3("# Azure endpoint url [Optional]")
-            print1("Enter Azure endpoint url below:")
+            print3("# Azure endpoint url")
+            print1("Enter Azure endpoint url for accessing language models:")
             endpoint = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.azureBaseUrl)
             if endpoint and not endpoint.strip().lower() in (config.cancel_entry, config.exit_entry):
                 config.azureBaseUrl = endpoint
@@ -760,6 +760,46 @@ class ToolMate:
                 print2("Configurations updated!")
             except:
                 print2("Failed to connect!")
+
+    def changeAzureAPIkey_dalle(self):
+        print1("Enter your Azure API Key for accessing dalle model [optional]:")
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.azureApi_key_dalle, is_password=True)
+        if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+            config.azureApi_key_dalle = apikey
+        else:
+            config.azureApi_key_dalle = "toolmate"
+        # endpoint
+        if config.azureApi_key_dalle and not config.azureApi_key_dalle == "toolmate":
+            print1("Enter Azure endpoint url for accessing dalle model:")
+            endpoint = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.azureBaseUrl_dalle)
+            if endpoint and not endpoint.strip().lower() in (config.cancel_entry, config.exit_entry):
+                config.azureBaseUrl_dalle = endpoint
+                # deployed model name
+                print1("Enter the deployed name of the dalle model:")
+                deployedname = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.azureOpenAI_model_dalle)
+                if deployedname and not deployedname.strip().lower() in (config.cancel_entry, config.exit_entry):
+                    config.azureOpenAI_model_dalle = deployedname
+                    config.saveConfig()
+
+    def changeAzureAPIkey_whisper(self):
+        print1("Enter your Azure API Key for accessing whisper model [optional]:")
+        apikey = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.azureApi_key_whisper, is_password=True)
+        if apikey and not apikey.strip().lower() in (config.cancel_entry, config.exit_entry):
+            config.azureApi_key_whisper = apikey
+        else:
+            config.azureApi_key_whisper = "toolmate"
+        # endpoint
+        if config.azureApi_key_whisper and not config.azureApi_key_whisper == "toolmate":
+            print1("Enter Azure endpoint url for accessing whisper model:")
+            endpoint = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.azureBaseUrl_whisper)
+            if endpoint and not endpoint.strip().lower() in (config.cancel_entry, config.exit_entry):
+                config.azureBaseUrl_whisper = endpoint
+                # deployed model name
+                print1("Enter the deployed name of the whisper model:")
+                deployedname = self.prompts.simplePrompt(style=self.prompts.promptStyle2, default=config.azureOpenAI_model_whisper)
+                if deployedname and not deployedname.strip().lower() in (config.cancel_entry, config.exit_entry):
+                    config.azureOpenAI_model_whisper = deployedname
+                    config.saveConfig()
 
     def changeTavilyApi(self):
         print3("# Tavily API Key: allows access to Tavily hosted LLMs")
@@ -1593,6 +1633,8 @@ class ToolMate:
                 self.changeGithubAPIkey()
             elif config.llmInterface == "azure":
                 self.changeAzureAPIkey()
+                self.changeAzureAPIkey_dalle()
+                self.changeAzureAPIkey_whisper()
             else:
                 self.changeChatGPTAPIkey()
             self.setLlmModel_chatgpt()

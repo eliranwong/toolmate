@@ -30,7 +30,7 @@ if config.online:
             chatMessages = useChatSystemMessage(copy.deepcopy(config.currentMessages))
             chatMessages = [i for i in chatMessages if not i.get("role", "") == "system"] # beta doesn't support system message
             completion = config.oai_client.chat.completions.create(
-                model="o1-preview",
+                model="o1",
                 messages=chatMessages,
                 max_completion_tokens=32768,
             )

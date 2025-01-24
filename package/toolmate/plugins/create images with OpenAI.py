@@ -20,7 +20,7 @@ if config.online:
     from pathlib import Path
 
     @check_openai_errors
-    def create_image_dalle3(function_args):
+    def create_image_openai(function_args):
         def openImageFile(imageFile):
             if config.terminalEnableTermuxAPI:
                 getCliOutput(f"termux-share {imageFile}")
@@ -109,7 +109,7 @@ if config.online:
             "generate image",
             "create image",
         ],
-        "name": "create_image_dalle3",
+        "name": "create_image_openai",
         "description": "Create an image with DALLE-3",
         "parameters": {
             "type": "object",
@@ -123,4 +123,4 @@ if config.online:
         },
     }
 
-    config.addToolCall(signature=functionSignature, method=create_image_dalle3)
+    config.addToolCall(signature=functionSignature, method=create_image_openai)

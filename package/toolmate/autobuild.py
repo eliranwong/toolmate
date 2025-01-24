@@ -9,6 +9,7 @@ if not hasattr(config, "use_oai_assistant"):
 
 from toolmate import print2, getCurrentModel
 
+#from autogen.agentchat.contrib.captainagent.agent_builder import AgentBuilder # newer version
 from autogen.agentchat.contrib.agent_builder import AgentBuilder
 from autogen import filter_config, GroupChat, GroupChatManager
 import os, traceback, re, datetime, argparse

@@ -251,6 +251,12 @@ defaultSettings = (
     ('azureOpenAIModels', ["gpt-4o", "gpt-4o-mini"]),
     ('azureApi_key', ''),
     ('azureBaseUrl', ''),
+    ('azureOpenAI_model_dalle', 'dall-e-3'),
+    ('azureApi_key_dalle', ''),
+    ('azureBaseUrl_dalle', ''),
+    ('azureOpenAI_model_whisper', 'whisper'),
+    ('azureApi_key_whisper', ''),
+    ('azureBaseUrl_whisper', ''),
     ('githubApi_key', ''),
     ('githubBaseUrl', "https://models.inference.ai.azure.com"),
     ('chatGPTApiModel', 'gpt-4o'),
@@ -281,8 +287,8 @@ defaultSettings = (
     ('groqApi_tool_model_additional_chat_options', {}),
     ('groqApi_chat_model', 'llama-3.3-70b-versatile'),
     ('groqApi_chat_model_additional_chat_options', {}),
-    ('groqApi_tool_model_max_tokens', 2048),
-    ('groqApi_chat_model_max_tokens', 2048),
+    ('groqApi_tool_model_max_tokens', 2048), # llama-3.3-70b-versatile supports 32768 tokens
+    ('groqApi_chat_model_max_tokens', 2048), # llama-3.3-70b-versatile supports 32768 tokens
     ('mistralApi_key', ''),
     ('mistralApi_tool_model', 'mistral-large-latest'),
     ('mistralApi_tool_model_additional_chat_options', {}),

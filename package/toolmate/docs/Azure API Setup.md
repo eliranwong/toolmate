@@ -60,6 +60,10 @@ or via CLI option:
 
 ![azure3](https://github.com/user-attachments/assets/c202d160-396f-44c5-beea-7570ae960560)
 
+# Support Additional Enpoints
+
+From version 0.6.51, toolmate support additional Azure enpoints for accessing dalle and whisper models, in additional to support endpoint for accessing language models.  It is useful when dalle and whisper are deployed in a different resource or region from the one used for language models.  After choosing Azure as the AI backend, follow through the prompts to enter additional endpoints and API keys.
+
 # Links
 
 https://github.com/marketplace

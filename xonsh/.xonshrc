@@ -23,7 +23,7 @@ toolmate_tools = [
  'googleai',
  'groq',
  'llamacpp',
- 'llamacppserver',
+ 'llamacpppython',
  'mistral',
  'o1',
  'o1_mini',

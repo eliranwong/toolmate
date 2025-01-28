@@ -80,7 +80,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallGroq.checkCompletion()
         elif llmInterface == "mistral":
             return CallMistral.checkCompletion()
-        elif llmInterface == "llamacppserver":
+        elif llmInterface == "llamacpp":
             return CallLlamaCppServer.checkCompletion()
         elif llmInterface == "llamacpppython":
             return CallLlamaCpp.checkCompletion()
@@ -112,7 +112,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallGroq.autoCorrectPythonCode(code, trace)
         elif llmInterface == "mistral":
             return CallMistral.autoCorrectPythonCode(code, trace)
-        elif llmInterface == "llamacppserver":
+        elif llmInterface == "llamacpp":
             return CallLlamaCppServer.autoCorrectPythonCode(code, trace)
         elif llmInterface == "llamacpppython":
             return CallLlamaCpp.autoCorrectPythonCode(code, trace)
@@ -143,7 +143,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallGroq.runSingleFunctionCall(messages, function_name)
         elif config.llmInterface == "mistral":
             return CallMistral.runSingleFunctionCall(messages, function_name)
-        elif config.llmInterface == "llamacppserver":
+        elif config.llmInterface == "llamacpp":
             return CallLlamaCppServer.runSingleFunctionCall(messages, function_name)
         elif config.llmInterface == "llamacpppython":
             return CallLlamaCpp.runSingleFunctionCall(messages, function_name)
@@ -175,7 +175,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallGroq.regularCall(messages)
         elif config.llmInterface == "mistral":
             return CallMistral.regularCall(messages)
-        elif config.llmInterface == "llamacppserver":
+        elif config.llmInterface == "llamacpp":
             return CallLlamaCppServer.regularCall(messages)
         elif config.llmInterface == "llamacpppython":
             return CallLlamaCpp.regularCall(messages)
@@ -212,7 +212,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallGenAI.getSingleChatResponse(userInput, messages=messages, temperature=temperature, max_tokens=max_tokens, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "xai":
             return CallXAI.getSingleChatResponse(userInput, messages=messages, temperature=temperature, max_tokens=max_tokens, keepSystemMessage=keepSystemMessage)
-        elif config.llmInterface == "llamacppserver":
+        elif config.llmInterface == "llamacpp":
             return CallLlamaCppServer.getSingleChatResponse(userInput, messages=messages, temperature=temperature, max_tokens=max_tokens, keepSystemMessage=keepSystemMessage)
         elif config.llmInterface == "llamacpppython":
             return CallLlamaCpp.getSingleChatResponse(userInput, messages=messages, temperature=temperature, max_tokens=max_tokens, keepSystemMessage=keepSystemMessage)
@@ -248,7 +248,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallGroq.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmInterface == "mistral":
             return CallMistral.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
-        elif config.llmInterface == "llamacppserver":
+        elif config.llmInterface == "llamacpp":
             return CallLlamaCppServer.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
         elif config.llmInterface == "llamacpppython":
             return CallLlamaCpp.getSingleFunctionCallResponse(messages, function_name, temperature=temperature)
@@ -279,7 +279,7 @@ Always remember that you are much more than a text-based AI. You possess both vi
             return CallGroq.runToolCall(messages)
         elif config.llmInterface == "mistral":
             return CallMistral.runToolCall(messages)
-        elif config.llmInterface == "llamacppserver":
+        elif config.llmInterface == "llamacpp":
             return CallLlamaCppServer.runToolCall(messages)
         elif config.llmInterface == "llamacpppython":
             return CallLlamaCpp.runToolCall(messages)

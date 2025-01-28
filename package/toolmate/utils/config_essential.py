@@ -85,7 +85,7 @@ defaultSettings = (
     ('appName', ''),
     ('text2art_font1', 'cybermedum'),
     ('text2art_font2', 'white_bubble'),
-    ('llmInterface', ""), # "anthropic", "llamacpppython", "llamacppserver", "ollama", "openai", "letmedoit", "github", "azure", "groq", "mistral", "xai", "googleai", "vertexai"
+    ('llmInterface', ""), # "anthropic", "llamacpppython", "llamacpp", "ollama", "openai", "letmedoit", "github", "azure", "groq", "mistral", "xai", "googleai", "vertexai"
     ('tool_selection_agent', False), # automatically screens user request and recommend tools, can also be manually triggered by tool `@recommend_tool`
     ('tool_selection_requirements', False), # convey each tool's requirements to the tool selection agent for the tool selection process.
     ('auto_tool_selection', False), # apply only if tool_selection_agent is set to True
@@ -294,8 +294,8 @@ defaultSettings = (
     ('mistralApi_tool_model_additional_chat_options', {}),
     ('mistralApi_chat_model', 'mistral-large-latest'),
     ('mistralApi_chat_model_additional_chat_options', {}),
-    ('mistralApi_tool_model_max_tokens', 2048),
-    ('mistralApi_chat_model_max_tokens', 2048),
+    ('mistralApi_tool_model_max_tokens', 8000),
+    ('mistralApi_chat_model_max_tokens', 8000),
     ('xaiApi_key', ''),
     ('xaiApi_tool_model', "grok-2-latest"),
     ('xaiApi_tool_model_additional_chat_options', {}),
@@ -454,7 +454,7 @@ temporaryConfigs = [
     "llamacppserver_tool_client",
     "llamacppserver_chat_client",
     "tempInterface",
-    "llamacppServer",
+    "llamacpp",
     "llamacppChatServer",
     "llamacppVisionServer",
     "autogenstudioServer",

@@ -62,7 +62,7 @@ class LlamacppServerChat:
             prompt, self.defaultPrompt = self.defaultPrompt, ""
         historyFolder = os.path.join(config.localStorage, "history")
         Path(historyFolder).mkdir(parents=True, exist_ok=True)
-        chat_history = os.path.join(historyFolder, "llamacppserver")
+        chat_history = os.path.join(historyFolder, "llamacpp")
         chat_session = PromptSession(history=FileHistory(chat_history))
 
         print2(f"\n{self.name} loaded!")

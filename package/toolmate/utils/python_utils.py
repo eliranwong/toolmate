@@ -3,7 +3,7 @@ from toolmate.utils.call_llm import CallLLM
 from toolmate import config, getPythonFunctionResponse, fineTunePythonCode, showErrors
 from toolmate import print1, extractPythonCode, displayPythonCode
 import json
-import io, sys
+import sys
 from io import StringIO
 
 class PythonUtil:

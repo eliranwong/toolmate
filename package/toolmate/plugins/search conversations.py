@@ -94,7 +94,7 @@ if not config.isLite:
                 messages = fileObj.read()
             currentMessages = eval(messages)
             if type(currentMessages) == list:
-                config.currentMessages = [{"content": i.get("content", ""), "role": "user"} if i.get("role", "") == "user" and config.llmInterface in ("openai", "letmedoit", "github", "azure", "groq", "llamacppserver") else i for i in currentMessages] # make sure "tool" is not in user message
+                config.currentMessages = [{"content": i.get("content", ""), "role": "user"} if i.get("role", "") == "user" and config.llmInterface in ("openai", "letmedoit", "github", "azure", "groq", "llamacpp") else i for i in currentMessages] # make sure "tool" is not in user message
                 # display loaded messages
                 displayLoadedMessages(config.currentMessages)
                 return ""

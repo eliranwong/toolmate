@@ -57,7 +57,7 @@ def main(tempInterface=""):
 
     # update to the latest version
     config.tempInterface = tempInterface
-    backends = ("anthropic", "llamacpppython", "llamacppserver", "mistral", "ollama", "groq", "xai", "googleai", "vertexai", "openai", "genai", "letmedoit", "github", "azure")
+    backends = ("anthropic", "llamacpppython", "llamacpp", "mistral", "ollama", "groq", "xai", "googleai", "vertexai", "openai", "genai", "letmedoit", "github", "azure")
     if args.backend:
         config.llmInterface = args.backend.lower()
     elif args.temp and args.temp.lower() in backends:

@@ -113,7 +113,7 @@ class ToolMateHub(QSystemTrayIcon):
         submenu = QMenu()
         for i in (
             "llamacpppython",
-            "llamacppserver",
+            "llamacpp",
             "ollamachat",
             "groqchat",
             "openai",

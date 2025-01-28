@@ -9,7 +9,7 @@ Ask llama.cpp server Model for conversation only; no function calling
 from toolmate import config
 from toolmate.utils.call_llamacppserver import CallLlamaCppServer
 
-def llamacppserver(function_args):
+def llamacpp(function_args):
     config.stopSpinning()
     if function_args:
         query = function_args.get("query") # required
@@ -24,7 +24,7 @@ functionSignature = {
     "examples": [
         "Ask Llama.cpp Server",
     ],
-    "name": "llamacppserver",
+    "name": "llamacpp",
     "description": "Ask Llama.cpp Server to chat or provide information",
     "parameters": {
         "type": "object",
@@ -38,5 +38,5 @@ functionSignature = {
     },
 }
 
-config.addToolCall(signature=functionSignature, method=llamacppserver)
+config.addToolCall(signature=functionSignature, method=llamacpp)
 config.inputSuggestions.append("Ask Llama.cpp Server: ")

@@ -2,7 +2,7 @@
 
 ![llamacpp_with_gpu_offloading_compressed](https://github.com/eliranwong/toolmate/assets/25262722/2d607fc1-e6b5-4c62-be14-325d73866fce)
 
-Run '.model' in ToolMate AI prompt and select 'llamacppserver' as LLM interface.  This option is designed for advanced users who want more control over the LLM backend, particularly useful for customisation like GPU acceleration.
+Run '.model' in ToolMate AI prompt and select 'llamacpp' as LLM interface.  This option is designed for advanced users who want more control over the LLM backend, particularly useful for customisation like GPU acceleration.
 
 # Requirements:
 

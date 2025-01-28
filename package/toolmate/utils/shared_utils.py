@@ -311,7 +311,7 @@ def getLlms() -> dict:
     llms = {
         "anthropic": ["claude-3-5-sonnet-latest"], # https://docs.anthropic.com/en/docs/about-claude/models
         "llamacpppython": ["llamacpppython"],
-        "llamacppserver": ["llamacppserver"],
+        "llamacpp": ["llamacpp"],
         "ollama": ollamaModels,
         "groq": [
             "mixtral-8x7b-32768",
@@ -811,7 +811,7 @@ def getAutogenConfigList():
             "model": config.llamacppToolModel_model_path,
             "base_url": f"{config.customToolServer_protocol}{config.customToolServer_ip}:{config.customToolServer_port}/v1",
             "api_key": "toolmate",
-            "tags": ["llamacppserver"],
+            "tags": ["llamacpp"],
         })
     os.environ["OAI_CONFIG_LIST"] = json.dumps(config_list)
     os.environ["code_execution_use_docker"] = str(config.code_execution_use_docker)
@@ -985,7 +985,7 @@ def getLlamacppServerClient(server="tool"):
 
 def startLlamacppServer():
     try:
-        if not hasattr(config, "llamacppServer") or config.llamacppServer is None:
+        if not hasattr(config, "llamacpp") or config.llamacppServer is None:
             config.llamacppServer = None
             print2("Running llama.cpp tool server ...")
             cpuThreads = getCpuThreads()
@@ -1000,7 +1000,7 @@ def startLlamacppServer():
     webbrowser.open(f"http://127.0.0.1:{config.llamacppToolModel_server_port}/docs")
 
 def stopLlamacppServer():
-    if hasattr(config, "llamacppServer") and config.llamacppServer is not None:
+    if hasattr(config, "llamacpp") and config.llamacppServer is not None:
         if isServerAlive("127.0.0.1", config.llamacppToolModel_server_port):
             print2("Stopping llama.cpp tool server ...")
             os.killpg(os.getpgid(config.llamacppServer.pid), signal.SIGTERM)
@@ -1621,7 +1621,7 @@ def useChatSystemMessage(messages: dict, mergeSystemIntoUserMessage=False, thisS
                 messages[originalIndex]["content"] = config.systemMessage_groq
             elif config.llmInterface == "mistral":
                 messages[originalIndex]["content"] = config.systemMessage_mistral
-            elif config.llmInterface == "llamacppserver":
+            elif config.llmInterface == "llamacpp":
                 messages[originalIndex]["content"] = config.systemMessage_llamacppserver
             elif config.llmInterface == "llamacpppython":
                 messages[originalIndex]["content"] = config.systemMessage_llamacpp

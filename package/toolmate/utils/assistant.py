@@ -181,7 +181,7 @@ class ToolMate:
 
         # initial completion check at startup
         if config.initialCompletionCheck:
-            if config.llmInterface == "llamacppserver":
+            if config.llmInterface == "llamacpp":
                 runToolMateCommand("customtoolserver")
                 if config.useAdditionalChatModel:
                     runToolMateCommand("customchatserver")
@@ -1483,7 +1483,7 @@ class ToolMate:
         instruction = "Select an AI Backend:"
         print1(instruction)
         options = {
-            "llamacppserver": "Llama.cpp [FREE]",
+            "llamacpp": "Llama.cpp [FREE]",
             "llamacpppython": "Llama-cpp-python [FREE]",
             "ollama": "Ollama [FREE]",
             "groq": "Groq Cloud API [FREE/PAID]",
@@ -1568,7 +1568,7 @@ class ToolMate:
                 self.setContextWindowSize(feature="chat")
                 self.setMaxTokens(feature="chat")
                 self.setGpuLayers(feature="chat")
-        elif config.llmInterface == "llamacppserver":
+        elif config.llmInterface == "llamacpp":
             print2("# Tool Server - for both task execution and conversation")
             self.setLlmModel_llamacppserver()
             self.setMaxTokens(feature="default")
@@ -2135,7 +2135,7 @@ class ToolMate:
             systemMessage_chat = config.systemMessage_groq
         elif config.llmInterface == "mistral":
             systemMessage_chat = config.systemMessage_mistral
-        elif config.llmInterface == "llamacppserver":
+        elif config.llmInterface == "llamacpp":
             systemMessage_chat = config.systemMessage_llamacppserver
         elif config.llmInterface == "llamacpppython":
             systemMessage_chat = config.systemMessage_llamacpp
@@ -2257,7 +2257,7 @@ class ToolMate:
                 config.systemMessage_groq = message
             elif config.llmInterface == "mistral":
                 config.systemMessage_mistral = message
-            elif config.llmInterface == "llamacppserver":
+            elif config.llmInterface == "llamacpp":
                 config.systemMessage_llamacppserver = message
             elif config.llmInterface == "llamacpppython":
                 config.systemMessage_llamacpp = message
@@ -2448,7 +2448,7 @@ class ToolMate:
             if showMessage:
                 print1("Visit https://docs.x.ai/docs#models to read about tokens limits. In our latest test, the maximum value accepts 127999.")
             currentMaxTokens = config.xaiApi_tool_model_max_tokens
-        elif config.llmInterface in ("llamacpppython", "llamacppserver"):
+        elif config.llmInterface in ("llamacpppython", "llamacpp"):
             currentMaxTokens = config.llamacppChatModel_max_tokens if feature == "chat" else config.llamacppToolModel_max_tokens
         elif config.llmInterface == "ollama":
             currentMaxTokens = config.ollamaChatModel_num_predict if feature == "chat" else config.ollamaToolModel_num_predict
@@ -2490,7 +2490,7 @@ class ToolMate:
                 config.xaiApi_tool_model_max_tokens = maxtokens
             elif config.llmInterface == "anthropic":
                 config.anthropicApi_tool_model_max_tokens = maxtokens
-            elif config.llmInterface in ("llamacpppython", "llamacppserver"):
+            elif config.llmInterface in ("llamacpppython", "llamacpp"):
                 if feature == "chat":
                     config.llamacppChatModel_max_tokens = maxtokens
                 else:
@@ -3659,7 +3659,7 @@ Acess the risk level of the following `{target.capitalize()}`:
         #if gui is None:
         #    gui = True if hasattr(config, "desktopAssistant") else False
         if openai is None:
-            openai = True if config.llmInterface in ("openai", "letmedoit", "github", "azure", "googleai", "xai", "groq", "mistral", "llamacppserver") else False
+            openai = True if config.llmInterface in ("openai", "letmedoit", "github", "azure", "googleai", "xai", "groq", "mistral", "llamacpp") else False
         try:
             #if gui:
             #    QtResponseStreamer(config.desktopAssistant).workOnCompletion(completion, openai)

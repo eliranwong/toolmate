@@ -252,7 +252,7 @@ def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
     parser.add_argument('-ta', '--toolagent', action='store_true', dest='toolagent', help="toggle tool selection agent for a single request")
     parser.add_argument('-vc', '--viewconfigs', action='store_true', dest='viewconfigs', help="view current server configurations")
     parser.add_argument('-wd', '--workingdirectory', action='store', dest='workingdirectory', help="working directory; current location by default")
-    parser.add_argument('-ws', '--windowsize', action='store', dest='windowsize', type=int, help="override context window size for a single request; applicable to backends `llama.cpp` amd `ollama` only; accepts non-negative integers; unaccepted values will be ignored")
+    parser.add_argument('-ws', '--windowsize', action='store', dest='windowsize', type=int, help="override context window size for a single request; applicable to backends `llama-cpp-python` amd `ollama` only; accepts non-negative integers; unaccepted values will be ignored")
     parser.add_argument('-ww', '--wordwrap', action='store_true', dest='wordwrap', help="toggle word wrap of assistant response a single request")
     # Parse arguments
     args = parser.parse_args()

@@ -89,6 +89,10 @@ Extended projects that based on ToolMate AI APIs:
 
 [TeamGen AI](https://github.com/eliranwong/teamgenai) - Automate generating teams of AI agents to resolve user requests
 
+NEW! We are developing a separate project `toolmate-sdk`, incorporating the best aspects of our ToolMate AI, to create a library aimed at further advancing the development of AI applications.
+
+Find more updates at: https://github.com/eliranwong/toolmate-sdk/tree/main
+
 # Documentation
 
 https://github.com/eliranwong/toolmate/wiki

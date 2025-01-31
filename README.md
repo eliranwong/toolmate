@@ -91,7 +91,7 @@ Extended projects that based on ToolMate AI APIs:
 
 NEW! We are developing a separate project `toolmate-sdk`, incorporating the best aspects of our ToolMate AI, to create a library aimed at further advancing the development of AI applications.
 
-Find more updates at: https://github.com/eliranwong/toolmate-sdk/tree/main
+Find more updates at: [https://github.com/eliranwong/toolmate-sdk/tree/main](https://github.com/eliranwong/agentmake)
 
 # Documentation
 

@@ -2,6 +2,10 @@
 
 [ToolMate AI](https://toolmate.ai/), formerly known as LetMeDoIt AI, is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. With the ability to perform multi-step actions, users can customize workflows to tackle complex projects with ease.
 
+# Latest Updates
+
+We are upgrading ToolMate AI tools and agents in AgentMake AI. Read more at: https://github.com/eliranwong/agentmake
+
 # Audio Overview
 
 [![Watch the video](https://img.youtube.com/vi/kLv0lUNoTQw/maxresdefault.jpg)](https://youtu.be/kLv0lUNoTQw)

@@ -67,7 +67,7 @@ if config.online:
             content.insert(0, {"type": "text", "text": query,})
 
             response = client.chat.completions.create(
-                model="gpt-4o",
+                model="gemini-1.5-pro",
                 messages=[
                     {
                     "role": "user",

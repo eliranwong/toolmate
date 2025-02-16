@@ -179,7 +179,7 @@ def tmt20():
 def main(chat: bool = False, defaultTool=None, chatSystem=None, default=""):
     configFile = os.path.join(config.toolMateAIFolder, "config.py")
     # Create the parser
-    parser = argparse.ArgumentParser(description = """ToolMate AI API client `tm` cli options;
+    parser = argparse.ArgumentParser(description = """AgentMake AI API `ag` cli options;
                                     available shortcuts:
                                     `tmc` -> `tm -c`;
                                     `tmcmd` -> `tm -dt command`;

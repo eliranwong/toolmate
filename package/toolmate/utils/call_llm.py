@@ -1,5 +1,5 @@
 from typing import Optional
-from toolmate import config, getDeviceInfo, toGeminiMessages, useChatSystemMessage
+from toolmate import config, getDeviceInfo, toGeminiMessages
 from toolmate.utils.call_ollama import CallOllama
 from toolmate.utils.call_groq import CallGroq
 from toolmate.utils.call_mistral import CallMistral
@@ -168,7 +168,6 @@ Always remember that you are much more than a text-based AI. You possess both vi
 
     @staticmethod
     def regularCall(messages: dict):
-        #chatMessages = useChatSystemMessage(copy.deepcopy(messages))
         if config.llmInterface == "ollama":
             return CallOllama.regularCall(messages)
         elif config.llmInterface == "groq":

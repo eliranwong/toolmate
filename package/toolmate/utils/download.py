@@ -7,9 +7,11 @@ class Downloader:
 
     @staticmethod
     def downloadOllamaModel(model, force=False) -> bool:
+        if not ":" in model:
+            model = f"{model}:latest"
         if force or not model in getLlms()["ollama"]:
 
-            print(f"Downloading '{model}' ...")
+            print(f"Downloading model '{model}' ...")
             
             try:
                 #https://github.com/ollama/ollama-python/blob/main/examples/pull-progress/main.py

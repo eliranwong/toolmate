@@ -133,7 +133,7 @@ Remember, give me the python code ONLY, without additional notes or explanation.
     @staticmethod
     @check_ollama_errors
     def getDictionaryOutput(messages: list, temperature: Optional[float]=None, num_ctx: Optional[int]=None, num_batch: Optional[int]=None, num_predict: Optional[int]=None, schema: Optional[Union[str,dict]]="json"):
-        #pprint.pprint(messages)
+        schema = toParameterSchema(schema)
         try:
             completion = getOllamaServerClient().chat(
                 keep_alive=config.ollamaToolModel_keep_alive,

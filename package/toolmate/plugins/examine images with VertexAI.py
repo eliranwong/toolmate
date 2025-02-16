@@ -32,7 +32,7 @@ if not config.isLite and config.online:
     def examine_images_vertexai(function_args):
         from toolmate import config
 
-        answer = GeminiProVision(temperature=config.llmTemperature).examine_images_vertexai(function_args)
+        answer = GeminiProVision(temperature=config.llmTemperature).examine_images(function_args)
         if answer:
             config.toolTextOutput = answer
             return ""

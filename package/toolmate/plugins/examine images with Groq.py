@@ -61,7 +61,7 @@ if config.online:
                     "content": content,
                     }
                 ],
-                max_tokens=8000,
+                max_tokens=8192,
             )
             answer = completion.choices[0].message.content
             config.toolTextOutput = answer

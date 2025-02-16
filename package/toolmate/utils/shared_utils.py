@@ -305,7 +305,7 @@ def separateSystemMessage(messages):
 
 def getLlms() -> dict:
     try:
-        ollamaModels = [i.get("model") for i in ollama_ls()["models"]]
+        ollamaModels = [i.model for i in ollama_ls().models]
     except:
         ollamaModels = []
     llms = {

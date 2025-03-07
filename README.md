@@ -93,6 +93,10 @@ Limitation: As ToolMate AI uses AgentMake AI tools, it can only solve requests w
 
 Go Beyond the limitations: AgentMake AI supports custom tools to extend its capabilities.  You can create [AgentMake AI custom tools](https://github.com/eliranwong/agentmake/blob/main/docs/create_tools.md) to meet your own needs.
 
+# Disclaimer
+
+In response to your instructions, ToolMate AI is capable of applying tools to generate files or make changes. Please use it with your sound judgment and at your own risk. We will not take any responsibility for any negative impacts, such as data loss or other issues.
+
 # ToolMate AI (BEFORE VERSION 2)
 
 [ToolMate AI](https://toolmate.ai/), formerly known as LetMeDoIt AI, is a cutting-edge AI companion that seamlessly integrates agents, tools, and plugins to excel in conversations, generative work, and task execution. With the ability to perform multi-step actions, users can customize workflows to tackle complex projects with ease.

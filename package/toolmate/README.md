@@ -16,6 +16,7 @@ Fully automatic:
 - Automate Report Generation
 
 As version 2.0 is completely written with [AgentMake AI SDK](https://github.com/eliranwong/agentmake), it [supports 14 AI backends](https://github.com/eliranwong/agentmake#supported-backends). It runs with less dependencies than that required by preivious versions. It starts up much faster. Much more ...
+
 # Disclaimer
 
 In response to your instructions, ToolMate AI is capable of applying tools to generate files or make changes on your devices. Please use it with your sound judgment and at your own risk. We will not take any responsibility for any negative impacts, such as data loss or other issues.

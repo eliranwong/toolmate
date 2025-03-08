@@ -16,6 +16,9 @@ Fully automatic:
 - Automate Report Generation
 
 As version 2.0 is completely written with [AgentMake AI SDK](https://github.com/eliranwong/agentmake), it [supports 14 AI backends](https://github.com/eliranwong/agentmake#supported-backends). It runs with less dependencies than that required by preivious versions. It starts up much faster. Much more ...
+# Disclaimer
+
+In response to your instructions, ToolMate AI is capable of applying tools to generate files or make changes on your devices. Please use it with your sound judgment and at your own risk. We will not take any responsibility for any negative impacts, such as data loss or other issues.
 
 # Installation
 
@@ -43,7 +46,7 @@ ai -m
 
 # Command Line Interface
 
-ToolMate AI 2.0 offers mainly two commands `toolmate` / `tm` and `toolmatelite` / `tml` to resolve complex and simple tasks respectively.
+ToolMate AI 2.0+ offers mainly two commands `toolmate` / `tm` and `toolmatelite` / `tml` to resolve complex and simple tasks respectively.
 
 To resolve tasks that involves multiple tools or multiple steps, e.g.:
 
@@ -93,9 +96,13 @@ Limitation: As ToolMate AI uses AgentMake AI tools, it can only solve requests w
 
 Go Beyond the limitations: AgentMake AI supports custom tools to extend its capabilities.  You can create [AgentMake AI custom tools](https://github.com/eliranwong/agentmake/blob/main/docs/create_tools.md) to meet your own needs.
 
-# Disclaimer
+# Sibling projects
 
-In response to your instructions, ToolMate AI is capable of applying tools to generate files or make changes. Please use it with your sound judgment and at your own risk. We will not take any responsibility for any negative impacts, such as data loss or other issues.
+[AgentMake AI](https://github.com/eliranwong/agentmake)
+
+[LetMeDoIt AI](https://github.com/eliranwong/letmedoit)
+
+[TeamGen AI](https://github.com/eliranwong/teamgenai)
 
 # ToolMate AI (BEFORE VERSION 2)
 

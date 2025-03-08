@@ -16,8 +16,37 @@ Fully automatic:
 - Automate Report Generation
 
 As version 2.0 is completely written with [AgentMake AI SDK](https://github.com/eliranwong/agentmake), it [supports 14 AI backends](https://github.com/eliranwong/agentmake#supported-backends). It runs with less dependencies than that required by preivious versions. It starts up much faster. Much more ...
+# Disclaimer
 
-ToolMate AI 2.0 offers mainly two commands `toolmate` / `tm` and `toolmatelite` / `tml` to resolve complex and simple tasks respectively.
+In response to your instructions, ToolMate AI is capable of applying tools to generate files or make changes on your devices. Please use it with your sound judgment and at your own risk. We will not take any responsibility for any negative impacts, such as data loss or other issues.
+
+# Installation
+
+> pip install toolmate
+
+Setting up a virtual environment is recommended, e.g.
+
+```
+python3 -m venv tm
+source tm/bin/activate
+pip install --upgrade toolmate
+# setup
+ai -m
+```
+
+Install extra package `genai` to support backend Vertex AI via `google-genai` library:
+
+```
+python3 -m venv tm
+source tm/bin/activate
+pip install --upgrade "toolmate[genai]"
+# setup
+ai -m
+```
+
+# Command Line Interface
+
+ToolMate AI 2.0+ offers mainly two commands `toolmate` / `tm` and `toolmatelite` / `tml` to resolve complex and simple tasks respectively.
 
 To resolve tasks that involves multiple tools or multiple steps, e.g.:
 
@@ -31,39 +60,49 @@ To resolve simple task, e.g.:
 
 Remarks: `tm` is an alias to `toolmate` whereas `tml` is an alias to `toolmatelite`.
 
-## Limit Tool Choices
+# Limit Tool Choices
 
 Be default, ToolMate AI considers all available tools recognized by AgentMake AI for tool selection and action plan.  You can limit the tool choices to serve your preference or to improve efficiency and accuracy. Simple declare the tools in your request e.g.:
 
 > toolmate "@chat @styles/british_english @search/google @magic @perplexica/anthropic Write brief introductions to William Shakespeare, David Williams and Plato. Save them in three separate markdown files in three separate folders named after them. Finally, package these three folders in a single zip file." -b azure
 
-## More CLI Options
+# More CLI Options
 
 For more CLI options, run:
 
 > toolmate -h
 
-## AI Backends and Configurations
+# AI Backends and Configurations
 
 ToolMate AI uses [AgentMake AI](https://github.com/eliranwong/agentmake) configurations. The default AI backend is Ollama, but you can easily edit the default backend and other configurations. To configure, run:
 
 > ai -ec
 
-## Custom Tools
-
-[AgentMake AI](https://github.com/eliranwong/agentmake) is built with a large set of tools. To list all of them, run:
-
-> ai -lt
-
-You can create [AgentMake AI custom tools](https://github.com/eliranwong/agentmake/blob/main/docs/create_tools.md) to meet your own needs.
-
-## ToolMate Agentic Workflow
+# ToolMate Agentic Workflow
 
 <img width="794" alt="Image" src="https://github.com/user-attachments/assets/c79efda7-5da5-41fe-af67-e48ea32e5af6" />
 
-## ToolMate Lite Agentic Workflow
+# ToolMate Lite Agentic Workflow
 
 <img width="881" alt="Image" src="https://github.com/user-attachments/assets/7809fa98-83e1-4a82-af80-2706895d4985" />
+
+# Limitations and Solutions
+
+[AgentMake AI](https://github.com/eliranwong/agentmake) is built with a large set of tools for problem solving. To list all of them, run:
+
+> ai -lt
+
+Limitation: As ToolMate AI uses AgentMake AI tools, it can only solve requests within the capbilities of [AgentMake AI](https://github.com/eliranwong/agentmake) tools. Though there are numerous tools that have been built for solving different tasks, there may be some use cases that are out of range.
+
+Go Beyond the limitations: AgentMake AI supports custom tools to extend its capabilities.  You can create [AgentMake AI custom tools](https://github.com/eliranwong/agentmake/blob/main/docs/create_tools.md) to meet your own needs.
+
+# Sibling projects
+
+[AgentMake AI](https://github.com/eliranwong/agentmake)
+
+[LetMeDoIt AI](https://github.com/eliranwong/letmedoit)
+
+[TeamGen AI](https://github.com/eliranwong/teamgenai)
 
 # ToolMate AI (BEFORE VERSION 2)
 

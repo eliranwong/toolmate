@@ -436,7 +436,7 @@
 
 > pip install --upgrade toolmate[gui]
 
-`linux` install additional packages for Linux users, i.e. `flaml[automl]`, `piper-tts`, `pyautogen[autobuild]`
+`linux` install additional packages for Linux users, i.e. `flaml[automl]`, `piper-tts`, `ag2[autobuild]`
 
 > pip install --upgrade toolmate[linux]
 
@@ -738,7 +738,7 @@ For set up of Vertex AI Credentials, read https://github.com/eliranwong/toolmate
 
 # Version: 0.3.23
 
-* fixed install on macOS, pysqlite3 failed the installation, as it is required by pyautogen[autobuild]
+* fixed install on macOS, pysqlite3 failed the installation, as it is required by ag2[autobuild]
 
 # Version: 0.3.22
 

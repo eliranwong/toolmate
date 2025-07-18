@@ -66,7 +66,7 @@ RUN \
     cd /home/${USER}/apps && \
     python3 -m venv toolmate && \
     . toolmate/bin/activate && \
-    pip install --upgrade toolmate==0.5.13 flaml[automl] pyautogen[autobuild]>=0.3.1
+    pip install --upgrade toolmate==0.5.13 flaml[automl] ag2[autobuild]>=0.3.1
 
 # Set the default command
 #CMD ["/bin/bash"]

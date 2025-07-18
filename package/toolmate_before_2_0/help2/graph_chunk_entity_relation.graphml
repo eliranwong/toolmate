@@ -705,7 +705,7 @@
     </node>
     <node id="&quot;TOOLMATE_LINUX&quot;">
       <data key="d0">"TECHNOLOGY"</data>
-      <data key="d1">"toolmate_linux refers to a set of instructions or packages that are installed on Linux users, enhancing their experience with ToolMate AI by installing additional libraries like flaml[automl], piper-tts, and pyautogen[autobuild]"</data>
+      <data key="d1">"toolmate_linux refers to a set of instructions or packages that are installed on Linux users, enhancing their experience with ToolMate AI by installing additional libraries like flaml[automl], piper-tts, and ag2[autobuild]"</data>
       <data key="d2">chunk-d8ead668718b74679a8edf65563b0c9a</data>
     </node>
     <node id="&quot;TOOLMATE AI BIBLE SUPPORT&quot;">
@@ -735,12 +735,12 @@
     </node>
     <node id="&quot;LINUX USERS&quot;">
       <data key="d2">chunk-d8ead668718b74679a8edf65563b0c9a</data>
-      <data key="d1">"For Linux users, additional packages like flaml[automl], piper-tts, and pyautogen[autobuild] are recommended to enhance the user experience with ToolMate AI."|"enhanced functionality, library support"&lt;SEP&gt;"The inclusion of toolmate_linux in the installation process indicates that Linux users can benefit from additional packages to improve their experience with ToolMate AI."|"platform-specific guidance, library support"</data>
+      <data key="d1">"For Linux users, additional packages like flaml[automl], piper-tts, and ag2[autobuild] are recommended to enhance the user experience with ToolMate AI."|"enhanced functionality, library support"&lt;SEP&gt;"The inclusion of toolmate_linux in the installation process indicates that Linux users can benefit from additional packages to improve their experience with ToolMate AI."|"platform-specific guidance, library support"</data>
       <data key="d0">"UNKNOWN"</data>
     </node>
     <node id="&quot;TOOLMATE LINUX&quot;">
       <data key="d2">chunk-d8ead668718b74679a8edf65563b0c9a</data>
-      <data key="d1">"For Linux users, additional packages like flaml[automl], piper-tts, and pyautogen[autobuild] are recommended to enhance the user experience with ToolMate AI."|"enhanced functionality, library support"&lt;SEP&gt;"The inclusion of toolmate_linux in the installation process indicates that Linux users can benefit from additional packages to improve their experience with ToolMate AI."|"platform-specific guidance, library support"</data>
+      <data key="d1">"For Linux users, additional packages like flaml[automl], piper-tts, and ag2[autobuild] are recommended to enhance the user experience with ToolMate AI."|"enhanced functionality, library support"&lt;SEP&gt;"The inclusion of toolmate_linux in the installation process indicates that Linux users can benefit from additional packages to improve their experience with ToolMate AI."|"platform-specific guidance, library support"</data>
       <data key="d0">"UNKNOWN"</data>
     </node>
     <node id="&quot;TOOLMATE AI USERS&quot;">
@@ -2034,7 +2034,7 @@
     </edge>
     <edge source="&quot;LINUX USERS&quot;" target="&quot;TOOLMATE LINUX&quot;">
       <data key="d3">20.0</data>
-      <data key="d4">"For Linux users, additional packages like flaml[automl], piper-tts, and pyautogen[autobuild] are recommended to enhance the user experience with ToolMate AI."|"enhanced functionality, library support"&lt;SEP&gt;"The inclusion of toolmate_linux in the installation process indicates that Linux users can benefit from additional packages to improve their experience with ToolMate AI."|"platform-specific guidance, library support"</data>
+      <data key="d4">"For Linux users, additional packages like flaml[automl], piper-tts, and ag2[autobuild] are recommended to enhance the user experience with ToolMate AI."|"enhanced functionality, library support"&lt;SEP&gt;"The inclusion of toolmate_linux in the installation process indicates that Linux users can benefit from additional packages to improve their experience with ToolMate AI."|"platform-specific guidance, library support"</data>
       <data key="d5">4&lt;SEP&gt;6</data>
       <data key="d6">chunk-d8ead668718b74679a8edf65563b0c9a</data>
     </edge>

@@ -22,7 +22,7 @@ Remarks: In the first run, `Toolmate AI` automatically creates a directory `~/to
 
 > pip install --upgrade toolmate[gui]
 
-`linux` install additional packages for Linux users, i.e. `flaml[automl]`, `piper-tts`, `pyautogen[autobuild]`
+`linux` install additional packages for Linux users, i.e. `flaml[automl]`, `piper-tts`, `ag2[autobuild]`
 
 > pip install --upgrade toolmate[linux]
 

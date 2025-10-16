@@ -1,3 +1,28 @@
+## NEW – A More Capable Agent than ToolMate AI
+
+Building upon the capabilities of ToolMate AI and AgentMake AI, we have developed a more advanced AI assistant: **ComputeMate AI**.  
+
+Learn more here: [https://github.com/eliranwong/computemate](https://github.com/eliranwong/computemate)
+
+## ToolMate AI vs ComputeMate AI
+
+| Feature                     | ToolMate AI | ComputeMate AI |
+|-----------------------------|-------------|----------------|
+| AgentMake Tool Support      | Yes         | Yes            |
+| AgentMake Agent Support     | No          | Yes            |
+| AgentMake MCP Server Support| No          | Yes            |
+| 3rd-Party MCP Server Support| No          | Yes            |
+| Partner Mode                | Yes         | Yes            |
+| Partner Mode                | No          | Yes            |
+| Chat Mode                   | No          | Yes            |
+| Auto Tool Selection         | Yes         | Yes            |
+| Manual Tool Selection       | No          | Yes            |
+| Save Master Plans           | No          | Yes            |
+| Save Prompts                | No          | Yes            |
+| Full UI Development         | No          | Yes            |
+| Built-in Text Editor        | No          | Yes            |
+| Stdin Support               | No          | Yes            |
+
 # ToolMate AI 2.0
 
 [ToolMate AI](https://toolmate.ai/) (version 2+) is a fully automatic AI agent, built to resolve complex tasks with [AgentMake AI tools](https://github.com/eliranwong/agentmake).

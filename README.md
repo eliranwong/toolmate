@@ -1,10 +1,10 @@
 ## NEW – A More Capable Agent than ToolMate AI
 
-Building upon the capabilities of ToolMate AI and AgentMake AI, we have developed a more advanced AI assistant: **ComputeMate AI**.  
+Building upon the capabilities of ToolMate AI and [AgentMake AI](https://github.com/eliranwong/agentmake), we have developed a more advanced AI assistant: **ComputeMate AI**.  
 
 Learn more here: [https://github.com/eliranwong/computemate](https://github.com/eliranwong/computemate)
 
-## ToolMate AI vs ComputeMate AI
+## Comparison - ToolMate AI vs ComputeMate AI
 
 | Feature                     | ToolMate AI | ComputeMate AI |
 |-----------------------------|-------------|----------------|
@@ -22,6 +22,7 @@ Learn more here: [https://github.com/eliranwong/computemate](https://github.com/
 | Full UI Development         | No          | Yes            |
 | Built-in Text Editor        | No          | Yes            |
 | Stdin Support               | No          | Yes            |
+| IDE Integration             | No          | Yes            |
 
 # ToolMate AI 2.0
 
